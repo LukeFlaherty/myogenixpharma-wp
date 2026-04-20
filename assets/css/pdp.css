@@ -90,10 +90,15 @@
 	padding: 72px 0;
 }
 
+.myogenix-pdp__product .myogenix-pdp__container {
+	max-width: 1440px;
+	padding: 0 60px;
+}
+
 .myogenix-pdp__product-inner {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
-	gap: 64px;
+	gap: 72px;
 	align-items: center;
 }
 
@@ -105,7 +110,7 @@
 
 .myogenix-pdp__product-image img {
 	width: 100%;
-	max-width: 400px;
+	max-width: 520px;
 	display: block;
 }
 
@@ -278,7 +283,7 @@
    ========================================================================== */
 
 .myogenix-pdp__faq {
-	background: #fff;
+	background: #ffffff;
 	padding: 80px 0;
 	border-top: 1px solid #ebebeb;
 }
@@ -290,6 +295,7 @@
 
 .myogenix-pdp__faq-item {
 	border-bottom: 1px solid #e0e0e0;
+	background: #ffffff;
 }
 
 .myogenix-pdp__faq-item:first-child {
@@ -298,7 +304,7 @@
 
 .myogenix-pdp__faq-question {
 	width: 100%;
-	background: none;
+	background: #ffffff;
 	border: none;
 	padding: 20px 0;
 	display: flex;
@@ -331,20 +337,25 @@
 	color: var(--pdp-purple);
 }
 
+/* Animated accordion — height transitions via max-height */
 .myogenix-pdp__faq-answer {
-	padding: 0 0 20px;
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.35s ease;
 	color: #555;
 	line-height: 1.75;
 	font-size: 0.95rem;
 	max-width: 740px;
+	background: #ffffff;
 }
 
-.myogenix-pdp__faq-answer[hidden] {
-	display: none;
+.myogenix-pdp__faq-answer.is-open {
+	max-height: 600px;
 }
 
 .myogenix-pdp__faq-answer p {
 	margin: 0;
+	padding-bottom: 20px;
 }
 
 .myogenix-pdp__faq-footnote {

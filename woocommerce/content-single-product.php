@@ -191,7 +191,6 @@ if ( $is_weight_loss ) :
 					<div
 						class="myogenix-pdp__faq-answer"
 						id="myogenix-faq-<?php echo esc_attr( $i ); ?>"
-						hidden
 					>
 						<p><?php echo esc_html( $faq['a'] ); ?></p>
 					</div>
