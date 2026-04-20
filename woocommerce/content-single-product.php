@@ -34,6 +34,34 @@ if ( post_password_required() ) {
 <div id="product-<?php the_ID(); ?>" <?php wc_product_class( '', $product ); ?>>
 
 	<?php
+	$product_slug = $product->get_slug();
+	$weight_loss_slugs = [ 'compound-semaglutide', 'compound-tirzepatide' ];
+
+	if ( in_array( $product_slug, $weight_loss_slugs, true ) ) :
+		$hero_content = [
+			'compound-semaglutide' => [
+				'headline'    => 'Placeholder Headline for Semaglutide',
+				'subheadline' => 'Placeholder subheadline — describe the key benefit or offer here.',
+				'button_text' => 'Get Started',
+				'button_url'  => '#buy',
+			],
+			'compound-tirzepatide' => [
+				'headline'    => 'Placeholder Headline for Tirzepatide',
+				'subheadline' => 'Placeholder subheadline — describe the key benefit or offer here.',
+				'button_text' => 'Get Started',
+				'button_url'  => '#buy',
+			],
+		];
+		$hero = $hero_content[ $product_slug ];
+		?>
+		<div class="myogenix-pdp-hero">
+			<h1 class="myogenix-pdp-hero__headline"><?php echo esc_html( $hero['headline'] ); ?></h1>
+			<p class="myogenix-pdp-hero__subheadline"><?php echo esc_html( $hero['subheadline'] ); ?></p>
+			<a href="<?php echo esc_url( $hero['button_url'] ); ?>" class="myogenix-pdp-hero__button button"><?php echo esc_html( $hero['button_text'] ); ?></a>
+		</div>
+	<?php endif; ?>
+
+	<?php
 	/**
 	 * Hook: woocommerce_before_single_product_summary.
 	 *
