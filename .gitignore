@@ -1,3 +1,6 @@
 .DS_Store
 *.log
 node_modules/
+
+# Local-only reference copies of plugins and parent theme
+/../../../_reference/
