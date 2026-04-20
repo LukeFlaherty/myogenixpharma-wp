@@ -161,27 +161,43 @@
 	vertical-align: middle;
 }
 
-.myogenix-pdp .single_add_to_cart_button.button {
-	display: block;
-	width: 100%;
-	background: var(--pdp-dark);
-	color: #fff;
-	border: none;
-	padding: 18px;
-	font-size: 1rem;
-	font-weight: 700;
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
-	cursor: pointer;
-	border-radius: 4px;
-	transition: opacity 0.2s ease;
-	text-align: center;
-	margin-top: 8px;
+/* Add to cart — covers WooCommerce, subscriptions, and parent theme overrides */
+.myogenix-pdp .cart button,
+.myogenix-pdp .cart .button,
+.myogenix-pdp button.single_add_to_cart_button,
+.myogenix-pdp a.single_add_to_cart_button,
+.myogenix-pdp .woocommerce-variation-add-to-cart .button,
+.myogenix-pdp input.button[type="submit"] {
+	display: block !important;
+	width: 100% !important;
+	background: #1a1a1a !important;
+	color: #fff !important;
+	border: none !important;
+	padding: 18px !important;
+	font-size: 1rem !important;
+	font-weight: 700 !important;
+	letter-spacing: 0.08em !important;
+	text-transform: uppercase !important;
+	cursor: pointer !important;
+	border-radius: 4px !important;
+	transition: opacity 0.2s ease !important;
+	text-align: center !important;
+	margin-top: 8px !important;
+	box-shadow: none !important;
 }
 
-.myogenix-pdp .single_add_to_cart_button.button:hover {
-	opacity: 0.82;
-	color: #fff;
+.myogenix-pdp .cart button:hover,
+.myogenix-pdp .cart .button:hover,
+.myogenix-pdp button.single_add_to_cart_button:hover,
+.myogenix-pdp a.single_add_to_cart_button:hover {
+	opacity: 0.82 !important;
+	color: #fff !important;
+	background: #1a1a1a !important;
+}
+
+/* Hide SKU / category meta */
+.myogenix-pdp .product_meta {
+	display: none;
 }
 
 /* ==========================================================================

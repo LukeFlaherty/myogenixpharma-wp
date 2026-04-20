@@ -218,13 +218,6 @@ if ( $is_weight_loss ) :
 		</div>
 	</section>
 
-	<!-- Compounded in the USA -->
-	<section class="myogenix-pdp__usa-badge">
-		<img
-			src="<?php echo $img_url( 'PDP Sections/componded by pharmacies in the usa.png' ); ?>"
-			alt="Compounded by Licensed Pharmacies in the USA"
-		/>
-	</section>
 
 </div>
 
