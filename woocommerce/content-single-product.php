@@ -37,25 +37,34 @@ if ( $is_weight_loss ) :
 		return esc_url( $base . implode( '/', array_map( 'rawurlencode', $parts ) ) );
 	};
 
-	$product_config = [
+	$img_map = [
+		'compound-semaglutide' => 'semaglutide/semaglutide.png',
+		'compound-tirzepatide' => 'tirzepatide/tirzepatide.png',
+	];
+
+	$hero = [
 		'compound-semaglutide' => [
-			'image'    => 'semaglutide/semaglutide.png',
-			'headline' => 'Placeholder Headline for Semaglutide',
-			'sub'      => 'Placeholder subheadline — describe the key benefit or offer here.',
-			'btn_text' => 'Get Started',
-			'btn_url'  => '#buy',
+			'badge'       => 'GLP-1 Receptor Agonist',
+			'title'       => 'Semaglutide',
+			'desc'        => 'Semaglutide activates GLP-1 receptors to reduce appetite and improve blood sugar control with once-weekly dosing.',
+			'compare_url' => '/product/compound-tirzepatide/',
+			'compare_txt' => 'Compare with Tirzepatide →',
+			'doses'       => [ '0.25mg', '0.5mg', '1mg', '1.7mg', '2.4mg' ],
+			'prices_ot'   => [ 79, 99, 119, 149, 179 ],
 		],
 		'compound-tirzepatide' => [
-			'image'    => 'tirzepatide/tirzepatide.png',
-			'headline' => 'Placeholder Headline for Tirzepatide',
-			'sub'      => 'Placeholder subheadline — describe the key benefit or offer here.',
-			'btn_text' => 'Get Started',
-			'btn_url'  => '#buy',
+			'badge'       => 'GIP/GLP-1 Receptor Agonist',
+			'title'       => 'Tirzepatide',
+			'desc'        => 'Tirzepatide activates both GIP and GLP-1 receptors, offering strong metabolic effects with once-weekly dosing.',
+			'compare_url' => '/product/compound-semaglutide/',
+			'compare_txt' => 'Compare with Semaglutide →',
+			'doses'       => [ '1mg', '2mg', '4mg', '6mg', '10mg' ],
+			'prices_ot'   => [ 99, 119, 149, 169, 199 ],
 		],
 	];
-	$cfg = $product_config[ $slug ];
+	$h = $hero[ $slug ];
 
-	// Remove WooCommerce's default image renderer — we render our own per-product image
+	// Keep WC images hook removed — we render the product image ourselves
 	remove_action( 'woocommerce_before_single_product_summary', 'woocommerce_show_product_images', 20 );
 
 	$steps = [
@@ -89,33 +98,124 @@ if ( $is_weight_loss ) :
 
 <div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'myogenix-pdp', $product ); ?>>
 
-	<!-- Hero Banner — placeholder copy, replace before launch -->
-	<div class="myogenix-pdp__hero-banner">
-		<div class="myogenix-pdp__container">
-			<h1 class="myogenix-pdp__hero-headline"><?php echo esc_html( $cfg['headline'] ); ?></h1>
-			<p class="myogenix-pdp__hero-sub"><?php echo esc_html( $cfg['sub'] ); ?></p>
-			<a href="<?php echo esc_url( $cfg['btn_url'] ); ?>" class="myogenix-pdp__hero-btn">
-				<?php echo esc_html( $cfg['btn_text'] ); ?>
-			</a>
-		</div>
-	</div>
+	<!-- Product Hero -->
+	<section class="pdp-hero" id="buy">
+		<div class="pdp-hero__inner">
 
-	<!-- Product Section -->
-	<section class="myogenix-pdp__product" id="buy">
-		<div class="myogenix-pdp__container myogenix-pdp__product-inner">
-			<div class="myogenix-pdp__product-image">
-				<img
-					src="<?php echo $img_url( $cfg['image'] ); ?>"
-					alt="<?php echo esc_attr( $product->get_name() ); ?>"
-				/>
+			<!-- Left: image + product info -->
+			<div class="pdp-hero__left">
+				<span class="pdp-hero__badge"><?php echo esc_html( $h['badge'] ); ?></span>
+				<h1 class="pdp-hero__title"><?php echo esc_html( $h['title'] ); ?></h1>
+				<p class="pdp-hero__desc"><?php echo esc_html( $h['desc'] ); ?></p>
+				<ul class="pdp-hero__bullets">
+					<li>Compounded · FDA-registered facility</li>
+					<li>Provider-reviewed</li>
+				</ul>
+				<div class="pdp-hero__image-card">
+					<img src="<?php echo $img_url( $img_map[ $slug ] ); ?>" alt="<?php echo esc_attr( $h['title'] ); ?>" />
+				</div>
+				<div class="pdp-hero__trust-grid">
+					<div class="pdp-hero__trust-item">
+						<span class="pdp-hero__trust-icon">🏥</span>
+						<div class="pdp-hero__trust-text">
+							<strong>Licensed providers</strong>
+							<span>Board-certified MDs</span>
+						</div>
+					</div>
+					<div class="pdp-hero__trust-item">
+						<span class="pdp-hero__trust-icon">✏️</span>
+						<div class="pdp-hero__trust-text">
+							<strong>Compounded in USA</strong>
+							<span>FDA-registered facility</span>
+						</div>
+					</div>
+					<div class="pdp-hero__trust-item">
+						<span class="pdp-hero__trust-icon">🚚</span>
+						<div class="pdp-hero__trust-text">
+							<strong>Free shipping</strong>
+							<span>Discreet packaging</span>
+						</div>
+					</div>
+					<div class="pdp-hero__trust-item">
+						<span class="pdp-hero__trust-icon">💬</span>
+						<div class="pdp-hero__trust-text">
+							<strong>Ongoing support</strong>
+							<span>Message your care team</span>
+						</div>
+					</div>
+				</div>
+				<a href="<?php echo esc_url( $h['compare_url'] ); ?>" class="pdp-hero__compare">
+					<?php echo esc_html( $h['compare_txt'] ); ?>
+				</a>
 			</div>
-			<div class="myogenix-pdp__product-summary summary entry-summary">
-				<?php
-				// Sale flash and any other before_summary hooks (product images removed above)
-				do_action( 'woocommerce_before_single_product_summary' );
-				// Title, rating, price, excerpt, add-to-cart — variations + subscriptions attach here
-				do_action( 'woocommerce_single_product_summary' );
-				?>
+
+			<!-- Right: configurator + hidden WC form -->
+			<div class="pdp-hero__right">
+
+				<!-- Hidden WC form — keeps variation JS alive for cart submission -->
+				<div class="pdp-hero__wc-hidden" aria-hidden="true">
+					<?php
+					do_action( 'woocommerce_before_single_product_summary' );
+					do_action( 'woocommerce_single_product_summary' );
+					?>
+				</div>
+
+				<!-- Custom configurator -->
+				<div id="pdp-cfg" class="pdp-cfg"
+					data-doses="<?php echo esc_attr( wp_json_encode( $h['doses'] ) ); ?>"
+					data-prices-ot="<?php echo esc_attr( wp_json_encode( $h['prices_ot'] ) ); ?>"
+					data-product-id="<?php echo esc_attr( $product->get_id() ); ?>"
+				>
+					<!-- Purchase Type -->
+					<p class="pdp-cfg__section-label">Purchase Type</p>
+					<div class="pdp-cfg__ptype-row">
+						<button class="pdp-cfg__ptype pdp-cfg__ptype--active" data-ptype="subscribe">
+							<div class="pdp-cfg__ptype-top">
+								<strong>Subscribe</strong>
+								<span class="pdp-cfg__save-tag">Save 10%</span>
+							</div>
+							<p>Auto-renews at your final month's dose. Cancel anytime.</p>
+						</button>
+						<button class="pdp-cfg__ptype" data-ptype="onetime">
+							<div class="pdp-cfg__ptype-top">
+								<strong>One-time</strong>
+							</div>
+							<p>Includes $79 provider consult fee.</p>
+						</button>
+					</div>
+
+					<!-- Supply Length -->
+					<p class="pdp-cfg__section-label">Supply Length</p>
+					<div class="pdp-cfg__supply-row">
+						<button class="pdp-cfg__supply pdp-cfg__supply--active" data-months="1">
+							<strong>1 month</strong>
+							<span>Single supply</span>
+						</button>
+						<button class="pdp-cfg__supply" data-months="2">
+							<strong>2 months</strong>
+							<span>Escalation pair</span>
+						</button>
+						<button class="pdp-cfg__supply" data-months="3">
+							<span class="pdp-cfg__popular-tag">POPULAR</span>
+							<strong>3 months</strong>
+							<span>Most popular</span>
+						</button>
+					</div>
+
+					<!-- Configure Your Doses -->
+					<p class="pdp-cfg__section-label">Configure Your Doses</p>
+					<div id="pdp-doses" class="pdp-cfg__doses-wrap"></div>
+
+					<!-- Order Summary -->
+					<div id="pdp-summary" class="pdp-cfg__summary"></div>
+
+					<!-- CTA -->
+					<button id="pdp-cta" class="pdp-cfg__cta">Start subscription →</button>
+					<p id="pdp-disclaimer" class="pdp-cfg__disclaimer">
+						By subscribing, you authorize recurring charges at your renewal dose price. Cancel anytime.
+					</p>
+				</div>
+
 			</div>
 		</div>
 	</section>
