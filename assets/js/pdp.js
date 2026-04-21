@@ -8,6 +8,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			btn.addEventListener( 'click', function () {
 				var isExpanded = this.getAttribute( 'aria-expanded' ) === 'true';
 				var answer     = document.getElementById( this.getAttribute( 'aria-controls' ) );
+				if ( ! answer ) return;
 
 				questions.forEach( function ( otherBtn ) {
 					if ( otherBtn === btn ) return;

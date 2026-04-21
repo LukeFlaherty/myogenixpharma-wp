@@ -375,7 +375,7 @@
    ========================================================================== */
 
 .myogenix-pdp__cq {
-	background: #fff;
+	background: #ffffff !important;
 	padding: 80px 0;
 	border-top: 1px solid #ebebeb;
 }
@@ -444,23 +444,28 @@
 
 .myogenix-pdp__cq-question {
 	width: 100%;
-	background: none;
-	border: none;
-	padding: 20px 0;
+	background: #ffffff !important;
+	border: none !important;
+	box-shadow: none !important;
+	padding: 20px 0 !important;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	font-size: 1rem;
 	font-weight: 700;
-	color: var(--pdp-dark);
+	color: #1a1a1a !important;
 	cursor: pointer;
 	text-align: left;
 	gap: 20px;
 	line-height: 1.4;
+	outline: none;
 }
 
-.myogenix-pdp__cq-question:hover {
-	color: var(--pdp-dark);
+.myogenix-pdp__cq-question:hover,
+.myogenix-pdp__cq-question:focus {
+	background: #ffffff !important;
+	color: #1a1a1a !important;
+	box-shadow: none !important;
 }
 
 .myogenix-pdp__cq-icon {
@@ -482,7 +487,8 @@
 	transition: max-height 0.35s ease;
 	font-size: 0.95rem;
 	line-height: 1.75;
-	color: #555;
+	color: #555555 !important;
+	background: #ffffff !important;
 }
 
 .myogenix-pdp__cq-answer.is-open {
@@ -492,6 +498,8 @@
 .myogenix-pdp__cq-answer p {
 	margin: 0;
 	padding-bottom: 20px;
+	color: #555555 !important;
+	background: #ffffff !important;
 }
 
 @media ( max-width: 768px ) {
