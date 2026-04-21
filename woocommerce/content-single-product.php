@@ -85,40 +85,6 @@ if ( $is_weight_loss ) :
 		],
 	];
 
-	$faqs = [
-		[
-			'q' => 'What is Myogenix Pharma ?',
-			'a' => 'MYOGENIX PHARMA is a modern, concierge telehealth clinic specializing in hormone optimization, weight loss, and longevity. We provide physician-guided treatments with at-home convenience, fast delivery, and ongoing support.',
-		],
-		[
-			'q' => 'Is the process easy ?',
-			'a' => 'Getting started is seamless: complete a quick online visit, and our medical team reviews your goals, symptoms, and history. If bloodwork is needed, you can schedule a lab appointment and a doctor consult in a few easy steps. A personalized treatment plan is designed, and your medications are delivered directly to your door, with ongoing support and adjustments to keep you feeling your best.',
-		],
-		[
-			'q' => 'Do I need blood work ?',
-			'a' => 'Not all treatments require blood work. But, when starting testosterone or hormone replacement therapy, we arrange your bloodwork at a local lab. The entire visit takes just a few minutes, and your provider reviews the results to design a precise, personalized treatment plan. If you have recent bloodwork, you can upload the results into the patient portal.',
-		],
-		[
-			'q' => 'Is mobile phlebotomy available ?',
-			'a' => 'If you\'re located within our service region, you can upgrade to mobile phlebotomy. We send a certified phlebotomist to your door, so your lab work is done privately, conveniently, and on your schedule.',
-		],
-		[
-			'q' => 'Who is eligible to use Myogenix Pharma ?',
-			'a' => 'Our services are for adults 18+ who have a documented medical need for treatment. Final eligibility, dosing, and medication choice are always determined by your provider after reviewing your intake, history, and goals.',
-		],
-		[
-			'q' => 'How do Prescriptions, Refills, and Shipping Work ?',
-			'a' => 'If you\'re approved for treatment, your prescription is sent to a licensed U.S. compounding pharmacy. They prepare your medication and ship directly and discreetly to your door, along with any applicable supplies. Your provider will schedule refills or follow-up evaluations as needed to continue treatment safely.',
-		],
-		[
-			'q' => 'What if I\'m not approved or want to stop treatment ?',
-			'a' => 'There\'s never a guarantee of a prescription — your provider will only recommend a medication if it\'s clinically appropriate and safe for you. If you\'re not a good candidate for a specific treatment, they may discuss alternative options. You can pause or cancel future renewals at any time according to the terms of your plan; just reach out through your Myogenix Pharma account or support team.',
-		],
-		[
-			'q' => 'What areas do you service ?',
-			'a' => 'Myogenix Pharma offers telehealth services in 48 states (not including Alaska or Mississippi).',
-		],
-	];
 ?>
 
 <div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'myogenix-pdp', $product ); ?>>
@@ -172,32 +138,77 @@ if ( $is_weight_loss ) :
 		</div>
 	</section>
 
-	<!-- FAQ Section -->
-	<section class="myogenix-pdp__faq">
+	<!-- How It Works Section -->
+	<section class="myogenix-pdp__how-it-works">
 		<div class="myogenix-pdp__container">
-			<h2 class="myogenix-pdp__section-heading">Frequently Asked Questions</h2>
-			<p class="myogenix-pdp__section-sub">Our Most Asked Questions</p>
-			<div class="myogenix-pdp__faq-list">
-				<?php foreach ( $faqs as $i => $faq ) : ?>
-				<div class="myogenix-pdp__faq-item">
-					<button
-						class="myogenix-pdp__faq-question"
-						aria-expanded="false"
-						aria-controls="myogenix-faq-<?php echo esc_attr( $i ); ?>"
-					>
-						<span><?php echo esc_html( $faq['q'] ); ?></span>
-						<span class="myogenix-pdp__faq-icon" aria-hidden="true">+</span>
-					</button>
-					<div
-						class="myogenix-pdp__faq-answer"
-						id="myogenix-faq-<?php echo esc_attr( $i ); ?>"
-					>
-						<p><?php echo esc_html( $faq['a'] ); ?></p>
+			<p class="myogenix-pdp__how-label">PROCESS</p>
+			<h2 class="myogenix-pdp__how-heading">How it works</h2>
+			<p class="myogenix-pdp__how-sub">From your first order to your ongoing program — here's what to expect at every step.</p>
+			<div class="myogenix-pdp__how-grid">
+
+				<div class="myogenix-pdp__how-card">
+					<div class="myogenix-pdp__how-card-top">
+						<div class="myogenix-pdp__how-icon" aria-hidden="true">
+							<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+								<rect x="8" y="2" width="8" height="4" rx="1"/>
+								<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+								<line x1="9" y1="11" x2="15" y2="11"/>
+								<line x1="9" y1="15" x2="13" y2="15"/>
+							</svg>
+						</div>
+						<span class="myogenix-pdp__how-num">01</span>
 					</div>
+					<h3 class="myogenix-pdp__how-title">Complete your intake</h3>
+					<p class="myogenix-pdp__how-desc">Answer a short health questionnaire so our providers have the clinical context they need. Takes about 5 minutes.</p>
 				</div>
-				<?php endforeach; ?>
+
+				<div class="myogenix-pdp__how-card">
+					<div class="myogenix-pdp__how-card-top">
+						<div class="myogenix-pdp__how-icon" aria-hidden="true">
+							<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+								<circle cx="12" cy="7" r="4"/>
+							</svg>
+						</div>
+						<span class="myogenix-pdp__how-num">02</span>
+					</div>
+					<h3 class="myogenix-pdp__how-title">Provider reviews &amp; approves</h3>
+					<p class="myogenix-pdp__how-desc">A licensed provider reviews your order within 24 hours. They confirm your dose is clinically appropriate before it ships.</p>
+				</div>
+
+				<div class="myogenix-pdp__how-card">
+					<div class="myogenix-pdp__how-card-top">
+						<div class="myogenix-pdp__how-icon" aria-hidden="true">
+							<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+								<rect x="1" y="3" width="15" height="13" rx="1"/>
+								<path d="M16 8h4l3 3v5h-7V8z"/>
+								<circle cx="5.5" cy="18.5" r="2.5"/>
+								<circle cx="18.5" cy="18.5" r="2.5"/>
+							</svg>
+						</div>
+						<span class="myogenix-pdp__how-num">03</span>
+					</div>
+					<h3 class="myogenix-pdp__how-title">Shipped to your door</h3>
+					<p class="myogenix-pdp__how-desc">Your medication ships from an FDA-registered compounding pharmacy in discreet packaging, with cold-chain handling.</p>
+				</div>
+
+				<div class="myogenix-pdp__how-card">
+					<div class="myogenix-pdp__how-card-top">
+						<div class="myogenix-pdp__how-icon" aria-hidden="true">
+							<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+								<line x1="18" y1="20" x2="18" y2="10"/>
+								<line x1="12" y1="20" x2="12" y2="4"/>
+								<line x1="6" y1="20" x2="6" y2="14"/>
+								<line x1="2" y1="20" x2="22" y2="20"/>
+							</svg>
+						</div>
+						<span class="myogenix-pdp__how-num">04</span>
+					</div>
+					<h3 class="myogenix-pdp__how-title">Adjust as you escalate</h3>
+					<p class="myogenix-pdp__how-desc">Your dose changes with you. Update your next shipment directly from your account — no new consultation required for subscribers.</p>
+				</div>
+
 			</div>
-			<p class="myogenix-pdp__faq-footnote">*If medically eligible</p>
 		</div>
 	</section>
 
