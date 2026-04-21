@@ -59,16 +59,25 @@ if ( $is_weight_loss ) :
 	];
 	$h = $hero[ $slug ];
 
-	// Build price matrix from live WC variation data: { "10mg": { "1-bottle": 329.95, ... }, ... }
-	// Prices always reflect whatever is set in WP Admin → Products → Variations — no hardcoding.
-	$price_matrix = [];
+	// Build price matrix { "10mg": { "1-bottle": 329.95, ... } } and variation map
+	// { "10mg": { "1-bottle": { "1-month": 1234 } } } from live WC variation data.
+	// Skip is_purchasable() — Prescribery plugin can return false for prescription products
+	// even when prices are set, which would leave both maps empty.
+	$price_matrix  = [];
+	$variation_map = [];
 	foreach ( $product->get_children() as $vid ) {
 		$v = wc_get_product( $vid );
-		if ( ! $v || ! $v->is_purchasable() ) continue;
+		if ( ! $v || 'publish' !== get_post_status( $vid ) ) continue;
 		$dose   = $v->get_attribute( 'pa_dosage' );
 		$bottle = $v->get_attribute( 'pa_wm-bottle' );
-		if ( $dose && $bottle ) {
-			$price_matrix[ $dose ][ $bottle ] = (float) $v->get_price();
+		$plan   = $v->get_attribute( 'pa_wm-subscription-plan' );
+		if ( ! $dose || ! $bottle ) continue;
+		$price = (float) $v->get_price();
+		if ( $price > 0 && ! isset( $price_matrix[ $dose ][ $bottle ] ) ) {
+			$price_matrix[ $dose ][ $bottle ] = $price;
+		}
+		if ( $plan ) {
+			$variation_map[ $dose ][ $bottle ][ $plan ] = (int) $vid;
 		}
 	}
 
@@ -196,6 +205,7 @@ if ( $is_weight_loss ) :
 				<div id="pdp-cfg" class="pdp-cfg"
 					data-doses="<?php echo esc_attr( wp_json_encode( $h['doses'] ) ); ?>"
 					data-price-matrix="<?php echo esc_attr( wp_json_encode( $price_matrix ) ); ?>"
+					data-variation-map="<?php echo esc_attr( wp_json_encode( $variation_map ) ); ?>"
 					data-product-id="<?php echo esc_attr( $product->get_id() ); ?>"
 				>
 					<!-- Supply Length -->

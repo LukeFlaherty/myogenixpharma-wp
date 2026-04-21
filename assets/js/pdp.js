@@ -55,8 +55,9 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	var cfg = document.getElementById( 'pdp-cfg' );
 	if ( ! cfg ) return;
 
-	var doses       = JSON.parse( cfg.getAttribute( 'data-doses' )        || '[]' );
-	var priceMatrix = JSON.parse( cfg.getAttribute( 'data-price-matrix' ) || '{}' );
+	var doses        = JSON.parse( cfg.getAttribute( 'data-doses' )         || '[]' );
+	var priceMatrix  = JSON.parse( cfg.getAttribute( 'data-price-matrix' )  || '{}' );
+	var variationMap = JSON.parse( cfg.getAttribute( 'data-variation-map' ) || '{}' );
 
 	/*
 	 * WC attribute slug → term slug mapping (confirmed via WP-CLI 2026-04-21)
@@ -202,35 +203,41 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			}
 
 			/*
-			 * Resolve variation_id from the WC form's embedded JSON.
-			 * WC embeds all variation data in data-product_variations for
-			 * products with fewer than 100 variations (this product has 30).
+			 * Resolve variation_id from our PHP-built variation map.
+			 * WC's data-product_variations may be false (AJAX mode) so we
+			 * embed our own map keyed by dose → bottle → plan.
 			 */
 			var variationId = 0;
-			var wcForm = document.querySelector( '.variations_form' );
-			if ( ! wcForm ) {
-				pdpWarn( 'WC variation form not found on page — cannot resolve variation.' );
-			} else {
-				var raw = wcForm.getAttribute( 'data-product_variations' );
-				if ( ! raw || raw === 'false' ) {
-					pdpWarn( 'data-product_variations is empty or false — variations may be loading via AJAX.' );
-				} else {
-					try {
-						var variations = JSON.parse( raw );
-						pdpLog( 'Variation data loaded: ' + variations.length + ' variations.' );
-						for ( var i = 0; i < variations.length; i++ ) {
-							var v = variations[ i ];
-							var a = v.attributes;
-							var doseOk   = ! a[ 'attribute_pa_dosage' ]               || a[ 'attribute_pa_dosage' ]               === state.dose;
-							var bottleOk = ! a[ 'attribute_pa_wm-bottle' ]            || a[ 'attribute_pa_wm-bottle' ]            === bottle;
-							var planOk   = ! a[ 'attribute_pa_wm-subscription-plan' ] || a[ 'attribute_pa_wm-subscription-plan' ] === plan;
-							if ( doseOk && bottleOk && planOk ) {
-								variationId = v.variation_id;
-								break;
+			if (
+				variationMap[ state.dose ] &&
+				variationMap[ state.dose ][ bottle ] &&
+				variationMap[ state.dose ][ bottle ][ plan ]
+			) {
+				variationId = variationMap[ state.dose ][ bottle ][ plan ];
+			}
+
+			if ( ! variationId ) {
+				/* Fallback: try WC's embedded form JSON if our map missed it */
+				var wcForm = document.querySelector( '.variations_form' );
+				if ( wcForm ) {
+					var raw = wcForm.getAttribute( 'data-product_variations' );
+					if ( raw && raw !== 'false' ) {
+						try {
+							var variations = JSON.parse( raw );
+							for ( var i = 0; i < variations.length; i++ ) {
+								var v = variations[ i ];
+								var a = v.attributes;
+								var doseOk   = ! a[ 'attribute_pa_dosage' ]               || a[ 'attribute_pa_dosage' ]               === state.dose;
+								var bottleOk = ! a[ 'attribute_pa_wm-bottle' ]            || a[ 'attribute_pa_wm-bottle' ]            === bottle;
+								var planOk   = ! a[ 'attribute_pa_wm-subscription-plan' ] || a[ 'attribute_pa_wm-subscription-plan' ] === plan;
+								if ( doseOk && bottleOk && planOk ) {
+									variationId = v.variation_id;
+									break;
+								}
 							}
+						} catch ( e ) {
+							pdpError( 'Could not parse WC variation data: ' + e.message );
 						}
-					} catch ( e ) {
-						pdpError( 'Could not parse variation data: ' + e.message );
 					}
 				}
 			}
