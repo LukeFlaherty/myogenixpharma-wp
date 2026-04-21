@@ -26,6 +26,7 @@
 .myogenix-pdp__product,
 .myogenix-pdp__steps,
 .myogenix-pdp__how-it-works,
+.myogenix-pdp__cq,
 .myogenix-pdp__faq,
 .myogenix-pdp__explore,
 .myogenix-pdp__usa-badge {
@@ -367,6 +368,145 @@
 	color: #666;
 	margin: 0;
 	line-height: 1.65;
+}
+
+/* ==========================================================================
+   Common Questions Section
+   ========================================================================== */
+
+.myogenix-pdp__cq {
+	background: #fff;
+	padding: 80px 0;
+	border-top: 1px solid #ebebeb;
+}
+
+.myogenix-pdp__cq-inner {
+	display: grid;
+	grid-template-columns: 2fr 3fr;
+	gap: 80px;
+	align-items: start;
+}
+
+.myogenix-pdp__cq-left {
+	position: sticky;
+	top: 40px;
+}
+
+.myogenix-pdp__cq-label {
+	font-size: 0.75rem;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--pdp-muted);
+	margin: 0 0 10px;
+}
+
+.myogenix-pdp__cq-heading {
+	font-size: 2.25rem;
+	font-weight: 800;
+	color: var(--pdp-dark);
+	margin: 0 0 16px;
+	line-height: 1.15;
+}
+
+.myogenix-pdp__cq-sub {
+	font-size: 1rem;
+	color: var(--pdp-muted);
+	margin: 0 0 32px;
+	line-height: 1.65;
+}
+
+.myogenix-pdp__cq-btn {
+	display: inline-block;
+	background: #1a1a1a;
+	color: #fff;
+	padding: 14px 28px;
+	border-radius: 50px;
+	font-size: 0.95rem;
+	font-weight: 600;
+	text-decoration: none;
+	transition: opacity 0.2s ease;
+}
+
+.myogenix-pdp__cq-btn:hover {
+	opacity: 0.82;
+	color: #fff;
+	text-decoration: none;
+}
+
+.myogenix-pdp__cq-item {
+	border-bottom: 1px solid #e8e8e8;
+}
+
+.myogenix-pdp__cq-item:first-child {
+	border-top: 1px solid #e8e8e8;
+}
+
+.myogenix-pdp__cq-question {
+	width: 100%;
+	background: none;
+	border: none;
+	padding: 20px 0;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-size: 1rem;
+	font-weight: 700;
+	color: var(--pdp-dark);
+	cursor: pointer;
+	text-align: left;
+	gap: 20px;
+	line-height: 1.4;
+}
+
+.myogenix-pdp__cq-question:hover {
+	color: var(--pdp-dark);
+}
+
+.myogenix-pdp__cq-icon {
+	font-size: 1.25rem;
+	font-weight: 300;
+	line-height: 1;
+	flex-shrink: 0;
+	color: #888;
+	transition: transform 0.25s ease;
+}
+
+.myogenix-pdp__cq-question[aria-expanded="true"] .myogenix-pdp__cq-icon {
+	transform: rotate(45deg);
+}
+
+.myogenix-pdp__cq-answer {
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.35s ease;
+	font-size: 0.95rem;
+	line-height: 1.75;
+	color: #555;
+}
+
+.myogenix-pdp__cq-answer.is-open {
+	max-height: 400px;
+}
+
+.myogenix-pdp__cq-answer p {
+	margin: 0;
+	padding-bottom: 20px;
+}
+
+@media ( max-width: 768px ) {
+	.myogenix-pdp__cq-inner {
+		grid-template-columns: 1fr;
+		gap: 36px;
+	}
+
+	.myogenix-pdp__cq-left {
+		position: static;
+	}
+
+	.myogenix-pdp__cq-heading {
+		font-size: 1.75rem;
+	}
 }
 
 /* ==========================================================================

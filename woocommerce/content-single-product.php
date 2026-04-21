@@ -212,6 +212,88 @@ if ( $is_weight_loss ) :
 		</div>
 	</section>
 
+	<!-- Common Questions Section -->
+	<section class="myogenix-pdp__cq">
+		<div class="myogenix-pdp__container">
+			<div class="myogenix-pdp__cq-inner">
+
+				<div class="myogenix-pdp__cq-left">
+					<p class="myogenix-pdp__cq-label">FAQ</p>
+					<h2 class="myogenix-pdp__cq-heading">Common questions</h2>
+					<p class="myogenix-pdp__cq-sub">Everything you need to know about the program, dosing, and ordering.</p>
+					<a href="#buy" class="myogenix-pdp__cq-btn">Configure your program &rarr;</a>
+				</div>
+
+				<div class="myogenix-pdp__cq-right">
+					<div class="myogenix-pdp__cq-list">
+
+						<div class="myogenix-pdp__cq-item">
+							<button class="myogenix-pdp__cq-question" aria-expanded="true" aria-controls="myogenix-cq-0">
+								<span>What is tirzepatide and how is it different from semaglutide?</span>
+								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
+							</button>
+							<div class="myogenix-pdp__cq-answer is-open" id="myogenix-cq-0">
+								<p>Tirzepatide is a dual GIP/GLP-1 receptor agonist — it activates two metabolic pathways simultaneously. Semaglutide only activates the GLP-1 receptor. Clinical trials (SURMOUNT-1) show tirzepatide produced significantly greater average weight loss than semaglutide across comparable doses.</p>
+							</div>
+						</div>
+
+						<div class="myogenix-pdp__cq-item">
+							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="myogenix-cq-1">
+								<span>How does dosing escalation work?</span>
+								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
+							</button>
+							<div class="myogenix-pdp__cq-answer" id="myogenix-cq-1">
+								<p>We start most patients at 2.5 mg weekly to minimize side effects, then increase by 2.5 mg every 4 weeks based on your tolerance and progress. Typical escalation runs 2.5 → 5 → 7.5 → 10 → 12.5 → 15 mg. Your provider reviews your response at each stage and adjusts accordingly — you're never escalated faster than is clinically appropriate.</p>
+							</div>
+						</div>
+
+						<div class="myogenix-pdp__cq-item">
+							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="myogenix-cq-2">
+								<span>Do I need a new consultation every month?</span>
+								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
+							</button>
+							<div class="myogenix-pdp__cq-answer" id="myogenix-cq-2">
+								<p>No. Once your treatment plan is established and your prescription is active, refills ship automatically on your chosen schedule. Your provider may request a brief check-in every few months to review progress and adjust dosing if needed — but there's no new full consultation required for standard refills.</p>
+							</div>
+						</div>
+
+						<div class="myogenix-pdp__cq-item">
+							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="myogenix-cq-3">
+								<span>What if my provider adjusts my dose?</span>
+								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
+							</button>
+							<div class="myogenix-pdp__cq-answer" id="myogenix-cq-3">
+								<p>If a dose adjustment is needed, your provider will update your prescription and your next shipment will automatically reflect the new dosage. You'll be notified through your patient portal. No additional consultation or fee is required for dose changes within your active treatment plan.</p>
+							</div>
+						</div>
+
+						<div class="myogenix-pdp__cq-item">
+							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="myogenix-cq-4">
+								<span>How is this compounded and where does it ship from?</span>
+								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
+							</button>
+							<div class="myogenix-pdp__cq-answer" id="myogenix-cq-4">
+								<p>Your tirzepatide is compounded by a licensed U.S. FDA-registered 503A compounding pharmacy. It's prepared as a sterile injectable solution and ships directly to your door in temperature-controlled packaging — along with syringes and all necessary supplies.</p>
+							</div>
+						</div>
+
+						<div class="myogenix-pdp__cq-item">
+							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="myogenix-cq-5">
+								<span>Can I cancel my subscription?</span>
+								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
+							</button>
+							<div class="myogenix-pdp__cq-answer" id="myogenix-cq-5">
+								<p>Yes. You can pause or cancel your subscription at any time through your Myogenix Pharma patient portal or by contacting our support team. We ask for at least 5 business days' notice before your next billing date. There are no long-term contracts or cancellation fees.</p>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</section>
+
 	<!-- Explore More Treatment Lines -->
 	<section class="myogenix-pdp__explore">
 		<div class="myogenix-pdp__container">
