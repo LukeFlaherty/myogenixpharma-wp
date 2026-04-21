@@ -68,9 +68,10 @@ if ( $is_weight_loss ) :
 	foreach ( $product->get_children() as $vid ) {
 		$v = wc_get_product( $vid );
 		if ( ! $v || 'publish' !== get_post_status( $vid ) ) continue;
-		$dose   = $v->get_attribute( 'pa_dosage' );
-		$bottle = $v->get_attribute( 'pa_wm-bottle' );
-		$plan   = $v->get_attribute( 'pa_wm-subscription-plan' );
+		// Read slugs directly from post meta — get_attribute() returns term names, not slugs
+		$dose   = get_post_meta( $vid, 'attribute_pa_dosage', true );
+		$bottle = get_post_meta( $vid, 'attribute_pa_wm-bottle', true );
+		$plan   = get_post_meta( $vid, 'attribute_pa_wm-subscription-plan', true );
 		if ( ! $dose || ! $bottle ) continue;
 		$price = (float) $v->get_price();
 		if ( $price > 0 && ! isset( $price_matrix[ $dose ][ $bottle ] ) ) {
