@@ -18,13 +18,13 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
 			[],
-			'1.0.3'
+			'1.0.4'
 		);
 		wp_enqueue_script(
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/js/pdp.js',
 			[],
-			'1.0.3',
+			'1.0.4',
 			true
 		);
 	}

@@ -192,22 +192,68 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		} );
 	} );
 
-	/* CTA — sync to hidden WC variations form and trigger add-to-cart */
+	/*
+	 * CTA — sync selections to WC hidden variations form and add to cart.
+	 *
+	 * Attribute slug mapping (based on CLAUDE.md product attributes):
+	 *   pa_dosage                   = selected dose  (e.g. "10mg")
+	 *   pa_vial                     = supply months  (1→"1-vial", 2→"2-vial", 3→"3-vial")
+	 *   pa_wm-subscription-plan     = subscribe plan (subscribe 1/2mo→"1-month", 3mo→"3-month")
+	 *                                                 (one-time = leave blank / no plan attribute)
+	 *
+	 * If the variation is not found (button stays disabled), the handler falls back
+	 * to a URL-based add-to-cart so the user can still proceed.
+	 */
+	var VIAL_MAP = { 1: '1-vial', 2: '2-vial', 3: '3-vial' };
+	var PLAN_MAP = {
+		subscribe: { 1: '1-month', 2: '1-month', 3: '3-month' },
+		onetime:   { 1: '',        2: '',        3: ''        }
+	};
+
 	var ctaBtn = document.getElementById( 'pdp-cta' );
 	if ( ctaBtn ) {
 		ctaBtn.addEventListener( 'click', function () {
-			var wcForm = document.querySelector( '.variations_form' ) || document.querySelector( 'form.cart' );
-			if ( wcForm ) {
-				var doseSelect = wcForm.querySelector( 'select[name="attribute_pa_dosage"]' );
-				if ( doseSelect ) {
-					doseSelect.value = state.selectedDoses[ 0 ];
-					doseSelect.dispatchEvent( new Event( 'change', { bubbles: true } ) );
-				}
-				setTimeout( function () {
-					var addBtn = wcForm.querySelector( '.single_add_to_cart_button' ) || wcForm.querySelector( '[name="add-to-cart"]' );
-					if ( addBtn ) addBtn.click();
-				}, 350 );
+			var wcForm = document.querySelector( '.variations_form' );
+
+			if ( ! wcForm ) {
+				// Simple (non-variable) product fallback
+				var pid = cfg.getAttribute( 'data-product-id' );
+				if ( pid ) window.location.href = '/?add-to-cart=' + pid + '&quantity=1';
+				return;
 			}
+
+			var dosage = state.selectedDoses[ 0 ];
+			var vial   = VIAL_MAP[ state.months ] || '1-vial';
+			var plan   = ( PLAN_MAP[ state.ptype ] || {} )[ state.months ] || '';
+
+			function setSelect( name, val ) {
+				var sel = wcForm.querySelector( 'select[name="' + name + '"]' );
+				if ( sel ) {
+					sel.value = val;
+					sel.dispatchEvent( new Event( 'change', { bubbles: true } ) );
+				}
+			}
+
+			setSelect( 'attribute_pa_dosage', dosage );
+			setSelect( 'attribute_pa_vial', vial );
+			setSelect( 'attribute_pa_wm-subscription-plan', plan );
+
+			// Give WC ~600 ms to resolve the variation before clicking
+			setTimeout( function () {
+				var addBtn = wcForm.querySelector( '.single_add_to_cart_button:not(.disabled):not([disabled])' );
+
+				if ( addBtn ) {
+					addBtn.click();
+				} else {
+					// Fallback: URL-based add-to-cart (works even if variation JS failed)
+					var pid  = cfg.getAttribute( 'data-product-id' );
+					var url  = window.location.pathname + '?add-to-cart=' + pid + '&quantity=1';
+					url += '&attribute_pa_dosage=' + encodeURIComponent( dosage );
+					url += '&attribute_pa_vial=' + encodeURIComponent( vial );
+					if ( plan ) url += '&attribute_pa_wm-subscription-plan=' + encodeURIComponent( plan );
+					window.location.href = url;
+				}
+			}, 600 );
 		} );
 	}
 

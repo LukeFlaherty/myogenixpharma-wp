@@ -22,7 +22,6 @@
 }
 
 /* Full-bleed helper — breaks out of WooCommerce content wrapper */
-.pdp-hero,
 .myogenix-pdp__steps,
 .myogenix-pdp__how-it-works,
 .myogenix-pdp__cq,
@@ -293,9 +292,10 @@
 	margin: 0 auto;
 	padding: 0 40px;
 	display: grid;
-	grid-template-columns: 55% 45%;
+	grid-template-columns: 11fr 9fr;
 	gap: 60px;
 	align-items: start;
+	box-sizing: border-box;
 }
 
 /* Left column */
@@ -421,19 +421,26 @@
 	text-decoration: underline;
 }
 
+/* Left column */
+.pdp-hero__left {
+	min-width: 0;
+}
+
 /* Right column */
 .pdp-hero__right {
+	min-width: 0;
 	position: sticky;
 	top: 24px;
 }
 
-/* Hidden WC form — keeps WC variation JS alive */
+/* Hidden WC form — no dimension restrictions so WC variation JS initializes */
 .pdp-hero__wc-hidden {
 	position: absolute;
 	left: -9999px;
-	width: 1px;
-	height: 1px;
-	overflow: hidden;
+	top: 0;
+	opacity: 0;
+	pointer-events: none;
+	tab-index: -1;
 }
 
 /* ==========================================================================
