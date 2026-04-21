@@ -22,6 +22,7 @@
 }
 
 /* Full-bleed helper — breaks out of WooCommerce content wrapper */
+.pdp-hero,
 .myogenix-pdp__steps,
 .myogenix-pdp__how-it-works,
 .myogenix-pdp__cq,
@@ -285,6 +286,7 @@
 .pdp-hero {
 	background: #fff;
 	padding: 48px 0 64px;
+	overflow-x: clip;
 }
 
 .pdp-hero__inner {
@@ -528,6 +530,7 @@
 	grid-template-columns: repeat(3, 1fr);
 	gap: 8px;
 	margin-bottom: 20px;
+	padding-top: 14px;
 }
 
 .pdp-cfg__supply {

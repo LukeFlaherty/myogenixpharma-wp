@@ -213,12 +213,39 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	var ctaBtn = document.getElementById( 'pdp-cta' );
 	if ( ctaBtn ) {
 		ctaBtn.addEventListener( 'click', function () {
+			var origText = ctaBtn.textContent;
+
+			/* Loading state */
+			ctaBtn.textContent = 'Adding to cart\u2026';
+			ctaBtn.disabled    = true;
+			ctaBtn.style.opacity = '0.65';
+
+			/* Remove any previous error */
+			var prevErr = document.getElementById( 'pdp-cta-error' );
+			if ( prevErr ) prevErr.remove();
+
+			function showError( msg ) {
+				ctaBtn.textContent   = origText;
+				ctaBtn.disabled      = false;
+				ctaBtn.style.opacity = '';
+				var err = document.createElement( 'p' );
+				err.id = 'pdp-cta-error';
+				err.style.cssText = 'color:#c0392b;font-size:0.85rem;text-align:center;margin:8px 0 0;padding:10px 14px;background:#fff0ee;border-radius:6px;border:1px solid #f5c6c0;line-height:1.5;';
+				err.textContent = msg;
+				ctaBtn.insertAdjacentElement( 'afterend', err );
+				console.error( '[Myogenix PDP] CTA error:', msg );
+			}
+
 			var wcForm = document.querySelector( '.variations_form' );
 
 			if ( ! wcForm ) {
-				// Simple (non-variable) product fallback
+				/* Simple (non-variable) product fallback */
 				var pid = cfg.getAttribute( 'data-product-id' );
-				if ( pid ) window.location.href = '/?add-to-cart=' + pid + '&quantity=1';
+				if ( pid ) {
+					window.location.href = '/?add-to-cart=' + pid + '&quantity=1';
+				} else {
+					showError( 'Could not find product. Please refresh and try again.' );
+				}
 				return;
 			}
 
@@ -226,11 +253,16 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			var vial   = VIAL_MAP[ state.months ] || '1-vial';
 			var plan   = ( PLAN_MAP[ state.ptype ] || {} )[ state.months ] || '';
 
+			console.log( '[Myogenix PDP] Setting WC attributes → dosage:', dosage, '| vial:', vial, '| plan:', plan );
+
 			function setSelect( name, val ) {
 				var sel = wcForm.querySelector( 'select[name="' + name + '"]' );
 				if ( sel ) {
 					sel.value = val;
 					sel.dispatchEvent( new Event( 'change', { bubbles: true } ) );
+					console.log( '[Myogenix PDP]   set', name, '=', JSON.stringify( val ), '(found:', !! sel, ')' );
+				} else {
+					console.warn( '[Myogenix PDP]   select "' + name + '" NOT FOUND in .variations_form' );
 				}
 			}
 
@@ -238,23 +270,64 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			setSelect( 'attribute_pa_vial', vial );
 			setSelect( 'attribute_pa_wm-subscription-plan', plan );
 
-			// Give WC ~600 ms to resolve the variation before clicking
+			/* Give WC ~600 ms to resolve the variation before clicking */
 			setTimeout( function () {
 				var addBtn = wcForm.querySelector( '.single_add_to_cart_button:not(.disabled):not([disabled])' );
 
 				if ( addBtn ) {
 					addBtn.click();
+					/* Reset button after a moment (WC will redirect/refresh on success) */
+					setTimeout( function () {
+						ctaBtn.textContent   = origText;
+						ctaBtn.disabled      = false;
+						ctaBtn.style.opacity = '';
+					}, 3000 );
 				} else {
-					// Fallback: URL-based add-to-cart (works even if variation JS failed)
-					var pid  = cfg.getAttribute( 'data-product-id' );
-					var url  = window.location.pathname + '?add-to-cart=' + pid + '&quantity=1';
-					url += '&attribute_pa_dosage=' + encodeURIComponent( dosage );
-					url += '&attribute_pa_vial=' + encodeURIComponent( vial );
-					if ( plan ) url += '&attribute_pa_wm-subscription-plan=' + encodeURIComponent( plan );
-					window.location.href = url;
+					/* Collect current WC form state for the error message */
+					var wcSelects  = wcForm.querySelectorAll( 'select[name^="attribute_"]' );
+					var debugParts = Array.prototype.slice.call( wcSelects ).map( function ( s ) {
+						return s.name.replace( 'attribute_pa_', '' ) + '="' + ( s.value || '(none)' ) + '"';
+					} );
+					var debugStr = debugParts.join( ', ' );
+					console.error( '[Myogenix PDP] Variation not found. WC form state:', debugStr );
+
+					/* Check if a disabled button exists (means WC found the form but variation doesn't exist) */
+					var disabledBtn = wcForm.querySelector( '.single_add_to_cart_button.disabled, .single_add_to_cart_button[disabled]' );
+					if ( disabledBtn ) {
+						showError(
+							'No matching variation found for: ' + debugStr + '. ' +
+							'Check WP Admin → Products → Variations that these exact attribute values exist and are in stock.'
+						);
+					} else {
+						/* URL-based add-to-cart fallback */
+						var pid  = cfg.getAttribute( 'data-product-id' );
+						var url  = window.location.pathname + '?add-to-cart=' + pid + '&quantity=1';
+						url += '&attribute_pa_dosage='                        + encodeURIComponent( dosage );
+						url += '&attribute_pa_vial='                          + encodeURIComponent( vial );
+						if ( plan ) url += '&attribute_pa_wm-subscription-plan=' + encodeURIComponent( plan );
+						console.log( '[Myogenix PDP] Falling back to URL add-to-cart:', url );
+						window.location.href = url;
+					}
 				}
 			}, 600 );
 		} );
+	}
+
+	/* Debug: log WC attribute selects so attribute name/value issues are visible in console */
+	var wcFormDebug = document.querySelector( '.variations_form' );
+	if ( wcFormDebug ) {
+		var debugSelects = wcFormDebug.querySelectorAll( 'select[name^="attribute_"]' );
+		if ( debugSelects.length ) {
+			console.log( '[Myogenix PDP] WC variation form found. Available attributes:' );
+			Array.prototype.slice.call( debugSelects ).forEach( function ( sel ) {
+				var opts = Array.prototype.slice.call( sel.options ).map( function ( o ) { return o.value || '(any)'; } );
+				console.log( '  ' + sel.name + ' → [' + opts.join( ', ' ) + ']' );
+			} );
+		} else {
+			console.warn( '[Myogenix PDP] .variations_form found but no attribute_* selects — WC variation JS may not have initialised yet.' );
+		}
+	} else {
+		console.warn( '[Myogenix PDP] No .variations_form on page — product may be a simple product or Elementor is intercepting the template.' );
 	}
 
 	/* Initial render */
