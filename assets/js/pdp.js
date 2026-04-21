@@ -1,27 +1,25 @@
 document.addEventListener( 'DOMContentLoaded', function () {
 
 	/* -----------------------------------------------------------------------
-	   Accordion helper (shared by both FAQ sections)
+	   Accordion helper (shared by FAQ + Common Questions sections)
 	----------------------------------------------------------------------- */
 	function initAccordion( selector ) {
-		var questions = Array.prototype.slice.call( document.querySelectorAll( selector ) );
-		questions.forEach( function ( btn ) {
+		var items = Array.prototype.slice.call( document.querySelectorAll( selector ) );
+		items.forEach( function ( btn ) {
 			btn.addEventListener( 'click', function () {
 				var isExpanded = this.getAttribute( 'aria-expanded' ) === 'true';
 				var answer     = document.getElementById( this.getAttribute( 'aria-controls' ) );
 				if ( ! answer ) return;
-				questions.forEach( function ( otherBtn ) {
-					if ( otherBtn === btn ) return;
-					otherBtn.setAttribute( 'aria-expanded', 'false' );
-					var other = document.getElementById( otherBtn.getAttribute( 'aria-controls' ) );
-					if ( other ) other.classList.remove( 'is-open' );
+
+				items.forEach( function ( other ) {
+					if ( other === btn ) return;
+					other.setAttribute( 'aria-expanded', 'false' );
+					var otherAns = document.getElementById( other.getAttribute( 'aria-controls' ) );
+					if ( otherAns ) otherAns.classList.remove( 'is-open' );
 				} );
+
 				this.setAttribute( 'aria-expanded', String( ! isExpanded ) );
-				if ( isExpanded ) {
-					answer.classList.remove( 'is-open' );
-				} else {
-					answer.classList.add( 'is-open' );
-				}
+				answer.classList.toggle( 'is-open', ! isExpanded );
 			} );
 		} );
 	}
@@ -35,152 +33,84 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	var cfg = document.getElementById( 'pdp-cfg' );
 	if ( ! cfg ) return;
 
-	var doses     = JSON.parse( cfg.getAttribute( 'data-doses' )     || '[]' );
-	var pricesOt  = JSON.parse( cfg.getAttribute( 'data-prices-ot' ) || '[]' );
-	var CONSULT   = 79;
-	var DISC      = 0.10;
+	var doses        = JSON.parse( cfg.getAttribute( 'data-doses' )         || '[]' );
+	var supplyPrices = JSON.parse( cfg.getAttribute( 'data-supply-prices' ) || '[0,0,0]' );
+
+	/*
+	 * WC attribute slug → term slug mapping (confirmed via WP-CLI 2026-04-21)
+	 *   attribute_pa_dosage               → value from doses array (e.g. "10mg")
+	 *   attribute_pa_wm-bottle            → "1-bottle" | "2-bottle" | "3-bottle"
+	 *   attribute_pa_wm-subscription-plan → "1-month" | "3-month"
+	 */
+	var BOTTLE_MAP = { 1: '1-bottle', 2: '2-bottle', 3: '3-bottle' };
+	var PLAN_MAP   = { 1: '1-month',  2: '1-month',  3: '3-month'  };
+	var RENEW_MAP  = { 1: 'monthly',  2: 'monthly',  3: 'every 3 months' };
 
 	var state = {
-		ptype:         'subscribe',
-		months:        1,
-		selectedDoses: [ doses[ doses.length - 1 ] ]
+		months: 1,
+		dose:   doses[ 0 ] || ''
 	};
-
-	function subPrice( idx ) {
-		return Math.round( pricesOt[ idx ] * ( 1 - DISC ) );
-	}
-
-	function doseIdx( dose ) {
-		return doses.indexOf( dose );
-	}
 
 	function weeklyMg( dose ) {
 		var mg = parseFloat( dose );
-		return ( mg / 4 ).toFixed( 2 );
+		return isNaN( mg ) ? '\u2014' : ( mg / 4 ).toFixed( 2 );
 	}
 
-	var MONTH_LABELS = [ 'First', 'Second', 'Third' ];
+	/* --- Dose selector -------------------------------------------------- */
+	function renderDose() {
+		var wrap = document.getElementById( 'pdp-dose' );
+		if ( ! wrap || ! doses.length ) return;
 
-	/* --- Dose section render -------------------------------------------- */
-	function renderDoses() {
-		var wrap = document.getElementById( 'pdp-doses' );
-		if ( ! wrap ) return;
+		var opts = doses.map( function ( d ) {
+			return '<option value="' + d + '"' + ( d === state.dose ? ' selected' : '' ) + '>' + d + '</option>';
+		} ).join( '' );
 
-		// Sync state.selectedDoses length to state.months
-		while ( state.selectedDoses.length < state.months ) {
-			state.selectedDoses.push( state.selectedDoses[ state.selectedDoses.length - 1 ] || doses[ doses.length - 1 ] );
-		}
-		state.selectedDoses = state.selectedDoses.slice( 0, state.months );
+		wrap.innerHTML =
+			'<div class="pdp-cfg__dose-card">' +
+				'<div class="pdp-cfg__dose-select-wrap">' +
+					'<select class="pdp-cfg__dose-select" id="pdp-dose-select">' + opts + '</select>' +
+					'<span class="pdp-cfg__dose-chevron">' +
+						'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>' +
+					'</span>' +
+				'</div>' +
+				'<p class="pdp-cfg__dose-detail">' +
+					state.dose + '/month = <strong>' + weeklyMg( state.dose ) + ' mg/week</strong> &middot; 4 injections per month' +
+				'</p>' +
+			'</div>';
 
-		var html = '';
-		for ( var i = 0; i < state.months; i++ ) {
-			var dose  = state.selectedDoses[ i ];
-			var badge = i === 0 ? 'Starting dose' : 'Prev: ' + state.selectedDoses[ i - 1 ];
-			var opts  = doses.map( function ( d ) {
-				return '<option value="' + d + '"' + ( d === dose ? ' selected' : '' ) + '>' + d + '</option>';
-			} ).join( '' );
-
-			html +=
-				'<div class="pdp-cfg__dose-card">' +
-					'<div class="pdp-cfg__dose-header">' +
-						'<span class="pdp-cfg__dose-month">' + MONTH_LABELS[ i ] + ' month</span>' +
-						'<span class="pdp-cfg__dose-badge">' + badge + '</span>' +
-					'</div>' +
-					'<div class="pdp-cfg__dose-select-wrap">' +
-						'<select class="pdp-cfg__dose-select" data-mi="' + i + '">' + opts + '</select>' +
-						'<span class="pdp-cfg__dose-chevron">' +
-							'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>' +
-						'</span>' +
-					'</div>' +
-					'<p class="pdp-cfg__dose-detail">' + dose + '/month = <strong>' + weeklyMg( dose ) + ' mg/week</strong> · 4 injections per month</p>' +
-				'</div>';
-		}
-		wrap.innerHTML = html;
-
-		// Bind selects
-		Array.prototype.slice.call( wrap.querySelectorAll( '.pdp-cfg__dose-select' ) ).forEach( function ( sel ) {
-			sel.addEventListener( 'change', function () {
-				state.selectedDoses[ parseInt( this.getAttribute( 'data-mi' ) ) ] = this.value;
-				renderDoses();
-				renderSummary();
-			} );
+		document.getElementById( 'pdp-dose-select' ).addEventListener( 'change', function () {
+			state.dose = this.value;
+			renderDose();
+			renderSummary();
 		} );
 	}
 
-	/* --- Order summary render ------------------------------------------- */
+	/* --- Order summary -------------------------------------------------- */
 	function renderSummary() {
 		var wrap = document.getElementById( 'pdp-summary' );
 		if ( ! wrap ) return;
 
-		var html  = '<p class="pdp-cfg__summary-label">Order Summary</p>';
-		var total = 0;
+		var price     = supplyPrices[ state.months - 1 ] || 0;
+		var planLabel = state.months === 3 ? '3-month subscription' : 'Monthly subscription';
+		var renewNote = 'Auto-renews ' + RENEW_MAP[ state.months ] + ' at <strong>$' + price.toFixed( 2 ) + '</strong>. Cancel anytime before renewal.';
 
-		if ( state.ptype === 'subscribe' ) {
-			var totalSaving = 0;
-			for ( var i = 0; i < state.months; i++ ) {
-				var di    = doseIdx( state.selectedDoses[ i ] );
-				var sp    = subPrice( di );
-				var sav   = pricesOt[ di ] - sp;
-				total    += sp;
-				totalSaving += sav;
-				html += '<div class="pdp-cfg__summary-line"><span>' + MONTH_LABELS[ i ] + ' month — ' + state.selectedDoses[ i ] + '</span><span>$' + sp + '</span></div>';
-			}
-			if ( totalSaving > 0 ) {
-				html += '<div class="pdp-cfg__summary-line"><span>Subscription savings (10%)</span><span class="pdp-cfg__summary-savings">−$' + totalSaving + '</span></div>';
-			}
-			html += '<div class="pdp-cfg__summary-total"><span>Total today</span><span class="pdp-cfg__summary-total-price">$' + total + '</span></div>';
-			var lastDi     = doseIdx( state.selectedDoses[ state.months - 1 ] );
-			var renewPrice = subPrice( lastDi );
-			html += '<div class="pdp-cfg__summary-note"><strong>Auto-renews</strong> at <strong>' + state.selectedDoses[ state.months - 1 ] + ' · $' + renewPrice + '/mo</strong> after your supply ends. Cancel anytime before renewal.</div>';
-
-		} else {
-			for ( var j = 0; j < state.months; j++ ) {
-				var di2  = doseIdx( state.selectedDoses[ j ] );
-				var ot   = pricesOt[ di2 ];
-				total   += ot;
-				html    += '<div class="pdp-cfg__summary-line"><span>' + MONTH_LABELS[ j ] + ' month — ' + state.selectedDoses[ j ] + '</span><span>$' + ot + '</span></div>';
-			}
-			html += '<div class="pdp-cfg__summary-line"><span>Provider consultation</span><span>$' + CONSULT + '</span></div>';
-			total += CONSULT;
-			html += '<div class="pdp-cfg__summary-total"><span>Total today</span><span class="pdp-cfg__summary-total-price">$' + total + '</span></div>';
-			html += '<div class="pdp-cfg__summary-note">A licensed provider reviews your order before it ships. The consult fee is non-refundable once your order is approved.</div>';
-		}
-
-		wrap.innerHTML = html;
-	}
-
-	/* --- CTA / disclaimer update ---------------------------------------- */
-	function updateCTA() {
-		var btn  = document.getElementById( 'pdp-cta' );
-		var disc = document.getElementById( 'pdp-disclaimer' );
-		if ( ! btn || ! disc ) return;
-		if ( state.ptype === 'subscribe' ) {
-			btn.textContent  = 'Start subscription \u2192';
-			disc.textContent = 'By subscribing, you authorize recurring charges at your renewal dose price. Cancel anytime.';
-		} else {
-			btn.textContent  = 'Order one-time \u2192';
-			disc.textContent = 'A licensed provider reviews your order before it ships. The consult fee is non-refundable once your order is approved.';
-		}
+		wrap.innerHTML =
+			'<p class="pdp-cfg__summary-label">Order Summary</p>' +
+			'<div class="pdp-cfg__summary-line"><span>' + state.months + '-month supply &middot; ' + state.dose + '</span><span>$' + price.toFixed( 2 ) + '</span></div>' +
+			'<div class="pdp-cfg__summary-line"><span>Plan</span><span>' + planLabel + '</span></div>' +
+			'<div class="pdp-cfg__summary-total">' +
+				'<span>Total today</span>' +
+				'<span class="pdp-cfg__summary-total-price">$' + price.toFixed( 2 ) + '</span>' +
+			'</div>' +
+			'<div class="pdp-cfg__summary-note">' + renewNote + '</div>';
 	}
 
 	function render() {
-		renderDoses();
+		renderDose();
 		renderSummary();
-		updateCTA();
 	}
 
-	/* --- Event bindings ------------------------------------------------- */
-	Array.prototype.slice.call( cfg.querySelectorAll( '.pdp-cfg__ptype' ) ).forEach( function ( btn ) {
-		btn.addEventListener( 'click', function () {
-			state.ptype = this.getAttribute( 'data-ptype' );
-			Array.prototype.slice.call( cfg.querySelectorAll( '.pdp-cfg__ptype' ) ).forEach( function ( b ) {
-				b.classList.remove( 'pdp-cfg__ptype--active' );
-			} );
-			this.classList.add( 'pdp-cfg__ptype--active' );
-			render();
-		} );
-	} );
-
+	/* --- Supply button bindings ----------------------------------------- */
 	Array.prototype.slice.call( cfg.querySelectorAll( '.pdp-cfg__supply' ) ).forEach( function ( btn ) {
 		btn.addEventListener( 'click', function () {
 			state.months = parseInt( this.getAttribute( 'data-months' ), 10 );
@@ -192,142 +122,54 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		} );
 	} );
 
-	/*
-	 * CTA — sync selections to WC hidden variations form and add to cart.
-	 *
-	 * Attribute slug mapping (based on CLAUDE.md product attributes):
-	 *   pa_dosage                   = selected dose  (e.g. "10mg")
-	 *   pa_vial                     = supply months  (1→"1-vial", 2→"2-vial", 3→"3-vial")
-	 *   pa_wm-subscription-plan     = subscribe plan (subscribe 1/2mo→"1-month", 3mo→"3-month")
-	 *                                                 (one-time = leave blank / no plan attribute)
-	 *
-	 * If the variation is not found (button stays disabled), the handler falls back
-	 * to a URL-based add-to-cart so the user can still proceed.
-	 */
-	var VIAL_MAP = { 1: '1-vial', 2: '2-vial', 3: '3-vial' };
-	var PLAN_MAP = {
-		subscribe: { 1: '1-month', 2: '1-month', 3: '3-month' },
-		onetime:   { 1: '',        2: '',        3: ''        }
-	};
-
+	/* -----------------------------------------------------------------------
+	   CTA — GET-based add-to-cart so page reload never triggers POST resubmission
+	   WooCommerce resolves the variation from attribute URL params server-side.
+	----------------------------------------------------------------------- */
 	var ctaBtn = document.getElementById( 'pdp-cta' );
 	if ( ctaBtn ) {
 		ctaBtn.addEventListener( 'click', function () {
-			var origText = ctaBtn.textContent;
+			var pid    = cfg.getAttribute( 'data-product-id' );
+			var bottle = BOTTLE_MAP[ state.months ] || '1-bottle';
+			var plan   = PLAN_MAP[ state.months ]   || '1-month';
 
-			/* Loading state */
-			ctaBtn.textContent = 'Adding to cart\u2026';
-			ctaBtn.disabled    = true;
-			ctaBtn.style.opacity = '0.65';
-
-			/* Remove any previous error */
+			/* Clear any previous error */
 			var prevErr = document.getElementById( 'pdp-cta-error' );
 			if ( prevErr ) prevErr.remove();
 
-			function showError( msg ) {
-				ctaBtn.textContent   = origText;
-				ctaBtn.disabled      = false;
-				ctaBtn.style.opacity = '';
+			if ( ! pid ) {
 				var err = document.createElement( 'p' );
 				err.id = 'pdp-cta-error';
 				err.style.cssText = 'color:#c0392b;font-size:0.85rem;text-align:center;margin:8px 0 0;padding:10px 14px;background:#fff0ee;border-radius:6px;border:1px solid #f5c6c0;line-height:1.5;';
-				err.textContent = msg;
+				err.textContent = 'Could not determine product. Please refresh and try again.';
 				ctaBtn.insertAdjacentElement( 'afterend', err );
-				console.error( '[Myogenix PDP] CTA error:', msg );
-			}
-
-			var wcForm = document.querySelector( '.variations_form' );
-
-			if ( ! wcForm ) {
-				/* Simple (non-variable) product fallback */
-				var pid = cfg.getAttribute( 'data-product-id' );
-				if ( pid ) {
-					window.location.href = '/?add-to-cart=' + pid + '&quantity=1';
-				} else {
-					showError( 'Could not find product. Please refresh and try again.' );
-				}
 				return;
 			}
 
-			var dosage = state.selectedDoses[ 0 ];
-			var vial   = VIAL_MAP[ state.months ] || '1-vial';
-			var plan   = ( PLAN_MAP[ state.ptype ] || {} )[ state.months ] || '';
+			console.log( '[Myogenix PDP] Adding to cart → dosage:', state.dose, '| bottle:', bottle, '| plan:', plan );
 
-			console.log( '[Myogenix PDP] Setting WC attributes → dosage:', dosage, '| vial:', vial, '| plan:', plan );
+			var url = window.location.pathname + '?add-to-cart=' + pid + '&quantity=1';
+			url += '&attribute_pa_dosage='                   + encodeURIComponent( state.dose );
+			url += '&attribute_pa_wm-bottle='                + encodeURIComponent( bottle );
+			url += '&attribute_pa_wm-subscription-plan='     + encodeURIComponent( plan );
 
-			function setSelect( name, val ) {
-				var sel = wcForm.querySelector( 'select[name="' + name + '"]' );
-				if ( sel ) {
-					sel.value = val;
-					sel.dispatchEvent( new Event( 'change', { bubbles: true } ) );
-					console.log( '[Myogenix PDP]   set', name, '=', JSON.stringify( val ), '(found:', !! sel, ')' );
-				} else {
-					console.warn( '[Myogenix PDP]   select "' + name + '" NOT FOUND in .variations_form' );
-				}
-			}
-
-			setSelect( 'attribute_pa_dosage', dosage );
-			setSelect( 'attribute_pa_vial', vial );
-			setSelect( 'attribute_pa_wm-subscription-plan', plan );
-
-			/* Give WC ~600 ms to resolve the variation before clicking */
-			setTimeout( function () {
-				var addBtn = wcForm.querySelector( '.single_add_to_cart_button:not(.disabled):not([disabled])' );
-
-				if ( addBtn ) {
-					addBtn.click();
-					/* Reset button after a moment (WC will redirect/refresh on success) */
-					setTimeout( function () {
-						ctaBtn.textContent   = origText;
-						ctaBtn.disabled      = false;
-						ctaBtn.style.opacity = '';
-					}, 3000 );
-				} else {
-					/* Collect current WC form state for the error message */
-					var wcSelects  = wcForm.querySelectorAll( 'select[name^="attribute_"]' );
-					var debugParts = Array.prototype.slice.call( wcSelects ).map( function ( s ) {
-						return s.name.replace( 'attribute_pa_', '' ) + '="' + ( s.value || '(none)' ) + '"';
-					} );
-					var debugStr = debugParts.join( ', ' );
-					console.error( '[Myogenix PDP] Variation not found. WC form state:', debugStr );
-
-					/* Check if a disabled button exists (means WC found the form but variation doesn't exist) */
-					var disabledBtn = wcForm.querySelector( '.single_add_to_cart_button.disabled, .single_add_to_cart_button[disabled]' );
-					if ( disabledBtn ) {
-						showError(
-							'No matching variation found for: ' + debugStr + '. ' +
-							'Check WP Admin → Products → Variations that these exact attribute values exist and are in stock.'
-						);
-					} else {
-						/* URL-based add-to-cart fallback */
-						var pid  = cfg.getAttribute( 'data-product-id' );
-						var url  = window.location.pathname + '?add-to-cart=' + pid + '&quantity=1';
-						url += '&attribute_pa_dosage='                        + encodeURIComponent( dosage );
-						url += '&attribute_pa_vial='                          + encodeURIComponent( vial );
-						if ( plan ) url += '&attribute_pa_wm-subscription-plan=' + encodeURIComponent( plan );
-						console.log( '[Myogenix PDP] Falling back to URL add-to-cart:', url );
-						window.location.href = url;
-					}
-				}
-			}, 600 );
+			window.location.href = url;
 		} );
 	}
 
-	/* Debug: log WC attribute selects so attribute name/value issues are visible in console */
-	var wcFormDebug = document.querySelector( '.variations_form' );
-	if ( wcFormDebug ) {
-		var debugSelects = wcFormDebug.querySelectorAll( 'select[name^="attribute_"]' );
-		if ( debugSelects.length ) {
-			console.log( '[Myogenix PDP] WC variation form found. Available attributes:' );
-			Array.prototype.slice.call( debugSelects ).forEach( function ( sel ) {
+	/* Debug: log WC form attribute selects on page load */
+	var wcForm = document.querySelector( '.variations_form' );
+	if ( wcForm ) {
+		var dbgSelects = wcForm.querySelectorAll( 'select[name^="attribute_"]' );
+		if ( dbgSelects.length ) {
+			console.log( '[Myogenix PDP] WC variation form found. Attributes:' );
+			Array.prototype.slice.call( dbgSelects ).forEach( function ( sel ) {
 				var opts = Array.prototype.slice.call( sel.options ).map( function ( o ) { return o.value || '(any)'; } );
-				console.log( '  ' + sel.name + ' → [' + opts.join( ', ' ) + ']' );
+				console.log( '  ' + sel.name + ' \u2192 [' + opts.join( ', ' ) + ']' );
 			} );
-		} else {
-			console.warn( '[Myogenix PDP] .variations_form found but no attribute_* selects — WC variation JS may not have initialised yet.' );
 		}
 	} else {
-		console.warn( '[Myogenix PDP] No .variations_form on page — product may be a simple product or Elementor is intercepting the template.' );
+		console.warn( '[Myogenix PDP] No .variations_form on page.' );
 	}
 
 	/* Initial render */

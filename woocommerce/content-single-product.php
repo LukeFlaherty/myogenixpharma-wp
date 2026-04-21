@@ -13,6 +13,16 @@ defined( 'ABSPATH' ) || exit;
 
 global $product;
 
+$slug           = $product->get_slug();
+$weight_loss    = [ 'compound-semaglutide', 'compound-tirzepatide' ];
+$is_weight_loss = in_array( $slug, $weight_loss, true );
+
+// Suppress the "Please choose product options" notice on our custom PDP —
+// it fires from the hidden WC form and confuses customers.
+if ( $is_weight_loss ) {
+	remove_action( 'woocommerce_before_single_product', 'woocommerce_output_all_notices', 10 );
+}
+
 /**
  * Hook: woocommerce_before_single_product.
  * @hooked woocommerce_output_all_notices - 10
@@ -24,48 +34,43 @@ if ( post_password_required() ) {
 	return;
 }
 
-$slug           = $product->get_slug();
-$weight_loss    = [ 'compound-semaglutide', 'compound-tirzepatide' ];
-$is_weight_loss = in_array( $slug, $weight_loss, true );
-
 if ( $is_weight_loss ) :
 
-	// Builds an encoded image URL from a relative path (handles spaces in folder/file names)
+	// Product hero config — doses + supply_prices confirmed via WP-CLI 2026-04-21
+	$hero = [
+		'compound-tirzepatide' => [
+			'badge'          => 'GIP/GLP-1 Receptor Agonist',
+			'title'          => 'Tirzepatide',
+			'desc'           => 'Tirzepatide activates both GIP and GLP-1 receptors, offering strong metabolic effects with once-weekly dosing.',
+			'compare_url'    => '/product/compound-semaglutide/',
+			'compare_txt'    => 'Compare with Semaglutide →',
+			'doses'          => [ '10mg', '20mg', '30mg', '40mg', '50mg' ],
+			'supply_prices'  => [ 329.95, 659.90, 989.85 ],
+		],
+		'compound-semaglutide' => [
+			'badge'          => 'GLP-1 Receptor Agonist',
+			'title'          => 'Semaglutide',
+			'desc'           => 'Semaglutide activates GLP-1 receptors to reduce appetite and improve blood sugar control with once-weekly dosing.',
+			'compare_url'    => '/product/compound-tirzepatide/',
+			'compare_txt'    => 'Compare with Tirzepatide →',
+			'doses'          => [ '1mg', '2mg', '4mg', '6mg', '10mg' ],
+			'supply_prices'  => [ 250.00, 500.00, 750.00 ], // TODO: verify with client — WC currently shows all at $250
+		],
+	];
+	$h = $hero[ $slug ];
+
+	// Use WC product image (falls back to nothing if unset)
+	$image_id  = $product->get_image_id();
+	$image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'large' ) : '';
+
+	// Keep WC images hook removed — we render the product image ourselves
+	remove_action( 'woocommerce_before_single_product_summary', 'woocommerce_show_product_images', 20 );
+
 	$img_url = function( $path ) {
 		$base  = get_stylesheet_directory_uri() . '/assets/images/';
 		$parts = explode( '/', $path );
 		return esc_url( $base . implode( '/', array_map( 'rawurlencode', $parts ) ) );
 	};
-
-	$img_map = [
-		'compound-semaglutide' => 'semaglutide/semaglutide.png',
-		'compound-tirzepatide' => 'tirzepatide/tirzepatide.png',
-	];
-
-	$hero = [
-		'compound-semaglutide' => [
-			'badge'       => 'GLP-1 Receptor Agonist',
-			'title'       => 'Semaglutide',
-			'desc'        => 'Semaglutide activates GLP-1 receptors to reduce appetite and improve blood sugar control with once-weekly dosing.',
-			'compare_url' => '/product/compound-tirzepatide/',
-			'compare_txt' => 'Compare with Tirzepatide →',
-			'doses'       => [ '0.25mg', '0.5mg', '1mg', '1.7mg', '2.4mg' ],
-			'prices_ot'   => [ 79, 99, 119, 149, 179 ],
-		],
-		'compound-tirzepatide' => [
-			'badge'       => 'GIP/GLP-1 Receptor Agonist',
-			'title'       => 'Tirzepatide',
-			'desc'        => 'Tirzepatide activates both GIP and GLP-1 receptors, offering strong metabolic effects with once-weekly dosing.',
-			'compare_url' => '/product/compound-semaglutide/',
-			'compare_txt' => 'Compare with Semaglutide →',
-			'doses'       => [ '1mg', '2mg', '4mg', '6mg', '10mg' ],
-			'prices_ot'   => [ 99, 119, 149, 169, 199 ],
-		],
-	];
-	$h = $hero[ $slug ];
-
-	// Keep WC images hook removed — we render the product image ourselves
-	remove_action( 'woocommerce_before_single_product_summary', 'woocommerce_show_product_images', 20 );
 
 	$steps = [
 		[
@@ -94,6 +99,8 @@ if ( $is_weight_loss ) :
 		],
 	];
 
+	$sp = $h['supply_prices'];
+
 ?>
 
 <div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'myogenix-pdp', $product ); ?>>
@@ -102,7 +109,7 @@ if ( $is_weight_loss ) :
 	<section class="pdp-hero" id="buy">
 		<div class="pdp-hero__inner">
 
-			<!-- Left: image + product info -->
+			<!-- Left: product info + image -->
 			<div class="pdp-hero__left">
 				<span class="pdp-hero__badge"><?php echo esc_html( $h['badge'] ); ?></span>
 				<h1 class="pdp-hero__title"><?php echo esc_html( $h['title'] ); ?></h1>
@@ -111,9 +118,13 @@ if ( $is_weight_loss ) :
 					<li>Compounded · FDA-registered facility</li>
 					<li>Provider-reviewed</li>
 				</ul>
+
+				<?php if ( $image_url ) : ?>
 				<div class="pdp-hero__image-card">
-					<img src="<?php echo $img_url( $img_map[ $slug ] ); ?>" alt="<?php echo esc_attr( $h['title'] ); ?>" />
+					<img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $h['title'] ); ?>" loading="lazy" />
 				</div>
+				<?php endif; ?>
+
 				<div class="pdp-hero__trust-grid">
 					<div class="pdp-hero__trust-item">
 						<span class="pdp-hero__trust-icon">🏥</span>
@@ -152,7 +163,7 @@ if ( $is_weight_loss ) :
 			<!-- Right: configurator + hidden WC form -->
 			<div class="pdp-hero__right">
 
-				<!-- Hidden WC form — keeps variation JS alive for cart submission -->
+				<!-- Hidden WC form — keeps variation JS alive for any plugin hooks -->
 				<div class="pdp-hero__wc-hidden" aria-hidden="true">
 					<?php
 					do_action( 'woocommerce_before_single_product_summary' );
@@ -163,56 +174,38 @@ if ( $is_weight_loss ) :
 				<!-- Custom configurator -->
 				<div id="pdp-cfg" class="pdp-cfg"
 					data-doses="<?php echo esc_attr( wp_json_encode( $h['doses'] ) ); ?>"
-					data-prices-ot="<?php echo esc_attr( wp_json_encode( $h['prices_ot'] ) ); ?>"
+					data-supply-prices="<?php echo esc_attr( wp_json_encode( $h['supply_prices'] ) ); ?>"
 					data-product-id="<?php echo esc_attr( $product->get_id() ); ?>"
 				>
-					<!-- Purchase Type -->
-					<p class="pdp-cfg__section-label">Purchase Type</p>
-					<div class="pdp-cfg__ptype-row">
-						<button class="pdp-cfg__ptype pdp-cfg__ptype--active" data-ptype="subscribe">
-							<div class="pdp-cfg__ptype-top">
-								<strong>Subscribe</strong>
-								<span class="pdp-cfg__save-tag">Save 10%</span>
-							</div>
-							<p>Auto-renews at your final month's dose. Cancel anytime.</p>
-						</button>
-						<button class="pdp-cfg__ptype" data-ptype="onetime">
-							<div class="pdp-cfg__ptype-top">
-								<strong>One-time</strong>
-							</div>
-							<p>Includes $79 provider consult fee.</p>
-						</button>
-					</div>
-
 					<!-- Supply Length -->
 					<p class="pdp-cfg__section-label">Supply Length</p>
 					<div class="pdp-cfg__supply-row">
 						<button class="pdp-cfg__supply pdp-cfg__supply--active" data-months="1">
-							<strong>1 month</strong>
-							<span>Single supply</span>
+							<strong>1 Month</strong>
+							<span>$<?php echo number_format( $sp[0], 2 ); ?>/mo</span>
 						</button>
 						<button class="pdp-cfg__supply" data-months="2">
-							<strong>2 months</strong>
-							<span>Escalation pair</span>
+							<strong>2 Months</strong>
+							<span>$<?php echo number_format( $sp[1], 2 ); ?>/mo</span>
 						</button>
 						<button class="pdp-cfg__supply" data-months="3">
 							<span class="pdp-cfg__popular-tag">POPULAR</span>
-							<strong>3 months</strong>
-							<span>Most popular</span>
+							<strong>3 Months</strong>
+							<span>$<?php echo number_format( $sp[2], 2 ); ?>/3mo</span>
 						</button>
 					</div>
 
-					<!-- Configure Your Doses -->
-					<p class="pdp-cfg__section-label">Configure Your Doses</p>
-					<div id="pdp-doses" class="pdp-cfg__doses-wrap"></div>
+					<!-- Dose Selector -->
+					<p class="pdp-cfg__section-label">Your Starting Dose</p>
+					<div id="pdp-dose" class="pdp-cfg__doses-wrap"></div>
 
 					<!-- Order Summary -->
 					<div id="pdp-summary" class="pdp-cfg__summary"></div>
 
 					<!-- CTA -->
-					<button id="pdp-cta" class="pdp-cfg__cta">Start subscription →</button>
+					<button id="pdp-cta" class="pdp-cfg__cta">Start subscription &rarr;</button>
 					<p id="pdp-disclaimer" class="pdp-cfg__disclaimer">
-						By subscribing, you authorize recurring charges at your renewal dose price. Cancel anytime.
+						By subscribing you authorize recurring charges at your selected plan price. Cancel anytime before renewal.
 					</p>
 				</div>
 
