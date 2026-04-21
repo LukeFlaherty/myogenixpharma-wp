@@ -263,6 +263,8 @@
 
 .pdp-cfg__supply:hover {
 	border-color: #999;
+	background: #fff;
+	color: var(--pdp-dark);
 }
 
 .pdp-cfg__supply strong {
@@ -278,7 +280,7 @@
 	line-height: 1.2;
 }
 
-.pdp-cfg__popular-tag {
+.pdp-cfg__supply .pdp-cfg__popular-tag {
 	position: absolute;
 	top: -11px;
 	left: 50%;
@@ -432,6 +434,8 @@
 }
 
 .pdp-cfg__cta:hover {
+	background: var(--pdp-dark);
+	color: #fff;
 	opacity: 0.85;
 }
 
