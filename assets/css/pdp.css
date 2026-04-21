@@ -768,6 +768,30 @@
 	background: transparent !important;
 }
 
+/* On-page debug log — populated by JS, hidden when empty */
+#pdp-debug-log {
+	margin-top: 8px;
+}
+#pdp-debug-log:empty { display: none; }
+
+.pdp-debug-line {
+	font-size: 0.8rem;
+	padding: 8px 12px;
+	border-radius: 6px;
+	margin-top: 4px;
+	line-height: 1.45;
+}
+.pdp-debug-line--error {
+	color: #c0392b;
+	background: #fff0ee;
+	border: 1px solid #f5c6c0;
+}
+.pdp-debug-line--warn {
+	color: #7d4e00;
+	background: #fff8e1;
+	border: 1px solid #ffe082;
+}
+
 /* Hero responsive */
 @media ( max-width: 960px ) {
 	.pdp-hero__inner {

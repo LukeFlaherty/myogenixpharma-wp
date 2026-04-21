@@ -59,6 +59,27 @@ if ( $is_weight_loss ) :
 	];
 	$h = $hero[ $slug ];
 
+	// Build price matrix from live WC variation data: { "10mg": { "1-bottle": 329.95, ... }, ... }
+	// Prices always reflect whatever is set in WP Admin → Products → Variations — no hardcoding.
+	$price_matrix = [];
+	foreach ( $product->get_children() as $vid ) {
+		$v = wc_get_product( $vid );
+		if ( ! $v || ! $v->is_purchasable() ) continue;
+		$dose   = $v->get_attribute( 'pa_dosage' );
+		$bottle = $v->get_attribute( 'pa_wm-bottle' );
+		if ( $dose && $bottle ) {
+			$price_matrix[ $dose ][ $bottle ] = (float) $v->get_price();
+		}
+	}
+
+	// Default supply prices (first dose) for PHP-rendered supply buttons before JS runs
+	$first_dose = ! empty( $h['doses'] ) ? $h['doses'][0] : '';
+	$sp         = [
+		isset( $price_matrix[ $first_dose ]['1-bottle'] ) ? $price_matrix[ $first_dose ]['1-bottle'] : 0,
+		isset( $price_matrix[ $first_dose ]['2-bottle'] ) ? $price_matrix[ $first_dose ]['2-bottle'] : 0,
+		isset( $price_matrix[ $first_dose ]['3-bottle'] ) ? $price_matrix[ $first_dose ]['3-bottle'] : 0,
+	];
+
 	// Use WC product image (falls back to nothing if unset)
 	$image_id  = $product->get_image_id();
 	$image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'large' ) : '';
@@ -174,7 +195,7 @@ if ( $is_weight_loss ) :
 				<!-- Custom configurator -->
 				<div id="pdp-cfg" class="pdp-cfg"
 					data-doses="<?php echo esc_attr( wp_json_encode( $h['doses'] ) ); ?>"
-					data-supply-prices="<?php echo esc_attr( wp_json_encode( $h['supply_prices'] ) ); ?>"
+					data-price-matrix="<?php echo esc_attr( wp_json_encode( $price_matrix ) ); ?>"
 					data-product-id="<?php echo esc_attr( $product->get_id() ); ?>"
 				>
 					<!-- Supply Length -->
@@ -182,16 +203,16 @@ if ( $is_weight_loss ) :
 					<div class="pdp-cfg__supply-row">
 						<button class="pdp-cfg__supply pdp-cfg__supply--active" data-months="1">
 							<strong>1 Month</strong>
-							<span>$<?php echo number_format( $sp[0], 2 ); ?>/mo</span>
+							<span class="pdp-cfg__supply-price"><?php echo $sp[0] ? '$' . number_format( $sp[0], 2 ) . '/mo' : ''; ?></span>
 						</button>
 						<button class="pdp-cfg__supply" data-months="2">
 							<strong>2 Months</strong>
-							<span>$<?php echo number_format( $sp[1], 2 ); ?>/mo</span>
+							<span class="pdp-cfg__supply-price"><?php echo $sp[1] ? '$' . number_format( $sp[1], 2 ) . '/mo' : ''; ?></span>
 						</button>
 						<button class="pdp-cfg__supply" data-months="3">
 							<span class="pdp-cfg__popular-tag">POPULAR</span>
 							<strong>3 Months</strong>
-							<span>$<?php echo number_format( $sp[2], 2 ); ?>/3mo</span>
+							<span class="pdp-cfg__supply-price"><?php echo $sp[2] ? '$' . number_format( $sp[2], 2 ) . '/3mo' : ''; ?></span>
 						</button>
 					</div>
 
@@ -207,6 +228,8 @@ if ( $is_weight_loss ) :
 					<p id="pdp-disclaimer" class="pdp-cfg__disclaimer">
 						By subscribing you authorize recurring charges at your selected plan price. Cancel anytime before renewal.
 					</p>
+					<!-- On-page error/warning log — populated by JS, hidden when empty -->
+					<div id="pdp-debug-log"></div>
 				</div>
 
 			</div>
