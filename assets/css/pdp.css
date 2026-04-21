@@ -1,17 +1,18 @@
 /* ==========================================================================
    Myogenix PDP — Custom layout for weight loss product pages
-   Scoped entirely to .myogenix-pdp to avoid conflicts with Elementor pages
+   Scoped to .myogenix-pdp to avoid conflicts with Elementor pages
    ========================================================================== */
 
 .myogenix-pdp {
-	--pdp-cream:   #faf0e6;
-	--pdp-purple:  #5b4bc4;
-	--pdp-orange:  #f0a030;
-	--pdp-dark:    #1a1a1a;
-	--pdp-text:    #2d2d2d;
-	--pdp-muted:   #666666;
-	--pdp-border:  #e8962a;
-	--pdp-max:     1200px;
+	--pdp-purple:      #5b4bc4;
+	--pdp-dark:        #1a1a1a;
+	--pdp-text:        #2d2d2d;
+	--pdp-muted:       #666;
+	--pdp-light:       #888;
+	--pdp-border:      #e0e0e0;
+	--pdp-bg-sub:      #f8f8f8;
+	--pdp-step-border: #e8962a;
+	--pdp-max:         1200px;
 }
 
 /* Shared container */
@@ -21,189 +22,16 @@
 	padding: 0 40px;
 }
 
-/* Full-bleed helper — breaks out of WooCommerce content wrapper */
+/* Full-bleed — breaks out of WooCommerce content wrapper */
 .pdp-hero,
 .myogenix-pdp__steps,
 .myogenix-pdp__how-it-works,
 .myogenix-pdp__cq,
-.myogenix-pdp__faq,
-.myogenix-pdp__explore,
-.myogenix-pdp__usa-badge {
+.myogenix-pdp__explore {
 	width: 100vw;
 	position: relative;
 	left: 50%;
 	transform: translateX(-50%);
-}
-
-/* ==========================================================================
-   Hero Banner
-   ========================================================================== */
-
-.myogenix-pdp__hero-banner {
-	background: var(--pdp-purple);
-	color: #fff;
-	text-align: center;
-	padding: 72px 20px;
-}
-
-.myogenix-pdp__hero-headline {
-	font-size: 2.5rem;
-	font-weight: 800;
-	margin: 0 0 16px;
-	color: #fff;
-	line-height: 1.2;
-}
-
-.myogenix-pdp__hero-sub {
-	font-size: 1.125rem;
-	margin: 0 0 32px;
-	color: rgba(255, 255, 255, 0.88);
-	max-width: 600px;
-	margin-left: auto;
-	margin-right: auto;
-}
-
-.myogenix-pdp__hero-btn {
-	display: inline-block;
-	background: var(--pdp-orange);
-	color: #fff;
-	padding: 16px 44px;
-	border-radius: 4px;
-	font-weight: 700;
-	font-size: 1rem;
-	text-decoration: none;
-	letter-spacing: 0.03em;
-	transition: opacity 0.2s ease;
-}
-
-.myogenix-pdp__hero-btn:hover {
-	opacity: 0.85;
-	color: #fff;
-	text-decoration: none;
-}
-
-/* ==========================================================================
-   Product Section
-   ========================================================================== */
-
-.myogenix-pdp__product {
-	background: var(--pdp-cream);
-	padding: 72px 0;
-}
-
-.myogenix-pdp__product .myogenix-pdp__container {
-	max-width: none;
-	padding: 0 7%;
-}
-
-.myogenix-pdp__product-inner {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 6%;
-	align-items: center;
-}
-
-.myogenix-pdp__product-image {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
-.myogenix-pdp__product-image img {
-	width: 100%;
-	max-width: 520px;
-	display: block;
-}
-
-/* WooCommerce summary overrides — scoped to custom PDP only */
-.myogenix-pdp .product_title.entry-title {
-	font-size: 2rem;
-	font-weight: 800;
-	text-transform: uppercase;
-	letter-spacing: 0.06em;
-	margin: 0 0 20px;
-	color: var(--pdp-dark);
-}
-
-.myogenix-pdp .woocommerce-product-details__short-description {
-	margin-bottom: 24px;
-	color: var(--pdp-text);
-	line-height: 1.7;
-	font-size: 0.95rem;
-}
-
-.myogenix-pdp .price {
-	font-size: 1.5rem;
-	font-weight: 700;
-	color: var(--pdp-text) !important;
-	margin-bottom: 24px;
-	display: block;
-}
-
-.myogenix-pdp .variations th.label label {
-	font-weight: 600;
-	color: var(--pdp-text);
-}
-
-.myogenix-pdp .variations select {
-	width: 100%;
-	padding: 10px 12px;
-	border: 1px solid #ccc;
-	border-radius: 4px;
-	font-size: 0.95rem;
-	color: var(--pdp-text);
-	background: #fff;
-}
-
-.myogenix-pdp table.variations {
-	width: 100%;
-	border-collapse: collapse;
-	margin-bottom: 16px;
-}
-
-.myogenix-pdp table.variations td,
-.myogenix-pdp table.variations th {
-	padding: 6px 0;
-	vertical-align: middle;
-}
-
-/* Add to cart — covers WooCommerce, subscriptions, and parent theme overrides */
-.myogenix-pdp .cart button,
-.myogenix-pdp .cart .button,
-.myogenix-pdp button.single_add_to_cart_button,
-.myogenix-pdp a.single_add_to_cart_button,
-.myogenix-pdp .woocommerce-variation-add-to-cart .button,
-.myogenix-pdp input.button[type="submit"] {
-	display: block !important;
-	width: 100% !important;
-	background: #1a1a1a !important;
-	color: #fff !important;
-	border: none !important;
-	padding: 18px !important;
-	font-size: 1rem !important;
-	font-weight: 700 !important;
-	letter-spacing: 0.08em !important;
-	text-transform: uppercase !important;
-	cursor: pointer !important;
-	border-radius: 4px !important;
-	transition: opacity 0.2s ease !important;
-	text-align: center !important;
-	margin-top: 8px !important;
-	box-shadow: none !important;
-}
-
-.myogenix-pdp .cart button:hover,
-.myogenix-pdp .cart .button:hover,
-.myogenix-pdp button.single_add_to_cart_button:hover,
-.myogenix-pdp a.single_add_to_cart_button:hover {
-	opacity: 0.82 !important;
-	color: #fff !important;
-	background: #1a1a1a !important;
-}
-
-/* Hide SKU / category meta */
-.myogenix-pdp .product_meta {
-	display: none;
 }
 
 /* ==========================================================================
@@ -226,60 +54,6 @@
 }
 
 /* ==========================================================================
-   4 Steps Section
-   ========================================================================== */
-
-.myogenix-pdp__steps {
-	background: #fff;
-	padding: 80px 0;
-}
-
-.myogenix-pdp__steps-grid {
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	gap: 24px;
-}
-
-.myogenix-pdp__step-card {
-	border: 2px solid var(--pdp-border);
-	border-radius: 8px;
-	padding: 28px 20px 24px;
-	text-align: center;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 14px;
-}
-
-.myogenix-pdp__step-num {
-	width: 52px;
-	height: 52px;
-	flex-shrink: 0;
-}
-
-.myogenix-pdp__step-img {
-	width: 100%;
-	max-width: 160px;
-	height: 140px;
-	object-fit: contain;
-}
-
-.myogenix-pdp__step-title {
-	font-size: 1rem;
-	font-weight: 700;
-	margin: 0;
-	color: var(--pdp-dark);
-	line-height: 1.3;
-}
-
-.myogenix-pdp__step-desc {
-	font-size: 0.875rem;
-	color: var(--pdp-muted);
-	margin: 0;
-	line-height: 1.6;
-}
-
-/* ==========================================================================
    Product Hero
    ========================================================================== */
 
@@ -290,17 +64,25 @@
 }
 
 .pdp-hero__inner {
-	max-width: 1200px;
+	max-width: var(--pdp-max);
 	margin: 0 auto;
 	padding: 0 40px;
 	display: grid;
-	grid-template-columns: 11fr 9fr;
+	grid-template-columns: 6fr 4fr;
 	gap: 60px;
 	align-items: start;
-	box-sizing: border-box;
 }
 
-/* Left column */
+.pdp-hero__left {
+	min-width: 0;
+}
+
+.pdp-hero__right {
+	min-width: 0;
+	position: sticky;
+	top: 24px;
+}
+
 .pdp-hero__badge {
 	display: inline-block;
 	border: 1.5px solid #ccc;
@@ -310,14 +92,14 @@
 	font-weight: 700;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
-	color: #666;
+	color: var(--pdp-muted);
 	margin-bottom: 16px;
 }
 
 .pdp-hero__title {
 	font-size: 2.75rem;
 	font-weight: 900;
-	color: #1a1a1a;
+	color: var(--pdp-dark);
 	margin: 0 0 14px;
 	line-height: 1.05;
 }
@@ -349,7 +131,6 @@
 
 .pdp-hero__bullets li::before {
 	content: '•';
-	color: #555;
 }
 
 .pdp-hero__image-card {
@@ -400,13 +181,13 @@
 .pdp-hero__trust-text strong {
 	font-size: 0.8125rem;
 	font-weight: 700;
-	color: #1a1a1a;
+	color: var(--pdp-dark);
 	line-height: 1.2;
 }
 
 .pdp-hero__trust-text span {
 	font-size: 0.75rem;
-	color: #666;
+	color: var(--pdp-muted);
 	line-height: 1.2;
 }
 
@@ -419,30 +200,17 @@
 }
 
 .pdp-hero__compare:hover {
-	color: #1a1a1a;
+	color: var(--pdp-dark);
 	text-decoration: underline;
 }
 
-/* Left column */
-.pdp-hero__left {
-	min-width: 0;
-}
-
-/* Right column */
-.pdp-hero__right {
-	min-width: 0;
-	position: sticky;
-	top: 24px;
-}
-
-/* Hidden WC form — no dimension restrictions so WC variation JS initializes */
+/* Hidden WC form — inert attr + aria-hidden prevent all interaction and a11y exposure */
 .pdp-hero__wc-hidden {
 	position: absolute;
 	left: -9999px;
 	top: 0;
 	opacity: 0;
 	pointer-events: none;
-	tab-index: -1;
 }
 
 /* ==========================================================================
@@ -459,69 +227,8 @@
 	font-weight: 700;
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
-	color: #888;
+	color: var(--pdp-light);
 	margin: 0 0 10px;
-}
-
-/* Purchase type */
-.pdp-cfg__ptype-row {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 10px;
-	margin-bottom: 20px;
-}
-
-.pdp-cfg__ptype {
-	background: #fff !important;
-	border: 1.5px solid #ddd !important;
-	border-radius: 12px !important;
-	padding: 14px 16px !important;
-	text-align: left !important;
-	cursor: pointer;
-	transition: border-color 0.15s ease;
-	color: #1a1a1a !important;
-	box-shadow: none !important;
-}
-
-.pdp-cfg__ptype--active {
-	border-color: #1a1a1a !important;
-}
-
-.pdp-cfg__ptype:hover {
-	border-color: #999 !important;
-	background: #fff !important;
-	color: #1a1a1a !important;
-	box-shadow: none !important;
-}
-
-.pdp-cfg__ptype-top {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	margin-bottom: 6px;
-}
-
-.pdp-cfg__ptype strong {
-	font-size: 1rem !important;
-	font-weight: 700 !important;
-	color: #1a1a1a !important;
-}
-
-.pdp-cfg__ptype p {
-	font-size: 0.8rem !important;
-	color: #666 !important;
-	margin: 0 !important;
-	line-height: 1.4;
-}
-
-.pdp-cfg__save-tag {
-	background: #1a1a1a !important;
-	color: #fff !important;
-	font-size: 0.7rem;
-	font-weight: 700;
-	padding: 3px 8px;
-	border-radius: 50px;
-	white-space: nowrap;
 }
 
 /* Supply length */
@@ -534,93 +241,69 @@
 }
 
 .pdp-cfg__supply {
-	background: #fff !important;
-	border: 1.5px solid #ddd !important;
-	border-radius: 10px !important;
-	padding: 12px 8px !important;
-	text-align: center !important;
+	background: #fff;
+	border: 1.5px solid var(--pdp-border);
+	border-radius: 10px;
+	padding: 12px 8px;
+	text-align: center;
 	cursor: pointer;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	gap: 3px;
 	position: relative;
-	color: #1a1a1a !important;
-	box-shadow: none !important;
+	color: var(--pdp-dark);
+	box-shadow: none;
 	transition: border-color 0.15s ease;
 }
 
 .pdp-cfg__supply--active {
-	border-color: #1a1a1a !important;
+	border-color: var(--pdp-dark);
 }
 
 .pdp-cfg__supply:hover {
-	border-color: #999 !important;
-	background: #fff !important;
-	box-shadow: none !important;
+	border-color: #999;
 }
 
 .pdp-cfg__supply strong {
-	font-size: 0.9375rem !important;
-	font-weight: 700 !important;
-	color: #1a1a1a !important;
+	font-size: 0.9375rem;
+	font-weight: 700;
+	color: var(--pdp-dark);
 	line-height: 1.2;
 }
 
 .pdp-cfg__supply span {
-	font-size: 0.75rem !important;
-	color: #666 !important;
+	font-size: 0.75rem;
+	color: var(--pdp-muted);
 	line-height: 1.2;
 }
 
 .pdp-cfg__popular-tag {
-	position: absolute !important;
-	top: -11px !important;
+	position: absolute;
+	top: -11px;
 	left: 50%;
 	transform: translateX(-50%);
-	background: #1a1a1a !important;
-	color: #fff !important;
-	font-size: 0.6rem !important;
-	font-weight: 700 !important;
+	background: var(--pdp-dark);
+	color: #fff;
+	font-size: 0.6rem;
+	font-weight: 700;
 	letter-spacing: 0.08em;
-	padding: 3px 8px !important;
-	border-radius: 50px !important;
+	padding: 3px 8px;
+	border-radius: 50px;
 	white-space: nowrap;
 }
 
-/* Dose cards (JS-rendered) */
+/* Dose card (JS-rendered) */
 .pdp-cfg__doses-wrap {
 	margin-bottom: 12px;
 }
 
 .pdp-cfg__dose-card {
-	border: 1px solid #e0e0e0;
+	border: 1px solid var(--pdp-border);
 	border-radius: 10px;
 	padding: 16px;
 	margin-bottom: 10px;
 	background: #fff;
-}
-
-.pdp-cfg__dose-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 12px;
-}
-
-.pdp-cfg__dose-month {
-	font-size: 0.9375rem;
-	font-weight: 700;
-	color: #1a1a1a;
-}
-
-.pdp-cfg__dose-badge {
-	background: #f0f0f0;
-	color: #666;
-	font-size: 0.7rem;
-	font-weight: 600;
-	padding: 3px 10px;
-	border-radius: 50px;
 }
 
 .pdp-cfg__dose-select-wrap {
@@ -629,17 +312,17 @@
 }
 
 .pdp-cfg__dose-select {
-	width: 100% !important;
-	border: 1.5px solid #e0e0e0 !important;
-	border-radius: 8px !important;
-	padding: 12px 40px 12px 14px !important;
-	font-size: 0.9375rem !important;
-	font-weight: 500 !important;
-	color: #1a1a1a !important;
-	background: #fff !important;
+	width: 100%;
+	border: 1.5px solid var(--pdp-border);
+	border-radius: 8px;
+	padding: 12px 40px 12px 14px;
+	font-size: 0.9375rem;
+	font-weight: 500;
+	color: var(--pdp-dark);
+	background: #fff;
 	appearance: none;
 	cursor: pointer;
-	box-shadow: none !important;
+	box-shadow: none;
 }
 
 .pdp-cfg__dose-chevron {
@@ -648,13 +331,13 @@
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	color: #666;
+	color: var(--pdp-muted);
 	display: flex;
 }
 
 .pdp-cfg__dose-detail {
 	font-size: 0.8rem;
-	color: #888;
+	color: var(--pdp-light);
 	line-height: 1.5;
 }
 
@@ -665,15 +348,15 @@
 
 .pdp-cfg__dose-note {
 	font-size: 0.8rem;
-	color: #888;
+	color: var(--pdp-light);
 	margin: 4px 0 0;
 	font-style: italic;
 	line-height: 1.4;
 }
 
-/* Order summary */
+/* Order summary (JS-rendered) */
 .pdp-cfg__summary {
-	background: #f8f8f8;
+	background: var(--pdp-bg-sub);
 	border: 1px solid #e8e8e8;
 	border-radius: 10px;
 	padding: 18px;
@@ -685,7 +368,7 @@
 	font-weight: 700;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
-	color: #888;
+	color: var(--pdp-light);
 	margin: 0 0 14px;
 }
 
@@ -698,20 +381,16 @@
 	margin-bottom: 8px;
 }
 
-.pdp-cfg__summary-savings {
-	color: #666;
-}
-
 .pdp-cfg__summary-total {
 	display: flex;
 	justify-content: space-between;
 	align-items: baseline;
 	font-size: 1rem;
 	font-weight: 700;
-	color: #1a1a1a;
+	color: var(--pdp-dark);
 	margin-top: 14px;
 	padding-top: 14px;
-	border-top: 1px solid #e0e0e0;
+	border-top: 1px solid var(--pdp-border);
 }
 
 .pdp-cfg__summary-total-price {
@@ -721,7 +400,7 @@
 
 .pdp-cfg__summary-note {
 	background: #fff;
-	border: 1px solid #e0e0e0;
+	border: 1px solid var(--pdp-border);
 	border-radius: 8px;
 	padding: 10px 12px;
 	font-size: 0.8rem;
@@ -731,96 +410,113 @@
 }
 
 .pdp-cfg__summary-note strong {
-	color: #1a1a1a;
+	color: var(--pdp-dark);
 }
 
 /* CTA */
 .pdp-cfg__cta {
-	display: block !important;
-	width: 100% !important;
-	background: #1a1a1a !important;
-	color: #fff !important;
-	border: none !important;
-	border-radius: 10px !important;
-	padding: 18px !important;
-	font-size: 1rem !important;
-	font-weight: 700 !important;
-	cursor: pointer !important;
-	text-align: center !important;
-	transition: opacity 0.2s ease !important;
-	box-shadow: none !important;
-	margin-bottom: 10px !important;
+	display: block;
+	width: 100%;
+	background: var(--pdp-dark);
+	color: #fff;
+	border: none;
+	border-radius: 10px;
+	padding: 18px;
+	font-size: 1rem;
+	font-weight: 700;
+	cursor: pointer;
+	text-align: center;
+	transition: opacity 0.2s ease;
+	margin-bottom: 10px;
 	letter-spacing: 0.02em;
 }
 
 .pdp-cfg__cta:hover {
-	opacity: 0.85 !important;
-	background: #1a1a1a !important;
-	color: #fff !important;
+	opacity: 0.85;
+}
+
+.pdp-cfg__cta:focus {
+	outline: none;
+}
+
+.pdp-cfg__cta:focus-visible {
+	outline: 2px solid var(--pdp-purple);
+	outline-offset: 2px;
+}
+
+.pdp-cfg__cta--loading {
+	opacity: 0.6;
+	cursor: not-allowed;
 }
 
 .pdp-cfg__disclaimer {
-	font-size: 0.8rem !important;
-	color: #888 !important;
-	text-align: center;
-	margin: 0 !important;
-	line-height: 1.5;
-	background: transparent !important;
-}
-
-/* On-page debug log — populated by JS, hidden when empty */
-#pdp-debug-log {
-	margin-top: 8px;
-}
-#pdp-debug-log:empty { display: none; }
-
-.pdp-debug-line {
 	font-size: 0.8rem;
-	padding: 8px 12px;
-	border-radius: 6px;
-	margin-top: 4px;
-	line-height: 1.45;
+	color: var(--pdp-light);
+	text-align: center;
+	margin: 0;
+	line-height: 1.5;
 }
-.pdp-debug-line--error {
+
+.pdp-cfg__error {
+	font-size: 0.85rem;
 	color: #c0392b;
-	background: #fff0ee;
-	border: 1px solid #f5c6c0;
-}
-.pdp-debug-line--warn {
-	color: #7d4e00;
-	background: #fff8e1;
-	border: 1px solid #ffe082;
+	margin-top: 10px;
+	text-align: center;
+	line-height: 1.4;
 }
 
-/* Hero responsive */
-@media ( max-width: 960px ) {
-	.pdp-hero__inner {
-		grid-template-columns: 1fr;
-		gap: 40px;
-	}
+/* ==========================================================================
+   4 Steps Section
+   ========================================================================== */
 
-	.pdp-hero__right {
-		position: static;
-	}
-
-	.pdp-hero__image-card img {
-		max-width: 260px;
-		margin: 0 auto;
-	}
+.myogenix-pdp__steps {
+	background: #fff;
+	padding: 80px 0;
 }
 
-@media ( max-width: 600px ) {
-	.pdp-hero__inner {
-		padding: 0 20px;
-	}
+.myogenix-pdp__steps-grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 24px;
+}
 
-	.pdp-hero__title {
-		font-size: 2.125rem;
-	}
+.myogenix-pdp__step-card {
+	border: 2px solid var(--pdp-step-border);
+	border-radius: 8px;
+	padding: 28px 20px 24px;
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 14px;
+}
 
-	.pdp-hero {
-		padding: 32px 0 48px;
-	}
+.myogenix-pdp__step-num {
+	width: 52px;
+	height: 52px;
+	flex-shrink: 0;
+}
+
+.myogenix-pdp__step-img {
+	width: 100%;
+	max-width: 160px;
+	height: 140px;
+	object-fit: contain;
+}
+
+.myogenix-pdp__step-title {
+	font-size: 1rem;
+	font-weight: 700;
+	margin: 0;
+	color: var(--pdp-dark);
+	line-height: 1.3;
+}
+
+.myogenix-pdp__step-desc {
+	font-size: 0.875rem;
+	color: var(--pdp-muted);
+	margin: 0;
+	line-height: 1.6;
 }
 
 /* ==========================================================================
@@ -908,7 +604,7 @@
 
 .myogenix-pdp__how-desc {
 	font-size: 0.9rem;
-	color: #666;
+	color: var(--pdp-muted);
 	margin: 0;
 	line-height: 1.65;
 }
@@ -918,7 +614,7 @@
    ========================================================================== */
 
 .myogenix-pdp__cq {
-	background: #ffffff !important;
+	background: #fff;
 	padding: 80px 0;
 	border-top: 1px solid #ebebeb;
 }
@@ -961,10 +657,10 @@
 
 .myogenix-pdp__cq-btn {
 	display: inline-block;
-	background: #1a1a1a;
+	background: var(--pdp-dark);
 	color: #fff;
 	padding: 14px 28px;
-	border-radius: 50px;
+	border-radius: 10px;
 	font-size: 0.95rem;
 	font-weight: 600;
 	text-decoration: none;
@@ -987,28 +683,29 @@
 
 .myogenix-pdp__cq-question {
 	width: 100%;
-	background: #ffffff !important;
-	border: none !important;
-	box-shadow: none !important;
-	padding: 20px 0 !important;
+	background: none;
+	border: none;
+	padding: 20px 0;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	font-size: 1rem;
 	font-weight: 700;
-	color: #1a1a1a !important;
+	color: var(--pdp-dark);
 	cursor: pointer;
 	text-align: left;
 	gap: 20px;
 	line-height: 1.4;
+}
+
+.myogenix-pdp__cq-question:focus {
 	outline: none;
 }
 
-.myogenix-pdp__cq-question:hover,
-.myogenix-pdp__cq-question:focus {
-	background: #ffffff !important;
-	color: #1a1a1a !important;
-	box-shadow: none !important;
+.myogenix-pdp__cq-question:focus-visible {
+	outline: 2px solid var(--pdp-purple);
+	outline-offset: 2px;
+	border-radius: 2px;
 }
 
 .myogenix-pdp__cq-icon {
@@ -1016,7 +713,7 @@
 	font-weight: 300;
 	line-height: 1;
 	flex-shrink: 0;
-	color: #888;
+	color: var(--pdp-light);
 	transition: transform 0.25s ease;
 }
 
@@ -1030,129 +727,16 @@
 	transition: max-height 0.35s ease;
 	font-size: 0.95rem;
 	line-height: 1.75;
-	color: #555555 !important;
-	background: #ffffff !important;
+	color: #555;
 }
 
 .myogenix-pdp__cq-answer.is-open {
-	max-height: 400px;
+	max-height: 800px;
 }
 
 .myogenix-pdp__cq-answer p {
 	margin: 0;
 	padding-bottom: 20px;
-	color: #555555 !important;
-	background: #ffffff !important;
-}
-
-@media ( max-width: 768px ) {
-	.myogenix-pdp__cq-inner {
-		grid-template-columns: 1fr;
-		gap: 36px;
-	}
-
-	.myogenix-pdp__cq-left {
-		position: static;
-	}
-
-	.myogenix-pdp__cq-heading {
-		font-size: 1.75rem;
-	}
-}
-
-/* ==========================================================================
-   FAQ Section
-   ========================================================================== */
-
-.myogenix-pdp__faq {
-	background: #ffffff !important;
-	padding: 80px 0;
-	border-top: 1px solid #ebebeb;
-}
-
-.myogenix-pdp__faq-list {
-	max-width: 820px;
-	margin: 0 auto;
-}
-
-.myogenix-pdp__faq-item {
-	border-bottom: 1px solid #e0e0e0;
-	background: #ffffff !important;
-}
-
-.myogenix-pdp__faq-item:first-child {
-	border-top: 1px solid #e0e0e0;
-}
-
-.myogenix-pdp__faq-question {
-	width: 100%;
-	background: #ffffff !important;
-	border: none;
-	padding: 20px 0;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	font-size: 1rem;
-	font-weight: 500;
-	color: #1a1a1a !important;
-	cursor: pointer;
-	text-align: left;
-	gap: 20px;
-	line-height: 1.4;
-}
-
-.myogenix-pdp__faq-question span:first-child {
-	color: #1a1a1a !important;
-}
-
-.myogenix-pdp__faq-question:hover,
-.myogenix-pdp__faq-question:hover span:first-child {
-	color: var(--pdp-purple) !important;
-}
-
-.myogenix-pdp__faq-icon {
-	font-size: 1.5rem;
-	font-weight: 300;
-	line-height: 1;
-	flex-shrink: 0;
-	color: #666666 !important;
-	transition: transform 0.25s ease;
-}
-
-.myogenix-pdp__faq-question[aria-expanded="true"] .myogenix-pdp__faq-icon {
-	transform: rotate(45deg);
-	color: var(--pdp-purple) !important;
-}
-
-/* Animated accordion — height transitions via max-height */
-.myogenix-pdp__faq-answer {
-	max-height: 0;
-	overflow: hidden;
-	transition: max-height 0.35s ease;
-	color: #555555 !important;
-	line-height: 1.75;
-	font-size: 0.95rem;
-	max-width: 740px;
-	background: #ffffff !important;
-}
-
-.myogenix-pdp__faq-answer.is-open {
-	max-height: 600px;
-}
-
-.myogenix-pdp__faq-answer p {
-	margin: 0;
-	padding-bottom: 20px;
-	color: #555555 !important;
-	background: #ffffff !important;
-}
-
-.myogenix-pdp__faq-footnote {
-	text-align: center;
-	color: #aaa;
-	font-size: 0.875rem;
-	margin-top: 44px;
-	margin-bottom: 0;
 }
 
 /* ==========================================================================
@@ -1188,30 +772,27 @@
 .myogenix-pdp__explore-link img {
 	width: 100%;
 	display: block;
-	border-radius: 12px;
-}
-
-/* ==========================================================================
-   USA Badge Section
-   ========================================================================== */
-
-.myogenix-pdp__usa-badge {
-	background: #1a1a1a;
-	text-align: center;
-	padding: 64px 20px;
-}
-
-.myogenix-pdp__usa-badge img {
-	max-width: 380px;
-	width: 100%;
-	display: inline-block;
 }
 
 /* ==========================================================================
    Responsive
    ========================================================================== */
 
-@media ( max-width: 900px ) {
+@media ( max-width: 960px ) {
+	.pdp-hero__inner {
+		grid-template-columns: 1fr;
+		gap: 40px;
+	}
+
+	.pdp-hero__right {
+		position: static;
+	}
+
+	.pdp-hero__image-card img {
+		max-width: 260px;
+		margin: 0 auto;
+	}
+
 	.myogenix-pdp__steps-grid {
 		grid-template-columns: repeat(2, 1fr);
 	}
@@ -1222,7 +803,20 @@
 		padding: 0 24px;
 	}
 
-	.myogenix-pdp__how-heading {
+	.pdp-hero__inner {
+		padding: 0 20px;
+	}
+
+	.pdp-hero__title {
+		font-size: 2.125rem;
+	}
+
+	.myogenix-pdp__section-heading {
+		font-size: 1.5rem;
+	}
+
+	.myogenix-pdp__how-heading,
+	.myogenix-pdp__cq-heading {
 		font-size: 1.75rem;
 	}
 
@@ -1230,22 +824,13 @@
 		grid-template-columns: 1fr;
 	}
 
-	.myogenix-pdp__product-inner {
+	.myogenix-pdp__cq-inner {
 		grid-template-columns: 1fr;
-		gap: 32px;
+		gap: 36px;
 	}
 
-	.myogenix-pdp__product-image img {
-		max-width: 280px;
-		margin: 0 auto;
-	}
-
-	.myogenix-pdp__hero-headline {
-		font-size: 1.75rem;
-	}
-
-	.myogenix-pdp__section-heading {
-		font-size: 1.5rem;
+	.myogenix-pdp__cq-left {
+		position: static;
 	}
 
 	.myogenix-pdp__explore-grid {
@@ -1254,13 +839,17 @@
 	}
 }
 
-@media ( max-width: 560px ) {
+@media ( max-width: 600px ) {
+	.pdp-hero {
+		padding: 32px 0 48px;
+	}
+
 	.myogenix-pdp__steps-grid {
 		grid-template-columns: 1fr;
 	}
 
-	.myogenix-pdp__hero-banner,
-	.myogenix-pdp__product {
+	.myogenix-pdp__steps,
+	.myogenix-pdp__how-it-works {
 		padding-top: 48px;
 		padding-bottom: 48px;
 	}

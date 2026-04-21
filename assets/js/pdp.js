@@ -1,29 +1,24 @@
 document.addEventListener( 'DOMContentLoaded', function () {
 
-	/* -----------------------------------------------------------------------
-	   On-page debug logger — errors and warnings appear as red text below
-	   the CTA so you don't need DevTools open to spot problems.
-	----------------------------------------------------------------------- */
-	function pdpLog( msg ) { console.log( '[Myogenix PDP] ' + msg ); }
-	function pdpWarn( msg ) {
-		console.warn( '[Myogenix PDP] ' + msg );
-		pdpAppend( msg, 'warn' );
-	}
-	function pdpError( msg ) {
-		console.error( '[Myogenix PDP] ' + msg );
-		pdpAppend( msg, 'error' );
-	}
-	function pdpAppend( msg, level ) {
-		var log = document.getElementById( 'pdp-debug-log' );
-		if ( ! log ) return;
-		var line = document.createElement( 'p' );
-		line.className = 'pdp-debug-line pdp-debug-line--' + level;
-		line.textContent = ( level === 'error' ? '\u26a0 ' : '\u2139 ' ) + msg;
-		log.appendChild( line );
+	function pdpLog( msg )  { console.log(   '[Myogenix PDP] ' + msg ); }
+	function pdpWarn( msg ) { console.warn(  '[Myogenix PDP] ' + msg ); }
+	function pdpError( msg ){ console.error( '[Myogenix PDP] ' + msg ); }
+
+	function showUserError( msg ) {
+		var existing = document.getElementById( 'pdp-user-error' );
+		if ( existing ) existing.remove();
+		var el = document.createElement( 'p' );
+		el.id = 'pdp-user-error';
+		el.className = 'pdp-cfg__error';
+		el.textContent = msg;
+		var disclaimer = document.getElementById( 'pdp-disclaimer' );
+		if ( disclaimer && disclaimer.parentNode ) {
+			disclaimer.parentNode.insertBefore( el, disclaimer.nextSibling );
+		}
 	}
 
 	/* -----------------------------------------------------------------------
-	   Accordion helper (shared by FAQ + Common Questions sections)
+	   Accordion helper (Common Questions section)
 	----------------------------------------------------------------------- */
 	function initAccordion( selector ) {
 		var items = Array.prototype.slice.call( document.querySelectorAll( selector ) );
@@ -46,7 +41,6 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		} );
 	}
 
-	initAccordion( '.myogenix-pdp__faq-question' );
 	initAccordion( '.myogenix-pdp__cq-question' );
 
 	/* -----------------------------------------------------------------------
@@ -157,7 +151,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			'</div>' +
 			( price
 				? '<div class="pdp-cfg__summary-note">Auto-renews ' + RENEW_MAP[ state.months ] + ' at <strong>' + priceStr + '</strong>. Cancel anytime before renewal.</div>'
-				: '<div class="pdp-cfg__summary-note pdp-debug-line--warn">No price found for this combination. Check WP Admin &rarr; Products &rarr; Variations.</div>'
+				: '<div class="pdp-cfg__summary-note">Price unavailable for this combination.</div>'
 			);
 	}
 
@@ -191,14 +185,12 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			var bottle = BOTTLE_MAP[ state.months ] || '1-bottle';
 			var plan   = PLAN_MAP[ state.months ]   || '1-month';
 
-			/* Clear previous error and debug lines */
-			var prevErr = document.getElementById( 'pdp-cta-error' );
+			var prevErr = document.getElementById( 'pdp-user-error' );
 			if ( prevErr ) prevErr.remove();
-			var log = document.getElementById( 'pdp-debug-log' );
-			if ( log ) log.innerHTML = '';
 
 			if ( ! pid ) {
-				pdpError( 'Could not determine product ID. Please refresh and try again.' );
+				showUserError( 'Something went wrong. Please refresh and try again.' );
+				pdpError( 'Could not determine product ID.' );
 				return;
 			}
 
@@ -236,7 +228,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 								}
 							}
 						} catch ( e ) {
-							pdpError( 'Could not parse WC variation data: ' + e.message );
+							pdpWarn( 'Could not parse WC variation data: ' + e.message );
 						}
 					}
 				}
@@ -245,12 +237,14 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			pdpLog( 'Adding to cart \u2192 dosage: ' + state.dose + ' | bottle: ' + bottle + ' | plan: ' + plan + ' | variation_id: ' + ( variationId || 'NOT FOUND' ) );
 
 			if ( ! variationId ) {
-				pdpError(
-					'No matching variation found for: ' + state.dose + ', ' + bottle + ', ' + plan + '. ' +
-					'Verify this combination exists and is published in WP Admin \u2192 Products \u2192 Variations.'
-				);
+				pdpError( 'No matching variation: ' + state.dose + ' / ' + bottle + ' / ' + plan );
+				showUserError( 'This combination is currently unavailable. Please try a different dose or supply length.' );
 				return;
 			}
+
+			ctaBtn.disabled = true;
+			ctaBtn.classList.add( 'pdp-cfg__cta--loading' );
+			ctaBtn.textContent = 'Adding to cart\u2026';
 
 			var url = window.location.pathname + '?add-to-cart=' + pid + '&quantity=1';
 			url += '&variation_id='                              + variationId;
@@ -260,19 +254,6 @@ document.addEventListener( 'DOMContentLoaded', function () {
 
 			window.location.href = url;
 		} );
-	}
-
-	/* Log WC form attributes on load (DevTools only — not on-page) */
-	var wcFormDbg = document.querySelector( '.variations_form' );
-	if ( wcFormDbg ) {
-		var dbgSelects = wcFormDbg.querySelectorAll( 'select[name^="attribute_"]' );
-		if ( dbgSelects.length ) {
-			pdpLog( 'WC variation form found. Attributes:' );
-			Array.prototype.slice.call( dbgSelects ).forEach( function ( sel ) {
-				var opts = Array.prototype.slice.call( sel.options ).map( function ( o ) { return o.value || '(any)'; } );
-				pdpLog( '  ' + sel.name + ' \u2192 [' + opts.join( ', ' ) + ']' );
-			} );
-		}
 	}
 
 	/* Initial render */

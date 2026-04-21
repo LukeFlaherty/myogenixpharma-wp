@@ -81,12 +81,12 @@ if ( $is_weight_loss ) :
 		}
 	}
 
-	// Default supply prices (first dose) for PHP-rendered supply buttons before JS runs
+	// Supply prices for PHP-rendered buttons — WC data takes precedence, falls back to config defaults
 	$first_dose = ! empty( $h['doses'] ) ? $h['doses'][0] : '';
 	$sp         = [
-		isset( $price_matrix[ $first_dose ]['1-bottle'] ) ? $price_matrix[ $first_dose ]['1-bottle'] : 0,
-		isset( $price_matrix[ $first_dose ]['2-bottle'] ) ? $price_matrix[ $first_dose ]['2-bottle'] : 0,
-		isset( $price_matrix[ $first_dose ]['3-bottle'] ) ? $price_matrix[ $first_dose ]['3-bottle'] : 0,
+		$price_matrix[ $first_dose ]['1-bottle'] ?? $h['supply_prices'][0],
+		$price_matrix[ $first_dose ]['2-bottle'] ?? $h['supply_prices'][1],
+		$price_matrix[ $first_dose ]['3-bottle'] ?? $h['supply_prices'][2],
 	];
 
 	// Use WC product image (falls back to nothing if unset)
@@ -129,8 +129,6 @@ if ( $is_weight_loss ) :
 		],
 	];
 
-	$sp = $h['supply_prices'];
-
 ?>
 
 <div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'myogenix-pdp', $product ); ?>>
@@ -157,28 +155,28 @@ if ( $is_weight_loss ) :
 
 				<div class="pdp-hero__trust-grid">
 					<div class="pdp-hero__trust-item">
-						<span class="pdp-hero__trust-icon">🏥</span>
+						<span class="pdp-hero__trust-icon" aria-hidden="true">🏥</span>
 						<div class="pdp-hero__trust-text">
 							<strong>Licensed providers</strong>
 							<span>Board-certified MDs</span>
 						</div>
 					</div>
 					<div class="pdp-hero__trust-item">
-						<span class="pdp-hero__trust-icon">✏️</span>
+						<span class="pdp-hero__trust-icon" aria-hidden="true">✏️</span>
 						<div class="pdp-hero__trust-text">
 							<strong>Compounded in USA</strong>
 							<span>FDA-registered facility</span>
 						</div>
 					</div>
 					<div class="pdp-hero__trust-item">
-						<span class="pdp-hero__trust-icon">🚚</span>
+						<span class="pdp-hero__trust-icon" aria-hidden="true">🚚</span>
 						<div class="pdp-hero__trust-text">
 							<strong>Free shipping</strong>
 							<span>Discreet packaging</span>
 						</div>
 					</div>
 					<div class="pdp-hero__trust-item">
-						<span class="pdp-hero__trust-icon">💬</span>
+						<span class="pdp-hero__trust-icon" aria-hidden="true">💬</span>
 						<div class="pdp-hero__trust-text">
 							<strong>Ongoing support</strong>
 							<span>Message your care team</span>
@@ -194,7 +192,7 @@ if ( $is_weight_loss ) :
 			<div class="pdp-hero__right">
 
 				<!-- Hidden WC form — keeps variation JS alive for any plugin hooks -->
-				<div class="pdp-hero__wc-hidden" aria-hidden="true">
+				<div class="pdp-hero__wc-hidden" aria-hidden="true" inert>
 					<?php
 					do_action( 'woocommerce_before_single_product_summary' );
 					do_action( 'woocommerce_single_product_summary' );
@@ -238,8 +236,6 @@ if ( $is_weight_loss ) :
 					<p id="pdp-disclaimer" class="pdp-cfg__disclaimer">
 						By subscribing you authorize recurring charges at your selected plan price. Cancel anytime before renewal.
 					</p>
-					<!-- On-page error/warning log — populated by JS, hidden when empty -->
-					<div id="pdp-debug-log"></div>
 				</div>
 
 			</div>
@@ -426,10 +422,10 @@ if ( $is_weight_loss ) :
 			<h2 class="myogenix-pdp__section-heading">Explore More Treatment Lines</h2>
 			<p class="myogenix-pdp__section-sub">The telehealth provider of choice for holistic care.</p>
 			<div class="myogenix-pdp__explore-grid">
-				<a href="https://myogenixpharma.com/mens-health/" class="myogenix-pdp__explore-link">
+				<a href="<?php echo esc_url( home_url( '/mens-health/' ) ); ?>" class="myogenix-pdp__explore-link">
 					<img src="<?php echo $img_url( 'PDP Sections/mens health.png' ); ?>" alt="Men's Health" />
 				</a>
-				<a href="https://myogenixpharma.com/womens-health/" class="myogenix-pdp__explore-link">
+				<a href="<?php echo esc_url( home_url( '/womens-health/' ) ); ?>" class="myogenix-pdp__explore-link">
 					<img src="<?php echo $img_url( 'PDP Sections/womens health.png' ); ?>" alt="Women's Health" />
 				</a>
 			</div>
