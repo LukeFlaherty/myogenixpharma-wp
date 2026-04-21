@@ -59,6 +59,24 @@ if ( $is_weight_loss ) :
 	];
 	$h = $hero[ $slug ];
 
+	// Detect which "bottle count" attribute this product uses.
+	// Tirzepatide uses pa_wm-bottle (slugs: 1-bottle/2-bottle/3-bottle).
+	// Semaglutide uses pa_vial (slugs: 1-vial/2-vial/3-vial).
+	// We normalize to 1-bottle/2-bottle/3-bottle throughout so JS stays consistent.
+	$attrs           = $product->get_attributes();
+	$bottle_attr_key = isset( $attrs['pa_wm-bottle'] ) ? 'pa_wm-bottle' : 'pa_vial';
+	$bottle_meta_key = 'attribute_' . $bottle_attr_key;
+	$raw_to_norm     = [
+		'1-vial' => '1-bottle', '2-vial' => '2-bottle', '3-vial' => '3-bottle',
+		'1-bottle' => '1-bottle', '2-bottle' => '2-bottle', '3-bottle' => '3-bottle',
+	];
+	// JS uses this to map normalized keys back to the real WC attribute slug for the add-to-cart URL.
+	$norm_to_raw = [
+		'1-bottle' => $bottle_attr_key === 'pa_vial' ? '1-vial' : '1-bottle',
+		'2-bottle' => $bottle_attr_key === 'pa_vial' ? '2-vial' : '2-bottle',
+		'3-bottle' => $bottle_attr_key === 'pa_vial' ? '3-vial' : '3-bottle',
+	];
+
 	// Build price matrix { "10mg": { "1-bottle": 329.95, ... } } and variation map
 	// { "10mg": { "1-bottle": { "1-month": 1234 } } } from live WC variation data.
 	// Skip is_purchasable() — Prescribery plugin can return false for prescription products
@@ -69,9 +87,10 @@ if ( $is_weight_loss ) :
 		$v = wc_get_product( $vid );
 		if ( ! $v || 'publish' !== get_post_status( $vid ) ) continue;
 		// Read slugs directly from post meta — get_attribute() returns term names, not slugs
-		$dose   = get_post_meta( $vid, 'attribute_pa_dosage', true );
-		$bottle = get_post_meta( $vid, 'attribute_pa_wm-bottle', true );
-		$plan   = get_post_meta( $vid, 'attribute_pa_wm-subscription-plan', true );
+		$dose       = get_post_meta( $vid, 'attribute_pa_dosage', true );
+		$bottle_raw = get_post_meta( $vid, $bottle_meta_key, true );
+		$bottle     = $raw_to_norm[ $bottle_raw ] ?? $bottle_raw; // normalize to 1-bottle/2-bottle/3-bottle
+		$plan       = get_post_meta( $vid, 'attribute_pa_wm-subscription-plan', true );
 		if ( ! $dose || ! $bottle ) continue;
 		$price = (float) $v->get_price();
 		if ( $price > 0 && ! isset( $price_matrix[ $dose ][ $bottle ] ) ) {
@@ -206,6 +225,8 @@ if ( $is_weight_loss ) :
 					data-price-matrix="<?php echo esc_attr( wp_json_encode( $price_matrix ) ); ?>"
 					data-variation-map="<?php echo esc_attr( wp_json_encode( $variation_map ) ); ?>"
 					data-product-id="<?php echo esc_attr( $product->get_id() ); ?>"
+					data-bottle-attr="<?php echo esc_attr( $bottle_meta_key ); ?>"
+					data-bottle-slug-map="<?php echo esc_attr( wp_json_encode( $norm_to_raw ) ); ?>"
 				>
 					<!-- Supply Length -->
 					<p class="pdp-cfg__section-label">Supply Length</p>

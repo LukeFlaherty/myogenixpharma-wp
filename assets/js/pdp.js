@@ -49,9 +49,11 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	var cfg = document.getElementById( 'pdp-cfg' );
 	if ( ! cfg ) return;
 
-	var doses        = JSON.parse( cfg.getAttribute( 'data-doses' )         || '[]' );
-	var priceMatrix  = JSON.parse( cfg.getAttribute( 'data-price-matrix' )  || '{}' );
-	var variationMap = JSON.parse( cfg.getAttribute( 'data-variation-map' ) || '{}' );
+	var doses          = JSON.parse( cfg.getAttribute( 'data-doses' )          || '[]' );
+	var priceMatrix    = JSON.parse( cfg.getAttribute( 'data-price-matrix' )   || '{}' );
+	var variationMap   = JSON.parse( cfg.getAttribute( 'data-variation-map' )  || '{}' );
+	var bottleAttr     = cfg.getAttribute( 'data-bottle-attr' )                || 'attribute_pa_wm-bottle';
+	var bottleSlugMap  = JSON.parse( cfg.getAttribute( 'data-bottle-slug-map' ) || '{}' );
 
 	/*
 	 * WC attribute slug → term slug mapping (confirmed via WP-CLI 2026-04-21)
@@ -246,11 +248,12 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			ctaBtn.classList.add( 'pdp-cfg__cta--loading' );
 			ctaBtn.textContent = 'Adding to cart\u2026';
 
+			var bottleWcSlug = bottleSlugMap[ bottle ] || bottle;
 			var url = window.location.pathname + '?add-to-cart=' + pid + '&quantity=1';
-			url += '&variation_id='                              + variationId;
-			url += '&attribute_pa_dosage='                       + encodeURIComponent( state.dose );
-			url += '&attribute_pa_wm-bottle='                    + encodeURIComponent( bottle );
-			url += '&attribute_pa_wm-subscription-plan='         + encodeURIComponent( plan );
+			url += '&variation_id='                      + variationId;
+			url += '&attribute_pa_dosage='               + encodeURIComponent( state.dose );
+			url += '&' + bottleAttr + '='                + encodeURIComponent( bottleWcSlug );
+			url += '&attribute_pa_wm-subscription-plan=' + encodeURIComponent( plan );
 
 			window.location.href = url;
 		} );
