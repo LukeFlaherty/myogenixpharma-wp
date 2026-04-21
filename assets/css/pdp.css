@@ -663,6 +663,14 @@
 	font-weight: 700;
 }
 
+.pdp-cfg__dose-note {
+	font-size: 0.8rem;
+	color: #888;
+	margin: 4px 0 0;
+	font-style: italic;
+	line-height: 1.4;
+}
+
 /* Order summary */
 .pdp-cfg__summary {
 	background: #f8f8f8;

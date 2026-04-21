@@ -65,6 +65,10 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			return '<option value="' + d + '"' + ( d === state.dose ? ' selected' : '' ) + '>' + d + '</option>';
 		} ).join( '' );
 
+		var doseNote = state.months > 1
+			? 'All ' + state.months + ' bottles ship at this dose. Adjust your dose at renewal.'
+			: '';
+
 		wrap.innerHTML =
 			'<div class="pdp-cfg__dose-card">' +
 				'<div class="pdp-cfg__dose-select-wrap">' +
@@ -76,6 +80,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 				'<p class="pdp-cfg__dose-detail">' +
 					state.dose + '/month = <strong>' + weeklyMg( state.dose ) + ' mg/week</strong> &middot; 4 injections per month' +
 				'</p>' +
+				( doseNote ? '<p class="pdp-cfg__dose-note">' + doseNote + '</p>' : '' ) +
 			'</div>';
 
 		document.getElementById( 'pdp-dose-select' ).addEventListener( 'change', function () {
@@ -123,8 +128,9 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	} );
 
 	/* -----------------------------------------------------------------------
-	   CTA — GET-based add-to-cart so page reload never triggers POST resubmission
-	   WooCommerce resolves the variation from attribute URL params server-side.
+	   CTA — GET-based add-to-cart (no POST = no "Confirm Form Resubmission").
+	   Looks up the variation_id from WC's embedded JSON so WC Subscriptions
+	   can resolve the correct variation reliably.
 	----------------------------------------------------------------------- */
 	var ctaBtn = document.getElementById( 'pdp-cta' );
 	if ( ctaBtn ) {
@@ -137,21 +143,70 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			var prevErr = document.getElementById( 'pdp-cta-error' );
 			if ( prevErr ) prevErr.remove();
 
-			if ( ! pid ) {
+			function showCtaError( msg ) {
 				var err = document.createElement( 'p' );
 				err.id = 'pdp-cta-error';
 				err.style.cssText = 'color:#c0392b;font-size:0.85rem;text-align:center;margin:8px 0 0;padding:10px 14px;background:#fff0ee;border-radius:6px;border:1px solid #f5c6c0;line-height:1.5;';
-				err.textContent = 'Could not determine product. Please refresh and try again.';
+				err.textContent = msg;
 				ctaBtn.insertAdjacentElement( 'afterend', err );
+				console.error( '[Myogenix PDP]', msg );
+			}
+
+			if ( ! pid ) {
+				showCtaError( 'Could not determine product. Please refresh and try again.' );
 				return;
 			}
 
-			console.log( '[Myogenix PDP] Adding to cart → dosage:', state.dose, '| bottle:', bottle, '| plan:', plan );
+			/*
+			 * Resolve the variation_id from the WC form's embedded JSON.
+			 * WC embeds all variation data in data-product_variations when
+			 * variation count is below the ajax threshold (default 100).
+			 */
+			var variationId = 0;
+			var wcForm = document.querySelector( '.variations_form' );
+			if ( wcForm ) {
+				var raw = wcForm.getAttribute( 'data-product_variations' );
+				if ( raw && raw !== 'false' ) {
+					try {
+						var variations = JSON.parse( raw );
+						for ( var i = 0; i < variations.length; i++ ) {
+							var v = variations[ i ];
+							var a = v.attributes;
+							/* Empty string in attribute means "any" — treat as match */
+							var doseOk   = ! a[ 'attribute_pa_dosage' ]               || a[ 'attribute_pa_dosage' ]               === state.dose;
+							var bottleOk = ! a[ 'attribute_pa_wm-bottle' ]            || a[ 'attribute_pa_wm-bottle' ]            === bottle;
+							var planOk   = ! a[ 'attribute_pa_wm-subscription-plan' ] || a[ 'attribute_pa_wm-subscription-plan' ] === plan;
+							if ( doseOk && bottleOk && planOk ) {
+								variationId = v.variation_id;
+								break;
+							}
+						}
+					} catch ( e ) {
+						console.warn( '[Myogenix PDP] Could not parse data-product_variations:', e );
+					}
+				}
+			}
+
+			console.log(
+				'[Myogenix PDP] Adding to cart → dosage:', state.dose,
+				'| bottle:', bottle,
+				'| plan:', plan,
+				'| variation_id:', variationId || '(not found — will rely on attribute params)'
+			);
+
+			if ( ! variationId ) {
+				showCtaError(
+					'Could not match a product variation for: ' + state.dose + ', ' + state.months + ' month(s). ' +
+					'Please check that this combination exists in WP Admin → Products → Variations.'
+				);
+				return;
+			}
 
 			var url = window.location.pathname + '?add-to-cart=' + pid + '&quantity=1';
-			url += '&attribute_pa_dosage='                   + encodeURIComponent( state.dose );
-			url += '&attribute_pa_wm-bottle='                + encodeURIComponent( bottle );
-			url += '&attribute_pa_wm-subscription-plan='     + encodeURIComponent( plan );
+			url += '&variation_id='                              + variationId;
+			url += '&attribute_pa_dosage='                       + encodeURIComponent( state.dose );
+			url += '&attribute_pa_wm-bottle='                    + encodeURIComponent( bottle );
+			url += '&attribute_pa_wm-subscription-plan='         + encodeURIComponent( plan );
 
 			window.location.href = url;
 		} );
