@@ -61,9 +61,10 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	 *   attribute_pa_wm-bottle            → "1-bottle" | "2-bottle" | "3-bottle"
 	 *   attribute_pa_wm-subscription-plan → "1-month"  | "3-month"
 	 */
-	var BOTTLE_MAP = { 1: '1-bottle', 2: '2-bottle', 3: '3-bottle' };
-	var PLAN_MAP   = { 1: '1-month',  2: '1-month',  3: '3-month'  };
-	var RENEW_MAP  = { 1: 'monthly',  2: 'monthly',  3: 'every 3 months' };
+	var BOTTLE_MAP   = { 1: '1-bottle', 2: '2-bottle', 3: '3-bottle' };
+	var PLAN_MAP     = { 1: '1-month',  2: '1-month',  3: '3-month'  };
+	var RENEW_MAP    = { 1: 'monthly',  2: 'monthly',  3: 'every 3 months' };
+	var MONTH_LABELS = { 1: 'First month', 2: 'Second month', 3: 'Third month' };
 
 	/*
 	 * Per-month dose state — doses[1] is always the "primary" dose used for
@@ -76,10 +77,11 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	};
 
 	var CHEVRON_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+	var WARNING_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
 
 	/* Look up the real WC price — keyed by first-month dose + supply length */
 	function getPrice( dose, months ) {
-		var bottle    = BOTTLE_MAP[ months ] || '1-bottle';
+		var bottle     = BOTTLE_MAP[ months ] || '1-bottle';
 		var dosePrices = priceMatrix[ dose ];
 		if ( dosePrices && dosePrices[ bottle ] !== undefined ) {
 			return dosePrices[ bottle ];
@@ -90,6 +92,14 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	function weeklyMg( dose ) {
 		var mg = parseFloat( dose );
 		return isNaN( mg ) ? '\u2014' : ( mg / 4 ).toFixed( 2 );
+	}
+
+	/* --- Section label (updates based on supply selection) ----------------- */
+	function renderDoseLabel() {
+		var el = document.getElementById( 'pdp-dose-label' );
+		if ( el ) {
+			el.textContent = state.months > 1 ? 'Configure Your Doses' : 'Your Starting Dose';
+		}
 	}
 
 	/* --- Supply button price labels (keyed off first month's dose) ---------- */
@@ -106,7 +116,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		} );
 	}
 
-	/* --- Dose selectors (one per month when supply > 1 month) --------------- */
+	/* --- Dose selectors (one per month, with prev-dose badge + decrease warning) --- */
 	function renderDoses() {
 		var wrap = document.getElementById( 'pdp-dose' );
 		if ( ! wrap || ! doses.length ) return;
@@ -115,16 +125,23 @@ document.addEventListener( 'DOMContentLoaded', function () {
 
 		for ( var m = 1; m <= state.months; m++ ) {
 			var current = state.doses[ m ] || doses[0];
-			var opts    = doses.map( function ( d ) {
+			var prev    = m > 1 ? ( state.doses[ m - 1 ] || doses[0] ) : null;
+			var isLower = prev !== null && parseFloat( current ) < parseFloat( prev );
+
+			var badge = m === 1
+				? '<span class="pdp-cfg__dose-badge">Starting dose</span>'
+				: '<span class="pdp-cfg__dose-badge">Prev: ' + prev + '</span>';
+
+			var opts = doses.map( function ( d ) {
 				return '<option value="' + d + '"' + ( d === current ? ' selected' : '' ) + '>' + d + '</option>';
 			} ).join( '' );
 
 			html +=
 				'<div class="pdp-cfg__dose-card" data-month="' + m + '">' +
-					( state.months > 1
-						? '<p class="pdp-cfg__dose-month-label">Month ' + m + '</p>'
-						: ''
-					) +
+					'<div class="pdp-cfg__dose-card-header">' +
+						'<span class="pdp-cfg__dose-month-label">' + MONTH_LABELS[ m ] + '</span>' +
+						badge +
+					'</div>' +
 					'<div class="pdp-cfg__dose-select-wrap">' +
 						'<select class="pdp-cfg__dose-select" data-month="' + m + '">' + opts + '</select>' +
 						'<span class="pdp-cfg__dose-chevron">' + CHEVRON_SVG + '</span>' +
@@ -132,12 +149,14 @@ document.addEventListener( 'DOMContentLoaded', function () {
 					'<p class="pdp-cfg__dose-detail">' +
 						current + '/month = <strong>' + weeklyMg( current ) + ' mg/week</strong> &middot; 4 injections per month' +
 					'</p>' +
+					( isLower
+						? '<div class="pdp-cfg__dose-warning">' +
+							'<span class="pdp-cfg__dose-warning-icon" aria-hidden="true">' + WARNING_SVG + '</span>' +
+							'This dose is lower than your previous month. Your provider may adjust this during review \u2014 no hard block, just a heads-up.' +
+						  '</div>'
+						: ''
+					) +
 				'</div>';
-
-			/* Connector arrow between cards */
-			if ( m < state.months ) {
-				html += '<div class="pdp-cfg__dose-connector" aria-hidden="true">' + CHEVRON_SVG + '</div>';
-			}
 		}
 
 		wrap.innerHTML = html;
@@ -161,28 +180,38 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		var price     = getPrice( state.doses[1], state.months );
 		var planLabel = state.months === 3 ? '3-month subscription' : 'Monthly subscription';
 		var priceStr  = price ? '$' + price.toFixed( 2 ) : '\u2014';
+		var lastDose  = state.doses[ state.months ] || state.doses[1];
 
-		/* Build dose schedule string e.g. "10mg → 20mg → 30mg" */
-		var doseSchedule = state.doses[1];
-		for ( var m = 2; m <= state.months; m++ ) {
-			doseSchedule += ' \u2192 ' + state.doses[ m ];
+		/* Per-month dose lines */
+		var doseLines = '';
+		for ( var m = 1; m <= state.months; m++ ) {
+			doseLines +=
+				'<div class="pdp-cfg__summary-line">' +
+					'<span>' + MONTH_LABELS[ m ] + ' \u2014 ' + state.doses[ m ] + '</span>' +
+					'<span></span>' +
+				'</div>';
 		}
+
+		/* Auto-renew note shows last month's dose and per-month price */
+		var renewPrice = getPrice( state.doses[1], 1 );
+		var renewNote  = price
+			? '<strong>Auto-renews</strong> at <strong>' + lastDose + ' &middot; ' +
+			  ( renewPrice ? '$' + renewPrice.toFixed( 2 ) + '/mo' : priceStr ) +
+			  '</strong> after your supply ends. Cancel anytime before renewal.'
+			: 'Price unavailable for this combination.';
 
 		wrap.innerHTML =
 			'<p class="pdp-cfg__summary-label">Order Summary</p>' +
-			'<div class="pdp-cfg__summary-line"><span>' + state.months + '-month supply &middot; ' + doseSchedule + '</span><span>' + priceStr + '</span></div>' +
-			'<div class="pdp-cfg__summary-line"><span>Plan</span><span>' + planLabel + '</span></div>' +
+			doseLines +
 			'<div class="pdp-cfg__summary-total">' +
 				'<span>Total today</span>' +
 				'<span class="pdp-cfg__summary-total-price">' + priceStr + '</span>' +
 			'</div>' +
-			( price
-				? '<div class="pdp-cfg__summary-note">Auto-renews ' + RENEW_MAP[ state.months ] + ' at <strong>' + priceStr + '</strong>. Cancel anytime before renewal.</div>'
-				: '<div class="pdp-cfg__summary-note">Price unavailable for this combination.</div>'
-			);
+			'<div class="pdp-cfg__summary-note">' + renewNote + '</div>';
 	}
 
 	function render() {
+		renderDoseLabel();
 		renderDoses();
 		renderSupplyPrices();
 		renderSummary();

@@ -247,7 +247,7 @@ if ( $is_weight_loss ) :
 					</div>
 
 					<!-- Dose Selector -->
-					<p class="pdp-cfg__section-label">Your Starting Dose</p>
+					<p class="pdp-cfg__section-label" id="pdp-dose-label">Your Starting Dose</p>
 					<div id="pdp-dose" class="pdp-cfg__doses-wrap"></div>
 
 					<!-- Order Summary -->

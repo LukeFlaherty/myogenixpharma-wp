@@ -295,17 +295,43 @@
 	white-space: nowrap;
 }
 
-/* Dose card (JS-rendered) */
+/* Dose cards (JS-rendered) */
 .pdp-cfg__doses-wrap {
 	margin-bottom: 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
 }
 
 .pdp-cfg__dose-card {
 	border: 1px solid var(--pdp-border);
 	border-radius: 10px;
 	padding: 16px;
-	margin-bottom: 10px;
 	background: #fff;
+}
+
+.pdp-cfg__dose-card-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 12px;
+}
+
+.pdp-cfg__dose-month-label {
+	font-size: 0.9375rem;
+	font-weight: 700;
+	color: var(--pdp-dark);
+	line-height: 1;
+}
+
+.pdp-cfg__dose-badge {
+	font-size: 0.7rem;
+	font-weight: 600;
+	color: var(--pdp-muted);
+	background: #f0f0f0;
+	border-radius: 50px;
+	padding: 3px 10px;
+	white-space: nowrap;
 }
 
 .pdp-cfg__dose-select-wrap {
@@ -348,30 +374,24 @@
 	font-weight: 700;
 }
 
-.pdp-cfg__dose-note {
-	font-size: 0.8rem;
-	color: var(--pdp-light);
-	margin: 4px 0 0;
-	font-style: italic;
-	line-height: 1.4;
-}
-
-.pdp-cfg__dose-month-label {
-	font-size: 0.65rem;
-	font-weight: 700;
-	letter-spacing: 0.1em;
-	text-transform: uppercase;
-	color: var(--pdp-purple);
-	margin: 0 0 8px;
-}
-
-.pdp-cfg__dose-connector {
+.pdp-cfg__dose-warning {
 	display: flex;
-	justify-content: center;
-	align-items: center;
-	padding: 2px 0;
-	color: var(--pdp-light);
-	transform: rotate(-90deg);
+	align-items: flex-start;
+	gap: 8px;
+	background: #f7f7f5;
+	border: 1px solid #e4e2dc;
+	border-radius: 8px;
+	padding: 10px 12px;
+	font-size: 0.8rem;
+	color: var(--pdp-muted);
+	line-height: 1.5;
+	margin-top: 10px;
+}
+
+.pdp-cfg__dose-warning-icon {
+	flex-shrink: 0;
+	margin-top: 1px;
+	color: #b08030;
 }
 
 /* Order summary (JS-rendered) */
