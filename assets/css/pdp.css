@@ -356,6 +356,24 @@
 	line-height: 1.4;
 }
 
+.pdp-cfg__dose-month-label {
+	font-size: 0.65rem;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--pdp-purple);
+	margin: 0 0 8px;
+}
+
+.pdp-cfg__dose-connector {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 2px 0;
+	color: var(--pdp-light);
+	transform: rotate(-90deg);
+}
+
 /* Order summary (JS-rendered) */
 .pdp-cfg__summary {
 	background: var(--pdp-bg-sub);

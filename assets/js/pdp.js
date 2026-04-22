@@ -49,11 +49,11 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	var cfg = document.getElementById( 'pdp-cfg' );
 	if ( ! cfg ) return;
 
-	var doses          = JSON.parse( cfg.getAttribute( 'data-doses' )          || '[]' );
-	var priceMatrix    = JSON.parse( cfg.getAttribute( 'data-price-matrix' )   || '{}' );
-	var variationMap   = JSON.parse( cfg.getAttribute( 'data-variation-map' )  || '{}' );
-	var bottleAttr     = cfg.getAttribute( 'data-bottle-attr' )                || 'attribute_pa_wm-bottle';
-	var bottleSlugMap  = JSON.parse( cfg.getAttribute( 'data-bottle-slug-map' ) || '{}' );
+	var doses         = JSON.parse( cfg.getAttribute( 'data-doses' )          || '[]' );
+	var priceMatrix   = JSON.parse( cfg.getAttribute( 'data-price-matrix' )   || '{}' );
+	var variationMap  = JSON.parse( cfg.getAttribute( 'data-variation-map' )  || '{}' );
+	var bottleAttr    = cfg.getAttribute( 'data-bottle-attr' )                || 'attribute_pa_wm-bottle';
+	var bottleSlugMap = JSON.parse( cfg.getAttribute( 'data-bottle-slug-map' ) || '{}' );
 
 	/*
 	 * WC attribute slug → term slug mapping (confirmed via WP-CLI 2026-04-21)
@@ -65,14 +65,21 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	var PLAN_MAP   = { 1: '1-month',  2: '1-month',  3: '3-month'  };
 	var RENEW_MAP  = { 1: 'monthly',  2: 'monthly',  3: 'every 3 months' };
 
+	/*
+	 * Per-month dose state — doses[1] is always the "primary" dose used for
+	 * variation lookup and pricing. Doses 2 and 3 are stored as custom order meta.
+	 * Selections persist when switching supply length so customers don't lose work.
+	 */
 	var state = {
 		months: 1,
-		dose:   doses[ 0 ] || ''
+		doses:  { 1: doses[0] || '', 2: doses[0] || '', 3: doses[0] || '' }
 	};
 
-	/* Look up the real WC price for the current dose + supply selection */
+	var CHEVRON_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+
+	/* Look up the real WC price — keyed by first-month dose + supply length */
 	function getPrice( dose, months ) {
-		var bottle = BOTTLE_MAP[ months ] || '1-bottle';
+		var bottle    = BOTTLE_MAP[ months ] || '1-bottle';
 		var dosePrices = priceMatrix[ dose ];
 		if ( dosePrices && dosePrices[ bottle ] !== undefined ) {
 			return dosePrices[ bottle ];
@@ -85,11 +92,11 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		return isNaN( mg ) ? '\u2014' : ( mg / 4 ).toFixed( 2 );
 	}
 
-	/* --- Supply button price labels (update whenever dose changes) --------- */
+	/* --- Supply button price labels (keyed off first month's dose) ---------- */
 	function renderSupplyPrices() {
 		Array.prototype.slice.call( cfg.querySelectorAll( '.pdp-cfg__supply' ) ).forEach( function ( btn ) {
 			var m     = parseInt( btn.getAttribute( 'data-months' ), 10 );
-			var price = getPrice( state.dose, m );
+			var price = getPrice( state.doses[1], m );
 			var el    = btn.querySelector( '.pdp-cfg__supply-price' );
 			if ( el ) {
 				el.textContent = price
@@ -99,53 +106,71 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		} );
 	}
 
-	/* --- Dose selector --------------------------------------------------- */
-	function renderDose() {
+	/* --- Dose selectors (one per month when supply > 1 month) --------------- */
+	function renderDoses() {
 		var wrap = document.getElementById( 'pdp-dose' );
 		if ( ! wrap || ! doses.length ) return;
 
-		var opts = doses.map( function ( d ) {
-			return '<option value="' + d + '"' + ( d === state.dose ? ' selected' : '' ) + '>' + d + '</option>';
-		} ).join( '' );
+		var html = '';
 
-		var doseNote = state.months > 1
-			? 'All ' + state.months + ' bottles ship at this dose. Adjust your dose at renewal.'
-			: '';
+		for ( var m = 1; m <= state.months; m++ ) {
+			var current = state.doses[ m ] || doses[0];
+			var opts    = doses.map( function ( d ) {
+				return '<option value="' + d + '"' + ( d === current ? ' selected' : '' ) + '>' + d + '</option>';
+			} ).join( '' );
 
-		wrap.innerHTML =
-			'<div class="pdp-cfg__dose-card">' +
-				'<div class="pdp-cfg__dose-select-wrap">' +
-					'<select class="pdp-cfg__dose-select" id="pdp-dose-select">' + opts + '</select>' +
-					'<span class="pdp-cfg__dose-chevron">' +
-						'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>' +
-					'</span>' +
-				'</div>' +
-				'<p class="pdp-cfg__dose-detail">' +
-					state.dose + '/month = <strong>' + weeklyMg( state.dose ) + ' mg/week</strong> &middot; 4 injections per month' +
-				'</p>' +
-				( doseNote ? '<p class="pdp-cfg__dose-note">' + doseNote + '</p>' : '' ) +
-			'</div>';
+			html +=
+				'<div class="pdp-cfg__dose-card" data-month="' + m + '">' +
+					( state.months > 1
+						? '<p class="pdp-cfg__dose-month-label">Month ' + m + '</p>'
+						: ''
+					) +
+					'<div class="pdp-cfg__dose-select-wrap">' +
+						'<select class="pdp-cfg__dose-select" data-month="' + m + '">' + opts + '</select>' +
+						'<span class="pdp-cfg__dose-chevron">' + CHEVRON_SVG + '</span>' +
+					'</div>' +
+					'<p class="pdp-cfg__dose-detail">' +
+						current + '/month = <strong>' + weeklyMg( current ) + ' mg/week</strong> &middot; 4 injections per month' +
+					'</p>' +
+				'</div>';
 
-		document.getElementById( 'pdp-dose-select' ).addEventListener( 'change', function () {
-			state.dose = this.value;
-			renderDose();
-			renderSupplyPrices();
-			renderSummary();
+			/* Connector arrow between cards */
+			if ( m < state.months ) {
+				html += '<div class="pdp-cfg__dose-connector" aria-hidden="true">' + CHEVRON_SVG + '</div>';
+			}
+		}
+
+		wrap.innerHTML = html;
+
+		Array.prototype.slice.call( wrap.querySelectorAll( '.pdp-cfg__dose-select' ) ).forEach( function ( sel ) {
+			sel.addEventListener( 'change', function () {
+				var month = parseInt( this.getAttribute( 'data-month' ), 10 );
+				state.doses[ month ] = this.value;
+				renderDoses();
+				renderSupplyPrices();
+				renderSummary();
+			} );
 		} );
 	}
 
-	/* --- Order summary --------------------------------------------------- */
+	/* --- Order summary ------------------------------------------------------ */
 	function renderSummary() {
 		var wrap = document.getElementById( 'pdp-summary' );
 		if ( ! wrap ) return;
 
-		var price     = getPrice( state.dose, state.months );
+		var price     = getPrice( state.doses[1], state.months );
 		var planLabel = state.months === 3 ? '3-month subscription' : 'Monthly subscription';
 		var priceStr  = price ? '$' + price.toFixed( 2 ) : '\u2014';
 
+		/* Build dose schedule string e.g. "10mg → 20mg → 30mg" */
+		var doseSchedule = state.doses[1];
+		for ( var m = 2; m <= state.months; m++ ) {
+			doseSchedule += ' \u2192 ' + state.doses[ m ];
+		}
+
 		wrap.innerHTML =
 			'<p class="pdp-cfg__summary-label">Order Summary</p>' +
-			'<div class="pdp-cfg__summary-line"><span>' + state.months + '-month supply &middot; ' + state.dose + '</span><span>' + priceStr + '</span></div>' +
+			'<div class="pdp-cfg__summary-line"><span>' + state.months + '-month supply &middot; ' + doseSchedule + '</span><span>' + priceStr + '</span></div>' +
 			'<div class="pdp-cfg__summary-line"><span>Plan</span><span>' + planLabel + '</span></div>' +
 			'<div class="pdp-cfg__summary-total">' +
 				'<span>Total today</span>' +
@@ -158,12 +183,12 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	}
 
 	function render() {
-		renderDose();
+		renderDoses();
 		renderSupplyPrices();
 		renderSummary();
 	}
 
-	/* --- Supply button bindings ------------------------------------------ */
+	/* --- Supply button bindings --------------------------------------------- */
 	Array.prototype.slice.call( cfg.querySelectorAll( '.pdp-cfg__supply' ) ).forEach( function ( btn ) {
 		btn.addEventListener( 'click', function () {
 			state.months = parseInt( this.getAttribute( 'data-months' ), 10 );
@@ -176,9 +201,9 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	} );
 
 	/* -----------------------------------------------------------------------
-	   CTA — GET-based add-to-cart (no POST = no "Confirm Form Resubmission").
-	   Looks up variation_id from WC's embedded JSON so WC Subscriptions can
-	   resolve the correct variation reliably without attribute-only guessing.
+	   CTA — GET-based add-to-cart.
+	   Variation lookup uses first-month dose (determines price tier).
+	   Extra month doses are passed as custom params and saved as order meta.
 	----------------------------------------------------------------------- */
 	var ctaBtn = document.getElementById( 'pdp-cta' );
 	if ( ctaBtn ) {
@@ -186,6 +211,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			var pid    = cfg.getAttribute( 'data-product-id' );
 			var bottle = BOTTLE_MAP[ state.months ] || '1-bottle';
 			var plan   = PLAN_MAP[ state.months ]   || '1-month';
+			var dose1  = state.doses[1];
 
 			var prevErr = document.getElementById( 'pdp-user-error' );
 			if ( prevErr ) prevErr.remove();
@@ -198,16 +224,15 @@ document.addEventListener( 'DOMContentLoaded', function () {
 
 			/*
 			 * Resolve variation_id from our PHP-built variation map.
-			 * WC's data-product_variations may be false (AJAX mode) so we
-			 * embed our own map keyed by dose → bottle → plan.
+			 * Keyed by first-month dose → bottle → plan.
 			 */
 			var variationId = 0;
 			if (
-				variationMap[ state.dose ] &&
-				variationMap[ state.dose ][ bottle ] &&
-				variationMap[ state.dose ][ bottle ][ plan ]
+				variationMap[ dose1 ] &&
+				variationMap[ dose1 ][ bottle ] &&
+				variationMap[ dose1 ][ bottle ][ plan ]
 			) {
-				variationId = variationMap[ state.dose ][ bottle ][ plan ];
+				variationId = variationMap[ dose1 ][ bottle ][ plan ];
 			}
 
 			if ( ! variationId ) {
@@ -221,7 +246,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 							for ( var i = 0; i < variations.length; i++ ) {
 								var v = variations[ i ];
 								var a = v.attributes;
-								var doseOk   = ! a[ 'attribute_pa_dosage' ]               || a[ 'attribute_pa_dosage' ]               === state.dose;
+								var doseOk   = ! a[ 'attribute_pa_dosage' ]               || a[ 'attribute_pa_dosage' ]               === dose1;
 								var bottleOk = ! a[ 'attribute_pa_wm-bottle' ]            || a[ 'attribute_pa_wm-bottle' ]            === bottle;
 								var planOk   = ! a[ 'attribute_pa_wm-subscription-plan' ] || a[ 'attribute_pa_wm-subscription-plan' ] === plan;
 								if ( doseOk && bottleOk && planOk ) {
@@ -236,10 +261,10 @@ document.addEventListener( 'DOMContentLoaded', function () {
 				}
 			}
 
-			pdpLog( 'Adding to cart \u2192 dosage: ' + state.dose + ' | bottle: ' + bottle + ' | plan: ' + plan + ' | variation_id: ' + ( variationId || 'NOT FOUND' ) );
+			pdpLog( 'Adding to cart \u2192 dose1: ' + dose1 + ' | bottle: ' + bottle + ' | plan: ' + plan + ' | variation_id: ' + ( variationId || 'NOT FOUND' ) );
 
 			if ( ! variationId ) {
-				pdpError( 'No matching variation: ' + state.dose + ' / ' + bottle + ' / ' + plan );
+				pdpError( 'No matching variation: ' + dose1 + ' / ' + bottle + ' / ' + plan );
 				showUserError( 'This combination is currently unavailable. Please try a different dose or supply length.' );
 				return;
 			}
@@ -251,9 +276,16 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			var bottleWcSlug = bottleSlugMap[ bottle ] || bottle;
 			var url = window.location.pathname + '?add-to-cart=' + pid + '&quantity=1';
 			url += '&variation_id='                      + variationId;
-			url += '&attribute_pa_dosage='               + encodeURIComponent( state.dose );
+			url += '&attribute_pa_dosage='               + encodeURIComponent( dose1 );
 			url += '&' + bottleAttr + '='                + encodeURIComponent( bottleWcSlug );
 			url += '&attribute_pa_wm-subscription-plan=' + encodeURIComponent( plan );
+			url += '&dose_month_1='                      + encodeURIComponent( dose1 );
+			if ( state.months >= 2 ) {
+				url += '&dose_month_2=' + encodeURIComponent( state.doses[2] );
+			}
+			if ( state.months >= 3 ) {
+				url += '&dose_month_3=' + encodeURIComponent( state.doses[3] );
+			}
 
 			window.location.href = url;
 		} );
