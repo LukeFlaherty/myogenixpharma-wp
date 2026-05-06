@@ -296,6 +296,47 @@ Don't duplicate snippet logic inside a template — you'll get double execution 
 
 ---
 
+## What Has Been Built
+
+### Weight Management PDP (live on staging, 2026-05)
+
+`woocommerce/single-product.php` and `woocommerce/content-single-product.php` are live and handling both weight management products (`compound-tirzepatide`, `compound-semaglutide`). All other products fall through to default WooCommerce rendering.
+
+**How the configurator works:**
+- PHP builds `$price_matrix` and `$variation_map` by looping published WC variations
+- Both are JSON-encoded into `data-*` attributes on `#pdp-cfg`
+- `assets/js/pdp.js` reads those attributes and drives all UI — supply length buttons, per-month dose selectors, order summary, and add-to-cart
+
+**Dose dropdowns are dynamic — do not hardcode them.** Doses are derived from the product's `pa_dosage` attribute terms (ordered per WP Admin), filtered to those with at least one published variation. Adding or retiring a dose in WP Admin automatically updates the dropdown.
+
+**Bottle attribute differs by product:**
+- Tirzepatide uses `pa_wm-bottle` (slugs: `1-bottle`, `2-bottle`, `3-bottle`)
+- Semaglutide uses `pa_vial` (slugs: `1-vial`, `2-vial`, `3-vial`)
+- The template normalizes both to `1-bottle`/`2-bottle`/`3-bottle` internally
+
+**Dose escalation (multi-month supply):** Customers pick a separate dose per month for 2- and 3-month supplies. `dose_month_1/2/3` are passed as URL params on add-to-cart, captured in cart item data via `woocommerce_add_cart_item_data`, displayed in cart/checkout via `woocommerce_get_item_data`, and saved to the order line item via `woocommerce_checkout_create_order_line_item`.
+
+### Rx Summary order meta
+
+Every weight management order line item gets an `Rx Summary` meta field written at checkout by the hook in `functions.php`. The backend team uses this to identify and process orders.
+
+**Format:** `{DRUG} - {doses}, {N} Bottle, {N} month`
+
+| Scenario | Example |
+|---|---|
+| 1-month, single dose | `TIRZEPATIDE - 10mg, 1 Bottle, 1 month` |
+| 2-month, escalating doses | `TIRZEPATIDE - 10mg, 20mg, 2 Bottle, 2 month` |
+| 3-month, same dose | `TIRZEPATIDE - 10mg, 3 Bottle, 3 month` |
+| 3-month, escalating doses | `TIRZEPATIDE - 10mg, 20mg, 30mg, 3 Bottle, 3 month` |
+
+Rules:
+- Drug name = uppercase of product slug minus `compound-` prefix
+- If all months share the same dose, show it once; if any differ, list all months in order
+- "N month" = supply length (bottle count), not the WC subscription plan slug
+- The individual "Month 1/2/3 Dose" meta fields are also saved alongside Rx Summary — don't remove them
+
+---
+
 ## Current PDP Structure (for reference when replacing)
 
 The existing Elementor-built PDP (template #990) includes:
@@ -322,15 +363,12 @@ The existing Elementor-built PDP (template #990) includes:
 
 ---
 
-## What To Build (Priority Order)
+## What To Build Next (Priority Order)
 
-1. **PDP (`woocommerce/single-product.php`)** — highest priority
-   - First, decide: disable Elementor Single Product template #990 entirely, OR restrict its display conditions to specific products and build the new template for the rest
-   - Preserve bottle UI, variations, subscription pricing, prescription flow
-2. **Product archive (`woocommerce/archive-product.php`)** — category/shop pages
-3. **Cart (`woocommerce/cart/cart.php`)** — preserve UpsellWP hooks, 3-month breakdown snippet behavior
-4. **Checkout (`woocommerce/checkout/form-checkout.php`)** — preserve Stripe, subscription totals, state selector, prescription approval flow
-5. **Thank you (`woocommerce/checkout/thankyou.php`)** — preserve expected charge display
+1. **Product archive (`woocommerce/archive-product.php`)** — category/shop pages
+2. **Cart (`woocommerce/cart/cart.php`)** — preserve UpsellWP hooks, 3-month breakdown snippet behavior
+3. **Checkout (`woocommerce/checkout/form-checkout.php`)** — preserve Stripe, subscription totals, state selector, prescription approval flow
+4. **Thank you (`woocommerce/checkout/thankyou.php`)** — preserve expected charge display
 
 ---
 
