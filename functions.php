@@ -51,6 +51,37 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( $item, $ca
 			$item->add_meta_data( $label, esc_html( $values[ $key ] ) );
 		}
 	}
+
+	// Consolidated Rx Summary for backend processing
+	// Format: TIRZEPATIDE - 10mg, 20mg, 30mg, 3 Bottle, 3 month
+	$parent_slug = get_post_field( 'post_name', $values['product_id'] ?? 0 );
+	if ( in_array( $parent_slug, [ 'compound-tirzepatide', 'compound-semaglutide' ], true ) ) {
+		$drug = strtoupper( str_replace( 'compound-', '', $parent_slug ) );
+
+		// Bottle count from whichever attribute this product uses
+		$variation  = $values['variation'] ?? [];
+		$bottle_raw = $variation['attribute_pa_wm-bottle'] ?? $variation['attribute_pa_vial'] ?? '';
+		$bottle_num = (int) preg_replace( '/[^0-9]/', '', $bottle_raw );
+
+		// Collect non-empty per-month doses; show all if different, just one if all same
+		$dose_fields = array_values( array_filter( [
+			$values['dose_month_1'] ?? '',
+			$values['dose_month_2'] ?? '',
+			$values['dose_month_3'] ?? '',
+		] ) );
+		$dose_str = ! empty( $dose_fields )
+			? ( count( array_unique( $dose_fields ) ) === 1 ? $dose_fields[0] : implode( ', ', $dose_fields ) )
+			: '';
+
+		$parts = array_filter( [
+			$dose_str,
+			$bottle_num ? $bottle_num . ' Bottle' : '',
+			$bottle_num ? $bottle_num . ' month'  : '',
+		] );
+		if ( $parts ) {
+			$item->add_meta_data( 'Rx Summary', $drug . ' - ' . implode( ', ', $parts ) );
+		}
+	}
 }, 10, 4 );
 
 // Enqueue PDP styles and scripts on single product pages only

@@ -101,6 +101,18 @@ if ( $is_weight_loss ) :
 		}
 	}
 
+	// Derive available doses from the product's attribute terms (WP Admin order),
+	// filtered to doses that have at least one published variation. Overrides the
+	// hardcoded list so adding/removing a dose variant in WP Admin takes effect here.
+	$dosage_terms = isset( $attrs['pa_dosage'] ) ? ( $attrs['pa_dosage']->get_terms() ?: [] ) : [];
+	$wc_doses = array_values( array_filter(
+		array_map( fn( $t ) => $t->slug, $dosage_terms ),
+		fn( $d ) => isset( $variation_map[ $d ] ) || isset( $price_matrix[ $d ] )
+	) );
+	if ( ! empty( $wc_doses ) ) {
+		$h['doses'] = $wc_doses;
+	}
+
 	// Supply prices for PHP-rendered buttons — WC data takes precedence, falls back to config defaults
 	$first_dose = ! empty( $h['doses'] ) ? $h['doses'][0] : '';
 	$sp         = [
