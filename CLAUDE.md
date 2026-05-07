@@ -175,8 +175,8 @@ For any template or WooCommerce change, verify on staging:
 
 - **Host:** WordPress.com Business plan
 - **SFTP:** `sftp.wp.com` port 22
-- **Staging SSH:** `ssh ecom-adamb01445d7f0c-kpnrf.wordpress.com@ssh.wp.com`
-- **Production SSH:** credentials in WordPress.com dashboard → Hosting → SFTP/SSH (not yet confirmed as of 2026-05-07 — verify with `wp option get siteurl` before running any commands)
+- **Production SSH:** `ssh ecom-adamb01445d7f0c-kpnrf.wordpress.com@ssh.wp.com`
+- **Staging SSH:** `ssh staging-b59c-ecom-adamb01445d7f0c-kpnrf.wordpress.com@ssh.wp.com`
 - **Auth:** SSH key (Luke's MacBook key attached — passwordless)
 - **Theme path on server:** `/srv/htdocs/wp-content/themes/myogenix-theme/`
 - **WP Admin:** `https://myogenixpharma.com/wp-admin`
