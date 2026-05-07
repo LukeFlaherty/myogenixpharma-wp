@@ -11,6 +11,16 @@ add_action( 'wp_enqueue_scripts', function() {
 	);
 } );
 
+// Convert a dose term slug (e.g. "10-mg") to its display name (e.g. "10 mg").
+// Checks pa_individual-dose first (production), then pa_dosage (staging).
+function myogenix_dose_display( $slug ) {
+	foreach ( [ 'pa_individual-dose', 'pa_dosage' ] as $tax ) {
+		$term = get_term_by( 'slug', $slug, $tax );
+		if ( $term ) return $term->name;
+	}
+	return $slug;
+}
+
 // Dose escalation — capture per-month doses from add-to-cart URL and attach to cart item
 add_filter( 'woocommerce_add_cart_item_data', function ( $cart_item_data, $product_id, $variation_id ) {
 	foreach ( [ 'dose_month_1', 'dose_month_2', 'dose_month_3' ] as $key ) {
@@ -32,7 +42,7 @@ add_filter( 'woocommerce_get_item_data', function ( $item_data, $cart_item ) {
 		if ( ! empty( $cart_item[ $key ] ) ) {
 			$item_data[] = [
 				'key'   => $label,
-				'value' => esc_html( $cart_item[ $key ] ),
+				'value' => esc_html( myogenix_dose_display( $cart_item[ $key ] ) ),
 			];
 		}
 	}
@@ -53,11 +63,14 @@ add_filter( 'woocommerce_cart_item_name', function ( $name, $cart_item, $cart_it
 	$bottle_raw = $variation['attribute_pa_wm-bottle'] ?? $variation['attribute_pa_vial'] ?? '';
 	$bottle_num = (int) preg_replace( '/[^0-9]/', '', $bottle_raw );
 
-	$dose_fields = array_values( array_filter( [
-		$cart_item['dose_month_1'] ?? '',
-		$cart_item['dose_month_2'] ?? '',
-		$cart_item['dose_month_3'] ?? '',
-	] ) );
+	$dose_fields = array_values( array_filter( array_map(
+		'myogenix_dose_display',
+		array_filter( [
+			$cart_item['dose_month_1'] ?? '',
+			$cart_item['dose_month_2'] ?? '',
+			$cart_item['dose_month_3'] ?? '',
+		] )
+	) ) );
 	$dose_str = ! empty( $dose_fields )
 		? ( count( array_unique( $dose_fields ) ) === 1 ? $dose_fields[0] : implode( ', ', $dose_fields ) )
 		: '';
@@ -87,7 +100,7 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( $item, $ca
 	];
 	foreach ( $labels as $key => $label ) {
 		if ( ! empty( $values[ $key ] ) ) {
-			$item->add_meta_data( $label, esc_html( $values[ $key ] ) );
+			$item->add_meta_data( $label, esc_html( myogenix_dose_display( $values[ $key ] ) ) );
 		}
 	}
 
@@ -103,11 +116,14 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( $item, $ca
 		$bottle_num = (int) preg_replace( '/[^0-9]/', '', $bottle_raw );
 
 		// Collect non-empty per-month doses; show all if different, just one if all same
-		$dose_fields = array_values( array_filter( [
-			$values['dose_month_1'] ?? '',
-			$values['dose_month_2'] ?? '',
-			$values['dose_month_3'] ?? '',
-		] ) );
+		$dose_fields = array_values( array_filter( array_map(
+			'myogenix_dose_display',
+			array_filter( [
+				$values['dose_month_1'] ?? '',
+				$values['dose_month_2'] ?? '',
+				$values['dose_month_3'] ?? '',
+			] )
+		) ) );
 		$dose_str = ! empty( $dose_fields )
 			? ( count( array_unique( $dose_fields ) ) === 1 ? $dose_fields[0] : implode( ', ', $dose_fields ) )
 			: '';
@@ -130,13 +146,13 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
 			[],
-			'1.2.5'
+			'1.2.6'
 		);
 		wp_enqueue_script(
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/js/pdp.js',
 			[],
-			'1.2.5',
+			'1.2.6',
 			true
 		);
 	}
