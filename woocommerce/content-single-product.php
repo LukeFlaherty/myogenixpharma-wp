@@ -39,22 +39,24 @@ if ( $is_weight_loss ) :
 	// Product hero config — doses + supply_prices confirmed via WP-CLI 2026-04-21
 	$hero = [
 		'compound-tirzepatide' => [
-			'badge'          => 'GIP/GLP-1 Receptor Agonist',
-			'title'          => 'Tirzepatide',
-			'desc'           => 'Tirzepatide activates both GIP and GLP-1 receptors, offering strong metabolic effects with once-weekly dosing.',
-			'compare_url'    => '/product/compound-semaglutide/',
-			'compare_txt'    => 'Compare with Semaglutide →',
-			'doses'          => [ '10mg', '20mg', '30mg', '40mg', '50mg' ],
-			'supply_prices'  => [ 329.95, 659.90, 989.85 ],
+			'badge'             => 'GIP/GLP-1 Receptor Agonist',
+			'title'             => 'Tirzepatide',
+			'desc'              => 'Tirzepatide activates both GIP and GLP-1 receptors, offering strong metabolic effects with once-weekly dosing.',
+			'compare_url'       => '/product/compound-semaglutide/',
+			'compare_txt'       => 'Compare with Semaglutide →',
+			'doses'             => [ '10mg', '20mg', '30mg', '40mg', '50mg' ],
+			'supply_prices'     => [ 329.95, 659.90, 989.85 ],
+			'warning_threshold' => 10, // warn when month 1 dose > 10mg
 		],
 		'compound-semaglutide' => [
-			'badge'          => 'GLP-1 Receptor Agonist',
-			'title'          => 'Semaglutide',
-			'desc'           => 'Semaglutide activates GLP-1 receptors to reduce appetite and improve blood sugar control with once-weekly dosing.',
-			'compare_url'    => '/product/compound-tirzepatide/',
-			'compare_txt'    => 'Compare with Tirzepatide →',
-			'doses'          => [ '1mg', '2mg', '4mg', '6mg', '10mg' ],
-			'supply_prices'  => [ 250.00, 500.00, 750.00 ], // TODO: verify with client — WC currently shows all at $250
+			'badge'             => 'GLP-1 Receptor Agonist',
+			'title'             => 'Semaglutide',
+			'desc'              => 'Semaglutide activates GLP-1 receptors to reduce appetite and improve blood sugar control with once-weekly dosing.',
+			'compare_url'       => '/product/compound-tirzepatide/',
+			'compare_txt'       => 'Compare with Tirzepatide →',
+			'doses'             => [ '1mg', '2mg', '4mg', '6mg', '10mg' ],
+			'supply_prices'     => [ 250.00, 500.00, 750.00 ], // TODO: verify with client — WC currently shows all at $250
+			'warning_threshold' => 1,  // warn when month 1 dose > 1mg
 		],
 	];
 	$h = $hero[ $slug ];
@@ -244,6 +246,7 @@ if ( $is_weight_loss ) :
 					data-product-id="<?php echo esc_attr( $product->get_id() ); ?>"
 					data-dose-attr="<?php echo esc_attr( $dose_meta_key ); ?>"
 					data-dose-labels="<?php echo esc_attr( wp_json_encode( $dose_labels ) ); ?>"
+					data-warning-threshold="<?php echo esc_attr( $h['warning_threshold'] ); ?>"
 					data-bottle-attr="<?php echo esc_attr( $bottle_meta_key ); ?>"
 					data-bottle-slug-map="<?php echo esc_attr( wp_json_encode( $norm_to_raw ) ); ?>"
 				>
@@ -266,7 +269,7 @@ if ( $is_weight_loss ) :
 					</div>
 
 					<!-- Dose Selector -->
-					<p class="pdp-cfg__section-label" id="pdp-dose-label">Your Starting Dose</p>
+					<p class="pdp-cfg__section-label" id="pdp-dose-label">Month 1 Dose</p>
 					<div id="pdp-dose" class="pdp-cfg__doses-wrap"></div>
 
 					<!-- Order Summary -->

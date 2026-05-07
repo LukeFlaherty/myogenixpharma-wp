@@ -52,8 +52,9 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	var doses         = JSON.parse( cfg.getAttribute( 'data-doses' )          || '[]' );
 	var priceMatrix   = JSON.parse( cfg.getAttribute( 'data-price-matrix' )   || '{}' );
 	var variationMap  = JSON.parse( cfg.getAttribute( 'data-variation-map' )  || '{}' );
-	var doseAttr      = cfg.getAttribute( 'data-dose-attr' )                  || 'attribute_pa_dosage';
-	var doseLabels    = JSON.parse( cfg.getAttribute( 'data-dose-labels' )    || '{}' );
+	var doseAttr          = cfg.getAttribute( 'data-dose-attr' )               || 'attribute_pa_dosage';
+	var doseLabels        = JSON.parse( cfg.getAttribute( 'data-dose-labels' ) || '{}' );
+	var warningThreshold  = parseFloat( cfg.getAttribute( 'data-warning-threshold' ) || '10' );
 	var bottleAttr    = cfg.getAttribute( 'data-bottle-attr' )                || 'attribute_pa_wm-bottle';
 	var bottleSlugMap = JSON.parse( cfg.getAttribute( 'data-bottle-slug-map' ) || '{}' );
 
@@ -100,7 +101,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	function renderDoseLabel() {
 		var el = document.getElementById( 'pdp-dose-label' );
 		if ( el ) {
-			el.textContent = state.months > 1 ? 'Configure Your Doses' : 'Your Starting Dose';
+			el.textContent = state.months > 1 ? 'Configure Your Doses' : 'Month 1 Dose';
 		}
 	}
 
@@ -131,8 +132,8 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			var isLower = prev !== null && parseFloat( current ) < parseFloat( prev );
 
 			var badge = m === 1
-				? '<span class="pdp-cfg__dose-badge">Starting dose</span>'
-				: '<span class="pdp-cfg__dose-badge">Prev: ' + prev + '</span>';
+				? '<span class="pdp-cfg__dose-badge">Month 1 Dose</span>'
+				: '<span class="pdp-cfg__dose-badge">Prev: ' + ( doseLabels[ prev ] || prev ) + '</span>';
 
 			var opts = doses.map( function ( d ) {
 				return '<option value="' + d + '"' + ( d === current ? ' selected' : '' ) + '>' + ( doseLabels[ d ] || d ) + '</option>';
@@ -196,15 +197,15 @@ document.addEventListener( 'DOMContentLoaded', function () {
 				'</div>';
 		}
 
-		/* Non-starter dose warning \u2014 shown when month 1 dose exceeds 10mg */
+		/* Documentation warning \u2014 shown when month 1 dose exceeds product-specific threshold */
 		var starterNote = '';
-		if ( parseFloat( state.doses[1] ) > 10 ) {
+		if ( parseFloat( state.doses[1] ) > warningThreshold ) {
 			starterNote =
 				'<div class="pdp-cfg__summary-starter-note">' +
 					'<span class="pdp-cfg__summary-starter-icon" aria-hidden="true">' +
 						'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' +
 					'</span>' +
-					'<span><strong>Non-starter dose selected.</strong> Doses above 10mg require proof of your current dosage. You\u2019ll be prompted to upload your provider documentation before your order is processed.</span>' +
+					'<span><strong>Documentation required.</strong> This dose requires proof of your current dosage. You\u2019ll be prompted to upload your provider documentation before your order is processed.</span>' +
 				'</div>';
 		}
 
