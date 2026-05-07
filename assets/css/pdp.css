@@ -262,17 +262,21 @@
 }
 
 .pdp-cfg__supply:hover {
-	border-color: var(--pdp-purple);
+	border-color: #bbb;
 	background: #fff;
-	color: var(--pdp-dark);
+	color: var(--pdp-dark) !important;
 }
 
 .pdp-cfg__supply:hover strong {
-	color: var(--pdp-dark);
+	color: var(--pdp-dark) !important;
 }
 
 .pdp-cfg__supply:hover span {
-	color: var(--pdp-muted);
+	color: var(--pdp-muted) !important;
+}
+
+.pdp-cfg__supply:hover .pdp-cfg__popular-tag {
+	color: #fff !important;
 }
 
 .pdp-cfg__supply strong {
@@ -749,7 +753,7 @@
 }
 
 .myogenix-pdp__cq-question:hover {
-	color: var(--pdp-purple);
+	color: #888 !important;
 }
 
 .myogenix-pdp__cq-question:focus {

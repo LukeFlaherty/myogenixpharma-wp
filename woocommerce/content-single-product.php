@@ -266,7 +266,7 @@ if ( $is_weight_loss ) :
 					<div id="pdp-summary" class="pdp-cfg__summary"></div>
 
 					<!-- CTA -->
-					<button id="pdp-cta" class="pdp-cfg__cta">Start subscription &rarr;</button>
+					<button id="pdp-cta" class="pdp-cfg__cta">Go to Checkout &rarr;</button>
 					<p id="pdp-disclaimer" class="pdp-cfg__disclaimer">
 						By subscribing you authorize recurring charges at your selected plan price. Cancel anytime before renewal.
 					</p>
