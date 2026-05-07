@@ -252,6 +252,23 @@ if ( $is_weight_loss ) :
 					data-bottle-attr="<?php echo esc_attr( $bottle_meta_key ); ?>"
 					data-bottle-slug-map="<?php echo esc_attr( wp_json_encode( $norm_to_raw ) ); ?>"
 				>
+					<!-- Package Type -->
+					<p class="pdp-cfg__section-label">Choose Your Package</p>
+					<div class="pdp-cfg__pkg-row">
+						<button class="pdp-cfg__pkg pdp-cfg__pkg--active" data-pkg="custom">
+							<strong>Build Your Own</strong>
+							<span>Choose your supply length &amp; customize monthly doses</span>
+						</button>
+						<button class="pdp-cfg__pkg" data-pkg="starter">
+							<strong>Starter Pack</strong>
+							<span>3-month supply &middot; Doses pre-set for months 1&ndash;3</span>
+						</button>
+						<button class="pdp-cfg__pkg" data-pkg="continuation">
+							<strong>Continuation Package</strong>
+							<span>3-month supply &middot; Doses pre-set for months 4&ndash;6</span>
+						</button>
+					</div>
+
 					<!-- Supply Length -->
 					<p class="pdp-cfg__section-label">Supply Length</p>
 					<div class="pdp-cfg__supply-row">

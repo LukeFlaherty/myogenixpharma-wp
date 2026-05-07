@@ -545,6 +545,86 @@
 	line-height: 1.4;
 }
 
+/* Package type selector */
+.pdp-cfg__pkg-row {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-bottom: 20px;
+}
+
+.pdp-cfg__pkg {
+	background: #fff;
+	border: 1.5px solid var(--pdp-border);
+	border-radius: 10px;
+	padding: 14px 16px;
+	text-align: left;
+	cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	color: var(--pdp-dark);
+	transition: border-color 0.15s ease;
+	width: 100%;
+}
+
+.pdp-cfg__pkg--active {
+	border-color: var(--pdp-dark);
+	background: #fafafa;
+}
+
+.pdp-cfg__pkg:hover {
+	border-color: #bbb;
+}
+
+.pdp-cfg__pkg strong {
+	font-size: 0.9375rem;
+	font-weight: 700;
+	color: var(--pdp-dark);
+	line-height: 1.2;
+}
+
+.pdp-cfg__pkg span {
+	font-size: 0.75rem;
+	color: var(--pdp-muted);
+	line-height: 1.3;
+}
+
+/* Greyed-out supply buttons when a locked package is selected */
+.pdp-cfg__supply--disabled {
+	opacity: 0.35;
+	cursor: not-allowed;
+	pointer-events: none;
+}
+
+/* Locked dose card */
+.pdp-cfg__dose-card--locked {
+	background: #fafafa;
+}
+
+.pdp-cfg__dose-static {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	border: 1.5px solid var(--pdp-border);
+	border-radius: 8px;
+	padding: 12px 14px;
+	margin-bottom: 8px;
+	background: #f2f2f2;
+}
+
+.pdp-cfg__dose-static-value {
+	font-size: 0.9375rem;
+	font-weight: 500;
+	color: var(--pdp-dark);
+}
+
+.pdp-cfg__dose-lock-icon {
+	color: var(--pdp-muted);
+	display: flex;
+	flex-shrink: 0;
+}
+
 /* ==========================================================================
    4 Steps Section
    ========================================================================== */

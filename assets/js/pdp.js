@@ -73,14 +73,21 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	 * Per-month dose state — doses[1] is always the "primary" dose used for
 	 * variation lookup and pricing. Doses 2 and 3 are stored as custom order meta.
 	 * Selections persist when switching supply length so customers don't lose work.
+	 *
+	 * packageType: 'custom' | 'starter' | 'continuation'
+	 *   - 'custom'       → Build Your Own (all supply lengths, editable doses)
+	 *   - 'starter'      → locked to 3 months, doses[0-2] pre-set
+	 *   - 'continuation' → locked to 3 months, doses[3-5] pre-set (repeats last if fewer than 6)
 	 */
 	var state = {
-		months: 1,
-		doses:  { 1: doses[0] || '', 2: doses[0] || '', 3: doses[0] || '' }
+		months:      1,
+		doses:       { 1: doses[0] || '', 2: doses[0] || '', 3: doses[0] || '' },
+		packageType: 'custom'
 	};
 
 	var CHEVRON_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
 	var WARNING_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+	var LOCK_SVG    = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
 
 	/* Look up the real WC price — keyed by first-month dose + supply length */
 	function getPrice( dose, months ) {
@@ -94,13 +101,40 @@ document.addEventListener( 'DOMContentLoaded', function () {
 
 	function weeklyMg( dose ) {
 		var mg = parseFloat( dose );
-		return isNaN( mg ) ? '\u2014' : ( mg / 4 ).toFixed( 2 );
+		return isNaN( mg ) ? '—' : ( mg / 4 ).toFixed( 2 );
 	}
 
-	/* --- Section label (updates based on supply selection) ----------------- */
+	/*
+	 * Returns the pre-set doses for starter / continuation packages.
+	 * Starter:      doses 0,1,2 (months 1-3 of treatment)
+	 * Continuation: doses 3,4,5 (months 4-6 of treatment) — repeats last dose if fewer than 6 exist
+	 */
+	function getLockedDoses() {
+		var last = doses[ doses.length - 1 ] || '';
+		if ( state.packageType === 'starter' ) {
+			return {
+				1: doses[0] || '',
+				2: doses[1] || doses[0] || '',
+				3: doses[2] || doses[1] || doses[0] || ''
+			};
+		}
+		if ( state.packageType === 'continuation' ) {
+			return {
+				1: doses[3] || last,
+				2: doses[4] || last,
+				3: doses[5] || last
+			};
+		}
+		return null;
+	}
+
+	/* --- Section label (updates based on supply / package selection) -------- */
 	function renderDoseLabel() {
 		var el = document.getElementById( 'pdp-dose-label' );
-		if ( el ) {
+		if ( ! el ) return;
+		if ( state.packageType !== 'custom' ) {
+			el.textContent = 'Your Monthly Doses';
+		} else {
 			el.textContent = state.months > 1 ? 'Configure Your Doses' : 'Month 1 Dose';
 		}
 	}
@@ -114,7 +148,22 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			if ( el ) {
 				el.textContent = price
 					? '$' + price.toFixed( 2 ) + ( m === 3 ? '/3mo' : '/mo' )
-					: '\u2014';
+					: '—';
+			}
+		} );
+	}
+
+	/*
+	 * When packageType is starter or continuation, disable the 1- and 2-month
+	 * supply buttons and force the 3-month button active.
+	 */
+	function renderSupplyVisibility() {
+		var isLocked = state.packageType !== 'custom';
+		Array.prototype.slice.call( cfg.querySelectorAll( '.pdp-cfg__supply' ) ).forEach( function ( btn ) {
+			var m = parseInt( btn.getAttribute( 'data-months' ), 10 );
+			btn.classList.toggle( 'pdp-cfg__supply--disabled', isLocked && m !== 3 );
+			if ( isLocked ) {
+				btn.classList.toggle( 'pdp-cfg__supply--active', m === 3 );
 			}
 		} );
 	}
@@ -124,6 +173,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		var wrap = document.getElementById( 'pdp-dose' );
 		if ( ! wrap || ! doses.length ) return;
 
+		var isLocked = state.packageType !== 'custom';
 		var html = '';
 
 		for ( var m = 1; m <= state.months; m++ ) {
@@ -135,27 +185,38 @@ document.addEventListener( 'DOMContentLoaded', function () {
 				? '<span class="pdp-cfg__dose-badge">Month 1 Dose</span>'
 				: '<span class="pdp-cfg__dose-badge">Prev: ' + ( doseLabels[ prev ] || prev ) + '</span>';
 
-			var opts = doses.map( function ( d ) {
-				return '<option value="' + d + '"' + ( d === current ? ' selected' : '' ) + '>' + ( doseLabels[ d ] || d ) + '</option>';
-			} ).join( '' );
+			var inputHtml;
+			if ( isLocked ) {
+				inputHtml =
+					'<div class="pdp-cfg__dose-static">' +
+						'<span class="pdp-cfg__dose-static-value">' + ( doseLabels[ current ] || current ) + '</span>' +
+						'<span class="pdp-cfg__dose-lock-icon" aria-hidden="true">' + LOCK_SVG + '</span>' +
+					'</div>';
+			} else {
+				var opts = doses.map( function ( d ) {
+					return '<option value="' + d + '"' + ( d === current ? ' selected' : '' ) + '>' + ( doseLabels[ d ] || d ) + '</option>';
+				} ).join( '' );
+				inputHtml =
+					'<div class="pdp-cfg__dose-select-wrap">' +
+						'<select class="pdp-cfg__dose-select" data-month="' + m + '">' + opts + '</select>' +
+						'<span class="pdp-cfg__dose-chevron">' + CHEVRON_SVG + '</span>' +
+					'</div>';
+			}
 
 			html +=
-				'<div class="pdp-cfg__dose-card" data-month="' + m + '">' +
+				'<div class="pdp-cfg__dose-card' + ( isLocked ? ' pdp-cfg__dose-card--locked' : '' ) + '" data-month="' + m + '">' +
 					'<div class="pdp-cfg__dose-card-header">' +
 						'<span class="pdp-cfg__dose-month-label">' + MONTH_LABELS[ m ] + '</span>' +
 						badge +
 					'</div>' +
-					'<div class="pdp-cfg__dose-select-wrap">' +
-						'<select class="pdp-cfg__dose-select" data-month="' + m + '">' + opts + '</select>' +
-						'<span class="pdp-cfg__dose-chevron">' + CHEVRON_SVG + '</span>' +
-					'</div>' +
+					inputHtml +
 					'<p class="pdp-cfg__dose-detail">' +
 						( doseLabels[ current ] || current ) + '/month = <strong>' + weeklyMg( current ) + ' mg/week</strong> &middot; 4 injections per month' +
 					'</p>' +
 					( isLower
 						? '<div class="pdp-cfg__dose-warning">' +
 							'<span class="pdp-cfg__dose-warning-icon" aria-hidden="true">' + WARNING_SVG + '</span>' +
-							'This dose is lower than your previous month. Your provider may adjust this during review \u2014 no hard block, just a heads-up.' +
+							'This dose is lower than your previous month. Your provider may adjust this during review — no hard block, just a heads-up.' +
 						  '</div>'
 						: ''
 					) +
@@ -164,15 +225,17 @@ document.addEventListener( 'DOMContentLoaded', function () {
 
 		wrap.innerHTML = html;
 
-		Array.prototype.slice.call( wrap.querySelectorAll( '.pdp-cfg__dose-select' ) ).forEach( function ( sel ) {
-			sel.addEventListener( 'change', function () {
-				var month = parseInt( this.getAttribute( 'data-month' ), 10 );
-				state.doses[ month ] = this.value;
-				renderDoses();
-				renderSupplyPrices();
-				renderSummary();
+		if ( ! isLocked ) {
+			Array.prototype.slice.call( wrap.querySelectorAll( '.pdp-cfg__dose-select' ) ).forEach( function ( sel ) {
+				sel.addEventListener( 'change', function () {
+					var month = parseInt( this.getAttribute( 'data-month' ), 10 );
+					state.doses[ month ] = this.value;
+					renderDoses();
+					renderSupplyPrices();
+					renderSummary();
+				} );
 			} );
-		} );
+		}
 	}
 
 	/* --- Order summary ------------------------------------------------------ */
@@ -182,7 +245,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 
 		var price     = getPrice( state.doses[1], state.months );
 		var planLabel = state.months === 3 ? '3-month subscription' : 'Monthly subscription';
-		var priceStr  = price ? '$' + price.toFixed( 2 ) : '\u2014';
+		var priceStr  = price ? '$' + price.toFixed( 2 ) : '—';
 		var lastDose  = state.doses[ state.months ] || state.doses[1];
 
 		/* Per-month dose lines with weekly breakdown */
@@ -192,12 +255,12 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			var weekly = weeklyMg( mDose );
 			doseLines +=
 				'<div class="pdp-cfg__summary-line">' +
-					'<span>' + MONTH_LABELS[ m ] + ' \u2014 ' + ( doseLabels[ mDose ] || mDose ) + '</span>' +
-					'<span class="pdp-cfg__summary-weekly">' + weekly + '\u202fmg/week \u00d7 4 injections</span>' +
+					'<span>' + MONTH_LABELS[ m ] + ' — ' + ( doseLabels[ mDose ] || mDose ) + '</span>' +
+					'<span class="pdp-cfg__summary-weekly">' + weekly + ' mg/week × 4 injections</span>' +
 				'</div>';
 		}
 
-		/* Documentation warning \u2014 shown when month 1 dose exceeds product-specific threshold */
+		/* Documentation warning — shown when month 1 dose exceeds product-specific threshold */
 		var starterNote = '';
 		if ( parseFloat( state.doses[1] ) > warningThreshold ) {
 			starterNote =
@@ -205,7 +268,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 					'<span class="pdp-cfg__summary-starter-icon" aria-hidden="true">' +
 						'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' +
 					'</span>' +
-					'<span><strong>Documentation required.</strong> This dose requires proof of your current dosage. You\u2019ll be prompted to upload your provider documentation before your order is processed.</span>' +
+					'<span><strong>Documentation required.</strong> This dose requires proof of your current dosage. You’ll be prompted to upload your provider documentation before your order is processed.</span>' +
 				'</div>';
 		}
 
@@ -223,17 +286,44 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		renderDoseLabel();
 		renderDoses();
 		renderSupplyPrices();
+		renderSupplyVisibility();
 		renderSummary();
 	}
 
 	/* --- Supply button bindings --------------------------------------------- */
 	Array.prototype.slice.call( cfg.querySelectorAll( '.pdp-cfg__supply' ) ).forEach( function ( btn ) {
 		btn.addEventListener( 'click', function () {
+			/* Locked packages always use 3 months — ignore clicks on other options */
+			if ( state.packageType !== 'custom' ) return;
+
 			state.months = parseInt( this.getAttribute( 'data-months' ), 10 );
 			Array.prototype.slice.call( cfg.querySelectorAll( '.pdp-cfg__supply' ) ).forEach( function ( b ) {
 				b.classList.remove( 'pdp-cfg__supply--active' );
 			} );
 			this.classList.add( 'pdp-cfg__supply--active' );
+			render();
+		} );
+	} );
+
+	/* --- Package type button bindings --------------------------------------- */
+	Array.prototype.slice.call( cfg.querySelectorAll( '.pdp-cfg__pkg' ) ).forEach( function ( btn ) {
+		btn.addEventListener( 'click', function () {
+			var pkg = this.getAttribute( 'data-pkg' );
+			state.packageType = pkg;
+
+			Array.prototype.slice.call( cfg.querySelectorAll( '.pdp-cfg__pkg' ) ).forEach( function ( b ) {
+				b.classList.remove( 'pdp-cfg__pkg--active' );
+			} );
+			this.classList.add( 'pdp-cfg__pkg--active' );
+
+			if ( pkg === 'starter' || pkg === 'continuation' ) {
+				state.months = 3;
+				var locked = getLockedDoses();
+				state.doses[1] = locked[1];
+				state.doses[2] = locked[2];
+				state.doses[3] = locked[3];
+			}
+
 			render();
 		} );
 	} );
@@ -297,7 +387,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 				}
 			}
 
-			pdpLog( 'Adding to cart \u2192 dose1: ' + dose1 + ' | bottle: ' + bottle + ' | plan: ' + plan + ' | variation_id: ' + ( variationId || 'NOT FOUND' ) );
+			pdpLog( 'Adding to cart → dose1: ' + dose1 + ' | bottle: ' + bottle + ' | plan: ' + plan + ' | variation_id: ' + ( variationId || 'NOT FOUND' ) );
 
 			if ( ! variationId ) {
 				pdpError( 'No matching variation: ' + dose1 + ' / ' + bottle + ' / ' + plan );
@@ -307,7 +397,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 
 			ctaBtn.disabled = true;
 			ctaBtn.classList.add( 'pdp-cfg__cta--loading' );
-			ctaBtn.textContent = 'Adding to cart\u2026';
+			ctaBtn.textContent = 'Adding to cart…';
 
 			var bottleWcSlug = bottleSlugMap[ bottle ] || bottle;
 			var url = window.location.pathname + '?add-to-cart=' + pid + '&quantity=1';
@@ -332,14 +422,24 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	/* Reset to defaults on bfcache restore (user navigates back from cart) */
 	window.addEventListener( 'pageshow', function ( e ) {
 		if ( ! e.persisted ) return;
-		state.months = 1;
-		state.doses  = { 1: doses[0] || '', 2: doses[0] || '', 3: doses[0] || '' };
+		state.months      = 1;
+		state.doses       = { 1: doses[0] || '', 2: doses[0] || '', 3: doses[0] || '' };
+		state.packageType = 'custom';
+
 		Array.prototype.slice.call( cfg.querySelectorAll( '.pdp-cfg__supply' ) ).forEach( function ( btn ) {
 			btn.classList.remove( 'pdp-cfg__supply--active' );
 			if ( parseInt( btn.getAttribute( 'data-months' ), 10 ) === 1 ) {
 				btn.classList.add( 'pdp-cfg__supply--active' );
 			}
 		} );
+
+		Array.prototype.slice.call( cfg.querySelectorAll( '.pdp-cfg__pkg' ) ).forEach( function ( btn ) {
+			btn.classList.remove( 'pdp-cfg__pkg--active' );
+			if ( btn.getAttribute( 'data-pkg' ) === 'custom' ) {
+				btn.classList.add( 'pdp-cfg__pkg--active' );
+			}
+		} );
+
 		if ( ctaBtn ) {
 			ctaBtn.disabled = false;
 			ctaBtn.classList.remove( 'pdp-cfg__cta--loading' );
