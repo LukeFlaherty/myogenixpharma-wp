@@ -262,9 +262,17 @@
 }
 
 .pdp-cfg__supply:hover {
-	border-color: #999;
+	border-color: var(--pdp-purple);
 	background: #fff;
 	color: var(--pdp-dark);
+}
+
+.pdp-cfg__supply:hover strong {
+	color: var(--pdp-dark);
+}
+
+.pdp-cfg__supply:hover span {
+	color: var(--pdp-muted);
 }
 
 .pdp-cfg__supply strong {
@@ -738,6 +746,10 @@
 	text-align: left;
 	gap: 20px;
 	line-height: 1.4;
+}
+
+.myogenix-pdp__cq-question:hover {
+	color: var(--pdp-purple);
 }
 
 .myogenix-pdp__cq-question:focus {
