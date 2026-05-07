@@ -450,6 +450,32 @@
 	font-weight: 800;
 }
 
+.pdp-cfg__summary-weekly {
+	font-size: 0.75rem;
+	color: var(--pdp-light);
+	white-space: nowrap;
+}
+
+.pdp-cfg__summary-starter-note {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	background: #fffbf0;
+	border: 1px solid #e8c84a;
+	border-radius: 8px;
+	padding: 10px 12px;
+	font-size: 0.8rem;
+	color: #7a5c00;
+	line-height: 1.5;
+	margin-top: 12px;
+}
+
+.pdp-cfg__summary-starter-icon {
+	flex-shrink: 0;
+	margin-top: 1px;
+	color: #c49a00;
+}
+
 .pdp-cfg__summary-note {
 	background: #fff;
 	border: 1px solid var(--pdp-border);

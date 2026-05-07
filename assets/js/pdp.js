@@ -182,13 +182,27 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		var priceStr  = price ? '$' + price.toFixed( 2 ) : '\u2014';
 		var lastDose  = state.doses[ state.months ] || state.doses[1];
 
-		/* Per-month dose lines */
+		/* Per-month dose lines with weekly breakdown */
 		var doseLines = '';
 		for ( var m = 1; m <= state.months; m++ ) {
+			var mDose  = state.doses[ m ] || state.doses[1];
+			var weekly = weeklyMg( mDose );
 			doseLines +=
 				'<div class="pdp-cfg__summary-line">' +
-					'<span>' + MONTH_LABELS[ m ] + ' \u2014 ' + state.doses[ m ] + '</span>' +
-					'<span></span>' +
+					'<span>' + MONTH_LABELS[ m ] + ' \u2014 ' + mDose + '</span>' +
+					'<span class="pdp-cfg__summary-weekly">' + weekly + '\u202fmg/week \u00d7 4 injections</span>' +
+				'</div>';
+		}
+
+		/* Non-starter dose warning \u2014 shown when month 1 dose exceeds 20mg */
+		var starterNote = '';
+		if ( parseFloat( state.doses[1] ) > 20 ) {
+			starterNote =
+				'<div class="pdp-cfg__summary-starter-note">' +
+					'<span class="pdp-cfg__summary-starter-icon" aria-hidden="true">' +
+						'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' +
+					'</span>' +
+					'<span><strong>Non-starter dose selected.</strong> Doses above 20mg require proof of your current dosage. You\u2019ll be prompted to upload your provider documentation before your order is processed.</span>' +
 				'</div>';
 		}
 
@@ -207,6 +221,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 				'<span>Total today</span>' +
 				'<span class="pdp-cfg__summary-total-price">' + priceStr + '</span>' +
 			'</div>' +
+			starterNote +
 			'<div class="pdp-cfg__summary-note">' + renewNote + '</div>';
 	}
 
