@@ -93,6 +93,32 @@ rsync -avz --progress \
 
 **Staging is the primary preview environment.** It has all plugins licensed and configured, real product data, and mirrors production exactly. Always verify on staging before merging to main.
 
+### Critical: after any production → staging database sync
+
+WordPress.com's sync copies the database but does NOT preserve all staging-specific state. After every sync, run these steps in order:
+
+1. **Activate the child theme** (sync often resets this):
+   ```bash
+   ssh ecom-adamb01445d7f0c-kpnrf.wordpress.com@ssh.wp.com "wp theme activate myogenix-theme"
+   ```
+2. **Flush Elementor cache** (CSS regenerates with correct staging URLs):
+   ```bash
+   ssh ecom-adamb01445d7f0c-kpnrf.wordpress.com@ssh.wp.com "wp cache flush && wp elementor flush-css"
+   ```
+3. **Re-apply Elementor Single Product exclude conditions** (sync overwrites these from production):
+   ```bash
+   ssh ecom-adamb01445d7f0c-kpnrf.wordpress.com@ssh.wp.com "
+   wp post meta update 990 _elementor_conditions '[\"include/product\",\"exclude/product/4063\",\"exclude/product/4041\"]' --format=json &&
+   wp option update elementor_pro_theme_builder_conditions '{\"single\":{\"990\":[\"include\/product\",\"exclude\/product\/4063\",\"exclude\/product\/4041\"]},\"archive\":{\"2039\":[\"include\/product_archive\/shop_page\"]},\"elementor_head\":{\"1695\":[\"include\/general\"]},\"elementor_body_end\":{\"1636\":[\"include\/woocommerce\"]},\"footer\":{\"914\":[\"include\/general\"]},\"header\":{\"898\":[\"include\/general\"]}}' --format=json &&
+   wp cache flush && wp elementor flush-css
+   "
+   ```
+4. If the site still looks broken in Elementor, go to **Elementor → Tools → Clear Files & Data**, then hard refresh.
+5. Do NOT try Elementor → Tools → Replace URL — WordPress.com staging sync handles URL replacement automatically (it returns 0 rows affected).
+6. If Elementor CSS files 404 after clearing, switch **Elementor → Settings → Performance → CSS Print Method → Internal Embedding**, save, clear again.
+
+If nothing works: **Jetpack → Activity Log → restore to the snapshot before the sync**. The git-deployed theme files survive a database-only restore.
+
 ---
 
 ## Deploy Pipeline
@@ -149,19 +175,29 @@ For any template or WooCommerce change, verify on staging:
 
 - **Host:** WordPress.com Business plan
 - **SFTP:** `sftp.wp.com` port 22
-- **SSH:** `ssh ecom-adamb01445d7f0c-kpnrf.wordpress.com@ssh.wp.com`
-- **Username:** `ecom-adamb01445d7f0c-kpnrf.wordpress.com`
+- **Staging SSH:** `ssh ecom-adamb01445d7f0c-kpnrf.wordpress.com@ssh.wp.com`
+- **Production SSH:** credentials in WordPress.com dashboard → Hosting → SFTP/SSH (not yet confirmed as of 2026-05-07 — verify with `wp option get siteurl` before running any commands)
 - **Auth:** SSH key (Luke's MacBook key attached — passwordless)
 - **Theme path on server:** `/srv/htdocs/wp-content/themes/myogenix-theme/`
 - **WP Admin:** `https://myogenixpharma.com/wp-admin`
 
+**Always verify which environment you're in before running WP-CLI:**
+```bash
+wp option get siteurl
+# Must return https://myogenixpharma.com for production
+# Must return https://staging-b59c-... for staging
+```
+
 SSH gives WP-CLI access for quick debugging. Useful commands:
 ```bash
 wp theme list
+wp theme activate myogenix-theme          # use after any Jetpack restore
 wp plugin list --status=active
-wp option get template       # confirms active theme
-wp option get stylesheet     # confirms active child theme
+wp option get template                    # confirms active theme
+wp option get stylesheet                  # confirms active child theme
 wp post list --post_type=product --fields=ID,post_title,post_status
+wp cache flush
+wp elementor flush-css                    # must run after theme activation or condition changes
 ```
 
 Credentials (SFTP password) are stored securely by Luke. Do not store credentials in this repo.
@@ -426,6 +462,40 @@ woocommerce_product_loop_end();
 do_action( 'woocommerce_after_shop_loop' );
 do_action( 'woocommerce_after_main_content' );
 ```
+
+---
+
+## Elementor Conditions Management
+
+Elementor stores template display conditions in TWO places. Both must be in sync or templates won't render correctly:
+
+| Store | What it is | How to read | How to update |
+|---|---|---|---|
+| `_elementor_conditions` post meta on the template post | Source of truth — what the UI edits | `wp post meta get 990 _elementor_conditions` | `wp post meta update 990 _elementor_conditions '[...]' --format=json` |
+| `elementor_pro_theme_builder_conditions` wp option | Compiled cache for fast lookup at render time | `wp option get elementor_pro_theme_builder_conditions --format=json` | `wp option update elementor_pro_theme_builder_conditions '{...}' --format=json` |
+
+**If you update only the post meta, the conditions cache still serves the old value — templates appear unchanged.** Always update both, then flush caches.
+
+### Current Single Product conditions (template #990)
+
+```json
+["include/product", "exclude/product/4063", "exclude/product/4041"]
+```
+
+- `include/product` — applies to all WooCommerce products
+- `exclude/product/4063` — except TIRZEPATIDE (lets our theme override render)
+- `exclude/product/4041` — except SEMAGLUTIDE (lets our theme override render)
+
+**These excludes must also be applied on production** after the first code deploy. They are not in git — they live in the database. Use the SSH command under "after any production → staging database sync" above, pointed at the production SSH endpoint.
+
+### Known Elementor Theme Builder templates
+
+| ID | Type | Condition | Notes |
+|---|---|---|---|
+| #898 | Header | include/general | Entire site |
+| #914 | Footer | include/general | Entire site |
+| #990 | Single Product | include/product, exclude/4063, exclude/4041 | All products except weight management |
+| #2039 | Products Archive | include/product_archive/shop_page | Shop/archive pages |
 
 ---
 
