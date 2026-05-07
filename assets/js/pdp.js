@@ -196,25 +196,17 @@ document.addEventListener( 'DOMContentLoaded', function () {
 				'</div>';
 		}
 
-		/* Non-starter dose warning \u2014 shown when month 1 dose exceeds 20mg */
+		/* Non-starter dose warning \u2014 shown when month 1 dose exceeds 10mg */
 		var starterNote = '';
-		if ( parseFloat( state.doses[1] ) > 20 ) {
+		if ( parseFloat( state.doses[1] ) > 10 ) {
 			starterNote =
 				'<div class="pdp-cfg__summary-starter-note">' +
 					'<span class="pdp-cfg__summary-starter-icon" aria-hidden="true">' +
 						'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' +
 					'</span>' +
-					'<span><strong>Non-starter dose selected.</strong> Doses above 20mg require proof of your current dosage. You\u2019ll be prompted to upload your provider documentation before your order is processed.</span>' +
+					'<span><strong>Non-starter dose selected.</strong> Doses above 10mg require proof of your current dosage. You\u2019ll be prompted to upload your provider documentation before your order is processed.</span>' +
 				'</div>';
 		}
-
-		/* Auto-renew note shows last month's dose and per-month price */
-		var renewPrice = getPrice( state.doses[1], 1 );
-		var renewNote  = price
-			? '<strong>Auto-renews</strong> at <strong>' + ( doseLabels[ lastDose ] || lastDose ) + ' &middot; ' +
-			  ( renewPrice ? '$' + renewPrice.toFixed( 2 ) + '/mo' : priceStr ) +
-			  '</strong> after your supply ends. Cancel anytime before renewal.'
-			: 'Price unavailable for this combination.';
 
 		wrap.innerHTML =
 			'<p class="pdp-cfg__summary-label">Order Summary</p>' +
@@ -223,8 +215,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 				'<span>Total today</span>' +
 				'<span class="pdp-cfg__summary-total-price">' + priceStr + '</span>' +
 			'</div>' +
-			starterNote +
-			'<div class="pdp-cfg__summary-note">' + renewNote + '</div>';
+			starterNote;
 	}
 
 	function render() {
@@ -336,6 +327,25 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			window.location.href = url;
 		} );
 	}
+
+	/* Reset to defaults on bfcache restore (user navigates back from cart) */
+	window.addEventListener( 'pageshow', function ( e ) {
+		if ( ! e.persisted ) return;
+		state.months = 1;
+		state.doses  = { 1: doses[0] || '', 2: doses[0] || '', 3: doses[0] || '' };
+		Array.prototype.slice.call( cfg.querySelectorAll( '.pdp-cfg__supply' ) ).forEach( function ( btn ) {
+			btn.classList.remove( 'pdp-cfg__supply--active' );
+			if ( parseInt( btn.getAttribute( 'data-months' ), 10 ) === 1 ) {
+				btn.classList.add( 'pdp-cfg__supply--active' );
+			}
+		} );
+		if ( ctaBtn ) {
+			ctaBtn.disabled = false;
+			ctaBtn.classList.remove( 'pdp-cfg__cta--loading' );
+			ctaBtn.textContent = 'Go to Checkout →';
+		}
+		render();
+	} );
 
 	/* Initial render */
 	render();

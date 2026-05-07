@@ -146,13 +146,13 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
 			[],
-			'1.2.6'
+			'1.2.7'
 		);
 		wp_enqueue_script(
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/js/pdp.js',
 			[],
-			'1.2.6',
+			'1.2.7',
 			true
 		);
 	}
