@@ -343,12 +343,19 @@ Don't duplicate snippet logic inside a template — you'll get double execution 
 - Both are JSON-encoded into `data-*` attributes on `#pdp-cfg`
 - `assets/js/pdp.js` reads those attributes and drives all UI — supply length buttons, per-month dose selectors, order summary, and add-to-cart
 
-**Dose dropdowns are dynamic — do not hardcode them.** Doses are derived from the product's `pa_dosage` attribute terms (ordered per WP Admin), filtered to those with at least one published variation. Adding or retiring a dose in WP Admin automatically updates the dropdown.
+**Dose dropdowns are dynamic — do not hardcode them.** Doses are derived from the product's dose attribute terms (ordered per WP Admin), filtered to those with at least one published variation. Adding or retiring a dose in WP Admin automatically updates the dropdown.
 
-**Bottle attribute differs by product:**
-- Tirzepatide uses `pa_wm-bottle` (slugs: `1-bottle`, `2-bottle`, `3-bottle`)
-- Semaglutide uses `pa_vial` (slugs: `1-vial`, `2-vial`, `3-vial`)
-- The template normalizes both to `1-bottle`/`2-bottle`/`3-bottle` internally
+**WooCommerce attribute names differ between production and staging environments:**
+
+| Attribute | Production slugs | Staging slugs |
+|---|---|---|
+| Dose | `pa_individual-dose` (`10-mg`, `15-mg`, `20-mg` …) | `pa_dosage` (`10mg`, `20mg`, `30mg` …) |
+| Bottle/vial count | `pa_vial` (`1-vial`, `2-vial`, `3-vial`) — both products | Tirzepatide: `pa_wm-bottle`, Semaglutide: `pa_vial` |
+| Subscription plan | None (plan determined by vial count) | `pa_wm-subscription-plan` (`1-month`, `3-month`) |
+
+The PHP template auto-detects which attribute is present (`pa_individual-dose` takes precedence). The template normalizes all bottle/vial slugs to `1-bottle`/`2-bottle`/`3-bottle` internally so JS stays consistent across environments.
+
+**Dose display names:** Dose term slugs (e.g. `10-mg`) must be converted to term names (e.g. `10 mg`) before showing to users. Use `myogenix_dose_display( $slug )` in `functions.php` — it looks up the term name from either taxonomy and falls back to the raw slug. Apply this function anywhere a dose value is rendered (cart title, meta boxes, order Rx Summary).
 
 **Dose escalation (multi-month supply):** Customers pick a separate dose per month for 2- and 3-month supplies. `dose_month_1/2/3` are passed as URL params on add-to-cart, captured in cart item data via `woocommerce_add_cart_item_data`, displayed in cart/checkout via `woocommerce_get_item_data`, and saved to the order line item via `woocommerce_checkout_create_order_line_item`.
 
@@ -360,10 +367,10 @@ Every weight management order line item gets an `Rx Summary` meta field written 
 
 | Scenario | Example |
 |---|---|
-| 1-month, single dose | `TIRZEPATIDE - 10mg, 1 Bottle, 1 month` |
-| 2-month, escalating doses | `TIRZEPATIDE - 10mg, 20mg, 2 Bottle, 2 month` |
-| 3-month, same dose | `TIRZEPATIDE - 10mg, 3 Bottle, 3 month` |
-| 3-month, escalating doses | `TIRZEPATIDE - 10mg, 20mg, 30mg, 3 Bottle, 3 month` |
+| 1-month, single dose | `TIRZEPATIDE - 10 mg, 1 Bottle, 1 month` |
+| 2-month, escalating doses | `TIRZEPATIDE - 10 mg, 20 mg, 2 Bottle, 2 month` |
+| 3-month, same dose | `TIRZEPATIDE - 10 mg, 3 Bottle, 3 month` |
+| 3-month, escalating doses | `TIRZEPATIDE - 10 mg, 20 mg, 30 mg, 3 Bottle, 3 month` |
 
 Rules:
 - Drug name = uppercase of product slug minus `compound-` prefix
