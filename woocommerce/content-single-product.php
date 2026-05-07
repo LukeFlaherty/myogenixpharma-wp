@@ -59,11 +59,13 @@ if ( $is_weight_loss ) :
 	];
 	$h = $hero[ $slug ];
 
-	// Detect which "bottle count" attribute this product uses.
-	// Tirzepatide uses pa_wm-bottle (slugs: 1-bottle/2-bottle/3-bottle).
-	// Semaglutide uses pa_vial (slugs: 1-vial/2-vial/3-vial).
-	// We normalize to 1-bottle/2-bottle/3-bottle throughout so JS stays consistent.
+	// Detect which attributes this product uses.
+	// Production uses pa_individual-dose + pa_vial for both products.
+	// Staging may use pa_dosage + pa_wm-bottle (tirzepatide) or pa_vial (semaglutide).
+	// We normalize bottle counts to 1-bottle/2-bottle/3-bottle throughout so JS stays consistent.
 	$attrs           = $product->get_attributes();
+	$dose_attr_key   = isset( $attrs['pa_individual-dose'] ) ? 'pa_individual-dose' : 'pa_dosage';
+	$dose_meta_key   = 'attribute_' . $dose_attr_key;
 	$bottle_attr_key = isset( $attrs['pa_wm-bottle'] ) ? 'pa_wm-bottle' : 'pa_vial';
 	$bottle_meta_key = 'attribute_' . $bottle_attr_key;
 	$raw_to_norm     = [
@@ -87,24 +89,27 @@ if ( $is_weight_loss ) :
 		$v = wc_get_product( $vid );
 		if ( ! $v || 'publish' !== get_post_status( $vid ) ) continue;
 		// Read slugs directly from post meta — get_attribute() returns term names, not slugs
-		$dose       = get_post_meta( $vid, 'attribute_pa_dosage', true );
+		$dose       = get_post_meta( $vid, $dose_meta_key, true );
 		$bottle_raw = get_post_meta( $vid, $bottle_meta_key, true );
-		$bottle     = $raw_to_norm[ $bottle_raw ] ?? $bottle_raw; // normalize to 1-bottle/2-bottle/3-bottle
+		$bottle     = $raw_to_norm[ $bottle_raw ] ?? null; // null if not a recognized vial count
 		$plan       = get_post_meta( $vid, 'attribute_pa_wm-subscription-plan', true );
 		if ( ! $dose || ! $bottle ) continue;
 		$price = (float) $v->get_price();
 		if ( $price > 0 && ! isset( $price_matrix[ $dose ][ $bottle ] ) ) {
 			$price_matrix[ $dose ][ $bottle ] = $price;
 		}
-		if ( $plan ) {
-			$variation_map[ $dose ][ $bottle ][ $plan ] = (int) $vid;
-		}
+		// Store with plan key if present; always store with '' key as fallback for products without plan attr.
+		$variation_map[ $dose ][ $bottle ][ $plan ?: '' ] = (int) $vid;
 	}
 
 	// Derive available doses from the product's attribute terms (WP Admin order),
 	// filtered to doses that have at least one published variation. Overrides the
 	// hardcoded list so adding/removing a dose variant in WP Admin takes effect here.
-	$dosage_terms = isset( $attrs['pa_dosage'] ) ? ( $attrs['pa_dosage']->get_terms() ?: [] ) : [];
+	$dosage_terms = isset( $attrs[ $dose_attr_key ] ) ? ( $attrs[ $dose_attr_key ]->get_terms() ?: [] ) : [];
+	$dose_labels  = [];
+	foreach ( $dosage_terms as $t ) {
+		$dose_labels[ $t->slug ] = $t->name; // e.g. "10-mg" => "10 mg"
+	}
 	$wc_doses = array_values( array_filter(
 		array_map( fn( $t ) => $t->slug, $dosage_terms ),
 		fn( $d ) => isset( $variation_map[ $d ] ) || isset( $price_matrix[ $d ] )
@@ -237,6 +242,8 @@ if ( $is_weight_loss ) :
 					data-price-matrix="<?php echo esc_attr( wp_json_encode( $price_matrix ) ); ?>"
 					data-variation-map="<?php echo esc_attr( wp_json_encode( $variation_map ) ); ?>"
 					data-product-id="<?php echo esc_attr( $product->get_id() ); ?>"
+					data-dose-attr="<?php echo esc_attr( $dose_meta_key ); ?>"
+					data-dose-labels="<?php echo esc_attr( wp_json_encode( $dose_labels ) ); ?>"
 					data-bottle-attr="<?php echo esc_attr( $bottle_meta_key ); ?>"
 					data-bottle-slug-map="<?php echo esc_attr( wp_json_encode( $norm_to_raw ) ); ?>"
 				>
