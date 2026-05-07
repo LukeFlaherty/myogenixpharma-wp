@@ -116,6 +116,8 @@ if ( $is_weight_loss ) :
 		array_map( fn( $t ) => $t->slug, $dosage_terms ),
 		fn( $d ) => isset( $variation_map[ $d ] ) || isset( $price_matrix[ $d ] )
 	) );
+	// Sort numerically so "1-mg" < "2-mg" < "10-mg" regardless of WP term menu_order.
+	usort( $wc_doses, fn( $a, $b ) => (float) $a - (float) $b );
 	if ( ! empty( $wc_doses ) ) {
 		$h['doses'] = $wc_doses;
 	}
