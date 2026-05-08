@@ -57,10 +57,10 @@ if ( $is_weight_loss ) :
 			'compare_url'       => '/product/compound-tirzepatide/',
 			'compare_txt'       => 'Compare with Tirzepatide →',
 			'doses'             => [ '1mg', '2mg', '4mg', '6mg', '10mg' ],
-			'supply_prices'     => [ 250.00, 500.00, 750.00 ], // TODO: verify with client — update with confirmed pricing
+			'supply_prices'     => [ 285.00, 379.00, 479.00 ],
 			'warning_threshold' => 1,
-			'pkg_dose_slugs'    => [ 'starter' => '', 'continuation' => '' ], // set when semaglutide packages are configured
-			'pkg_prices'        => [ 'starter' => 0.00, 'continuation' => 0.00 ],
+			'pkg_dose_slugs'    => [ 'starter' => 'months-1-3-bundle', 'continuation' => 'months-4-6-bundle' ],
+			'pkg_prices'        => [ 'starter' => 549.00, 'continuation' => 799.00 ],
 		],
 	];
 	$h = $hero[ $slug ];
