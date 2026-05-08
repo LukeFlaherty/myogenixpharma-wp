@@ -139,6 +139,61 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( $item, $ca
 	}
 }, 10, 4 );
 
+// Look up the 1-vial price for a given dose slug on a weight management product.
+// Used by the cart price override below.
+function myogenix_get_1vial_price( $parent_id, $dose_slug ) {
+	$parent = wc_get_product( $parent_id );
+	if ( ! $parent ) return 0;
+	$attrs           = $parent->get_attributes();
+	$dose_meta_key   = isset( $attrs['pa_individual-dose'] ) ? 'attribute_pa_individual-dose' : 'attribute_pa_dosage';
+	$bottle_meta_key = isset( $attrs['pa_wm-bottle'] )       ? 'attribute_pa_wm-bottle'       : 'attribute_pa_vial';
+	$one_vial        = [ '1-vial', '1-bottle' ];
+	foreach ( $parent->get_children() as $vid ) {
+		if ( 'publish' !== get_post_status( $vid ) ) continue;
+		if ( get_post_meta( $vid, $dose_meta_key, true ) !== $dose_slug ) continue;
+		if ( ! in_array( get_post_meta( $vid, $bottle_meta_key, true ), $one_vial, true ) ) continue;
+		$price = (float) get_post_meta( $vid, '_price', true );
+		if ( $price > 0 ) return $price;
+	}
+	return 0;
+}
+
+// Override cart price for mixed-dose BYO orders.
+// When monthly doses differ, charge the sum of each month's 1-vial price instead of
+// the variation's N-vial bulk rate. Package variations (Starter/Continuation) are
+// detected by their non-numeric dose attribute and are left at their flat rate.
+add_action( 'woocommerce_before_calculate_totals', function ( $cart ) {
+	if ( is_admin() && ! defined( 'DOING_AJAX' ) ) return;
+	$wm_slugs = [ 'compound-tirzepatide', 'compound-semaglutide' ];
+	foreach ( $cart->get_cart() as $cart_item ) {
+		$parent_slug = get_post_field( 'post_name', $cart_item['product_id'] ?? 0 );
+		if ( ! in_array( $parent_slug, $wm_slugs, true ) ) continue;
+
+		// Package variations have a non-numeric dose slug (e.g. "months-1-3-bundle") — skip them.
+		$variation    = $cart_item['variation'] ?? [];
+		$var_dose_raw = $variation['attribute_pa_individual-dose'] ?? $variation['attribute_pa_dosage'] ?? '';
+		if ( ! empty( $var_dose_raw ) && (float) $var_dose_raw === 0.0 ) continue;
+
+		$doses = array_values( array_filter( [
+			$cart_item['dose_month_1'] ?? '',
+			$cart_item['dose_month_2'] ?? '',
+			$cart_item['dose_month_3'] ?? '',
+		] ) );
+
+		// Same dose every month → variation's N-vial bulk price is correct, leave it alone.
+		if ( count( $doses ) < 2 || count( array_unique( $doses ) ) === 1 ) continue;
+
+		// Mixed doses → sum each month's 1-vial price.
+		$total = 0;
+		foreach ( $doses as $dose_slug ) {
+			$total += myogenix_get_1vial_price( $cart_item['product_id'], $dose_slug );
+		}
+		if ( $total > 0 ) {
+			$cart_item['data']->set_price( $total );
+		}
+	}
+}, 99 );
+
 // Enqueue PDP styles and scripts on single product pages only
 add_action( 'wp_enqueue_scripts', function() {
 	if ( is_singular( 'product' ) ) {
