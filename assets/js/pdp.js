@@ -58,6 +58,14 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	var bottleAttr    = cfg.getAttribute( 'data-bottle-attr' )                || 'attribute_pa_wm-bottle';
 	var bottleSlugMap = JSON.parse( cfg.getAttribute( 'data-bottle-slug-map' ) || '{}' );
 
+	/* Package variation IDs and prices — populated by PHP from WC variation data */
+	var starterVariationId      = parseInt(  cfg.getAttribute( 'data-starter-variation-id' )      || '0', 10 );
+	var starterPrice            = parseFloat( cfg.getAttribute( 'data-starter-price' )             || '0' );
+	var starterDoseSlug         = cfg.getAttribute( 'data-starter-dose-slug' )                     || '';
+	var continuationVariationId = parseInt(  cfg.getAttribute( 'data-continuation-variation-id' ) || '0', 10 );
+	var continuationPrice       = parseFloat( cfg.getAttribute( 'data-continuation-price' )        || '0' );
+	var continuationDoseSlug    = cfg.getAttribute( 'data-continuation-dose-slug' )                || '';
+
 	/*
 	 * WC attribute slug → term slug mapping (confirmed via WP-CLI 2026-04-21)
 	 *   attribute_pa_dosage               → value from doses array (e.g. "10mg")
@@ -142,13 +150,17 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	/* --- Supply button price labels (keyed off first month's dose) ---------- */
 	function renderSupplyPrices() {
 		Array.prototype.slice.call( cfg.querySelectorAll( '.pdp-cfg__supply' ) ).forEach( function ( btn ) {
-			var m     = parseInt( btn.getAttribute( 'data-months' ), 10 );
-			var price = getPrice( state.doses[1], m );
-			var el    = btn.querySelector( '.pdp-cfg__supply-price' );
-			if ( el ) {
-				el.textContent = price
-					? '$' + price.toFixed( 2 ) + ( m === 3 ? '/3mo' : '/mo' )
-					: '—';
+			var m  = parseInt( btn.getAttribute( 'data-months' ), 10 );
+			var el = btn.querySelector( '.pdp-cfg__supply-price' );
+			if ( ! el ) return;
+
+			if ( state.packageType === 'starter' && m === 3 ) {
+				el.textContent = starterPrice ? '$' + starterPrice.toFixed( 2 ) + '/3mo' : '—';
+			} else if ( state.packageType === 'continuation' && m === 3 ) {
+				el.textContent = continuationPrice ? '$' + continuationPrice.toFixed( 2 ) + '/3mo' : '—';
+			} else {
+				var price = getPrice( state.doses[1], m );
+				el.textContent = price ? '$' + price.toFixed( 2 ) + ( m === 3 ? '/3mo' : '/mo' ) : '—';
 			}
 		} );
 	}
@@ -243,7 +255,14 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		var wrap = document.getElementById( 'pdp-summary' );
 		if ( ! wrap ) return;
 
-		var price     = getPrice( state.doses[1], state.months );
+		var price;
+		if ( state.packageType === 'starter' ) {
+			price = starterPrice;
+		} else if ( state.packageType === 'continuation' ) {
+			price = continuationPrice;
+		} else {
+			price = getPrice( state.doses[1], state.months );
+		}
 		var planLabel = state.months === 3 ? '3-month subscription' : 'Monthly subscription';
 		var priceStr  = price ? '$' + price.toFixed( 2 ) : '—';
 		var lastDose  = state.doses[ state.months ] || state.doses[1];
@@ -336,10 +355,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	var ctaBtn = document.getElementById( 'pdp-cta' );
 	if ( ctaBtn ) {
 		ctaBtn.addEventListener( 'click', function () {
-			var pid    = cfg.getAttribute( 'data-product-id' );
-			var bottle = BOTTLE_MAP[ state.months ] || '1-bottle';
-			var plan   = PLAN_MAP[ state.months ]   || '1-month';
-			var dose1  = state.doses[1];
+			var pid = cfg.getAttribute( 'data-product-id' );
 
 			var prevErr = document.getElementById( 'pdp-user-error' );
 			if ( prevErr ) prevErr.remove();
@@ -349,6 +365,41 @@ document.addEventListener( 'DOMContentLoaded', function () {
 				pdpError( 'Could not determine product ID.' );
 				return;
 			}
+
+			/* ---- Package (Starter / Continuation) add-to-cart ---- */
+			if ( state.packageType !== 'custom' ) {
+				var pkgVarId   = state.packageType === 'starter' ? starterVariationId   : continuationVariationId;
+				var pkgDoseSlg = state.packageType === 'starter' ? starterDoseSlug      : continuationDoseSlug;
+
+				if ( ! pkgVarId ) {
+					showUserError( 'This package is currently unavailable. Please try Build Your Own.' );
+					pdpError( 'Package variation ID not found for: ' + state.packageType );
+					return;
+				}
+
+				pdpLog( 'Adding package to cart → type:' + state.packageType + ' | variation_id:' + pkgVarId );
+
+				ctaBtn.disabled = true;
+				ctaBtn.classList.add( 'pdp-cfg__cta--loading' );
+				ctaBtn.textContent = 'Adding to cart…';
+
+				var pkgBottle = bottleSlugMap[ '3-bottle' ] || '3-vial';
+				var url = window.location.pathname + '?add-to-cart=' + pid + '&quantity=1';
+				url += '&variation_id='        + pkgVarId;
+				url += '&' + doseAttr + '='   + encodeURIComponent( pkgDoseSlg );
+				url += '&' + bottleAttr + '=' + encodeURIComponent( pkgBottle );
+				url += '&dose_month_1='        + encodeURIComponent( state.doses[1] );
+				url += '&dose_month_2='        + encodeURIComponent( state.doses[2] );
+				url += '&dose_month_3='        + encodeURIComponent( state.doses[3] );
+
+				window.location.href = url;
+				return;
+			}
+
+			/* ---- Build Your Own add-to-cart ---- */
+			var bottle = BOTTLE_MAP[ state.months ] || '1-bottle';
+			var plan   = PLAN_MAP[ state.months ]   || '1-month';
+			var dose1  = state.doses[1];
 
 			/*
 			 * Resolve variation_id from our PHP-built variation map.

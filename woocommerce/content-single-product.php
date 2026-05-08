@@ -45,8 +45,10 @@ if ( $is_weight_loss ) :
 			'compare_url'       => '/product/compound-semaglutide/',
 			'compare_txt'       => 'Compare with Semaglutide →',
 			'doses'             => [ '10mg', '20mg', '30mg', '40mg', '50mg' ],
-			'supply_prices'     => [ 329.95, 659.90, 989.85 ],
-			'warning_threshold' => 10, // warn when month 1 dose > 10mg
+			'supply_prices'     => [ 399.00, 599.00, 799.00 ],
+			'warning_threshold' => 10,
+			'pkg_dose_slugs'    => [ 'starter' => 'months-1-3-bundle', 'continuation' => 'months-4-6-bundle' ],
+			'pkg_prices'        => [ 'starter' => 989.00, 'continuation' => 1149.00 ],
 		],
 		'compound-semaglutide' => [
 			'badge'             => 'GLP-1 Receptor Agonist',
@@ -55,8 +57,10 @@ if ( $is_weight_loss ) :
 			'compare_url'       => '/product/compound-tirzepatide/',
 			'compare_txt'       => 'Compare with Tirzepatide →',
 			'doses'             => [ '1mg', '2mg', '4mg', '6mg', '10mg' ],
-			'supply_prices'     => [ 250.00, 500.00, 750.00 ], // TODO: verify with client — WC currently shows all at $250
-			'warning_threshold' => 1,  // warn when month 1 dose > 1mg
+			'supply_prices'     => [ 250.00, 500.00, 750.00 ], // TODO: verify with client — update with confirmed pricing
+			'warning_threshold' => 1,
+			'pkg_dose_slugs'    => [ 'starter' => '', 'continuation' => '' ], // set when semaglutide packages are configured
+			'pkg_prices'        => [ 'starter' => 0.00, 'continuation' => 0.00 ],
 		],
 	];
 	$h = $hero[ $slug ];
@@ -104,6 +108,29 @@ if ( $is_weight_loss ) :
 		$variation_map[ $dose ][ $bottle ][ $plan ?: '' ] = (int) $vid;
 	}
 
+	// Detect package variations (Starter / Continuation) by their reserved dose slugs.
+	// These are priced separately and excluded from the regular dose selector.
+	$pkg_dose_slugs      = $h['pkg_dose_slugs'] ?? [];
+	$pkg_prices          = $h['pkg_prices']      ?? [];
+	$starter_var_id      = 0;
+	$starter_price       = $pkg_prices['starter']      ?? 0;
+	$continuation_var_id = 0;
+	$continuation_price  = $pkg_prices['continuation'] ?? 0;
+	foreach ( $product->get_children() as $vid ) {
+		if ( 'publish' !== get_post_status( $vid ) ) continue;
+		$dose = get_post_meta( $vid, $dose_meta_key, true );
+		if ( ! empty( $pkg_dose_slugs['starter'] ) && $dose === $pkg_dose_slugs['starter'] ) {
+			$starter_var_id = (int) $vid;
+			$live_price     = (float) get_post_meta( $vid, '_price', true );
+			if ( $live_price > 0 ) $starter_price = $live_price;
+		}
+		if ( ! empty( $pkg_dose_slugs['continuation'] ) && $dose === $pkg_dose_slugs['continuation'] ) {
+			$continuation_var_id = (int) $vid;
+			$live_price          = (float) get_post_meta( $vid, '_price', true );
+			if ( $live_price > 0 ) $continuation_price = $live_price;
+		}
+	}
+
 	// Derive available doses from the product's attribute terms (WP Admin order),
 	// filtered to doses that have at least one published variation. Overrides the
 	// hardcoded list so adding/removing a dose variant in WP Admin takes effect here.
@@ -112,9 +139,11 @@ if ( $is_weight_loss ) :
 	foreach ( $dosage_terms as $t ) {
 		$dose_labels[ $t->slug ] = $t->name; // e.g. "10-mg" => "10 mg"
 	}
+	$reserved_pkg_slugs = array_filter( array_values( $pkg_dose_slugs ) );
 	$wc_doses = array_values( array_filter(
 		array_map( fn( $t ) => $t->slug, $dosage_terms ),
-		fn( $d ) => isset( $variation_map[ $d ] ) || isset( $price_matrix[ $d ] )
+		fn( $d ) => ( isset( $variation_map[ $d ] ) || isset( $price_matrix[ $d ] ) )
+		         && ! in_array( $d, $reserved_pkg_slugs, true )
 	) );
 	// Sort numerically so "1-mg" < "2-mg" < "10-mg" regardless of WP term menu_order.
 	usort( $wc_doses, fn( $a, $b ) => (float) $a - (float) $b );
@@ -251,6 +280,12 @@ if ( $is_weight_loss ) :
 					data-warning-threshold="<?php echo esc_attr( $h['warning_threshold'] ); ?>"
 					data-bottle-attr="<?php echo esc_attr( $bottle_meta_key ); ?>"
 					data-bottle-slug-map="<?php echo esc_attr( wp_json_encode( $norm_to_raw ) ); ?>"
+					data-starter-variation-id="<?php echo esc_attr( $starter_var_id ); ?>"
+					data-starter-price="<?php echo esc_attr( $starter_price ); ?>"
+					data-starter-dose-slug="<?php echo esc_attr( $pkg_dose_slugs['starter'] ?? '' ); ?>"
+					data-continuation-variation-id="<?php echo esc_attr( $continuation_var_id ); ?>"
+					data-continuation-price="<?php echo esc_attr( $continuation_price ); ?>"
+					data-continuation-dose-slug="<?php echo esc_attr( $pkg_dose_slugs['continuation'] ?? '' ); ?>"
 				>
 					<!-- Package Type -->
 					<p class="pdp-cfg__section-label">Choose Your Package</p>
