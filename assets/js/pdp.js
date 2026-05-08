@@ -97,7 +97,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	var WARNING_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
 	var LOCK_SVG    = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
 
-	/* Look up the real WC price — keyed by first-month dose + supply length */
+	/* Look up the real WC price — keyed by dose + supply length (N-vial bulk rate) */
 	function getPrice( dose, months ) {
 		var bottle     = BOTTLE_MAP[ months ] || '1-bottle';
 		var dosePrices = priceMatrix[ dose ];
@@ -105,6 +105,29 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			return dosePrices[ bottle ];
 		}
 		return 0;
+	}
+
+	/*
+	 * BYO total price:
+	 *   - All months same dose → use the N-vial bulk rate (discounted)
+	 *   - Mixed doses         → sum each month's 1-vial price
+	 */
+	function getBYOTotal() {
+		var allSame = true;
+		for ( var m = 2; m <= state.months; m++ ) {
+			if ( ( state.doses[ m ] || state.doses[1] ) !== state.doses[1] ) {
+				allSame = false;
+				break;
+			}
+		}
+		if ( allSame ) {
+			return getPrice( state.doses[1], state.months );
+		}
+		var total = 0;
+		for ( var m = 1; m <= state.months; m++ ) {
+			total += getPrice( state.doses[ m ] || state.doses[1], 1 );
+		}
+		return total;
 	}
 
 	function weeklyMg( dose ) {
@@ -261,7 +284,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		} else if ( state.packageType === 'continuation' ) {
 			price = continuationPrice;
 		} else {
-			price = getPrice( state.doses[1], state.months );
+			price = getBYOTotal();
 		}
 		var planLabel = state.months === 3 ? '3-month subscription' : 'Monthly subscription';
 		var priceStr  = price ? '$' + price.toFixed( 2 ) : '—';
