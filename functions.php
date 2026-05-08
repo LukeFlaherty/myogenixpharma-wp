@@ -31,7 +31,7 @@ add_filter( 'woocommerce_add_cart_item_data', function ( $cart_item_data, $produ
 	return $cart_item_data;
 }, 10, 3 );
 
-// Display dose schedule in cart and checkout review
+// Display dose schedule in cart and checkout review, with weekly breakdown
 add_filter( 'woocommerce_get_item_data', function ( $item_data, $cart_item ) {
 	$labels = [
 		'dose_month_1' => 'Month 1 Dose',
@@ -40,9 +40,15 @@ add_filter( 'woocommerce_get_item_data', function ( $item_data, $cart_item ) {
 	];
 	foreach ( $labels as $key => $label ) {
 		if ( ! empty( $cart_item[ $key ] ) ) {
+			$slug    = $cart_item[ $key ];
+			$display = myogenix_dose_display( $slug );
+			$mg      = (float) $slug;
+			$weekly  = $mg > 0
+				? ' (' . rtrim( rtrim( number_format( $mg / 4, 2 ), '0' ), '.' ) . ' mg/week)'
+				: '';
 			$item_data[] = [
 				'key'   => $label,
-				'value' => esc_html( myogenix_dose_display( $cart_item[ $key ] ) ),
+				'value' => esc_html( $display . $weekly ),
 			];
 		}
 	}
