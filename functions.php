@@ -204,6 +204,17 @@ add_action( 'woocommerce_before_calculate_totals', function ( $cart ) {
 	}
 }, 99 );
 
+// Cart/checkout: ensure variation meta dd elements stack as blocks so <br> line breaks render
+add_action( 'wp_enqueue_scripts', function() {
+	if ( is_cart() || is_checkout() ) {
+		wp_add_inline_style( 'hello-elementor-style',
+			'.variation dt, .variation dd { display: block; float: none; margin: 0; }' .
+			'.variation dt { font-weight: 600; margin-top: 6px; }' .
+			'.variation dd { margin-bottom: 2px; }'
+		);
+	}
+}, 20 );
+
 // Enqueue PDP styles and scripts on single product pages only
 add_action( 'wp_enqueue_scripts', function() {
 	if ( is_singular( 'product' ) ) {
