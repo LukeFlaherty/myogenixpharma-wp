@@ -108,26 +108,30 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	}
 
 	/*
-	 * BYO total price:
+	 * BYO total price for a given supply length:
 	 *   - All months same dose → use the N-vial bulk rate (discounted)
 	 *   - Mixed doses         → sum each month's 1-vial price
 	 */
-	function getBYOTotal() {
+	function getBYOTotalFor( months ) {
 		var allSame = true;
-		for ( var m = 2; m <= state.months; m++ ) {
-			if ( ( state.doses[ m ] || state.doses[1] ) !== state.doses[1] ) {
+		for ( var i = 2; i <= months; i++ ) {
+			if ( ( state.doses[ i ] || state.doses[1] ) !== state.doses[1] ) {
 				allSame = false;
 				break;
 			}
 		}
 		if ( allSame ) {
-			return getPrice( state.doses[1], state.months );
+			return getPrice( state.doses[1], months );
 		}
 		var total = 0;
-		for ( var m = 1; m <= state.months; m++ ) {
-			total += getPrice( state.doses[ m ] || state.doses[1], 1 );
+		for ( var i = 1; i <= months; i++ ) {
+			total += getPrice( state.doses[ i ] || state.doses[1], 1 );
 		}
 		return total;
+	}
+
+	function getBYOTotal() {
+		return getBYOTotalFor( state.months );
 	}
 
 	function weeklyMg( dose ) {
@@ -182,7 +186,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			} else if ( state.packageType === 'continuation' && m === 3 ) {
 				el.textContent = continuationPrice ? '$' + continuationPrice.toFixed( 2 ) + '/3mo' : '—';
 			} else {
-				var price = getPrice( state.doses[1], m );
+				var price = getBYOTotalFor( m );
 				el.textContent = price ? '$' + price.toFixed( 2 ) + ( m === 3 ? '/3mo' : '/mo' ) : '—';
 			}
 		} );
