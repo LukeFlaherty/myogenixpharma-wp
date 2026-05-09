@@ -111,40 +111,44 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( $item, $ca
 		}
 	}
 
-	// Consolidated Rx Summary for backend processing
-	// Format: TIRZEPATIDE - 10mg, 20mg, 30mg, 3 Bottle, 3 month
+	// Rx Summary for Prescribery — backend only, not shown to customer
+	// Format: Tirzepatide - 10mg(2.5mg/wk), 20mg(5mg/wk), 30mg(7.5mg/wk) - 3 Bottle - 3 month
 	$parent_slug = get_post_field( 'post_name', $values['product_id'] ?? 0 );
 	if ( in_array( $parent_slug, [ 'compound-tirzepatide', 'compound-semaglutide' ], true ) ) {
-		$drug = strtoupper( str_replace( 'compound-', '', $parent_slug ) );
+		$drug = ucfirst( str_replace( 'compound-', '', $parent_slug ) );
 
-		// Bottle count from whichever attribute this product uses
 		$variation  = $values['variation'] ?? [];
 		$bottle_raw = $variation['attribute_pa_wm-bottle'] ?? $variation['attribute_pa_vial'] ?? '';
 		$bottle_num = (int) preg_replace( '/[^0-9]/', '', $bottle_raw );
 
-		// Collect non-empty per-month doses; show all if different, just one if all same
-		$dose_fields = array_values( array_filter( array_map(
-			'myogenix_dose_display',
-			array_filter( [
-				$values['dose_month_1'] ?? '',
-				$values['dose_month_2'] ?? '',
-				$values['dose_month_3'] ?? '',
-			] )
-		) ) );
-		$dose_str = ! empty( $dose_fields )
-			? ( count( array_unique( $dose_fields ) ) === 1 ? $dose_fields[0] : implode( ', ', $dose_fields ) )
-			: '';
-
-		$parts = array_filter( [
-			$dose_str,
-			$bottle_num ? $bottle_num . ' Bottle' : '',
-			$bottle_num ? $bottle_num . ' month'  : '',
-		] );
-		if ( $parts ) {
-			$rx_name = $drug . ' - ' . implode( ', ', $parts );
-			$item->add_meta_data( 'Rx Summary', $rx_name );
-			$item->set_name( $rx_name );
+		// Build per-dose strings with inline weekly breakdown
+		$dose_strings = [];
+		foreach ( [ 'dose_month_1', 'dose_month_2', 'dose_month_3' ] as $key ) {
+			$slug = $values[ $key ] ?? '';
+			if ( empty( $slug ) ) continue;
+			$mg = (float) $slug;
+			if ( $mg > 0 ) {
+				$mg_str         = rtrim( rtrim( number_format( $mg, 2 ), '0' ), '.' );
+				$weekly         = rtrim( rtrim( number_format( $mg / 4, 2 ), '0' ), '.' );
+				$dose_strings[] = $mg_str . 'mg(' . $weekly . 'mg/wk)';
+			} else {
+				$dose_strings[] = myogenix_dose_display( $slug );
+			}
 		}
+
+		if ( empty( $dose_strings ) ) return;
+
+		$dose_str = count( array_unique( $dose_strings ) ) === 1
+			? $dose_strings[0]
+			: implode( ', ', $dose_strings );
+
+		$rx_name = $drug . ' - ' . $dose_str;
+		if ( $bottle_num ) {
+			$rx_name .= ' - ' . $bottle_num . ' Bottle - ' . $bottle_num . ' month';
+		}
+
+		$item->add_meta_data( 'Rx Summary', $rx_name );
+		$item->set_name( $rx_name );
 	}
 }, 10, 4 );
 
