@@ -31,14 +31,14 @@ add_filter( 'woocommerce_add_cart_item_data', function ( $cart_item_data, $produ
 	return $cart_item_data;
 }, 10, 3 );
 
-// Display dose schedule in cart and checkout review as a single bulleted block
+// Display dose schedule in cart and checkout review with weekly breakdown.
+// Uses separate entries so WC Blocks checkout renders each as its own row.
 add_filter( 'woocommerce_get_item_data', function ( $item_data, $cart_item ) {
 	$months = [
 		'dose_month_1' => 'Month 1',
 		'dose_month_2' => 'Month 2',
 		'dose_month_3' => 'Month 3',
 	];
-	$lines = [];
 	foreach ( $months as $key => $label ) {
 		if ( ! empty( $cart_item[ $key ] ) ) {
 			$slug    = $cart_item[ $key ];
@@ -47,14 +47,11 @@ add_filter( 'woocommerce_get_item_data', function ( $item_data, $cart_item ) {
 			$weekly  = $mg > 0
 				? ' (' . rtrim( rtrim( number_format( $mg / 4, 2 ), '0' ), '.' ) . ' mg/week)'
 				: '';
-			$lines[] = '• ' . esc_html( $label . ': ' . $display . $weekly );
+			$item_data[] = [
+				'key'   => $label,
+				'value' => esc_html( $display . $weekly ),
+			];
 		}
-	}
-	if ( ! empty( $lines ) ) {
-		$item_data[] = [
-			'key'   => 'Dose Schedule',
-			'value' => implode( '<br>', $lines ),
-		];
 	}
 	return $item_data;
 }, 10, 2 );
