@@ -144,7 +144,9 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( $item, $ca
 			$bottle_num ? $bottle_num . ' month'  : '',
 		] );
 		if ( $parts ) {
-			$item->add_meta_data( 'Rx Summary', $drug . ' - ' . implode( ', ', $parts ) );
+			$rx_name = $drug . ' - ' . implode( ', ', $parts );
+			$item->add_meta_data( 'Rx Summary', $rx_name );
+			$item->set_name( $rx_name );
 		}
 	}
 }, 10, 4 );
