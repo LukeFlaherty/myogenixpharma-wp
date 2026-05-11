@@ -112,7 +112,7 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( $item, $ca
 	}
 
 	// Rx Summary for Prescribery — backend only, not shown to customer
-	// Format: Tirzepatide - 10mg(2.5mg/wk), 20mg(5mg/wk), 30mg(7.5mg/wk) - 3 Bottle - 3 month
+	// Format: Tirzepatide - 10mg(2.5mg/wk), 20mg(5mg/wk), 30mg(7.5mg/wk) QTY-3
 	$parent_slug = get_post_field( 'post_name', $values['product_id'] ?? 0 );
 	if ( in_array( $parent_slug, [ 'compound-tirzepatide', 'compound-semaglutide' ], true ) ) {
 		$drug = ucfirst( str_replace( 'compound-', '', $parent_slug ) );
@@ -136,6 +136,20 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( $item, $ca
 			}
 		}
 
+		// Fallback for orders placed without dose_month_* URL params (standard add-to-cart).
+		// Read the dose directly from the selected variation attribute.
+		if ( empty( $dose_strings ) ) {
+			$var_dose = $variation['attribute_pa_individual-dose'] ?? $variation['attribute_pa_dosage'] ?? '';
+			if ( ! empty( $var_dose ) ) {
+				$mg = (float) $var_dose;
+				if ( $mg > 0 ) {
+					$mg_str         = rtrim( rtrim( number_format( $mg, 2 ), '0' ), '.' );
+					$weekly         = rtrim( rtrim( number_format( $mg / 4, 2 ), '0' ), '.' );
+					$dose_strings[] = $mg_str . 'mg(' . $weekly . 'mg/wk)';
+				}
+			}
+		}
+
 		if ( empty( $dose_strings ) ) return;
 
 		$dose_str = count( array_unique( $dose_strings ) ) === 1
@@ -144,7 +158,7 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( $item, $ca
 
 		$rx_name = $drug . ' - ' . $dose_str;
 		if ( $bottle_num ) {
-			$rx_name .= ' - ' . $bottle_num . ' Bottle - ' . $bottle_num . ' month';
+			$rx_name .= ' QTY-' . $bottle_num;
 		}
 
 		$item->add_meta_data( 'Rx Summary', $rx_name );
