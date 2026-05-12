@@ -363,19 +363,19 @@ The PHP template auto-detects which attribute is present (`pa_individual-dose` t
 
 Every weight management order line item gets an `Rx Summary` meta field written at checkout by the hook in `functions.php`. This same string is also set as the WC order item name via `$item->set_name()` — it is what Prescribery reads from `line_items[].name` in the WC REST API for "reason for visit."
 
-**Format:** `{Drug} - {dose1}mg({weekly1}mg/wk), {dose2}mg({weekly2}mg/wk), ... QTY-{N}`
+**Format:** `{Drug} - {dose1}mg({weekly1}mg/wk), {dose2}mg({weekly2}mg/wk), ...`
 
 | Scenario | Example |
 |---|---|
-| 1-month, single dose | `Tirzepatide - 10mg(2.5mg/wk) QTY-1` |
-| 3-month, same dose | `Tirzepatide - 10mg(2.5mg/wk) QTY-3` |
-| 2-month, escalating doses | `Tirzepatide - 10mg(2.5mg/wk), 20mg(5mg/wk) QTY-2` |
-| 3-month, escalating doses | `Tirzepatide - 10mg(2.5mg/wk), 20mg(5mg/wk), 30mg(7.5mg/wk) QTY-3` |
+| 1-month, single dose | `Tirzepatide - 10mg(2.5mg/wk)` |
+| 3-month, same dose | `Tirzepatide - 10mg(2.5mg/wk)` |
+| 2-month, escalating doses | `Tirzepatide - 10mg(2.5mg/wk), 20mg(5mg/wk)` |
+| 3-month, escalating doses | `Tirzepatide - 10mg(2.5mg/wk), 20mg(5mg/wk), 30mg(7.5mg/wk)` |
 
 Rules:
 - Drug name = title case of product slug minus `compound-` prefix (e.g. "Tirzepatide", "Semaglutide")
 - Each dose includes its weekly rate in parentheses: `{mg}mg({mg/4}mg/wk)`, trailing zeros stripped
-- Doses separated by `, `; QTY-N appended with a space (no dash before it)
+- Doses separated by `, `; no QTY suffix — Prescribery manages quantity internally
 - If all months share the same dose, show it once; if any differ, list all months in order
 - Dose source priority: `dose_month_*` URL params first; if absent, falls back to `attribute_pa_individual-dose` / `attribute_pa_dosage` on the variation. This handles both dose-escalation BYO orders and standard single-variation add-to-cart.
 - The individual "Month 1/2/3 Dose" meta fields are also saved alongside Rx Summary — don't remove them

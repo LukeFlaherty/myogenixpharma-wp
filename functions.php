@@ -112,14 +112,12 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( $item, $ca
 	}
 
 	// Rx Summary for Prescribery — backend only, not shown to customer
-	// Format: Tirzepatide - 10mg(2.5mg/wk), 20mg(5mg/wk), 30mg(7.5mg/wk) QTY-3
+	// Format: Tirzepatide - 10mg(2.5mg/wk), 20mg(5mg/wk), 30mg(7.5mg/wk)
 	$parent_slug = get_post_field( 'post_name', $values['product_id'] ?? 0 );
 	if ( in_array( $parent_slug, [ 'compound-tirzepatide', 'compound-semaglutide' ], true ) ) {
 		$drug = ucfirst( str_replace( 'compound-', '', $parent_slug ) );
 
-		$variation  = $values['variation'] ?? [];
-		$bottle_raw = $variation['attribute_pa_wm-bottle'] ?? $variation['attribute_pa_vial'] ?? '';
-		$bottle_num = (int) preg_replace( '/[^0-9]/', '', $bottle_raw );
+		$variation = $values['variation'] ?? [];
 
 		// Build per-dose strings with inline weekly breakdown
 		$dose_strings = [];
@@ -157,9 +155,6 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( $item, $ca
 			: implode( ', ', $dose_strings );
 
 		$rx_name = $drug . ' - ' . $dose_str;
-		if ( $bottle_num ) {
-			$rx_name .= ' QTY-' . $bottle_num;
-		}
 
 		$item->add_meta_data( 'Rx Summary', $rx_name );
 		$item->set_name( $rx_name );
