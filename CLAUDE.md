@@ -361,22 +361,25 @@ The PHP template auto-detects which attribute is present (`pa_individual-dose` t
 
 ### Rx Summary order meta
 
-Every weight management order line item gets an `Rx Summary` meta field written at checkout by the hook in `functions.php`. The backend team uses this to identify and process orders.
+Every weight management order line item gets an `Rx Summary` meta field written at checkout by the hook in `functions.php`. This same string is also set as the WC order item name via `$item->set_name()` — it is what Prescribery reads from `line_items[].name` in the WC REST API for "reason for visit."
 
-**Format:** `{DRUG} - {doses}, {N} Bottle, {N} month`
+**Format:** `{Drug} - {dose1}mg({weekly1}mg/wk), {dose2}mg({weekly2}mg/wk), ... QTY-{N}`
 
 | Scenario | Example |
 |---|---|
-| 1-month, single dose | `TIRZEPATIDE - 10 mg, 1 Bottle, 1 month` |
-| 2-month, escalating doses | `TIRZEPATIDE - 10 mg, 20 mg, 2 Bottle, 2 month` |
-| 3-month, same dose | `TIRZEPATIDE - 10 mg, 3 Bottle, 3 month` |
-| 3-month, escalating doses | `TIRZEPATIDE - 10 mg, 20 mg, 30 mg, 3 Bottle, 3 month` |
+| 1-month, single dose | `Tirzepatide - 10mg(2.5mg/wk) QTY-1` |
+| 3-month, same dose | `Tirzepatide - 10mg(2.5mg/wk) QTY-3` |
+| 2-month, escalating doses | `Tirzepatide - 10mg(2.5mg/wk), 20mg(5mg/wk) QTY-2` |
+| 3-month, escalating doses | `Tirzepatide - 10mg(2.5mg/wk), 20mg(5mg/wk), 30mg(7.5mg/wk) QTY-3` |
 
 Rules:
-- Drug name = uppercase of product slug minus `compound-` prefix
+- Drug name = title case of product slug minus `compound-` prefix (e.g. "Tirzepatide", "Semaglutide")
+- Each dose includes its weekly rate in parentheses: `{mg}mg({mg/4}mg/wk)`, trailing zeros stripped
+- Doses separated by `, `; QTY-N appended with a space (no dash before it)
 - If all months share the same dose, show it once; if any differ, list all months in order
-- "N month" = supply length (bottle count), not the WC subscription plan slug
+- Dose source priority: `dose_month_*` URL params first; if absent, falls back to `attribute_pa_individual-dose` / `attribute_pa_dosage` on the variation. This handles both dose-escalation BYO orders and standard single-variation add-to-cart.
 - The individual "Month 1/2/3 Dose" meta fields are also saved alongside Rx Summary — don't remove them
+- Prescribery flow: order placed → `set_name()` writes to `order_item_name` DB → order goes to processing → Prescribery callback fires (sends only order ID) → Prescribery fetches full order via WC REST API → reads `line_items[].name`
 
 ---
 

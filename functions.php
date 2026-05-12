@@ -232,20 +232,25 @@ add_action( 'wp_enqueue_scripts', function() {
 	}
 }, 20 );
 
-// Enqueue PDP styles and scripts on single product pages only
+// Enqueue PDP styles and scripts on single product pages and the weight-loss category
 add_action( 'wp_enqueue_scripts', function() {
-	if ( is_singular( 'product' ) ) {
+	$is_pdp = is_singular( 'product' );
+	$is_wm_cat = is_tax( 'product_cat', 'weight-loss' );
+
+	if ( $is_pdp || $is_wm_cat ) {
 		wp_enqueue_style(
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
 			[],
-			'1.3.3'
+			'1.3.4'
 		);
+	}
+	if ( $is_pdp ) {
 		wp_enqueue_script(
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/js/pdp.js',
 			[],
-			'1.3.3',
+			'1.3.4',
 			true
 		);
 	}
