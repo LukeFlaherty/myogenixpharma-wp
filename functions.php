@@ -214,7 +214,7 @@ add_action( 'woocommerce_before_calculate_totals', function ( $cart ) {
 			$cart_item['data']->set_price( $total );
 		}
 	}
-}, 99 );
+}, 10 );
 
 // Cart/checkout: ensure variation meta dd elements stack as blocks so <br> line breaks render
 add_action( 'wp_enqueue_scripts', function() {
