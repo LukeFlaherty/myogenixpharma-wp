@@ -150,9 +150,21 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( $item, $ca
 
 		if ( empty( $dose_strings ) ) return;
 
-		$dose_str = count( array_unique( $dose_strings ) ) === 1
+		$is_same_dose = count( array_unique( $dose_strings ) ) === 1;
+		$dose_str     = $is_same_dose
 			? $dose_strings[0]
 			: implode( ', ', $dose_strings );
+
+		// For same-dose orders the vial count isn't implied by the dose string,
+		// so Prescribery can't distinguish 1-vial from 3-vial at the same dose.
+		// Mixed-dose orders already convey supply size via number of dose entries.
+		if ( $is_same_dose ) {
+			$bottle_raw = $variation['attribute_pa_wm-bottle'] ?? $variation['attribute_pa_vial'] ?? '';
+			$bottle_num = (int) preg_replace( '/[^0-9]/', '', $bottle_raw );
+			if ( $bottle_num > 1 ) {
+				$dose_str .= ', ' . $bottle_num . ' vial';
+			}
+		}
 
 		$rx_name = $drug . ' - ' . $dose_str;
 
