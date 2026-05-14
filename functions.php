@@ -216,6 +216,33 @@ add_action( 'woocommerce_before_calculate_totals', function ( $cart ) {
 	}
 }, 10 );
 
+// In WC Blocks checkout (Store API context), hide the confusing WC Subscriptions
+// price string ("$599 → $0.00/month") and sale badge ("Save $599/month") for
+// Prescribery-synced products. The "Expected Product Charge After Approval" row
+// already shows the correct charge. Scoped to /wc/store/ requests only so PDPs,
+// admin, and WC REST API v3 are unaffected.
+add_filter( 'woocommerce_get_price_html', function ( $price_html, $product ) {
+	if ( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) return $price_html;
+	if ( strpos( $_SERVER['REQUEST_URI'] ?? '', '/wc/store/' ) === false ) return $price_html;
+	$product_id = $product->get_parent_id() ?: $product->get_id();
+	if ( strtolower( trim( get_post_meta( $product_id, '_pre_woo_sync', true ) ) ) === 'yes' ) return '';
+	return $price_html;
+}, 10, 2 );
+
+// Also zero regular_price in Store API context for synced products so WC Blocks
+// does not render a "Save $X/month" sale badge (badge fires when regular > current).
+add_filter( 'woocommerce_product_get_regular_price', 'myogenix_synced_regular_price_store_api', 99, 2 );
+add_filter( 'woocommerce_product_variation_get_regular_price', 'myogenix_synced_regular_price_store_api', 99, 2 );
+function myogenix_synced_regular_price_store_api( $price, $product ) {
+	if ( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) return $price;
+	if ( strpos( $_SERVER['REQUEST_URI'] ?? '', '/wc/store/' ) === false ) return $price;
+	$product_id = $product->get_parent_id() ?: $product->get_id();
+	if ( strtolower( trim( get_post_meta( $product_id, '_pre_woo_sync', true ) ) ) === 'yes' ) {
+		return $product->get_price(); // regular = current ($0) → no sale badge
+	}
+	return $price;
+}
+
 // Cart/checkout: ensure variation meta dd elements stack as blocks so <br> line breaks render
 add_action( 'wp_enqueue_scripts', function() {
 	if ( is_cart() || is_checkout() ) {
