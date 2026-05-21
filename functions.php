@@ -289,3 +289,30 @@ add_action( 'wp_enqueue_scripts', function() {
 		);
 	}
 } );
+
+// Google Places address autocomplete on billing and shipping address_1 fields.
+// Works with both Classic WooCommerce checkout and WC Blocks (React-based).
+// Replace MYOGENIX_GOOGLE_MAPS_KEY with your real API key (Places API must be enabled).
+define( 'MYOGENIX_GOOGLE_MAPS_KEY', 'YOUR_GOOGLE_MAPS_API_KEY' );
+
+add_action( 'wp_enqueue_scripts', function () {
+	if ( ! is_checkout() ) return;
+
+	// Our script must load first so window.initCheckoutAutocomplete is defined
+	// before Google Maps calls it as its async callback.
+	wp_enqueue_script(
+		'myogenix-checkout-autocomplete',
+		get_stylesheet_directory_uri() . '/assets/js/checkout-autocomplete.js',
+		[],
+		'1.0.0',
+		true
+	);
+
+	wp_enqueue_script(
+		'google-maps-places',
+		'https://maps.googleapis.com/maps/api/js?key=' . MYOGENIX_GOOGLE_MAPS_KEY . '&libraries=places&callback=initCheckoutAutocomplete',
+		[ 'myogenix-checkout-autocomplete' ],
+		null, // no version — Google manages its own versioning
+		true
+	);
+}, 20 );
