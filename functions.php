@@ -307,7 +307,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
 			[],
-			'1.3.4'
+			'1.3.5'
 		);
 	}
 	if ( $is_pdp || $is_rtd ) {
@@ -315,7 +315,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/js/pdp.js',
 			[],
-			'1.3.4',
+			'1.3.5',
 			true
 		);
 	}

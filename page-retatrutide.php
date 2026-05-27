@@ -7,9 +7,7 @@
 defined( 'ABSPATH' ) || exit;
 
 // ─── Password gate ────────────────────────────────────────────────────────────
-// Passwords are keyed by location slug → display name.
-// Add entries here to grant access to new clinic locations.
-$gate_passwords  = [
+$gate_passwords = [
 	'legacytrainingcenter' => 'Legacy Training Center',
 ];
 $gate_cookie = 'mgx_rtd_access';
@@ -24,98 +22,52 @@ if ( ! empty( $_COOKIE[ $gate_cookie ] ) ) {
 	}
 }
 
+// ─── Load product (use direct post query — wc_get_products filters hidden) ───
+$rtd_post = get_page_by_path( 'compound-retatrutide', OBJECT, 'product' );
+$product  = $rtd_post ? wc_get_product( $rtd_post->ID ) : null;
+
+// ─── Gate view ────────────────────────────────────────────────────────────────
 if ( ! $authenticated ) {
 	$gate_error = ! empty( $GLOBALS['retatrutide_gate_error'] );
+	get_header();
 	?>
-<!DOCTYPE html>
-<html <?php language_attributes(); ?>>
-<head>
-<meta charset="<?php bloginfo( 'charset' ); ?>">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Retatrutide — Provider Access Required</title>
-<?php wp_head(); ?>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
-body{background:#080d18;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh}
-.rtd-gate{width:100%;max-width:420px;padding:0 24px}
-.rtd-gate__logo{display:block;margin:0 auto 40px;text-align:center}
-.rtd-gate__logo img{max-width:160px;height:auto}
-.rtd-gate__logo-text{font-size:22px;font-weight:700;letter-spacing:.04em;color:#fff}
-.rtd-gate__badge{display:inline-block;background:rgba(99,179,237,.15);border:1px solid rgba(99,179,237,.35);color:#63b3ed;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:20px;margin-bottom:24px}
-.rtd-gate__heading{font-size:28px;font-weight:700;line-height:1.2;margin-bottom:10px}
-.rtd-gate__sub{font-size:15px;color:#8a9bbb;line-height:1.6;margin-bottom:32px}
-.rtd-gate__label{display:block;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#8a9bbb;margin-bottom:8px}
-.rtd-gate__input{width:100%;background:#0f1829;border:1px solid #1e2d47;border-radius:8px;padding:14px 16px;font-size:15px;color:#fff;outline:none;transition:border-color .2s}
-.rtd-gate__input:focus{border-color:#3b7dd8}
-.rtd-gate__input::placeholder{color:#3a4a64}
-.rtd-gate__error{margin-top:10px;font-size:13px;color:#fc8181;display:flex;align-items:center;gap:6px}
-.rtd-gate__btn{display:block;width:100%;margin-top:20px;padding:15px;background:#3b7dd8;border:none;border-radius:8px;font-size:15px;font-weight:600;color:#fff;cursor:pointer;transition:background .2s,transform .1s}
-.rtd-gate__btn:hover{background:#2f6bc2}
-.rtd-gate__btn:active{transform:scale(.98)}
-.rtd-gate__footer{margin-top:28px;font-size:13px;color:#4a5a7a;text-align:center}
-@media(max-width:480px){.rtd-gate__heading{font-size:24px}}
-</style>
-</head>
-<body>
-<div class="rtd-gate">
+	<div class="rtd-gate-section">
+		<div class="rtd-gate-card">
+			<span class="rtd-gate__badge">Provider-Referred Patients Only</span>
+			<h1 class="rtd-gate__heading">Access Required</h1>
+			<p class="rtd-gate__sub">This treatment program is available exclusively to patients referred by a licensed clinic partner. Enter the access code provided by your provider to continue.</p>
 
-	<div class="rtd-gate__logo">
-		<?php
-		$logo_html = get_custom_logo();
-		if ( $logo_html ) {
-			echo $logo_html;
-		} else {
-			echo '<span class="rtd-gate__logo-text">' . esc_html( get_bloginfo( 'name' ) ) . '</span>';
-		}
-		?>
+			<form class="rtd-gate__form" method="post" action="">
+				<?php wp_nonce_field( 'retatrutide_gate', 'retatrutide_nonce' ); ?>
+				<label class="rtd-gate__label" for="rtd-pw">Clinic Access Code</label>
+				<input id="rtd-pw" class="rtd-gate__input" type="password" name="retatrutide_pw"
+					placeholder="Enter your access code" autocomplete="current-password" required>
+				<?php if ( $gate_error ) : ?>
+				<p class="rtd-gate__error">
+					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+					Incorrect access code. Please try again.
+				</p>
+				<?php endif; ?>
+				<button class="rtd-gate__btn" type="submit">Continue &rarr;</button>
+			</form>
+
+			<p class="rtd-gate__footer">Not a referred patient? Contact your healthcare provider to receive access.</p>
+		</div>
 	</div>
-
-	<span class="rtd-gate__badge">Provider Access Required</span>
-	<h1 class="rtd-gate__heading">Restricted Treatment Program</h1>
-	<p class="rtd-gate__sub">This page is for patients referred by a licensed provider partner. Enter the access code provided by your clinic to continue.</p>
-
-	<form method="post" action="">
-		<?php wp_nonce_field( 'retatrutide_gate', 'retatrutide_nonce' ); ?>
-		<label class="rtd-gate__label" for="rtd-pw">Access Code</label>
-		<input id="rtd-pw" class="rtd-gate__input" type="password" name="retatrutide_pw"
-			placeholder="Enter your clinic access code" autocomplete="current-password" required>
-		<?php if ( $gate_error ) : ?>
-		<p class="rtd-gate__error">
-			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-			Incorrect access code. Please try again.
-		</p>
-		<?php endif; ?>
-		<button class="rtd-gate__btn" type="submit">Continue &rarr;</button>
-	</form>
-
-	<p class="rtd-gate__footer">Not a referred patient? Contact your healthcare provider to receive access.</p>
-
-</div>
-<?php wp_footer(); ?>
-</body>
-</html>
 	<?php
+	get_footer();
 	return;
 }
 
 // ─── PDP (authenticated) ──────────────────────────────────────────────────────
-$rtd_products = wc_get_products( [
-	'slug'   => 'compound-retatrutide',
-	'status' => 'publish',
-	'limit'  => 1,
-] );
-
-if ( empty( $rtd_products ) ) {
+if ( ! $product ) {
 	get_header();
 	echo '<div style="padding:80px 24px;text-align:center"><p>This product is not yet available. Please check back soon.</p></div>';
 	get_footer();
 	return;
 }
 
-$product = $rtd_products[0];
-
-// Build price matrix and variation map (mirrors content-single-product.php logic)
+// Build price matrix and variation map
 $attrs           = $product->get_attributes();
 $dose_attr_key   = isset( $attrs['pa_individual-dose'] ) ? 'pa_individual-dose' : 'pa_dosage';
 $dose_meta_key   = 'attribute_' . $dose_attr_key;
@@ -176,38 +128,15 @@ $img_url = function( $path ) {
 };
 
 $steps = [
-	[
-		'num'   => 'PDP Sections/1.png',
-		'img'   => 'PDP Sections/form.png',
-		'title' => 'Questionnaire',
-		'desc'  => 'Answer a few questions and share your medical details',
-	],
-	[
-		'num'   => 'PDP Sections/2.png',
-		'img'   => 'PDP Sections/consultation.png',
-		'title' => 'Review and Approved by provider',
-		'desc'  => 'Discuss your goals and receive expert recommendations',
-	],
-	[
-		'num'   => 'PDP Sections/3.png',
-		'img'   => 'PDP Sections/box.png',
-		'title' => 'Receive medication',
-		'desc'  => 'Medication and supplies shipped straight to your door',
-	],
-	[
-		'num'   => 'PDP Sections/4.png',
-		'img'   => 'PDP Sections/calendar.png',
-		'title' => 'Monthly Monitoring',
-		'desc'  => 'Stay on track with regular free check-ins to ensure progress',
-	],
+	[ 'num' => 'PDP Sections/1.png', 'img' => 'PDP Sections/form.png',         'title' => 'Questionnaire',                'desc' => 'Answer a few questions and share your medical details' ],
+	[ 'num' => 'PDP Sections/2.png', 'img' => 'PDP Sections/consultation.png', 'title' => 'Review and Approved by provider', 'desc' => 'Discuss your goals and receive expert recommendations' ],
+	[ 'num' => 'PDP Sections/3.png', 'img' => 'PDP Sections/box.png',          'title' => 'Receive medication',             'desc' => 'Medication and supplies shipped straight to your door' ],
+	[ 'num' => 'PDP Sections/4.png', 'img' => 'PDP Sections/calendar.png',     'title' => 'Monthly Monitoring',             'desc' => 'Stay on track with regular free check-ins to ensure progress' ],
 ];
 
 get_header();
-
-// Suppress the WC "Please choose product options" notice
 remove_action( 'woocommerce_before_single_product', 'woocommerce_output_all_notices', 10 );
 do_action( 'woocommerce_before_single_product' );
-
 ?>
 
 <div id="product-<?php echo esc_attr( $product->get_id() ); ?>" class="myogenix-pdp retatrutide-pdp">
@@ -216,7 +145,6 @@ do_action( 'woocommerce_before_single_product' );
 	<section class="pdp-hero" id="buy">
 		<div class="pdp-hero__inner">
 
-			<!-- Left: product info + image -->
 			<div class="pdp-hero__left">
 				<span class="pdp-hero__badge">GIP/GLP-1/Glucagon Triple Agonist</span>
 				<h1 class="pdp-hero__title">Retatrutide</h1>
@@ -235,53 +163,25 @@ do_action( 'woocommerce_before_single_product' );
 				<div class="pdp-hero__trust-grid">
 					<div class="pdp-hero__trust-item">
 						<span class="pdp-hero__trust-icon" aria-hidden="true">🏥</span>
-						<div class="pdp-hero__trust-text">
-							<strong>Licensed providers</strong>
-							<span>Board-certified MDs</span>
-						</div>
+						<div class="pdp-hero__trust-text"><strong>Licensed providers</strong><span>Board-certified MDs</span></div>
 					</div>
 					<div class="pdp-hero__trust-item">
 						<span class="pdp-hero__trust-icon" aria-hidden="true">✏️</span>
-						<div class="pdp-hero__trust-text">
-							<strong>Compounded in USA</strong>
-							<span>FDA-registered facility</span>
-						</div>
+						<div class="pdp-hero__trust-text"><strong>Compounded in USA</strong><span>FDA-registered facility</span></div>
 					</div>
 					<div class="pdp-hero__trust-item">
 						<span class="pdp-hero__trust-icon" aria-hidden="true">🚚</span>
-						<div class="pdp-hero__trust-text">
-							<strong>Free shipping</strong>
-							<span>Discreet packaging</span>
-						</div>
+						<div class="pdp-hero__trust-text"><strong>Free shipping</strong><span>Discreet packaging</span></div>
 					</div>
 					<div class="pdp-hero__trust-item">
 						<span class="pdp-hero__trust-icon" aria-hidden="true">💬</span>
-						<div class="pdp-hero__trust-text">
-							<strong>Ongoing support</strong>
-							<span>Message your care team</span>
-						</div>
+						<div class="pdp-hero__trust-text"><strong>Ongoing support</strong><span>Message your care team</span></div>
 					</div>
 				</div>
 			</div>
 
-			<!-- Right: configurator -->
 			<div class="pdp-hero__right">
 
-				<!-- Hidden WC hooks — preserves plugin integrations -->
-				<div style="display:none" aria-hidden="true" inert>
-					<?php
-					global $post;
-					$prev_post = $post;
-					$post      = get_post( $product->get_id() );
-					setup_postdata( $post );
-					do_action( 'woocommerce_before_single_product_summary' );
-					do_action( 'woocommerce_single_product_summary' );
-					wp_reset_postdata();
-					$post = $prev_post;
-					?>
-				</div>
-
-				<!-- Custom configurator — drives pdp.js -->
 				<div id="pdp-cfg" class="pdp-cfg"
 					data-doses="<?php echo esc_attr( wp_json_encode( $wc_doses ) ); ?>"
 					data-price-matrix="<?php echo esc_attr( wp_json_encode( $price_matrix ) ); ?>"
@@ -299,7 +199,6 @@ do_action( 'woocommerce_before_single_product' );
 					data-continuation-price="0"
 					data-continuation-dose-slug=""
 				>
-					<!-- Supply Length (BYO only — no package type selector) -->
 					<p class="pdp-cfg__section-label">Supply Length</p>
 					<div class="pdp-cfg__supply-row">
 						<button class="pdp-cfg__supply pdp-cfg__supply--active" data-months="1">
@@ -317,11 +216,9 @@ do_action( 'woocommerce_before_single_product' );
 						</button>
 					</div>
 
-					<!-- Dose Selector -->
 					<p class="pdp-cfg__section-label" id="pdp-dose-label">Month 1 Dose</p>
 					<div id="pdp-dose" class="pdp-cfg__doses-wrap"></div>
 
-					<!-- Dose reference table -->
 					<div class="rtd-dose-ref">
 						<p class="rtd-dose-ref__label">Dose Reference</p>
 						<table class="rtd-dose-ref__table">
@@ -337,10 +234,7 @@ do_action( 'woocommerce_before_single_product' );
 						</table>
 					</div>
 
-					<!-- Order Summary -->
 					<div id="pdp-summary" class="pdp-cfg__summary"></div>
-
-					<!-- CTA -->
 					<button id="pdp-cta" class="pdp-cfg__cta">Go to Checkout &rarr;</button>
 					<p id="pdp-disclaimer" class="pdp-cfg__disclaimer">
 						This is a one-time purchase. Your order will be reviewed by a licensed provider before processing.
@@ -351,7 +245,7 @@ do_action( 'woocommerce_before_single_product' );
 		</div>
 	</section>
 
-	<!-- 4 Steps Section -->
+	<!-- 4 Steps -->
 	<section class="myogenix-pdp__steps">
 		<div class="myogenix-pdp__container">
 			<h2 class="myogenix-pdp__section-heading">Personalized Healthcare in 4 Simple Steps</h2>
@@ -369,7 +263,7 @@ do_action( 'woocommerce_before_single_product' );
 		</div>
 	</section>
 
-	<!-- How It Works Section -->
+	<!-- How It Works -->
 	<section class="myogenix-pdp__how-it-works">
 		<div class="myogenix-pdp__container">
 			<p class="myogenix-pdp__how-label">PROCESS</p>
@@ -380,10 +274,7 @@ do_action( 'woocommerce_before_single_product' );
 				<div class="myogenix-pdp__how-card">
 					<div class="myogenix-pdp__how-card-top">
 						<div class="myogenix-pdp__how-icon" aria-hidden="true">
-							<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-								<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-								<line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="13" y2="15"/>
-							</svg>
+							<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="13" y2="15"/></svg>
 						</div>
 						<span class="myogenix-pdp__how-num">01</span>
 					</div>
@@ -394,9 +285,7 @@ do_action( 'woocommerce_before_single_product' );
 				<div class="myogenix-pdp__how-card">
 					<div class="myogenix-pdp__how-card-top">
 						<div class="myogenix-pdp__how-icon" aria-hidden="true">
-							<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-								<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-							</svg>
+							<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
 						</div>
 						<span class="myogenix-pdp__how-num">02</span>
 					</div>
@@ -407,10 +296,7 @@ do_action( 'woocommerce_before_single_product' );
 				<div class="myogenix-pdp__how-card">
 					<div class="myogenix-pdp__how-card-top">
 						<div class="myogenix-pdp__how-icon" aria-hidden="true">
-							<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-								<rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/>
-								<circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
-							</svg>
+							<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
 						</div>
 						<span class="myogenix-pdp__how-num">03</span>
 					</div>
@@ -421,22 +307,19 @@ do_action( 'woocommerce_before_single_product' );
 				<div class="myogenix-pdp__how-card">
 					<div class="myogenix-pdp__how-card-top">
 						<div class="myogenix-pdp__how-icon" aria-hidden="true">
-							<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-								<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
-								<line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/>
-							</svg>
+							<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
 						</div>
 						<span class="myogenix-pdp__how-num">04</span>
 					</div>
 					<h3 class="myogenix-pdp__how-title">Adjust as you escalate</h3>
-					<p class="myogenix-pdp__how-desc">Your dose changes with you. Update your next shipment directly from your account — no new consultation required for subscribers.</p>
+					<p class="myogenix-pdp__how-desc">Your dose changes with you. Update your next shipment directly from your account — no new consultation required.</p>
 				</div>
 
 			</div>
 		</div>
 	</section>
 
-	<!-- Common Questions -->
+	<!-- FAQ -->
 	<section class="myogenix-pdp__cq">
 		<div class="myogenix-pdp__container">
 			<div class="myogenix-pdp__cq-inner">
@@ -457,7 +340,7 @@ do_action( 'woocommerce_before_single_product' );
 								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
 							</button>
 							<div class="myogenix-pdp__cq-answer is-open" id="rtd-cq-0">
-								<p>Retatrutide is the first triple agonist, simultaneously activating three receptors: GIP, GLP-1, and glucagon. Semaglutide targets only GLP-1; tirzepatide targets GIP and GLP-1. By adding glucagon receptor activation, retatrutide further increases energy expenditure on top of the appetite suppression provided by the other two pathways — making it one of the most potent metabolic agents in clinical development.</p>
+								<p>Retatrutide is the first triple agonist, simultaneously activating GIP, GLP-1, and glucagon receptors. Semaglutide targets only GLP-1; tirzepatide targets GIP and GLP-1. By adding glucagon receptor activation, retatrutide further increases energy expenditure — making it one of the most potent metabolic agents in clinical development.</p>
 							</div>
 						</div>
 
@@ -467,7 +350,7 @@ do_action( 'woocommerce_before_single_product' );
 								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
 							</button>
 							<div class="myogenix-pdp__cq-answer" id="rtd-cq-1">
-								<p>A typical escalation starts at 1–2 mg per week and increases gradually every 4 weeks based on tolerance and clinical response. Doses range from 1 mg/week up to 12 mg/week. Each vial contains a 4-week supply at the selected weekly dose. Your provider reviews your progress at each stage and adjusts accordingly.</p>
+								<p>Typical escalation starts at 1–2 mg/week and increases gradually every 4 weeks based on tolerance. Doses range from 1 mg/week up to 12 mg/week. Each vial contains a 4-week supply at the selected weekly dose. Your provider reviews progress at each stage and adjusts accordingly.</p>
 							</div>
 						</div>
 
@@ -477,7 +360,7 @@ do_action( 'woocommerce_before_single_product' );
 								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
 							</button>
 							<div class="myogenix-pdp__cq-answer" id="rtd-cq-2">
-								<p>Retatrutide is a newer compound with a higher potency profile. We currently offer it exclusively through verified clinic partner referrals to ensure every patient has appropriate clinical oversight. This allows us to provide tighter monitoring during dose escalation and maintain the highest standard of care.</p>
+								<p>Retatrutide is a newer compound with a higher potency profile. We currently offer it exclusively through verified clinic partner referrals to ensure every patient has appropriate clinical oversight and tighter monitoring during dose escalation.</p>
 							</div>
 						</div>
 
@@ -487,7 +370,7 @@ do_action( 'woocommerce_before_single_product' );
 								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
 							</button>
 							<div class="myogenix-pdp__cq-answer" id="rtd-cq-3">
-								<p>No. Once your treatment plan is established, refills ship automatically on your chosen schedule. Your provider may request a brief check-in every few months to review progress and adjust dosing if needed — but there's no new full consultation required for standard refills.</p>
+								<p>No. Once your treatment plan is established, refills ship on your chosen schedule. Your provider may request a brief check-in every few months, but no new full consultation is required for standard refills.</p>
 							</div>
 						</div>
 
@@ -497,13 +380,12 @@ do_action( 'woocommerce_before_single_product' );
 								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
 							</button>
 							<div class="myogenix-pdp__cq-answer" id="rtd-cq-4">
-								<p>Your retatrutide is compounded by a licensed U.S. FDA-registered 503A compounding pharmacy as a sterile injectable solution. It ships directly to your door in temperature-controlled packaging along with syringes and all necessary supplies.</p>
+								<p>Your retatrutide is compounded by a licensed U.S. FDA-registered 503A pharmacy as a sterile injectable solution. It ships in temperature-controlled packaging with syringes and all necessary supplies.</p>
 							</div>
 						</div>
 
 					</div>
 				</div>
-
 			</div>
 		</div>
 	</section>
