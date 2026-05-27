@@ -11,6 +11,36 @@ add_action( 'wp_enqueue_scripts', function() {
 	);
 } );
 
+// ─── Retatrutide password gate ────────────────────────────────────────────────
+// Process the access-code form before any output fires.
+add_action( 'template_redirect', function () {
+	if ( ! is_page( 'retatrutide' ) ) return;
+	if ( empty( $_POST['retatrutide_pw'] ) ) return;
+	if ( ! isset( $_POST['retatrutide_nonce'] ) || ! wp_verify_nonce( wp_unslash( $_POST['retatrutide_nonce'] ), 'retatrutide_gate' ) ) return;
+
+	$passwords = [ 'legacytrainingcenter' => 'Legacy Training Center' ];
+	$pw        = sanitize_text_field( wp_unslash( $_POST['retatrutide_pw'] ) );
+
+	if ( isset( $passwords[ $pw ] ) ) {
+		setcookie( 'mgx_rtd_access', wp_hash( $pw ), time() + DAY_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true );
+		wp_safe_redirect( get_permalink( get_page_by_path( 'retatrutide' ) ) );
+		exit;
+	}
+
+	$GLOBALS['retatrutide_gate_error'] = true;
+} );
+
+// Redirect direct product URL to the password-gated page.
+add_action( 'template_redirect', function () {
+	if ( ! is_singular( 'product' ) ) return;
+	global $product;
+	if ( ! $product ) $product = wc_get_product( get_the_ID() );
+	if ( $product && $product->get_slug() === 'compound-retatrutide' ) {
+		wp_safe_redirect( home_url( '/retatrutide/' ), 301 );
+		exit;
+	}
+} );
+
 // Convert a dose term slug (e.g. "10-mg") to its display name (e.g. "10 mg").
 // Checks pa_individual-dose first (production), then pa_dosage (staging).
 function myogenix_dose_display( $slug ) {
@@ -60,7 +90,7 @@ add_filter( 'woocommerce_get_item_data', function ( $item_data, $cart_item ) {
 // e.g. TIRZEPATIDE - 10mg, 20mg, 40mg, 3 Bottle, 3 month
 add_filter( 'woocommerce_cart_item_name', function ( $name, $cart_item, $cart_item_key ) {
 	$parent_slug = get_post_field( 'post_name', $cart_item['product_id'] ?? 0 );
-	if ( ! in_array( $parent_slug, [ 'compound-tirzepatide', 'compound-semaglutide' ], true ) ) {
+	if ( ! in_array( $parent_slug, [ 'compound-tirzepatide', 'compound-semaglutide', 'compound-retatrutide' ], true ) ) {
 		return $name;
 	}
 
@@ -114,7 +144,7 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( $item, $ca
 	// Rx Summary for Prescribery — backend only, not shown to customer
 	// Format: Tirzepatide - 10mg(2.5mg/wk), 20mg(5mg/wk), 30mg(7.5mg/wk)
 	$parent_slug = get_post_field( 'post_name', $values['product_id'] ?? 0 );
-	if ( in_array( $parent_slug, [ 'compound-tirzepatide', 'compound-semaglutide' ], true ) ) {
+	if ( in_array( $parent_slug, [ 'compound-tirzepatide', 'compound-semaglutide', 'compound-retatrutide' ], true ) ) {
 		$drug = ucfirst( str_replace( 'compound-', '', $parent_slug ) );
 
 		$variation = $values['variation'] ?? [];
@@ -198,7 +228,7 @@ function myogenix_get_1vial_price( $parent_id, $dose_slug ) {
 // detected by their non-numeric dose attribute and are left at their flat rate.
 add_action( 'woocommerce_before_calculate_totals', function ( $cart ) {
 	if ( is_admin() && ! defined( 'DOING_AJAX' ) ) return;
-	$wm_slugs = [ 'compound-tirzepatide', 'compound-semaglutide' ];
+	$wm_slugs = [ 'compound-tirzepatide', 'compound-semaglutide', 'compound-retatrutide' ];
 	foreach ( $cart->get_cart() as $cart_item ) {
 		$parent_slug = get_post_field( 'post_name', $cart_item['product_id'] ?? 0 );
 		if ( ! in_array( $parent_slug, $wm_slugs, true ) ) continue;
@@ -266,12 +296,13 @@ add_action( 'wp_enqueue_scripts', function() {
 	}
 }, 20 );
 
-// Enqueue PDP styles and scripts on single product pages and the weight-loss category
+// Enqueue PDP styles and scripts on single product pages, weight-loss category, and retatrutide page
 add_action( 'wp_enqueue_scripts', function() {
-	$is_pdp = is_singular( 'product' );
+	$is_pdp    = is_singular( 'product' );
 	$is_wm_cat = is_tax( 'product_cat', 'weight-loss' );
+	$is_rtd    = is_page( 'retatrutide' );
 
-	if ( $is_pdp || $is_wm_cat ) {
+	if ( $is_pdp || $is_wm_cat || $is_rtd ) {
 		wp_enqueue_style(
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
@@ -279,7 +310,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			'1.3.4'
 		);
 	}
-	if ( $is_pdp ) {
+	if ( $is_pdp || $is_rtd ) {
 		wp_enqueue_script(
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/js/pdp.js',
