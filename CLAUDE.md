@@ -108,8 +108,8 @@ WordPress.com's sync copies the database but does NOT preserve all staging-speci
 3. **Re-apply Elementor Single Product exclude conditions** (sync overwrites these from production):
    ```bash
    ssh ecom-adamb01445d7f0c-kpnrf.wordpress.com@ssh.wp.com "
-   wp post meta update 990 _elementor_conditions '[\"include/product\",\"exclude/product/4063\",\"exclude/product/4041\"]' --format=json &&
-   wp option update elementor_pro_theme_builder_conditions '{\"single\":{\"990\":[\"include\/product\",\"exclude\/product\/4063\",\"exclude\/product\/4041\"]},\"archive\":{\"2039\":[\"include\/product_archive\/shop_page\"]},\"elementor_head\":{\"1695\":[\"include\/general\"]},\"elementor_body_end\":{\"1636\":[\"include\/woocommerce\"]},\"footer\":{\"914\":[\"include\/general\"]},\"header\":{\"898\":[\"include\/general\"]}}' --format=json &&
+   wp post meta update 990 _elementor_conditions '[\"include/product\",\"exclude/singular/product/4063\",\"exclude/singular/product/4041\",\"exclude/singular/product/4537\"]' --format=json &&
+   wp option update elementor_pro_theme_builder_conditions '{\"single\":{\"990\":[\"include\/product\",\"exclude\/singular\/product\/4063\",\"exclude\/singular\/product\/4041\",\"exclude\/singular\/product\/4537\"]},\"archive\":{\"2039\":[\"include\/product_archive\/shop_page\"]},\"elementor_head\":{\"1695\":[\"include\/general\"]},\"elementor_body_end\":{\"1636\":[\"include\/woocommerce\"]},\"footer\":{\"914\":[\"include\/general\"]},\"header\":{\"898\":[\"include\/general\"]}}' --format=json &&
    wp cache flush && wp elementor flush-css
    "
    ```
@@ -489,12 +489,15 @@ Elementor stores template display conditions in TWO places. Both must be in sync
 ### Current Single Product conditions (template #990)
 
 ```json
-["include/product", "exclude/product/4063", "exclude/product/4041"]
+["include/product", "exclude/singular/product/4063", "exclude/singular/product/4041", "exclude/singular/product/4537"]
 ```
 
 - `include/product` — applies to all WooCommerce products
-- `exclude/product/4063` — except TIRZEPATIDE (lets our theme override render)
-- `exclude/product/4041` — except SEMAGLUTIDE (lets our theme override render)
+- `exclude/singular/product/4063` — except TIRZEPATIDE (lets our theme override render)
+- `exclude/singular/product/4041` — except SEMAGLUTIDE (lets our theme override render)
+- `exclude/singular/product/4537` — except RETATRUTIDE (lets page-retatrutide.php render)
+
+**Format note:** Elementor 4.1 changed condition parsing to a 4-part `type/name/sub_name/sub_id` format. The old 3-part `exclude/product/4063` format silently broke after the 4.0→4.1 update — the exclude was skipped because `get_condition('4063')` returns null. Always use the full 4-part `exclude/singular/product/{id}` format.
 
 **These excludes must also be applied on production** after the first code deploy. They are not in git — they live in the database. Use the SSH command under "after any production → staging database sync" above, pointed at the production SSH endpoint.
 
