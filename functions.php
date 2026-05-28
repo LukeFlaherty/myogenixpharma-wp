@@ -96,16 +96,29 @@ add_filter( 'woocommerce_get_item_data', function ( $item_data, $cart_item ) {
 // Replace cart/checkout item title with full multi-dose Rx name
 // e.g. TIRZEPATIDE - 10mg, 20mg, 40mg, 3 Bottle, 3 month
 add_filter( 'woocommerce_cart_item_name', function ( $name, $cart_item, $cart_item_key ) {
+	$slug_to_drug = [
+		'compound-tirzepatide'         => 'TIRZEPATIDE',
+		'compound-semaglutide'         => 'SEMAGLUTIDE',
+		'compound-retatrutide'         => 'RETATRUTIDE',
+		'compound-retatrutide-step-up' => 'RETATRUTIDE',
+		'compound-retatrutide-phase-2' => 'RETATRUTIDE',
+	];
 	$parent_slug = get_post_field( 'post_name', $cart_item['product_id'] ?? 0 );
-	if ( ! in_array( $parent_slug, [ 'compound-tirzepatide', 'compound-semaglutide', 'compound-retatrutide' ], true ) ) {
-		return $name;
-	}
+	if ( ! isset( $slug_to_drug[ $parent_slug ] ) ) return $name;
 
-	$drug = strtoupper( str_replace( 'compound-', '', $parent_slug ) );
+	$drug = $slug_to_drug[ $parent_slug ];
 
 	$variation  = $cart_item['variation'] ?? [];
 	$bottle_raw = $variation['attribute_pa_wm-bottle'] ?? $variation['attribute_pa_vial'] ?? '';
 	$bottle_num = (int) preg_replace( '/[^0-9]/', '', $bottle_raw );
+	// Bundle products are simple (no variation) — derive bottle count from filled dose months.
+	if ( $bottle_num === 0 ) {
+		$bottle_num = count( array_filter( [
+			$cart_item['dose_month_1'] ?? '',
+			$cart_item['dose_month_2'] ?? '',
+			$cart_item['dose_month_3'] ?? '',
+		] ) );
+	}
 
 	$dose_fields = array_values( array_filter( array_map(
 		'myogenix_dose_display',
@@ -150,9 +163,16 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( $item, $ca
 
 	// Rx Summary for Prescribery — backend only, not shown to customer
 	// Format: Tirzepatide - 10mg(2.5mg/wk), 20mg(5mg/wk), 30mg(7.5mg/wk)
+	$slug_to_drug_rx = [
+		'compound-tirzepatide'         => 'Tirzepatide',
+		'compound-semaglutide'         => 'Semaglutide',
+		'compound-retatrutide'         => 'Retatrutide',
+		'compound-retatrutide-step-up' => 'Retatrutide',
+		'compound-retatrutide-phase-2' => 'Retatrutide',
+	];
 	$parent_slug = get_post_field( 'post_name', $values['product_id'] ?? 0 );
-	if ( in_array( $parent_slug, [ 'compound-tirzepatide', 'compound-semaglutide', 'compound-retatrutide' ], true ) ) {
-		$drug = ucfirst( str_replace( 'compound-', '', $parent_slug ) );
+	if ( isset( $slug_to_drug_rx[ $parent_slug ] ) ) {
+		$drug = $slug_to_drug_rx[ $parent_slug ];
 
 		$variation = $values['variation'] ?? [];
 
@@ -314,7 +334,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
 			[],
-			'1.3.6'
+			'1.3.7'
 		);
 	}
 	if ( $is_pdp || $is_rtd ) {
@@ -322,7 +342,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/js/pdp.js',
 			[],
-			'1.3.6',
+			'1.3.7',
 			true
 		);
 	}

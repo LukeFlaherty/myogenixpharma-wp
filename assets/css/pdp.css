@@ -1429,3 +1429,129 @@
 .rtd-dose-ref__table tbody td:last-child {
 	color: var(--pdp-muted);
 }
+
+/* ── Retatrutide bundle package selector ──────────────────────────────────── */
+.rtd-pkg-row {
+	display: flex;
+	gap: 8px;
+	margin-bottom: 20px;
+}
+
+.rtd-pkg {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	padding: 10px 8px;
+	border: 1.5px solid var(--pdp-border, #e2e8f0);
+	border-radius: 8px;
+	background: #fff;
+	cursor: pointer;
+	text-align: center;
+	transition: border-color .15s, background .15s;
+}
+
+.rtd-pkg strong {
+	display: block;
+	font-size: 12px;
+	font-weight: 700;
+	color: var(--pdp-dark, #1a1a1a);
+	line-height: 1.2;
+}
+
+.rtd-pkg span {
+	display: block;
+	font-size: 10.5px;
+	color: var(--pdp-muted, #666);
+	line-height: 1.3;
+}
+
+.rtd-pkg--active {
+	border-color: var(--pdp-purple, #5b4bc4);
+	background: #f3f1fd;
+}
+
+.rtd-pkg--active strong {
+	color: var(--pdp-purple, #5b4bc4);
+}
+
+/* ── Bundle detail panel ──────────────────────────────────────────────────── */
+.rtd-bundle-panel__title {
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--pdp-muted, #666);
+	margin: 0 0 14px;
+}
+
+.rtd-bundle-panel__months {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-bottom: 18px;
+}
+
+.rtd-bundle-panel__month {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 11px 14px;
+	background: var(--pdp-bg-sub, #f8f9fa);
+	border-radius: 8px;
+	font-size: 13px;
+}
+
+.rtd-bundle-panel__month-label {
+	color: var(--pdp-muted, #666);
+	font-size: 12px;
+	min-width: 54px;
+}
+
+.rtd-bundle-panel__month-dose {
+	flex: 1;
+	font-weight: 700;
+	color: var(--pdp-dark, #1a1a1a);
+}
+
+.rtd-bundle-panel__month-weekly {
+	color: var(--pdp-muted, #666);
+	font-size: 12px;
+}
+
+.rtd-bundle-panel__price {
+	font-size: 30px;
+	font-weight: 800;
+	color: var(--pdp-dark, #1a1a1a);
+	margin-bottom: 16px;
+	letter-spacing: -.02em;
+}
+
+.rtd-bundle-panel__price span {
+	font-size: 14px;
+	font-weight: 400;
+	color: var(--pdp-muted, #666);
+	letter-spacing: 0;
+}
+
+/* Bundle ATC link styled identical to the button */
+a.rtd-bundle-atc {
+	display: block;
+	text-decoration: none;
+	text-align: center;
+	margin-bottom: 8px;
+}
+
+@media (max-width: 480px) {
+	.rtd-pkg-row {
+		gap: 6px;
+	}
+	.rtd-pkg {
+		padding: 9px 6px;
+	}
+	.rtd-pkg strong {
+		font-size: 11px;
+	}
+	.rtd-pkg span {
+		font-size: 10px;
+	}
+}
