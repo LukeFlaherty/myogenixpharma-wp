@@ -7,24 +7,13 @@
 defined( 'ABSPATH' ) || exit;
 
 // ─── Password gate ────────────────────────────────────────────────────────────
-$gate_passwords = [
-	'legacytrainingcenter' => 'Legacy Training Center',
-];
-$gate_cookie = 'mgx_rtd_access';
+// Authentication is request-scoped only — no cookie, password required every load.
+// The template_redirect hook in functions.php verifies the POST and sets this global.
+$authenticated = ! empty( $GLOBALS['retatrutide_authenticated'] );
 
-$authenticated = false;
-if ( ! empty( $_COOKIE[ $gate_cookie ] ) ) {
-	foreach ( array_keys( $gate_passwords ) as $pw ) {
-		if ( hash_equals( wp_hash( $pw ), $_COOKIE[ $gate_cookie ] ) ) {
-			$authenticated = true;
-			break;
-		}
-	}
-}
-
-// ─── Load product (use direct post query — wc_get_products filters hidden) ───
-$rtd_post = get_page_by_path( 'compound-retatrutide', OBJECT, 'product' );
-$product  = $rtd_post ? wc_get_product( $rtd_post->ID ) : null;
+// ─── Load product by slug (direct post query avoids catalog-visibility filter) ─
+$rtd_post   = get_page_by_path( 'compound-retatrutide', OBJECT, 'product' );
+$rtd_prod_id = $rtd_post ? (int) $rtd_post->ID : 0;
 
 // ─── Gate view ────────────────────────────────────────────────────────────────
 if ( ! $authenticated ) {
@@ -60,9 +49,21 @@ if ( ! $authenticated ) {
 }
 
 // ─── PDP (authenticated) ──────────────────────────────────────────────────────
-if ( ! $product ) {
+if ( ! $rtd_prod_id ) {
 	get_header();
 	echo '<div style="padding:80px 24px;text-align:center"><p>This product is not yet available. Please check back soon.</p></div>';
+	get_footer();
+	return;
+}
+
+get_header();
+
+// Re-fetch after get_header() — WC/Elementor hooks inside the header can
+// overwrite the global $product variable; re-loading here keeps us safe.
+$product = wc_get_product( $rtd_prod_id );
+
+if ( ! $product ) {
+	echo '<div style="padding:80px 24px;text-align:center"><p>Product could not be loaded. Please try again.</p></div>';
 	get_footer();
 	return;
 }
@@ -134,7 +135,6 @@ $steps = [
 	[ 'num' => 'PDP Sections/4.png', 'img' => 'PDP Sections/calendar.png',     'title' => 'Monthly Monitoring',             'desc' => 'Stay on track with regular free check-ins to ensure progress' ],
 ];
 
-get_header();
 remove_action( 'woocommerce_before_single_product', 'woocommerce_output_all_notices', 10 );
 do_action( 'woocommerce_before_single_product' );
 ?>

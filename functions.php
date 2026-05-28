@@ -22,24 +22,13 @@ add_action( 'template_redirect', function () {
 	$pw        = sanitize_text_field( wp_unslash( $_POST['retatrutide_pw'] ) );
 
 	if ( isset( $passwords[ $pw ] ) ) {
-		setcookie( 'mgx_rtd_access', wp_hash( $pw ), time() + DAY_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true );
-		wp_safe_redirect( get_permalink( get_page_by_path( 'retatrutide' ) ) );
-		exit;
-	}
-
-	$GLOBALS['retatrutide_gate_error'] = true;
-} );
-
-// Redirect direct product URL to the password-gated page.
-add_action( 'template_redirect', function () {
-	if ( ! is_singular( 'product' ) ) return;
-	global $product;
-	if ( ! $product ) $product = wc_get_product( get_the_ID() );
-	if ( $product && $product->get_slug() === 'compound-retatrutide' ) {
-		wp_safe_redirect( home_url( '/retatrutide/' ), 301 );
-		exit;
+		// No cookie — password required every page load per design spec.
+		$GLOBALS['retatrutide_authenticated'] = true;
+	} else {
+		$GLOBALS['retatrutide_gate_error'] = true;
 	}
 } );
+
 
 // Convert a dose term slug (e.g. "10-mg") to its display name (e.g. "10 mg").
 // Checks pa_individual-dose first (production), then pa_dosage (staging).
