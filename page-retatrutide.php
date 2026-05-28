@@ -149,7 +149,7 @@ do_action( 'woocommerce_before_single_product' );
 				<span class="pdp-hero__badge">GIP/GLP-1/Glucagon Triple Agonist</span>
 				<h1 class="pdp-hero__title">Retatrutide</h1>
 				<p class="pdp-hero__desc">Retatrutide is the first triple agonist — simultaneously activating GIP, GLP-1, and glucagon receptors for powerful metabolic effects with once-weekly dosing.</p>
-				<ul class="pdp-hero__bullets">
+				<ul class="pdp-hero__bullets retatrutide-pdp__bullets">
 					<li>Compounded &middot; FDA-registered facility</li>
 					<li>Provider-reviewed &middot; Clinic-referred patients only</li>
 				</ul>
@@ -162,19 +162,27 @@ do_action( 'woocommerce_before_single_product' );
 
 				<div class="pdp-hero__trust-grid">
 					<div class="pdp-hero__trust-item">
-						<span class="pdp-hero__trust-icon" aria-hidden="true">🏥</span>
+						<span class="pdp-hero__trust-icon" aria-hidden="true">
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+						</span>
 						<div class="pdp-hero__trust-text"><strong>Licensed providers</strong><span>Board-certified MDs</span></div>
 					</div>
 					<div class="pdp-hero__trust-item">
-						<span class="pdp-hero__trust-icon" aria-hidden="true">✏️</span>
+						<span class="pdp-hero__trust-icon" aria-hidden="true">
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+						</span>
 						<div class="pdp-hero__trust-text"><strong>Compounded in USA</strong><span>FDA-registered facility</span></div>
 					</div>
 					<div class="pdp-hero__trust-item">
-						<span class="pdp-hero__trust-icon" aria-hidden="true">🚚</span>
+						<span class="pdp-hero__trust-icon" aria-hidden="true">
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+						</span>
 						<div class="pdp-hero__trust-text"><strong>Free shipping</strong><span>Discreet packaging</span></div>
 					</div>
 					<div class="pdp-hero__trust-item">
-						<span class="pdp-hero__trust-icon" aria-hidden="true">💬</span>
+						<span class="pdp-hero__trust-icon" aria-hidden="true">
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+						</span>
 						<div class="pdp-hero__trust-text"><strong>Ongoing support</strong><span>Message your care team</span></div>
 					</div>
 				</div>

@@ -12,20 +12,38 @@ add_action( 'wp_enqueue_scripts', function() {
 } );
 
 // ─── Retatrutide password gate ────────────────────────────────────────────────
-// Process the access-code form before any output fires.
 add_action( 'template_redirect', function () {
 	if ( ! is_page( 'retatrutide' ) ) return;
-	if ( empty( $_POST['retatrutide_pw'] ) ) return;
-	if ( ! isset( $_POST['retatrutide_nonce'] ) || ! wp_verify_nonce( wp_unslash( $_POST['retatrutide_nonce'] ), 'retatrutide_gate' ) ) return;
 
 	$passwords = [ 'legacytrainingcenter' => 'Legacy Training Center' ];
-	$pw        = sanitize_text_field( wp_unslash( $_POST['retatrutide_pw'] ) );
 
-	if ( isset( $passwords[ $pw ] ) ) {
-		// No cookie — password required every page load per design spec.
-		$GLOBALS['retatrutide_authenticated'] = true;
-	} else {
+	// POST: verify password, then PRG to avoid browser resubmit alert.
+	if ( ! empty( $_POST['retatrutide_pw'] ) ) {
+		if ( ! isset( $_POST['retatrutide_nonce'] ) || ! wp_verify_nonce( wp_unslash( $_POST['retatrutide_nonce'] ), 'retatrutide_gate' ) ) return;
+		$pw = sanitize_text_field( wp_unslash( $_POST['retatrutide_pw'] ) );
+		if ( isset( $passwords[ $pw ] ) ) {
+			// Short-lived signed token (90 s) — password required every page load,
+			// but redirect avoids the "Confirm resubmission" browser dialog.
+			$expires = time() + 90;
+			$token   = hash_hmac( 'sha256', $expires . '|' . $pw, NONCE_SALT );
+			wp_safe_redirect( add_query_arg( [ 'rtd' => $token, 'rtd_t' => $expires ], get_permalink() ) );
+			exit;
+		}
 		$GLOBALS['retatrutide_gate_error'] = true;
+		return;
+	}
+
+	// GET: validate short-lived token issued by the POST redirect above.
+	if ( ! empty( $_GET['rtd'] ) && ! empty( $_GET['rtd_t'] ) ) {
+		$t = (int) $_GET['rtd_t'];
+		if ( $t >= time() ) {
+			foreach ( array_keys( $passwords ) as $pw ) {
+				if ( hash_equals( hash_hmac( 'sha256', $t . '|' . $pw, NONCE_SALT ), sanitize_text_field( wp_unslash( $_GET['rtd'] ) ) ) ) {
+					$GLOBALS['retatrutide_authenticated'] = true;
+					break;
+				}
+			}
+		}
 	}
 } );
 
@@ -296,7 +314,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
 			[],
-			'1.3.5'
+			'1.3.6'
 		);
 	}
 	if ( $is_pdp || $is_rtd ) {
@@ -304,7 +322,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/js/pdp.js',
 			[],
-			'1.3.5',
+			'1.3.6',
 			true
 		);
 	}

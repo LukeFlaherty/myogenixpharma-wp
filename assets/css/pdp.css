@@ -1223,6 +1223,37 @@
 }
 
 /* ==========================================================================
+   Retatrutide — page-level overrides
+   ========================================================================== */
+
+/* Stack bullets vertically (weight-loss pages are horizontal) */
+.retatrutide-pdp__bullets {
+	flex-direction: column;
+	gap: 6px;
+}
+
+/* Neutralise any #cc3366 pink that bleeds in from Elementor global styles */
+.retatrutide-pdp a,
+.retatrutide-pdp a:visited,
+.retatrutide-pdp a:hover,
+.rtd-gate-section a,
+.rtd-gate-section a:visited {
+	color: inherit;
+}
+.retatrutide-pdp *,
+.rtd-gate-section * {
+	--e-global-color-accent: #5b4bc4;
+}
+/* Override any pink/magenta Elementor injects as link or accent */
+.retatrutide-pdp .elementor-widget-container a { color: inherit; }
+
+/* Trust-grid SVG icons — match muted text colour */
+.pdp-hero__trust-icon svg {
+	color: var(--pdp-muted, #666);
+	flex-shrink: 0;
+}
+
+/* ==========================================================================
    Retatrutide — password gate (light mode, within WP layout)
    ========================================================================== */
 
