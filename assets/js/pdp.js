@@ -65,6 +65,8 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	var continuationVariationId = parseInt(  cfg.getAttribute( 'data-continuation-variation-id' ) || '0', 10 );
 	var continuationPrice       = parseFloat( cfg.getAttribute( 'data-continuation-price' )        || '0' );
 	var continuationDoseSlug    = cfg.getAttribute( 'data-continuation-dose-slug' )                || '';
+	/* Locked month count for each package type. Defaults to 3; override via data-continuation-months. */
+	var continuationMonths      = parseInt(  cfg.getAttribute( 'data-continuation-months' )        || '3', 10 );
 
 	/*
 	 * WC attribute slug → term slug mapping (confirmed via WP-CLI 2026-04-21)
@@ -334,6 +336,9 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		renderSupplyPrices();
 		renderSupplyVisibility();
 		renderSummary();
+		/* Hide the static dose reference table when a bundle is selected (locked cards already show the info) */
+		var doseRef = document.getElementById( 'rtd-dose-ref' );
+		if ( doseRef ) doseRef.hidden = ( state.packageType !== 'custom' );
 	}
 
 	/* --- Supply button bindings --------------------------------------------- */
@@ -363,7 +368,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			this.classList.add( 'pdp-cfg__pkg--active' );
 
 			if ( pkg === 'starter' || pkg === 'continuation' ) {
-				state.months = 3;
+				state.months = pkg === 'continuation' ? continuationMonths : 3;
 				var locked = getLockedDoses();
 				state.doses[1] = locked[1];
 				state.doses[2] = locked[2];
@@ -410,14 +415,15 @@ document.addEventListener( 'DOMContentLoaded', function () {
 				ctaBtn.classList.add( 'pdp-cfg__cta--loading' );
 				ctaBtn.textContent = 'Adding to cart…';
 
-				var pkgBottle = bottleSlugMap[ '3-bottle' ] || '3-vial';
+				var pkgBottleKey = BOTTLE_MAP[ state.months ] || '3-bottle';
+				var pkgBottle    = bottleSlugMap[ pkgBottleKey ] || pkgBottleKey.replace( 'bottle', 'vial' );
 				var url = window.location.pathname + '?add-to-cart=' + pid + '&quantity=1';
 				url += '&variation_id='        + pkgVarId;
 				url += '&' + doseAttr + '='   + encodeURIComponent( pkgDoseSlg );
 				url += '&' + bottleAttr + '=' + encodeURIComponent( pkgBottle );
 				url += '&dose_month_1='        + encodeURIComponent( state.doses[1] );
-				url += '&dose_month_2='        + encodeURIComponent( state.doses[2] );
-				url += '&dose_month_3='        + encodeURIComponent( state.doses[3] );
+				if ( state.months >= 2 ) { url += '&dose_month_2=' + encodeURIComponent( state.doses[2] ); }
+				if ( state.months >= 3 ) { url += '&dose_month_3=' + encodeURIComponent( state.doses[3] ); }
 
 				window.location.href = url;
 				return;

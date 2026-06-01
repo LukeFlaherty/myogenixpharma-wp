@@ -62,27 +62,6 @@ get_header();
 // overwrite the global $product variable; re-loading here keeps us safe.
 $product = wc_get_product( $rtd_prod_id );
 
-// Bundle simple products
-$step_up_post = get_page_by_path( 'compound-retatrutide-step-up', OBJECT, 'product' );
-$step_up_id   = $step_up_post ? (int) $step_up_post->ID : 0;
-$phase2_post  = get_page_by_path( 'compound-retatrutide-phase-2', OBJECT, 'product' );
-$phase2_id    = $phase2_post ? (int) $phase2_post->ID : 0;
-
-$step_up_url = $step_up_id ? esc_url( add_query_arg( [
-	'add-to-cart'  => $step_up_id,
-	'quantity'     => 1,
-	'dose_month_1' => '4-mg',
-	'dose_month_2' => '8-mg',
-	'dose_month_3' => '16-mg',
-], wc_get_cart_url() ) ) : '#';
-
-$phase2_url = $phase2_id ? esc_url( add_query_arg( [
-	'add-to-cart'  => $phase2_id,
-	'quantity'     => 1,
-	'dose_month_1' => '24-mg',
-	'dose_month_2' => '32-mg',
-], wc_get_cart_url() ) ) : '#';
-
 if ( ! $product ) {
 	echo '<div style="padding:80px 24px;text-align:center"><p>Product could not be loaded. Please try again.</p></div>';
 	get_footer();
@@ -105,6 +84,15 @@ $norm_to_raw = [
 	'3-bottle' => $bottle_attr_key === 'pa_vial' ? '3-vial' : '3-bottle',
 ];
 
+// Bundle variations are identified by reserved dose slugs — same pattern as Tirz/Sema.
+// The step-up is 3 months (months-1-3-bundle) and Phase 2 is 2 months (months-4-6-bundle).
+$pkg_dose_slugs = [ 'starter' => 'months-1-3-bundle', 'continuation' => 'months-4-6-bundle' ];
+$pkg_prices     = [ 'starter' => 950.00, 'continuation' => 1175.00 ];
+$starter_var_id      = 0;
+$starter_price       = $pkg_prices['starter'];
+$continuation_var_id = 0;
+$continuation_price  = $pkg_prices['continuation'];
+
 $price_matrix  = [];
 $variation_map = [];
 foreach ( $product->get_children() as $vid ) {
@@ -115,6 +103,21 @@ foreach ( $product->get_children() as $vid ) {
 	$bottle     = $raw_to_norm[ $bottle_raw ] ?? null;
 	$plan       = get_post_meta( $vid, 'attribute_pa_wm-subscription-plan', true );
 	if ( ! $dose || ! $bottle ) continue;
+
+	// Detect bundle variations by reserved dose slug
+	if ( $dose === $pkg_dose_slugs['starter'] ) {
+		$starter_var_id = (int) $vid;
+		$live_price     = (float) get_post_meta( $vid, '_price', true );
+		if ( $live_price > 0 ) $starter_price = $live_price;
+		continue;
+	}
+	if ( $dose === $pkg_dose_slugs['continuation'] ) {
+		$continuation_var_id = (int) $vid;
+		$live_price          = (float) get_post_meta( $vid, '_price', true );
+		if ( $live_price > 0 ) $continuation_price = $live_price;
+		continue;
+	}
+
 	$price = (float) $v->get_price();
 	if ( $price > 0 && ! isset( $price_matrix[ $dose ][ $bottle ] ) ) {
 		$price_matrix[ $dose ][ $bottle ] = $price;
@@ -122,14 +125,16 @@ foreach ( $product->get_children() as $vid ) {
 	$variation_map[ $dose ][ $bottle ][ $plan ?: '' ] = (int) $vid;
 }
 
-$dosage_terms = isset( $attrs[ $dose_attr_key ] ) ? ( $attrs[ $dose_attr_key ]->get_terms() ?: [] ) : [];
-$dose_labels  = [];
+$dosage_terms       = isset( $attrs[ $dose_attr_key ] ) ? ( $attrs[ $dose_attr_key ]->get_terms() ?: [] ) : [];
+$reserved_pkg_slugs = array_values( array_filter( $pkg_dose_slugs ) );
+$dose_labels        = [];
 foreach ( $dosage_terms as $t ) {
 	$dose_labels[ $t->slug ] = $t->name;
 }
 $wc_doses = array_values( array_filter(
 	array_map( fn( $t ) => $t->slug, $dosage_terms ),
-	fn( $d ) => isset( $variation_map[ $d ] ) || isset( $price_matrix[ $d ] )
+	fn( $d ) => ( isset( $variation_map[ $d ] ) || isset( $price_matrix[ $d ] ) )
+	         && ! in_array( $d, $reserved_pkg_slugs, true )
 ) );
 usort( $wc_doses, fn( $a, $b ) => (float) $a - (float) $b );
 
@@ -221,156 +226,78 @@ do_action( 'woocommerce_before_single_product' );
 					data-warning-threshold="4"
 					data-bottle-attr="<?php echo esc_attr( $bottle_meta_key ); ?>"
 					data-bottle-slug-map="<?php echo esc_attr( wp_json_encode( $norm_to_raw ) ); ?>"
-					data-starter-variation-id="0"
-					data-starter-price="0"
-					data-starter-dose-slug=""
-					data-continuation-variation-id="0"
-					data-continuation-price="0"
-					data-continuation-dose-slug=""
+					data-starter-variation-id="<?php echo esc_attr( $starter_var_id ); ?>"
+					data-starter-price="<?php echo esc_attr( $starter_price ); ?>"
+					data-starter-dose-slug="<?php echo esc_attr( $pkg_dose_slugs['starter'] ); ?>"
+					data-continuation-variation-id="<?php echo esc_attr( $continuation_var_id ); ?>"
+					data-continuation-price="<?php echo esc_attr( $continuation_price ); ?>"
+					data-continuation-dose-slug="<?php echo esc_attr( $pkg_dose_slugs['continuation'] ); ?>"
+					data-continuation-months="2"
 				>
 
 					<!-- ── Program type selector ── -->
 					<p class="pdp-cfg__section-label">Program</p>
-					<div class="rtd-pkg-row">
-						<button class="rtd-pkg rtd-pkg--active" data-pkg="step-up">
+					<div class="pdp-cfg__pkg-row">
+						<button class="pdp-cfg__pkg" data-pkg="starter">
 							<strong>Step Up Bundle</strong>
-							<span>Mos 1&ndash;3 &middot; $950</span>
+							<span>Mos 1&ndash;3 &middot; $<?php echo number_format( $starter_price, 0 ); ?></span>
 						</button>
-						<button class="rtd-pkg" data-pkg="phase-2">
+						<button class="pdp-cfg__pkg" data-pkg="continuation">
 							<strong>Phase 2</strong>
-							<span>Mos 4&ndash;5 &middot; $1,175</span>
+							<span>Mos 4&ndash;5 &middot; $<?php echo number_format( $continuation_price, 0 ); ?></span>
 						</button>
-						<button class="rtd-pkg" data-pkg="byo">
+						<button class="pdp-cfg__pkg pdp-cfg__pkg--active" data-pkg="custom">
 							<strong>Build Your Own</strong>
 							<span>Choose dose &amp; supply</span>
 						</button>
 					</div>
 
-					<!-- ── Step Up Bundle panel ── -->
-					<div id="rtd-panel-step-up" class="rtd-bundle-panel">
-						<p class="rtd-bundle-panel__title">Starter escalation protocol — 3 vials</p>
-						<div class="rtd-bundle-panel__months">
-							<div class="rtd-bundle-panel__month">
-								<span class="rtd-bundle-panel__month-label">Month 1</span>
-								<span class="rtd-bundle-panel__month-dose">4 mg vial</span>
-								<span class="rtd-bundle-panel__month-weekly">1 mg / week</span>
-							</div>
-							<div class="rtd-bundle-panel__month">
-								<span class="rtd-bundle-panel__month-label">Month 2</span>
-								<span class="rtd-bundle-panel__month-dose">8 mg vial</span>
-								<span class="rtd-bundle-panel__month-weekly">2 mg / week</span>
-							</div>
-							<div class="rtd-bundle-panel__month">
-								<span class="rtd-bundle-panel__month-label">Month 3</span>
-								<span class="rtd-bundle-panel__month-dose">16 mg vial</span>
-								<span class="rtd-bundle-panel__month-weekly">4 mg / week</span>
-							</div>
-						</div>
-						<div class="rtd-bundle-panel__price">$950 <span>/ 3 months</span></div>
-						<?php if ( $step_up_id ) : ?>
-						<a href="<?php echo $step_up_url; ?>" class="pdp-cfg__cta rtd-bundle-atc">Go to Checkout &rarr;</a>
-						<?php else : ?>
-						<p class="pdp-cfg__disclaimer">Bundle temporarily unavailable — please use Build Your Own.</p>
-						<?php endif; ?>
-						<p class="pdp-cfg__disclaimer">One-time purchase. Order reviewed by a licensed provider before processing.</p>
+					<!-- ── Supply Length (disabled for locked bundle packages by pdp.js) ── -->
+					<p class="pdp-cfg__section-label">Supply Length</p>
+					<div class="pdp-cfg__supply-row">
+						<button class="pdp-cfg__supply pdp-cfg__supply--active" data-months="1">
+							<strong>1 Month</strong>
+							<span class="pdp-cfg__supply-price"><?php echo $sp[0] ? '$' . number_format( $sp[0], 2 ) . '/mo' : ''; ?></span>
+						</button>
+						<button class="pdp-cfg__supply" data-months="2">
+							<strong>2 Months</strong>
+							<span class="pdp-cfg__supply-price"><?php echo $sp[1] ? '$' . number_format( $sp[1], 2 ) . '/mo' : ''; ?></span>
+						</button>
+						<button class="pdp-cfg__supply" data-months="3">
+							<span class="pdp-cfg__popular-tag">POPULAR</span>
+							<strong>3 Months</strong>
+							<span class="pdp-cfg__supply-price"><?php echo $sp[2] ? '$' . number_format( $sp[2], 2 ) . '/3mo' : ''; ?></span>
+						</button>
 					</div>
 
-					<!-- ── Phase 2 Bundle panel ── -->
-					<div id="rtd-panel-phase-2" class="rtd-bundle-panel" hidden>
-						<p class="rtd-bundle-panel__title">Continued escalation — 2 vials</p>
-						<div class="rtd-bundle-panel__months">
-							<div class="rtd-bundle-panel__month">
-								<span class="rtd-bundle-panel__month-label">Month 4</span>
-								<span class="rtd-bundle-panel__month-dose">24 mg vial</span>
-								<span class="rtd-bundle-panel__month-weekly">6 mg / week</span>
-							</div>
-							<div class="rtd-bundle-panel__month">
-								<span class="rtd-bundle-panel__month-label">Month 5</span>
-								<span class="rtd-bundle-panel__month-dose">32 mg vial</span>
-								<span class="rtd-bundle-panel__month-weekly">8 mg / week</span>
-							</div>
-						</div>
-						<div class="rtd-bundle-panel__price">$1,175 <span>/ 2 months</span></div>
-						<?php if ( $phase2_id ) : ?>
-						<a href="<?php echo $phase2_url; ?>" class="pdp-cfg__cta rtd-bundle-atc">Go to Checkout &rarr;</a>
-						<?php else : ?>
-						<p class="pdp-cfg__disclaimer">Bundle temporarily unavailable — please use Build Your Own.</p>
-						<?php endif; ?>
-						<p class="pdp-cfg__disclaimer">One-time purchase. Order reviewed by a licensed provider before processing.</p>
+					<!-- ── Dose selector (locked cards for bundles, dropdowns for BYO) ── -->
+					<p class="pdp-cfg__section-label" id="pdp-dose-label">Month 1 Dose</p>
+					<div id="pdp-dose" class="pdp-cfg__doses-wrap"></div>
+
+					<!-- ── Dose reference table (BYO only — hidden by pdp.js for bundles) ── -->
+					<div class="rtd-dose-ref" id="rtd-dose-ref">
+						<p class="rtd-dose-ref__label">Dose Reference</p>
+						<table class="rtd-dose-ref__table">
+							<thead><tr><th>Vial</th><th>Weekly Dose</th></tr></thead>
+							<tbody>
+								<tr><td>4 mg</td><td>1 mg / week</td></tr>
+								<tr><td>8 mg</td><td>2 mg / week</td></tr>
+								<tr><td>16 mg</td><td>4 mg / week</td></tr>
+								<tr><td>24 mg</td><td>6 mg / week</td></tr>
+								<tr><td>32 mg</td><td>8 mg / week</td></tr>
+								<tr><td>48 mg</td><td>12 mg / week</td></tr>
+							</tbody>
+						</table>
 					</div>
 
-					<!-- ── BYO section (hidden by default) ── -->
-					<div id="rtd-byo-section" hidden>
-						<p class="pdp-cfg__section-label">Supply Length</p>
-						<div class="pdp-cfg__supply-row">
-							<button class="pdp-cfg__supply pdp-cfg__supply--active" data-months="1">
-								<strong>1 Month</strong>
-								<span class="pdp-cfg__supply-price"><?php echo $sp[0] ? '$' . number_format( $sp[0], 2 ) . '/mo' : ''; ?></span>
-							</button>
-							<button class="pdp-cfg__supply" data-months="2">
-								<strong>2 Months</strong>
-								<span class="pdp-cfg__supply-price"><?php echo $sp[1] ? '$' . number_format( $sp[1], 2 ) . '/mo' : ''; ?></span>
-							</button>
-							<button class="pdp-cfg__supply" data-months="3">
-								<span class="pdp-cfg__popular-tag">POPULAR</span>
-								<strong>3 Months</strong>
-								<span class="pdp-cfg__supply-price"><?php echo $sp[2] ? '$' . number_format( $sp[2], 2 ) . '/3mo' : ''; ?></span>
-							</button>
-						</div>
-
-						<p class="pdp-cfg__section-label" id="pdp-dose-label">Month 1 Dose</p>
-						<div id="pdp-dose" class="pdp-cfg__doses-wrap"></div>
-
-						<div class="rtd-dose-ref">
-							<p class="rtd-dose-ref__label">Dose Reference</p>
-							<table class="rtd-dose-ref__table">
-								<thead><tr><th>Vial</th><th>Weekly Dose</th></tr></thead>
-								<tbody>
-									<tr><td>4 mg</td><td>1 mg / week</td></tr>
-									<tr><td>8 mg</td><td>2 mg / week</td></tr>
-									<tr><td>16 mg</td><td>4 mg / week</td></tr>
-									<tr><td>24 mg</td><td>6 mg / week</td></tr>
-									<tr><td>32 mg</td><td>8 mg / week</td></tr>
-									<tr><td>48 mg</td><td>12 mg / week</td></tr>
-								</tbody>
-							</table>
-						</div>
-
-						<div id="pdp-summary" class="pdp-cfg__summary"></div>
-						<button id="pdp-cta" class="pdp-cfg__cta">Go to Checkout &rarr;</button>
-						<p id="pdp-disclaimer" class="pdp-cfg__disclaimer">
-							This is a one-time purchase. Your order will be reviewed by a licensed provider before processing.
-						</p>
-					</div>
+					<!-- ── Order summary + CTA ── -->
+					<div id="pdp-summary" class="pdp-cfg__summary"></div>
+					<button id="pdp-cta" class="pdp-cfg__cta">Go to Checkout &rarr;</button>
+					<p id="pdp-disclaimer" class="pdp-cfg__disclaimer">
+						One-time purchase. Order reviewed by a licensed provider before processing.
+					</p>
 
 				</div>
-
-				<script>
-				(function () {
-					var pkgBtns  = document.querySelectorAll( '.rtd-pkg' );
-					var panels   = {
-						'step-up': document.getElementById( 'rtd-panel-step-up' ),
-						'phase-2': document.getElementById( 'rtd-panel-phase-2' ),
-						'byo':     document.getElementById( 'rtd-byo-section' ),
-					};
-
-					function activate( pkg ) {
-						pkgBtns.forEach( function ( b ) {
-							b.classList.toggle( 'rtd-pkg--active', b.dataset.pkg === pkg );
-						} );
-						Object.keys( panels ).forEach( function ( key ) {
-							panels[ key ].hidden = ( key !== pkg );
-						} );
-					}
-
-					pkgBtns.forEach( function ( btn ) {
-						btn.addEventListener( 'click', function () { activate( this.dataset.pkg ); } );
-					} );
-
-					// Default: Step Up Bundle
-					activate( 'step-up' );
-				}());
-				</script>
 
 			</div>
 		</div>
