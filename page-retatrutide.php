@@ -74,14 +74,14 @@ $step_up_url = $step_up_id ? esc_url( add_query_arg( [
 	'dose_month_1' => '4-mg',
 	'dose_month_2' => '8-mg',
 	'dose_month_3' => '16-mg',
-], home_url( '/' ) ) ) : '#';
+], wc_get_cart_url() ) ) : '#';
 
 $phase2_url = $phase2_id ? esc_url( add_query_arg( [
 	'add-to-cart'  => $phase2_id,
 	'quantity'     => 1,
 	'dose_month_1' => '24-mg',
 	'dose_month_2' => '32-mg',
-], home_url( '/' ) ) ) : '#';
+], wc_get_cart_url() ) ) : '#';
 
 if ( ! $product ) {
 	echo '<div style="padding:80px 24px;text-align:center"><p>Product could not be loaded. Please try again.</p></div>';

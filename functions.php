@@ -58,6 +58,36 @@ function myogenix_dose_display( $slug ) {
 	return $slug;
 }
 
+// When adding a Retatrutide bundle (step-up or phase-2), remove any existing
+// Retatrutide-family items first so the cart never accumulates multiple bundles.
+add_filter( 'woocommerce_add_cart_item_data', function ( $cart_item_data, $product_id ) {
+	$bundle_slugs  = [ 'compound-retatrutide-step-up', 'compound-retatrutide-phase-2' ];
+	$current_slug  = get_post_field( 'post_name', $product_id );
+	if ( ! in_array( $current_slug, $bundle_slugs, true ) ) return $cart_item_data;
+	$all_rtd_slugs = array_merge( $bundle_slugs, [ 'compound-retatrutide' ] );
+	foreach ( WC()->cart->get_cart() as $key => $item ) {
+		if ( in_array( get_post_field( 'post_name', $item['product_id'] ), $all_rtd_slugs, true ) ) {
+			WC()->cart->remove_cart_item( $key );
+		}
+	}
+	return $cart_item_data;
+}, 5, 2 );
+
+// Use the main Retatrutide product image for bundle cart items that have no image.
+add_filter( 'woocommerce_cart_item_thumbnail', function ( $thumbnail, $cart_item, $cart_item_key ) {
+	$bundle_slugs = [ 'compound-retatrutide-step-up', 'compound-retatrutide-phase-2' ];
+	if ( ! in_array( get_post_field( 'post_name', $cart_item['product_id'] ), $bundle_slugs, true ) ) {
+		return $thumbnail;
+	}
+	$product = wc_get_product( $cart_item['product_id'] );
+	if ( $product && $product->get_image_id() ) return $thumbnail;
+	$rtd_post = get_page_by_path( 'compound-retatrutide', OBJECT, 'product' );
+	if ( ! $rtd_post ) return $thumbnail;
+	$rtd = wc_get_product( $rtd_post->ID );
+	if ( ! $rtd || ! $rtd->get_image_id() ) return $thumbnail;
+	return $rtd->get_image( 'woocommerce_thumbnail' );
+}, 10, 3 );
+
 // Dose escalation — capture per-month doses from add-to-cart URL and attach to cart item
 add_filter( 'woocommerce_add_cart_item_data', function ( $cart_item_data, $product_id, $variation_id ) {
 	foreach ( [ 'dose_month_1', 'dose_month_2', 'dose_month_3' ] as $key ) {
