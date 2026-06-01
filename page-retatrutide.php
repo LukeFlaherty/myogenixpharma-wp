@@ -238,7 +238,7 @@ do_action( 'woocommerce_before_single_product' );
 					<!-- ── Program type selector ── -->
 					<p class="pdp-cfg__section-label">Program</p>
 					<div class="pdp-cfg__pkg-row">
-						<button class="pdp-cfg__pkg" data-pkg="starter">
+						<button class="pdp-cfg__pkg pdp-cfg__pkg--active" data-pkg="starter">
 							<strong>Step Up Bundle</strong>
 							<span>Mos 1&ndash;3 &middot; $<?php echo number_format( $starter_price, 0 ); ?></span>
 						</button>
@@ -246,7 +246,7 @@ do_action( 'woocommerce_before_single_product' );
 							<strong>Phase 2</strong>
 							<span>Mos 4&ndash;5 &middot; $<?php echo number_format( $continuation_price, 0 ); ?></span>
 						</button>
-						<button class="pdp-cfg__pkg pdp-cfg__pkg--active" data-pkg="custom">
+						<button class="pdp-cfg__pkg" data-pkg="custom">
 							<strong>Build Your Own</strong>
 							<span>Choose dose &amp; supply</span>
 						</button>

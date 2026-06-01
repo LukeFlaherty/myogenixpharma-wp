@@ -94,6 +94,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		doses:       { 1: doses[0] || '', 2: doses[0] || '', 3: doses[0] || '' },
 		packageType: 'custom'
 	};
+	var defaultPkg = 'custom';
 
 	var CHEVRON_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
 	var WARNING_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
@@ -165,6 +166,22 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		return null;
 	}
 
+	/* Read initial package selection from DOM (PHP sets the --active class) */
+	( function () {
+		var activeBtn = cfg.querySelector( '.pdp-cfg__pkg.pdp-cfg__pkg--active' );
+		defaultPkg = activeBtn ? activeBtn.getAttribute( 'data-pkg' ) : 'custom';
+		if ( defaultPkg === 'starter' || defaultPkg === 'continuation' ) {
+			state.packageType = defaultPkg;
+			state.months      = defaultPkg === 'continuation' ? continuationMonths : 3;
+			var locked = getLockedDoses();
+			if ( locked ) {
+				state.doses[1] = locked[1];
+				state.doses[2] = locked[2];
+				state.doses[3] = locked[3];
+			}
+		}
+	}() );
+
 	/* --- Section label (updates based on supply / package selection) -------- */
 	function renderDoseLabel() {
 		var el = document.getElementById( 'pdp-dose-label' );
@@ -185,8 +202,8 @@ document.addEventListener( 'DOMContentLoaded', function () {
 
 			if ( state.packageType === 'starter' && m === 3 ) {
 				el.textContent = starterPrice ? '$' + starterPrice.toFixed( 2 ) + '/3mo' : '—';
-			} else if ( state.packageType === 'continuation' && m === 3 ) {
-				el.textContent = continuationPrice ? '$' + continuationPrice.toFixed( 2 ) + '/3mo' : '—';
+			} else if ( state.packageType === 'continuation' && m === continuationMonths ) {
+				el.textContent = continuationPrice ? '$' + continuationPrice.toFixed( 2 ) + '/' + continuationMonths + 'mo' : '—';
 			} else {
 				var price = getBYOTotalFor( m );
 				el.textContent = price ? '$' + price.toFixed( 2 ) + ( m === 3 ? '/3mo' : '/mo' ) : '—';
@@ -202,9 +219,9 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		var isLocked = state.packageType !== 'custom';
 		Array.prototype.slice.call( cfg.querySelectorAll( '.pdp-cfg__supply' ) ).forEach( function ( btn ) {
 			var m = parseInt( btn.getAttribute( 'data-months' ), 10 );
-			btn.classList.toggle( 'pdp-cfg__supply--disabled', isLocked && m !== 3 );
+			btn.classList.toggle( 'pdp-cfg__supply--disabled', isLocked && m !== state.months );
 			if ( isLocked ) {
-				btn.classList.toggle( 'pdp-cfg__supply--active', m === 3 );
+				btn.classList.toggle( 'pdp-cfg__supply--active', m === state.months );
 			}
 		} );
 	}
@@ -506,20 +523,28 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	/* Reset to defaults on bfcache restore (user navigates back from cart) */
 	window.addEventListener( 'pageshow', function ( e ) {
 		if ( ! e.persisted ) return;
-		state.months      = 1;
-		state.doses       = { 1: doses[0] || '', 2: doses[0] || '', 3: doses[0] || '' };
-		state.packageType = 'custom';
+		state.packageType = defaultPkg;
+		if ( defaultPkg === 'starter' || defaultPkg === 'continuation' ) {
+			state.months = defaultPkg === 'continuation' ? continuationMonths : 3;
+			var resetLocked = getLockedDoses();
+			state.doses = resetLocked
+				? { 1: resetLocked[1], 2: resetLocked[2], 3: resetLocked[3] }
+				: { 1: doses[0] || '', 2: doses[0] || '', 3: doses[0] || '' };
+		} else {
+			state.months = 1;
+			state.doses  = { 1: doses[0] || '', 2: doses[0] || '', 3: doses[0] || '' };
+		}
 
 		Array.prototype.slice.call( cfg.querySelectorAll( '.pdp-cfg__supply' ) ).forEach( function ( btn ) {
 			btn.classList.remove( 'pdp-cfg__supply--active' );
-			if ( parseInt( btn.getAttribute( 'data-months' ), 10 ) === 1 ) {
+			if ( parseInt( btn.getAttribute( 'data-months' ), 10 ) === state.months ) {
 				btn.classList.add( 'pdp-cfg__supply--active' );
 			}
 		} );
 
 		Array.prototype.slice.call( cfg.querySelectorAll( '.pdp-cfg__pkg' ) ).forEach( function ( btn ) {
 			btn.classList.remove( 'pdp-cfg__pkg--active' );
-			if ( btn.getAttribute( 'data-pkg' ) === 'custom' ) {
+			if ( btn.getAttribute( 'data-pkg' ) === defaultPkg ) {
 				btn.classList.add( 'pdp-cfg__pkg--active' );
 			}
 		} );
