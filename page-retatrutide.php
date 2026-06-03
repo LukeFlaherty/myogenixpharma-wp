@@ -252,46 +252,89 @@ do_action( 'woocommerce_before_single_product' );
 						</button>
 					</div>
 
-					<!-- ── Supply Length (disabled for locked bundle packages by pdp.js) ── -->
-					<p class="pdp-cfg__section-label">Supply Length</p>
-					<div class="pdp-cfg__supply-row">
-						<button class="pdp-cfg__supply pdp-cfg__supply--active" data-months="1">
-							<strong>1 Month</strong>
-							<span class="pdp-cfg__supply-price"><?php echo $sp[0] ? '$' . number_format( $sp[0], 2 ) . '/mo' : ''; ?></span>
-						</button>
-						<button class="pdp-cfg__supply" data-months="2">
-							<strong>2 Months</strong>
-							<span class="pdp-cfg__supply-price"><?php echo $sp[1] ? '$' . number_format( $sp[1], 2 ) . '/mo' : ''; ?></span>
-						</button>
-						<button class="pdp-cfg__supply" data-months="3">
-							<span class="pdp-cfg__popular-tag">POPULAR</span>
-							<strong>3 Months</strong>
-							<span class="pdp-cfg__supply-price"><?php echo $sp[2] ? '$' . number_format( $sp[2], 2 ) . '/3mo' : ''; ?></span>
-						</button>
+					<!-- ── Bundle panels (compact breakdown, shown when a preset package is active) ── -->
+					<div id="rtd-bundle-starter" class="rtd-bundle-panel">
+						<p class="rtd-bundle-panel__title">Starter escalation protocol &mdash; 3 vials</p>
+						<div class="rtd-bundle-panel__months">
+							<div class="rtd-bundle-panel__month">
+								<span class="rtd-bundle-panel__month-label">Month 1</span>
+								<span class="rtd-bundle-panel__month-dose">4 mg vial</span>
+								<span class="rtd-bundle-panel__month-weekly">1 mg / week</span>
+							</div>
+							<div class="rtd-bundle-panel__month">
+								<span class="rtd-bundle-panel__month-label">Month 2</span>
+								<span class="rtd-bundle-panel__month-dose">8 mg vial</span>
+								<span class="rtd-bundle-panel__month-weekly">2 mg / week</span>
+							</div>
+							<div class="rtd-bundle-panel__month">
+								<span class="rtd-bundle-panel__month-label">Month 3</span>
+								<span class="rtd-bundle-panel__month-dose">16 mg vial</span>
+								<span class="rtd-bundle-panel__month-weekly">4 mg / week</span>
+							</div>
+						</div>
+						<div class="rtd-bundle-panel__price">$<?php echo number_format( $starter_price, 0 ); ?> <span>/ 3 months</span></div>
 					</div>
 
-					<!-- ── Dose selector (locked cards for bundles, dropdowns for BYO) ── -->
-					<p class="pdp-cfg__section-label" id="pdp-dose-label">Month 1 Dose</p>
-					<div id="pdp-dose" class="pdp-cfg__doses-wrap"></div>
-
-					<!-- ── Dose reference table (BYO only — hidden by pdp.js for bundles) ── -->
-					<div class="rtd-dose-ref" id="rtd-dose-ref">
-						<p class="rtd-dose-ref__label">Dose Reference</p>
-						<table class="rtd-dose-ref__table">
-							<thead><tr><th>Vial</th><th>Weekly Dose</th></tr></thead>
-							<tbody>
-								<tr><td>4 mg</td><td>1 mg / week</td></tr>
-								<tr><td>8 mg</td><td>2 mg / week</td></tr>
-								<tr><td>16 mg</td><td>4 mg / week</td></tr>
-								<tr><td>24 mg</td><td>6 mg / week</td></tr>
-								<tr><td>32 mg</td><td>8 mg / week</td></tr>
-								<tr><td>48 mg</td><td>12 mg / week</td></tr>
-							</tbody>
-						</table>
+					<div id="rtd-bundle-continuation" class="rtd-bundle-panel" hidden>
+						<p class="rtd-bundle-panel__title">Continued escalation &mdash; 2 vials</p>
+						<div class="rtd-bundle-panel__months">
+							<div class="rtd-bundle-panel__month">
+								<span class="rtd-bundle-panel__month-label">Month 4</span>
+								<span class="rtd-bundle-panel__month-dose">24 mg vial</span>
+								<span class="rtd-bundle-panel__month-weekly">6 mg / week</span>
+							</div>
+							<div class="rtd-bundle-panel__month">
+								<span class="rtd-bundle-panel__month-label">Month 5</span>
+								<span class="rtd-bundle-panel__month-dose">32 mg vial</span>
+								<span class="rtd-bundle-panel__month-weekly">8 mg / week</span>
+							</div>
+						</div>
+						<div class="rtd-bundle-panel__price">$<?php echo number_format( $continuation_price, 0 ); ?> <span>/ 2 months</span></div>
 					</div>
 
-					<!-- ── Order summary + CTA ── -->
-					<div id="pdp-summary" class="pdp-cfg__summary"></div>
+					<!-- ── BYO section (supply + dose + summary, shown only when Build Your Own is selected) ── -->
+					<div id="rtd-byo-section" hidden>
+
+						<p class="pdp-cfg__section-label">Supply Length</p>
+						<div class="pdp-cfg__supply-row">
+							<button class="pdp-cfg__supply pdp-cfg__supply--active" data-months="1">
+								<strong>1 Month</strong>
+								<span class="pdp-cfg__supply-price"><?php echo $sp[0] ? '$' . number_format( $sp[0], 2 ) . '/mo' : ''; ?></span>
+							</button>
+							<button class="pdp-cfg__supply" data-months="2">
+								<strong>2 Months</strong>
+								<span class="pdp-cfg__supply-price"><?php echo $sp[1] ? '$' . number_format( $sp[1], 2 ) . '/mo' : ''; ?></span>
+							</button>
+							<button class="pdp-cfg__supply" data-months="3">
+								<span class="pdp-cfg__popular-tag">POPULAR</span>
+								<strong>3 Months</strong>
+								<span class="pdp-cfg__supply-price"><?php echo $sp[2] ? '$' . number_format( $sp[2], 2 ) . '/3mo' : ''; ?></span>
+							</button>
+						</div>
+
+						<p class="pdp-cfg__section-label" id="pdp-dose-label">Month 1 Dose</p>
+						<div id="pdp-dose" class="pdp-cfg__doses-wrap"></div>
+
+						<div class="rtd-dose-ref" id="rtd-dose-ref">
+							<p class="rtd-dose-ref__label">Dose Reference</p>
+							<table class="rtd-dose-ref__table">
+								<thead><tr><th>Vial</th><th>Weekly Dose</th></tr></thead>
+								<tbody>
+									<tr><td>4 mg</td><td>1 mg / week</td></tr>
+									<tr><td>8 mg</td><td>2 mg / week</td></tr>
+									<tr><td>16 mg</td><td>4 mg / week</td></tr>
+									<tr><td>24 mg</td><td>6 mg / week</td></tr>
+									<tr><td>32 mg</td><td>8 mg / week</td></tr>
+									<tr><td>48 mg</td><td>12 mg / week</td></tr>
+								</tbody>
+							</table>
+						</div>
+
+						<div id="pdp-summary" class="pdp-cfg__summary"></div>
+
+					</div>
+
+					<!-- ── CTA (always visible) ── -->
 					<button id="pdp-cta" class="pdp-cfg__cta">Go to Checkout &rarr;</button>
 					<p id="pdp-disclaimer" class="pdp-cfg__disclaimer">
 						One-time purchase. Order reviewed by a licensed provider before processing.

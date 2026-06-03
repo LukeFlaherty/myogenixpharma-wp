@@ -356,6 +356,13 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		/* Hide the static dose reference table when a bundle is selected (locked cards already show the info) */
 		var doseRef = document.getElementById( 'rtd-dose-ref' );
 		if ( doseRef ) doseRef.hidden = ( state.packageType !== 'custom' );
+		/* Retatrutide-style layout: compact bundle panels vs. full BYO section */
+		var bundleStarterEl = document.getElementById( 'rtd-bundle-starter' );
+		var bundleContEl    = document.getElementById( 'rtd-bundle-continuation' );
+		var byoSectionEl    = document.getElementById( 'rtd-byo-section' );
+		if ( bundleStarterEl ) bundleStarterEl.hidden = ( state.packageType !== 'starter' );
+		if ( bundleContEl )    bundleContEl.hidden    = ( state.packageType !== 'continuation' );
+		if ( byoSectionEl )    byoSectionEl.hidden    = ( state.packageType !== 'custom' );
 	}
 
 	/* --- Supply button bindings --------------------------------------------- */
