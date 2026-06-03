@@ -15,7 +15,7 @@ add_action( 'wp_enqueue_scripts', function() {
 add_action( 'template_redirect', function () {
 	if ( ! is_page( 'retatrutide' ) ) return;
 
-	$passwords = [ 'legacytrainingcenter' => 'Legacy Training Center' ];
+	$passwords = [ 'legacy' => 'Legacy Training Center' ];
 
 	// POST: verify password, then PRG to avoid browser resubmit alert.
 	if ( ! empty( $_POST['retatrutide_pw'] ) ) {
@@ -338,7 +338,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/js/pdp.js',
 			[],
-			'1.3.8',
+			'1.3.9',
 			true
 		);
 	}
