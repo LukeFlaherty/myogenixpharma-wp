@@ -744,10 +744,6 @@ if ( $is_weight_loss ) :
 						<?php
 						$is_first = true;
 						foreach ( $supply_map as $s_slug => $s_entry ) :
-							$s_qty     = $s_entry['qty'];
-							$unit_noun = strpos( $s_slug, 'vial' ) !== false ? 'vial' : 'bottle';
-							$per_unit  = '$' . number_format( $s_entry['price'] / $s_qty, 0 ) . '/' . $unit_noun;
-							$s_savings = $s_qty > 1 ? (int) round( $single_supply_price * $s_qty - $s_entry['price'] ) : 0;
 						?>
 						<button class="pdp-cfg__supply<?php echo $is_first ? ' pdp-cfg__supply--active' : ''; ?>"
 							data-supply="<?php echo esc_attr( $s_slug ); ?>">
@@ -755,10 +751,6 @@ if ( $is_weight_loss ) :
 							<span class="pdp-cfg__popular-tag">POPULAR</span>
 							<?php endif; ?>
 							<strong><?php echo esc_html( $s_entry['label'] ); ?></strong>
-							<span class="pdp-cfg__supply-price">$<?php echo number_format( $s_entry['price'], 0 ); ?></span>
-							<?php if ( $s_qty > 1 ) : ?>
-							<span class="pdp-cfg__supply-unit"><?php echo esc_html( $per_unit . ( $s_savings > 0 ? ' · Save $' . number_format( $s_savings, 0 ) : '' ) ); ?></span>
-							<?php endif; ?>
 						</button>
 						<?php
 						$is_first = false;

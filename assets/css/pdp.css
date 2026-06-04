@@ -294,21 +294,6 @@
 	color: var(--pdp-muted) !important;
 }
 
-.peptide-pdp .pdp-cfg__supply:hover {
-	background: #f6f6f6 !important;
-	border-color: #bbb !important;
-	color: var(--pdp-dark) !important;
-}
-
-.peptide-pdp .pdp-cfg__supply:hover strong,
-.peptide-pdp .pdp-cfg__supply:hover span {
-	color: var(--pdp-dark) !important;
-}
-
-.peptide-pdp .pdp-cfg__supply:hover .pdp-cfg__popular-tag {
-	color: #fff !important;
-}
-
 .peptide-pdp .pdp-cfg__supply--active {
 	background: var(--pdp-dark) !important;
 	border-color: var(--pdp-dark) !important;
@@ -319,17 +304,19 @@
 	color: #fff !important;
 }
 
-.peptide-pdp .pdp-cfg__supply--active .pdp-cfg__supply-price {
-	color: rgba(255, 255, 255, 0.85) !important;
+/* No hover state — keep buttons visually static to avoid conflicts */
+.peptide-pdp .pdp-cfg__supply:hover,
+.peptide-pdp .pdp-cfg__supply:focus,
+.peptide-pdp .pdp-cfg__supply--active:hover,
+.peptide-pdp .pdp-cfg__supply--active:focus {
+	background: inherit !important;
+	border-color: inherit !important;
+	color: inherit !important;
+	outline: none;
 }
 
-.peptide-pdp .pdp-cfg__supply--active .pdp-cfg__supply-unit {
-	color: rgba(255, 255, 255, 0.6) !important;
-}
-
-.peptide-pdp .pdp-cfg__supply--active:hover {
-	background: #333 !important;
-	border-color: #333 !important;
+.peptide-pdp .pdp-cfg__supply {
+	transition: none;
 }
 
 .pdp-cfg__supply strong {
