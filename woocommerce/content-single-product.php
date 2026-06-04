@@ -17,9 +17,17 @@ $slug           = $product->get_slug();
 $weight_loss    = [ 'compound-semaglutide', 'compound-tirzepatide' ];
 $is_weight_loss = in_array( $slug, $weight_loss, true );
 
-// Suppress the "Please choose product options" notice on our custom PDP —
+$peptide_slugs = [
+	'bpc', 'motsc', 'epithalon', 'compound-injectable-nad',
+	'tesamorelin-ipamorelin', 'cjc1295-ipamorelin',
+	'klow-stack-bpc157-10mg-ghk-cu-50mg-tb50010mg-kpv-10mg',
+	'2606', 'compound-injectable-sermorelin', 'compound-injectable-glutathione',
+];
+$is_peptide = in_array( $slug, $peptide_slugs, true );
+
+// Suppress the "Please choose product options" notice on our custom PDPs —
 // it fires from the hidden WC form and confuses customers.
-if ( $is_weight_loss ) {
+if ( $is_weight_loss || $is_peptide ) {
 	remove_action( 'woocommerce_before_single_product', 'woocommerce_output_all_notices', 10 );
 }
 
@@ -530,6 +538,287 @@ if ( $is_weight_loss ) :
 		</div>
 	</section>
 
+
+</div>
+
+<?php do_action( 'woocommerce_after_single_product' ); ?>
+
+<?php elseif ( $is_peptide ) :
+
+	// ─── Per-product config ────────────────────────────────────────────────────
+	$peptide_config = [
+		'bpc'                     => [ 'name' => 'BPC-157',                  'badge' => 'Tissue &amp; Joint Recovery',    'desc' => 'BPC-157 is a synthetic peptide derived from a protective stomach protein, studied for its regenerative effects on tissue repair, joint health, and gut function.' ],
+		'motsc'                   => [ 'name' => 'MOTSc',                    'badge' => 'Mitochondrial Peptide',           'desc' => 'MOTSc is a mitochondrial-derived peptide that activates AMPK pathways, supporting energy metabolism, insulin sensitivity, and cellular resilience.' ],
+		'epithalon'               => [ 'name' => 'Epithalon',                'badge' => 'Longevity Peptide',               'desc' => 'Epithalon is a tetrapeptide that stimulates telomerase activity and regulates the pineal gland, supporting healthy aging and cellular longevity.' ],
+		'compound-injectable-nad' => [ 'name' => 'NAD+',                     'badge' => 'Cellular Energy Support',         'desc' => 'NAD+ is a critical coenzyme involved in cellular energy production, DNA repair, and sirtuin activation — supporting cognitive function, metabolism, and anti-aging pathways.' ],
+		'tesamorelin-ipamorelin'  => [ 'name' => 'Tesamorelin / Ipamorelin', 'badge' => 'GH Secretagogue Blend',           'desc' => 'A dual-action blend combining Tesamorelin (a GHRH analogue) with Ipamorelin (a GHRP), designed to pulse growth hormone release naturally and support lean body composition.' ],
+		'cjc1295-ipamorelin'      => [ 'name' => 'CJC-1295 / Ipamorelin',   'badge' => 'GH Secretagogue Blend',           'desc' => 'CJC-1295 extends the half-life of natural GH pulses while Ipamorelin provides a clean GH release — a popular stack for muscle recovery, fat loss, and sleep quality.' ],
+		'klow-stack-bpc157-10mg-ghk-cu-50mg-tb50010mg-kpv-10mg' => [ 'name' => 'KLOW Stack', 'badge' => 'Recovery Peptide Stack', 'desc' => 'The KLOW Stack combines BPC-157, GHK-Cu, TB-500, and KPV in a single vial — a comprehensive recovery peptide blend targeting tissue repair, inflammation, and systemic healing.' ],
+		'2606'                    => [ 'name' => 'Wolverine Stack',           'badge' => 'Recovery Peptide Stack',          'desc' => 'The Wolverine Stack pairs BPC-157 with TB-500 for accelerated recovery and tissue regeneration — a go-to protocol for musculoskeletal injuries and chronic inflammation.' ],
+		'compound-injectable-sermorelin'   => [ 'name' => 'Sermorelin',      'badge' => 'Growth Hormone Secretagogue',     'desc' => 'Sermorelin is a synthetic analogue of GHRH that stimulates natural growth hormone production, supporting sleep quality, lean mass, recovery, and metabolic health.' ],
+		'compound-injectable-glutathione'  => [ 'name' => 'Glutathione',     'badge' => 'Master Antioxidant Therapy',      'desc' => 'Glutathione is the body\'s master antioxidant, critical for oxidative stress management, immune function, and liver detoxification. Delivered as a sterile injectable for maximum bioavailability.' ],
+	];
+	$pcfg = $peptide_config[ $slug ];
+
+	// ─── Build supply map from live WC variation data ─────────────────────────
+	// Detect which supply attribute this product uses (pa_vial-wellness or pa_bottle).
+	$attrs           = $product->get_attributes();
+	$supply_attr_key = isset( $attrs['pa_vial-wellness'] ) ? 'pa_vial-wellness' : 'pa_bottle';
+	$supply_meta_key = 'attribute_' . $supply_attr_key;
+
+	$supply_label_map = [
+		'1-vial'   => '1 Vial',    '2-vial'   => '2 Vials',    '3-vial'   => '3 Vials',
+		'1-bottle' => '1 Bottle',  '2-bottle' => '2 Bottles',  '3-bottle' => '3 Bottles',
+	];
+	$supply_order = [
+		'1-vial' => 1, '1-bottle' => 1,
+		'2-vial' => 2, '2-bottle' => 2,
+		'3-vial' => 3, '3-bottle' => 3,
+	];
+
+	$supply_map = [];
+	foreach ( $product->get_children() as $vid ) {
+		$v = wc_get_product( $vid );
+		if ( ! $v || 'publish' !== get_post_status( $vid ) ) continue;
+		$supply_slug = get_post_meta( $vid, $supply_meta_key, true );
+		if ( ! $supply_slug ) continue;
+		$price = (float) $v->get_price();
+		if ( $price > 0 && ! isset( $supply_map[ $supply_slug ] ) ) {
+			$supply_map[ $supply_slug ] = [
+				'id'    => (int) $vid,
+				'price' => $price,
+				'label' => $supply_label_map[ $supply_slug ] ?? $supply_slug,
+			];
+		}
+	}
+	uksort( $supply_map, fn( $a, $b ) => ( $supply_order[ $a ] ?? 99 ) - ( $supply_order[ $b ] ?? 99 ) );
+
+	$supply_keys  = array_keys( $supply_map );
+	$last_supply  = ! empty( $supply_keys ) ? end( $supply_keys ) : '';
+
+	// ─── Image ────────────────────────────────────────────────────────────────
+	$image_id  = $product->get_image_id();
+	$image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'large' ) : '';
+
+	remove_action( 'woocommerce_before_single_product_summary', 'woocommerce_show_product_images', 20 );
+
+	$img_url = function( $path ) {
+		$base  = get_stylesheet_directory_uri() . '/assets/images/';
+		$parts = explode( '/', $path );
+		return esc_url( $base . implode( '/', array_map( 'rawurlencode', $parts ) ) );
+	};
+
+	$steps = [
+		[ 'num' => 'PDP Sections/1.png', 'img' => 'PDP Sections/form.png',         'title' => 'Questionnaire',                  'desc' => 'Answer a few questions and share your medical details' ],
+		[ 'num' => 'PDP Sections/2.png', 'img' => 'PDP Sections/consultation.png', 'title' => 'Review and Approved by provider',  'desc' => 'Discuss your goals and receive expert recommendations' ],
+		[ 'num' => 'PDP Sections/3.png', 'img' => 'PDP Sections/box.png',          'title' => 'Receive medication',               'desc' => 'Medication and supplies shipped straight to your door' ],
+		[ 'num' => 'PDP Sections/4.png', 'img' => 'PDP Sections/calendar.png',     'title' => 'Monthly Monitoring',               'desc' => 'Stay on track with regular free check-ins to ensure progress' ],
+	];
+
+?>
+
+<div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'myogenix-pdp peptide-pdp', $product ); ?>>
+
+	<!-- Product Hero -->
+	<section class="pdp-hero" id="buy">
+		<div class="pdp-hero__inner">
+
+			<div class="pdp-hero__left">
+				<span class="pdp-hero__badge"><?php echo $pcfg['badge']; ?></span>
+				<h1 class="pdp-hero__title"><?php echo esc_html( $pcfg['name'] ); ?></h1>
+				<p class="pdp-hero__desc"><?php echo esc_html( $pcfg['desc'] ); ?></p>
+				<ul class="pdp-hero__bullets">
+					<li>Compounded &middot; FDA-registered facility</li>
+					<li>Provider-reviewed &middot; Prescription required</li>
+				</ul>
+
+				<?php if ( $image_url ) : ?>
+				<div class="pdp-hero__image-card">
+					<img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $pcfg['name'] ); ?>" loading="lazy" />
+				</div>
+				<?php endif; ?>
+
+				<div class="pdp-hero__trust-grid">
+					<div class="pdp-hero__trust-item">
+						<span class="pdp-hero__trust-icon" aria-hidden="true">
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+						</span>
+						<div class="pdp-hero__trust-text"><strong>Licensed providers</strong><span>Board-certified MDs</span></div>
+					</div>
+					<div class="pdp-hero__trust-item">
+						<span class="pdp-hero__trust-icon" aria-hidden="true">
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+						</span>
+						<div class="pdp-hero__trust-text"><strong>Compounded in USA</strong><span>FDA-registered facility</span></div>
+					</div>
+					<div class="pdp-hero__trust-item">
+						<span class="pdp-hero__trust-icon" aria-hidden="true">
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+						</span>
+						<div class="pdp-hero__trust-text"><strong>Free shipping</strong><span>Discreet packaging</span></div>
+					</div>
+					<div class="pdp-hero__trust-item">
+						<span class="pdp-hero__trust-icon" aria-hidden="true">
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+						</span>
+						<div class="pdp-hero__trust-text"><strong>Ongoing support</strong><span>Message your care team</span></div>
+					</div>
+				</div>
+			</div>
+
+			<div class="pdp-hero__right">
+
+				<!-- Hidden WC form — keeps variation hooks alive for plugins -->
+				<div class="pdp-hero__wc-hidden" aria-hidden="true" inert>
+					<?php
+					do_action( 'woocommerce_before_single_product_summary' );
+					do_action( 'woocommerce_single_product_summary' );
+					?>
+				</div>
+
+				<!-- Peptide configurator -->
+				<div id="pdp-cfg" class="pdp-cfg"
+					data-product-id="<?php echo esc_attr( $product->get_id() ); ?>"
+					data-supply-map="<?php echo esc_attr( wp_json_encode( $supply_map ) ); ?>"
+					data-supply-attr="<?php echo esc_attr( $supply_meta_key ); ?>"
+				>
+					<p class="pdp-cfg__section-label">Supply</p>
+					<div class="pdp-cfg__supply-row">
+						<?php
+						$is_first = true;
+						foreach ( $supply_map as $s_slug => $s_entry ) :
+						?>
+						<button class="pdp-cfg__supply<?php echo $is_first ? ' pdp-cfg__supply--active' : ''; ?>"
+							data-supply="<?php echo esc_attr( $s_slug ); ?>">
+							<?php if ( $s_slug === $last_supply && count( $supply_map ) > 1 ) : ?>
+							<span class="pdp-cfg__popular-tag">POPULAR</span>
+							<?php endif; ?>
+							<strong><?php echo esc_html( $s_entry['label'] ); ?></strong>
+							<span class="pdp-cfg__supply-price">$<?php echo number_format( $s_entry['price'], 0 ); ?></span>
+						</button>
+						<?php
+						$is_first = false;
+						endforeach;
+						?>
+					</div>
+
+					<div id="peptide-summary" class="pdp-cfg__summary"></div>
+
+					<button id="pdp-cta" class="pdp-cfg__cta">Go to Checkout &rarr;</button>
+					<p id="pdp-disclaimer" class="pdp-cfg__disclaimer">
+						One-time purchase. Order reviewed by a licensed provider before processing.
+					</p>
+
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- 4 Steps -->
+	<section class="myogenix-pdp__steps">
+		<div class="myogenix-pdp__container">
+			<h2 class="myogenix-pdp__section-heading">Personalized Healthcare in 4 Simple Steps</h2>
+			<p class="myogenix-pdp__section-sub">Get started with no insurance required.</p>
+			<div class="myogenix-pdp__steps-grid">
+				<?php foreach ( $steps as $step ) : ?>
+				<div class="myogenix-pdp__step-card">
+					<img class="myogenix-pdp__step-num" src="<?php echo $img_url( $step['num'] ); ?>" alt="" aria-hidden="true" />
+					<img class="myogenix-pdp__step-img" src="<?php echo $img_url( $step['img'] ); ?>" alt="<?php echo esc_attr( $step['title'] ); ?>" />
+					<h3 class="myogenix-pdp__step-title"><?php echo esc_html( $step['title'] ); ?></h3>
+					<p class="myogenix-pdp__step-desc"><?php echo esc_html( $step['desc'] ); ?></p>
+				</div>
+				<?php endforeach; ?>
+			</div>
+		</div>
+	</section>
+
+	<!-- Common Questions -->
+	<section class="myogenix-pdp__cq">
+		<div class="myogenix-pdp__container">
+			<div class="myogenix-pdp__cq-inner">
+
+				<div class="myogenix-pdp__cq-left">
+					<p class="myogenix-pdp__cq-label">FAQ</p>
+					<h2 class="myogenix-pdp__cq-heading">Common questions</h2>
+					<p class="myogenix-pdp__cq-sub">Everything you need to know about peptide therapy, ordering, and what to expect.</p>
+					<a href="#buy" class="myogenix-pdp__cq-btn">Order now &rarr;</a>
+				</div>
+
+				<div class="myogenix-pdp__cq-right">
+					<div class="myogenix-pdp__cq-list">
+
+						<div class="myogenix-pdp__cq-item">
+							<button class="myogenix-pdp__cq-question" aria-expanded="true" aria-controls="pcq-0">
+								<span>How is this peptide administered?</span>
+								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
+							</button>
+							<div class="myogenix-pdp__cq-answer is-open" id="pcq-0">
+								<p>Your peptide is formulated as a sterile injectable solution and administered subcutaneously (under the skin) using a small insulin-style syringe. All necessary supplies — syringes, bacteriostatic water where required, and alcohol swabs — are included with your order.</p>
+							</div>
+						</div>
+
+						<div class="myogenix-pdp__cq-item">
+							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="pcq-1">
+								<span>How long until I see results?</span>
+								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
+							</button>
+							<div class="myogenix-pdp__cq-answer" id="pcq-1">
+								<p>Results vary by compound and individual. Tissue-repair peptides like BPC-157 and the Wolverine Stack often show faster response (2–4 weeks). Longer-acting agents like MOTSc, Epithalon, and Sermorelin may require 4–8 weeks of consistent use for the full effect to become apparent.</p>
+							</div>
+						</div>
+
+						<div class="myogenix-pdp__cq-item">
+							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="pcq-2">
+								<span>Why is a provider review required before my order ships?</span>
+								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
+							</button>
+							<div class="myogenix-pdp__cq-answer" id="pcq-2">
+								<p>We operate as a licensed telehealth clinic, not a supplement retailer. Every order is reviewed by a board-certified provider who confirms the compound and dose are appropriate for you before anything ships. This protects your safety and ensures you receive the correct protocol.</p>
+							</div>
+						</div>
+
+						<div class="myogenix-pdp__cq-item">
+							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="pcq-3">
+								<span>How do I store my peptide vials?</span>
+								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
+							</button>
+							<div class="myogenix-pdp__cq-answer" id="pcq-3">
+								<p>Lyophilized (dry) peptides can be stored at room temperature short-term or refrigerated for longer shelf life. After reconstitution with bacteriostatic water, store refrigerated at 2–8&deg;C and use within 28 days. Never freeze reconstituted peptides — freezing degrades peptide integrity.</p>
+							</div>
+						</div>
+
+						<div class="myogenix-pdp__cq-item">
+							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="pcq-4">
+								<span>How is this compounded and where does it ship from?</span>
+								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
+							</button>
+							<div class="myogenix-pdp__cq-answer" id="pcq-4">
+								<p>Your peptide is compounded by a licensed U.S. FDA-registered 503A compounding pharmacy as a sterile injectable solution. It ships directly to your door in temperature-controlled, discreet packaging with all necessary supplies included.</p>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</section>
+
+	<!-- Explore More Treatment Lines -->
+	<section class="myogenix-pdp__explore">
+		<div class="myogenix-pdp__container">
+			<h2 class="myogenix-pdp__section-heading">Explore More Treatment Lines</h2>
+			<p class="myogenix-pdp__section-sub">The telehealth provider of choice for holistic care.</p>
+			<div class="myogenix-pdp__explore-grid">
+				<a href="<?php echo esc_url( home_url( '/weight-management/' ) ); ?>" class="myogenix-pdp__explore-link">
+					<img src="<?php echo $img_url( 'PDP Sections/mens health.png' ); ?>" alt="Weight Management" />
+				</a>
+				<a href="<?php echo esc_url( home_url( '/womens-health/' ) ); ?>" class="myogenix-pdp__explore-link">
+					<img src="<?php echo $img_url( 'PDP Sections/womens health.png' ); ?>" alt="Women's Health" />
+				</a>
+			</div>
+		</div>
+	</section>
 
 </div>
 

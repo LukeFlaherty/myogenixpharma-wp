@@ -93,51 +93,73 @@ add_filter( 'woocommerce_get_item_data', function ( $item_data, $cart_item ) {
 	return $item_data;
 }, 10, 2 );
 
-// Replace cart/checkout item title with full multi-dose Rx name
-// e.g. TIRZEPATIDE - 10mg, 20mg, 40mg, 3 Bottle, 3 month
+// Replace cart/checkout item title for weight-management and peptide products.
 add_filter( 'woocommerce_cart_item_name', function ( $name, $cart_item, $cart_item_key ) {
-	$slug_to_drug = [
+	$parent_slug = get_post_field( 'post_name', $cart_item['product_id'] ?? 0 );
+
+	$wm_names = [
 		'compound-tirzepatide' => 'TIRZEPATIDE',
 		'compound-semaglutide' => 'SEMAGLUTIDE',
 		'compound-retatrutide' => 'RETATRUTIDE',
 	];
-	$parent_slug = get_post_field( 'post_name', $cart_item['product_id'] ?? 0 );
-	if ( ! isset( $slug_to_drug[ $parent_slug ] ) ) return $name;
+	$peptide_names = [
+		'bpc'                                                    => 'BPC-157',
+		'motsc'                                                  => 'MOTSc',
+		'epithalon'                                              => 'Epithalon',
+		'compound-injectable-nad'                                => 'NAD+',
+		'tesamorelin-ipamorelin'                                 => 'Tesamorelin / Ipamorelin',
+		'cjc1295-ipamorelin'                                     => 'CJC-1295 / Ipamorelin',
+		'klow-stack-bpc157-10mg-ghk-cu-50mg-tb50010mg-kpv-10mg' => 'KLOW Stack',
+		'2606'                                                   => 'Wolverine Stack',
+		'compound-injectable-sermorelin'                         => 'Sermorelin',
+		'compound-injectable-glutathione'                        => 'Glutathione',
+	];
 
-	$drug = $slug_to_drug[ $parent_slug ];
+	if ( isset( $wm_names[ $parent_slug ] ) ) {
+		$drug      = $wm_names[ $parent_slug ];
+		$variation  = $cart_item['variation'] ?? [];
+		$bottle_raw = $variation['attribute_pa_wm-bottle'] ?? $variation['attribute_pa_vial'] ?? '';
+		$bottle_num = (int) preg_replace( '/[^0-9]/', '', $bottle_raw );
+		if ( $bottle_num === 0 ) {
+			$bottle_num = count( array_filter( [
+				$cart_item['dose_month_1'] ?? '',
+				$cart_item['dose_month_2'] ?? '',
+				$cart_item['dose_month_3'] ?? '',
+			] ) );
+		}
+		$dose_fields = array_values( array_filter( array_map(
+			'myogenix_dose_display',
+			array_filter( [
+				$cart_item['dose_month_1'] ?? '',
+				$cart_item['dose_month_2'] ?? '',
+				$cart_item['dose_month_3'] ?? '',
+			] )
+		) ) );
+		$dose_str = ! empty( $dose_fields )
+			? ( count( array_unique( $dose_fields ) ) === 1 ? $dose_fields[0] : implode( ', ', $dose_fields ) )
+			: '';
+		$parts = array_filter( [
+			$dose_str,
+			$bottle_num ? $bottle_num . ' Bottle' : '',
+			$bottle_num ? $bottle_num . ' month'  : '',
+		] );
+		if ( ! $parts ) return $name;
+		$custom = esc_html( $drug . ' - ' . implode( ', ', $parts ) );
 
-	$variation  = $cart_item['variation'] ?? [];
-	$bottle_raw = $variation['attribute_pa_wm-bottle'] ?? $variation['attribute_pa_vial'] ?? '';
-	$bottle_num = (int) preg_replace( '/[^0-9]/', '', $bottle_raw );
-	// Bundle products are simple (no variation) — derive bottle count from filled dose months.
-	if ( $bottle_num === 0 ) {
-		$bottle_num = count( array_filter( [
-			$cart_item['dose_month_1'] ?? '',
-			$cart_item['dose_month_2'] ?? '',
-			$cart_item['dose_month_3'] ?? '',
-		] ) );
+	} elseif ( isset( $peptide_names[ $parent_slug ] ) ) {
+		$drug       = $peptide_names[ $parent_slug ];
+		$variation  = $cart_item['variation'] ?? [];
+		$supply_raw = $variation['attribute_pa_vial-wellness'] ?? $variation['attribute_pa_bottle'] ?? '';
+		$supply_map = [
+			'1-vial' => '1 vial', '2-vial' => '2 vials', '3-vial' => '3 vials',
+			'1-bottle' => '1 bottle', '2-bottle' => '2 bottles', '3-bottle' => '3 bottles',
+		];
+		$supply_str = $supply_map[ $supply_raw ] ?? '';
+		$custom = esc_html( $drug . ( $supply_str ? ' - ' . $supply_str : '' ) );
+
+	} else {
+		return $name;
 	}
-
-	$dose_fields = array_values( array_filter( array_map(
-		'myogenix_dose_display',
-		array_filter( [
-			$cart_item['dose_month_1'] ?? '',
-			$cart_item['dose_month_2'] ?? '',
-			$cart_item['dose_month_3'] ?? '',
-		] )
-	) ) );
-	$dose_str = ! empty( $dose_fields )
-		? ( count( array_unique( $dose_fields ) ) === 1 ? $dose_fields[0] : implode( ', ', $dose_fields ) )
-		: '';
-
-	$parts = array_filter( [
-		$dose_str,
-		$bottle_num ? $bottle_num . ' Bottle' : '',
-		$bottle_num ? $bottle_num . ' month'  : '',
-	] );
-	if ( ! $parts ) return $name;
-
-	$custom = esc_html( $drug . ' - ' . implode( ', ', $parts ) );
 
 	// Preserve the <a> link wrapper if WooCommerce already added one
 	if ( strpos( $name, '<a ' ) !== false ) {
@@ -223,6 +245,38 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( $item, $ca
 
 		$item->add_meta_data( 'Rx Summary', $rx_name );
 		$item->set_name( $rx_name );
+		return;
+	}
+
+	// Rx Summary for peptide products — supply count only, no dose escalation
+	$peptide_drug_names = [
+		'bpc'                                                    => 'BPC-157',
+		'motsc'                                                  => 'MOTSc',
+		'epithalon'                                              => 'Epithalon',
+		'compound-injectable-nad'                                => 'NAD+',
+		'tesamorelin-ipamorelin'                                 => 'Tesamorelin / Ipamorelin',
+		'cjc1295-ipamorelin'                                     => 'CJC-1295 / Ipamorelin',
+		'klow-stack-bpc157-10mg-ghk-cu-50mg-tb50010mg-kpv-10mg' => 'KLOW Stack',
+		'2606'                                                   => 'Wolverine Stack',
+		'compound-injectable-sermorelin'                         => 'Sermorelin',
+		'compound-injectable-glutathione'                        => 'Glutathione',
+	];
+	if ( isset( $peptide_drug_names[ $parent_slug ] ) ) {
+		$drug      = $peptide_drug_names[ $parent_slug ];
+		$variation = $values['variation'] ?? [];
+
+		$supply_slug = $variation['attribute_pa_vial-wellness'] ?? $variation['attribute_pa_bottle'] ?? '';
+		$supply_display = [
+			'1-vial' => '1 vial', '2-vial' => '2 vials', '3-vial' => '3 vials',
+			'1-bottle' => '1 bottle', '2-bottle' => '2 bottles', '3-bottle' => '3 bottles',
+		];
+		$supply_str = $supply_display[ $supply_slug ] ?? $supply_slug;
+
+		if ( $supply_str ) {
+			$rx_name = $drug . ' - ' . $supply_str;
+			$item->add_meta_data( 'Rx Summary', $rx_name );
+			$item->set_name( $rx_name );
+		}
 	}
 }, 10, 4 );
 
@@ -333,14 +387,36 @@ add_action( 'wp_enqueue_scripts', function() {
 			'1.3.7'
 		);
 	}
+
 	if ( $is_pdp || $is_rtd ) {
-		wp_enqueue_script(
-			'myogenix-pdp',
-			get_stylesheet_directory_uri() . '/assets/js/pdp.js',
-			[],
-			'1.3.9',
-			true
-		);
+		$product_slug = $is_pdp ? get_post_field( 'post_name', get_the_ID() ) : '';
+
+		$wm_slugs = [ 'compound-tirzepatide', 'compound-semaglutide', 'compound-retatrutide' ];
+		if ( $is_rtd || in_array( $product_slug, $wm_slugs, true ) ) {
+			wp_enqueue_script(
+				'myogenix-pdp',
+				get_stylesheet_directory_uri() . '/assets/js/pdp.js',
+				[],
+				'1.3.9',
+				true
+			);
+		}
+
+		$peptide_slugs = [
+			'bpc', 'motsc', 'epithalon', 'compound-injectable-nad',
+			'tesamorelin-ipamorelin', 'cjc1295-ipamorelin',
+			'klow-stack-bpc157-10mg-ghk-cu-50mg-tb50010mg-kpv-10mg',
+			'2606', 'compound-injectable-sermorelin', 'compound-injectable-glutathione',
+		];
+		if ( in_array( $product_slug, $peptide_slugs, true ) ) {
+			wp_enqueue_script(
+				'myogenix-peptide-pdp',
+				get_stylesheet_directory_uri() . '/assets/js/peptide-pdp.js',
+				[],
+				'1.0.0',
+				true
+			);
+		}
 	}
 } );
 
