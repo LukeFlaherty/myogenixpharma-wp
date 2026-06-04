@@ -441,8 +441,8 @@ do_action( 'woocommerce_before_single_product' );
 			<h2 class="myogenix-pdp__section-heading">Explore More Treatment Lines</h2>
 			<p class="myogenix-pdp__section-sub">The telehealth provider of choice for holistic care.</p>
 			<div class="myogenix-pdp__explore-grid">
-				<a href="<?php echo esc_url( home_url( '/weight-loss/' ) ); ?>" class="myogenix-pdp__explore-link">
-					<img src="<?php echo $img_url( 'PDP Sections/mens health.png' ); ?>" alt="Weight Management" />
+				<a href="<?php echo esc_url( home_url( '/mens-health/' ) ); ?>" class="myogenix-pdp__explore-link">
+					<img src="<?php echo $img_url( 'PDP Sections/mens health.png' ); ?>" alt="Men's Health" />
 				</a>
 				<a href="<?php echo esc_url( home_url( '/womens-health/' ) ); ?>" class="myogenix-pdp__explore-link">
 					<img src="<?php echo $img_url( 'PDP Sections/womens health.png' ); ?>" alt="Women's Health" />
