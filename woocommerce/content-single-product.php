@@ -547,16 +547,66 @@ if ( $is_weight_loss ) :
 
 	// ─── Per-product config ────────────────────────────────────────────────────
 	$peptide_config = [
-		'bpc'                     => [ 'name' => 'BPC-157',                  'badge' => 'Tissue &amp; Joint Recovery',    'desc' => 'BPC-157 is a synthetic peptide derived from a protective stomach protein, studied for its regenerative effects on tissue repair, joint health, and gut function.' ],
-		'motsc'                   => [ 'name' => 'MOTSc',                    'badge' => 'Mitochondrial Peptide',           'desc' => 'MOTSc is a mitochondrial-derived peptide that activates AMPK pathways, supporting energy metabolism, insulin sensitivity, and cellular resilience.' ],
-		'epithalon'               => [ 'name' => 'Epithalon',                'badge' => 'Longevity Peptide',               'desc' => 'Epithalon is a tetrapeptide that stimulates telomerase activity and regulates the pineal gland, supporting healthy aging and cellular longevity.' ],
-		'compound-injectable-nad' => [ 'name' => 'NAD+',                     'badge' => 'Cellular Energy Support',         'desc' => 'NAD+ is a critical coenzyme involved in cellular energy production, DNA repair, and sirtuin activation — supporting cognitive function, metabolism, and anti-aging pathways.' ],
-		'tesamorelin-ipamorelin'  => [ 'name' => 'Tesamorelin / Ipamorelin', 'badge' => 'GH Secretagogue Blend',           'desc' => 'A dual-action blend combining Tesamorelin (a GHRH analogue) with Ipamorelin (a GHRP), designed to pulse growth hormone release naturally and support lean body composition.' ],
-		'cjc1295-ipamorelin'      => [ 'name' => 'CJC-1295 / Ipamorelin',   'badge' => 'GH Secretagogue Blend',           'desc' => 'CJC-1295 extends the half-life of natural GH pulses while Ipamorelin provides a clean GH release — a popular stack for muscle recovery, fat loss, and sleep quality.' ],
-		'klow-stack-bpc157-10mg-ghk-cu-50mg-tb50010mg-kpv-10mg' => [ 'name' => 'KLOW Stack', 'badge' => 'Recovery Peptide Stack', 'desc' => 'The KLOW Stack combines BPC-157, GHK-Cu, TB-500, and KPV in a single vial — a comprehensive recovery peptide blend targeting tissue repair, inflammation, and systemic healing.' ],
-		'2606'                    => [ 'name' => 'Wolverine Stack',           'badge' => 'Recovery Peptide Stack',          'desc' => 'The Wolverine Stack pairs BPC-157 with TB-500 for accelerated recovery and tissue regeneration — a go-to protocol for musculoskeletal injuries and chronic inflammation.' ],
-		'compound-injectable-sermorelin'   => [ 'name' => 'Sermorelin',      'badge' => 'Growth Hormone Secretagogue',     'desc' => 'Sermorelin is a synthetic analogue of GHRH that stimulates natural growth hormone production, supporting sleep quality, lean mass, recovery, and metabolic health.' ],
-		'compound-injectable-glutathione'  => [ 'name' => 'Glutathione',     'badge' => 'Master Antioxidant Therapy',      'desc' => 'Glutathione is the body\'s master antioxidant, critical for oxidative stress management, immune function, and liver detoxification. Delivered as a sterile injectable for maximum bioavailability.' ],
+		'bpc' => [
+			'name'  => 'BPC-157',
+			'badge' => 'Tissue &amp; Joint Recovery',
+			'desc'  => 'BPC-157 is a synthetic peptide derived from a protective stomach protein, studied for its regenerative effects on tissue repair, joint health, and gut function.',
+			'spec'  => 'BPC-157 · 3mg/ml · 5ml per vial',
+		],
+		'motsc' => [
+			'name'  => 'MOTSc',
+			'badge' => 'Mitochondrial Peptide',
+			'desc'  => 'MOTSc is a mitochondrial-derived peptide that activates AMPK pathways, supporting energy metabolism, insulin sensitivity, and cellular resilience.',
+			'spec'  => 'MOTSc · 2mg/ml · 5ml per vial',
+		],
+		'epithalon' => [
+			'name'  => 'Epithalon',
+			'badge' => 'Longevity Peptide',
+			'desc'  => 'Epithalon is a tetrapeptide that stimulates telomerase activity and regulates the pineal gland, supporting healthy aging and cellular longevity.',
+			'spec'  => 'Epithalon · 2mg/ml · 5ml per vial',
+		],
+		'compound-injectable-nad' => [
+			'name'  => 'NAD+',
+			'badge' => 'Cellular Energy Support',
+			'desc'  => 'NAD+ is a critical coenzyme involved in cellular energy production, DNA repair, and sirtuin activation — supporting cognitive function, metabolism, and anti-aging pathways.',
+			'spec'  => 'NAD+ · 100mg/ml · 10ml per vial',
+		],
+		'tesamorelin-ipamorelin' => [
+			'name'  => 'Tesamorelin / Ipamorelin',
+			'badge' => 'GH Secretagogue Blend',
+			'desc'  => 'A dual-action blend combining Tesamorelin (a GHRH analogue) with Ipamorelin (a GHRP), designed to pulse growth hormone release naturally and support lean body composition.',
+			'spec'  => 'Tesamorelin 3mg + Ipamorelin 2mg · 5ml per vial',
+		],
+		'cjc1295-ipamorelin' => [
+			'name'  => 'CJC-1295 / Ipamorelin',
+			'badge' => 'GH Secretagogue Blend',
+			'desc'  => 'CJC-1295 extends the half-life of natural GH pulses while Ipamorelin provides a clean GH release — a popular stack for muscle recovery, fat loss, and sleep quality.',
+			'spec'  => 'CJC-1295 1.2mg + Ipamorelin 2mg · 5ml per vial',
+		],
+		'klow-stack-bpc157-10mg-ghk-cu-50mg-tb50010mg-kpv-10mg' => [
+			'name'  => 'KLOW Stack',
+			'badge' => 'Recovery Peptide Stack',
+			'desc'  => 'The KLOW Stack combines BPC-157, GHK-Cu, TB-500, and KPV in a single vial — a comprehensive recovery peptide blend targeting tissue repair, inflammation, and systemic healing.',
+			'spec'  => 'BPC-157 3mg / GHK-Cu 10mg / TB-500 3mg / KPV 3mg · 5ml per vial',
+		],
+		'2606' => [
+			'name'  => 'Wolverine Stack',
+			'badge' => 'Recovery Peptide Stack',
+			'desc'  => 'The Wolverine Stack pairs BPC-157 with TB-500 for accelerated recovery and tissue regeneration — a go-to protocol for musculoskeletal injuries and chronic inflammation.',
+			'spec'  => 'BPC-157 3mg + TB-500 3mg · 5ml per vial',
+		],
+		'compound-injectable-sermorelin' => [
+			'name'  => 'Sermorelin',
+			'badge' => 'Growth Hormone Secretagogue',
+			'desc'  => 'Sermorelin is a synthetic analogue of GHRH that stimulates natural growth hormone production, supporting sleep quality, lean mass, recovery, and metabolic health.',
+			'spec'  => 'Sermorelin · 10mg per vial',
+		],
+		'compound-injectable-glutathione' => [
+			'name'  => 'Glutathione',
+			'badge' => 'Master Antioxidant Therapy',
+			'desc'  => 'Glutathione is the body\'s master antioxidant, critical for oxidative stress management, immune function, and liver detoxification. Delivered as a sterile injectable for maximum bioavailability.',
+			'spec'  => 'Glutathione · 200mg/ml · 10ml per vial',
+		],
 	];
 	$pcfg = $peptide_config[ $slug ];
 
@@ -569,6 +619,11 @@ if ( $is_weight_loss ) :
 	$supply_label_map = [
 		'1-vial'   => '1 Vial',    '2-vial'   => '2 Vials',    '3-vial'   => '3 Vials',
 		'1-bottle' => '1 Bottle',  '2-bottle' => '2 Bottles',  '3-bottle' => '3 Bottles',
+	];
+	$supply_qty_map = [
+		'1-vial' => 1, '1-bottle' => 1,
+		'2-vial' => 2, '2-bottle' => 2,
+		'3-vial' => 3, '3-bottle' => 3,
 	];
 	$supply_order = [
 		'1-vial' => 1, '1-bottle' => 1,
@@ -588,13 +643,15 @@ if ( $is_weight_loss ) :
 				'id'    => (int) $vid,
 				'price' => $price,
 				'label' => $supply_label_map[ $supply_slug ] ?? $supply_slug,
+				'qty'   => $supply_qty_map[ $supply_slug ] ?? 1,
 			];
 		}
 	}
 	uksort( $supply_map, fn( $a, $b ) => ( $supply_order[ $a ] ?? 99 ) - ( $supply_order[ $b ] ?? 99 ) );
 
-	$supply_keys  = array_keys( $supply_map );
-	$last_supply  = ! empty( $supply_keys ) ? end( $supply_keys ) : '';
+	$supply_keys         = array_keys( $supply_map );
+	$last_supply         = ! empty( $supply_keys ) ? end( $supply_keys ) : '';
+	$single_supply_price = ! empty( $supply_keys ) ? ( $supply_map[ $supply_keys[0] ]['price'] ?? 0 ) : 0;
 
 	// ─── Image ────────────────────────────────────────────────────────────────
 	$image_id  = $product->get_image_id();
@@ -687,6 +744,10 @@ if ( $is_weight_loss ) :
 						<?php
 						$is_first = true;
 						foreach ( $supply_map as $s_slug => $s_entry ) :
+							$s_qty     = $s_entry['qty'];
+							$unit_noun = strpos( $s_slug, 'vial' ) !== false ? 'vial' : 'bottle';
+							$per_unit  = '$' . number_format( $s_entry['price'] / $s_qty, 0 ) . '/' . $unit_noun;
+							$s_savings = $s_qty > 1 ? (int) round( $single_supply_price * $s_qty - $s_entry['price'] ) : 0;
 						?>
 						<button class="pdp-cfg__supply<?php echo $is_first ? ' pdp-cfg__supply--active' : ''; ?>"
 							data-supply="<?php echo esc_attr( $s_slug ); ?>">
@@ -695,11 +756,36 @@ if ( $is_weight_loss ) :
 							<?php endif; ?>
 							<strong><?php echo esc_html( $s_entry['label'] ); ?></strong>
 							<span class="pdp-cfg__supply-price">$<?php echo number_format( $s_entry['price'], 0 ); ?></span>
+							<?php if ( $s_qty > 1 ) : ?>
+							<span class="pdp-cfg__supply-unit"><?php echo esc_html( $per_unit . ( $s_savings > 0 ? ' · Save $' . number_format( $s_savings, 0 ) : '' ) ); ?></span>
+							<?php endif; ?>
 						</button>
 						<?php
 						$is_first = false;
 						endforeach;
 						?>
+					</div>
+
+					<div class="peptide-cfg__includes">
+						<p class="peptide-cfg__includes-title">What's included</p>
+						<ul class="peptide-cfg__includes-list">
+							<li class="peptide-cfg__includes-item">
+								<span class="peptide-cfg__includes-icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+								<?php echo esc_html( $pcfg['spec'] ); ?>
+							</li>
+							<li class="peptide-cfg__includes-item">
+								<span class="peptide-cfg__includes-icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+								Syringes &amp; needles
+							</li>
+							<li class="peptide-cfg__includes-item">
+								<span class="peptide-cfg__includes-icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+								Alcohol prep pads
+							</li>
+							<li class="peptide-cfg__includes-item">
+								<span class="peptide-cfg__includes-icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+								Dosing protocol card
+							</li>
+						</ul>
 					</div>
 
 					<div id="peptide-summary" class="pdp-cfg__summary"></div>
