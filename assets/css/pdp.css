@@ -304,19 +304,36 @@
 	color: #fff !important;
 }
 
-/* No hover state — keep buttons visually static to avoid conflicts */
+/* Freeze all hover/focus states — unselected = white/dark, selected = dark/white */
 .peptide-pdp .pdp-cfg__supply:hover,
-.peptide-pdp .pdp-cfg__supply:focus,
+.peptide-pdp .pdp-cfg__supply:focus {
+	background: #fff !important;
+	border-color: var(--pdp-border, #e0e0e0) !important;
+	color: var(--pdp-dark, #1a1a1a) !important;
+	outline: none;
+}
+
+.peptide-pdp .pdp-cfg__supply:hover strong,
+.peptide-pdp .pdp-cfg__supply:focus strong {
+	color: var(--pdp-dark, #1a1a1a) !important;
+}
+
 .peptide-pdp .pdp-cfg__supply--active:hover,
 .peptide-pdp .pdp-cfg__supply--active:focus {
-	background: inherit !important;
-	border-color: inherit !important;
-	color: inherit !important;
+	background: var(--pdp-dark, #1a1a1a) !important;
+	border-color: var(--pdp-dark, #1a1a1a) !important;
+	color: #fff !important;
 	outline: none;
+}
+
+.peptide-pdp .pdp-cfg__supply--active:hover strong,
+.peptide-pdp .pdp-cfg__supply--active:focus strong {
+	color: #fff !important;
 }
 
 .peptide-pdp .pdp-cfg__supply {
 	transition: none;
+	cursor: pointer;
 }
 
 .pdp-cfg__supply strong {
@@ -1648,6 +1665,17 @@ a.rtd-bundle-atc {
 	flex-shrink: 0;
 	margin-top: 1px;
 	color: var(--pdp-dark, #1a1a1a);
+}
+
+/* Peptide summary sub-line (per-unit + savings) */
+.pdp-cfg__summary-sub {
+	font-size: 0.8125rem;
+	color: var(--pdp-muted, #666);
+}
+
+.pdp-cfg__summary-savings {
+	color: #1a7a3c;
+	font-weight: 700;
 }
 
 /* Per-unit price in the JS-rendered summary row */

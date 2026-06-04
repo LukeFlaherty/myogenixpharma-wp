@@ -384,7 +384,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
 			[],
-			'1.3.9'
+			'1.4.0'
 		);
 	}
 
@@ -397,7 +397,7 @@ add_action( 'wp_enqueue_scripts', function() {
 				'myogenix-pdp',
 				get_stylesheet_directory_uri() . '/assets/js/pdp.js',
 				[],
-				'1.3.9',
+				'1.4.0',
 				true
 			);
 		}
@@ -413,7 +413,7 @@ add_action( 'wp_enqueue_scripts', function() {
 				'myogenix-peptide-pdp',
 				get_stylesheet_directory_uri() . '/assets/js/peptide-pdp.js',
 				[],
-				'1.2.0',
+				'1.3.0',
 				true
 			);
 		}
