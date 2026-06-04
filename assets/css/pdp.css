@@ -279,6 +279,59 @@
 	color: #fff !important;
 }
 
+/* ── Peptide PDP: override WC/theme global button styles on supply buttons ── */
+
+.peptide-pdp .pdp-cfg__supply {
+	background: #fff !important;
+	color: var(--pdp-dark) !important;
+}
+
+.peptide-pdp .pdp-cfg__supply strong {
+	color: var(--pdp-dark) !important;
+}
+
+.peptide-pdp .pdp-cfg__supply span {
+	color: var(--pdp-muted) !important;
+}
+
+.peptide-pdp .pdp-cfg__supply:hover {
+	background: #f6f6f6 !important;
+	border-color: #bbb !important;
+	color: var(--pdp-dark) !important;
+}
+
+.peptide-pdp .pdp-cfg__supply:hover strong,
+.peptide-pdp .pdp-cfg__supply:hover span {
+	color: var(--pdp-dark) !important;
+}
+
+.peptide-pdp .pdp-cfg__supply:hover .pdp-cfg__popular-tag {
+	color: #fff !important;
+}
+
+.peptide-pdp .pdp-cfg__supply--active {
+	background: var(--pdp-dark) !important;
+	border-color: var(--pdp-dark) !important;
+	color: #fff !important;
+}
+
+.peptide-pdp .pdp-cfg__supply--active strong {
+	color: #fff !important;
+}
+
+.peptide-pdp .pdp-cfg__supply--active .pdp-cfg__supply-price {
+	color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.peptide-pdp .pdp-cfg__supply--active .pdp-cfg__supply-unit {
+	color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.peptide-pdp .pdp-cfg__supply--active:hover {
+	background: #333 !important;
+	border-color: #333 !important;
+}
+
 .pdp-cfg__supply strong {
 	font-size: 0.9375rem;
 	font-weight: 700;
@@ -1617,4 +1670,57 @@ a.rtd-bundle-atc {
 	font-weight: 400;
 	color: var(--pdp-muted, #666);
 	margin-top: 2px;
+}
+
+/* ── Peptide PDP: configurator card + summary overrides ──────────────────── */
+
+.peptide-pdp .pdp-cfg {
+	background: #fff;
+	border: 1.5px solid var(--pdp-border, #e0e0e0);
+	border-radius: 16px;
+	padding: 24px;
+}
+
+/* Override the pdp-cfg__summary background so it contrasts with the card */
+.peptide-pdp .pdp-cfg__summary {
+	background: var(--pdp-bg-sub, #f8f8f8);
+	border: 1px solid #ececec;
+	border-radius: 10px;
+	padding: 16px 18px;
+}
+
+/* Summary label (JS-rendered) */
+.peptide-pdp .pdp-cfg__summary .pdp-cfg__summary-label {
+	display: block;
+	font-size: 0.6875rem;
+	font-weight: 700;
+	letter-spacing: 0.09em;
+	text-transform: uppercase;
+	color: var(--pdp-muted, #666);
+	margin-bottom: 8px;
+}
+
+/* Summary total row: label left, price right */
+.peptide-pdp .pdp-cfg__summary .pdp-cfg__summary-total {
+	margin-top: 0;
+	padding-top: 0;
+	border-top: none;
+}
+
+/* Large total price */
+.peptide-pdp .pdp-cfg__summary .pdp-cfg__summary-total-price {
+	font-size: 1.5rem;
+	font-weight: 800;
+	color: var(--pdp-dark, #1a1a1a);
+	letter-spacing: -0.02em;
+}
+
+/* Supply row spacing inside the card */
+.peptide-pdp .pdp-cfg__supply-row {
+	padding-top: 10px;
+}
+
+/* Add a visual separator line above the summary inside the card */
+.peptide-pdp #peptide-summary {
+	margin-top: 4px;
 }

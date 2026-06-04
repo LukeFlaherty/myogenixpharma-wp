@@ -2,7 +2,7 @@
  * Peptide PDP configurator — supply-quantity selector.
  * Single-attribute peptide products (no dose escalation).
  * Reads config from data-* attributes on #pdp-cfg.
- * @version 1.1.0
+ * @version 1.2.0
  */
 ( function () {
 	'use strict';
@@ -44,17 +44,15 @@
 		var entry = supplyMap[ state.supply ];
 		if ( ! entry ) { el.innerHTML = ''; return; }
 
-		var qty       = entry.qty || 1;
-		var unitNoun  = state.supply.indexOf( 'vial' ) !== -1 ? 'vial' : 'bottle';
-		var perUnit   = '$' + Math.round( entry.price / qty ) + '/' + unitNoun;
-		var unitLine  = qty > 1 ? '<span class="pdp-cfg__summary-unit">' + perUnit + '</span>' : '';
+		var qty      = entry.qty || 1;
+		var unitNoun = state.supply.indexOf( 'vial' ) !== -1 ? 'vial' : 'bottle';
+		var perUnit  = '$' + Math.round( entry.price / qty ) + '/' + unitNoun;
 
 		el.innerHTML =
-			'<div class="pdp-cfg__summary-inner">' +
-				'<div class="pdp-cfg__summary-row pdp-cfg__summary-row--total">' +
-					'<span>' + entry.label + unitLine + '</span>' +
-					'<strong>' + fmt( entry.price ) + '</strong>' +
-				'</div>' +
+			'<span class="pdp-cfg__summary-label">' + entry.label + '</span>' +
+			'<div class="pdp-cfg__summary-total">' +
+				'<span>' + ( qty > 1 ? perUnit : 'One-time charge' ) + '</span>' +
+				'<strong class="pdp-cfg__summary-total-price">' + fmt( entry.price ) + '</strong>' +
 			'</div>';
 	}
 
