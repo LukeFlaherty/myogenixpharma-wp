@@ -158,7 +158,23 @@ add_filter( 'woocommerce_cart_item_name', function ( $name, $cart_item, $cart_it
 		$custom = esc_html( $drug . ( $supply_str ? ' - ' . $supply_str : '' ) );
 
 	} else {
-		return $name;
+		$sexual_health_names = [
+			'compound-oral-tadalafil' => 'Tadalafil',
+			'compound-sildenafil'     => 'Sildenafil',
+			'testosterone'            => 'Testosterone Cypionate',
+		];
+		if ( isset( $sexual_health_names[ $parent_slug ] ) ) {
+			$drug      = $sexual_health_names[ $parent_slug ];
+			$variation = $cart_item['variation'] ?? [];
+			$dosage    = $variation['attribute_pa_dosage']             ?? '';
+			$days      = $variation['attribute_pa_days']               ?? '';
+			$tablets   = $variation['attribute_pa_tablets']            ?? '';
+			$plan      = $variation['attribute_pa_subscription-plan']  ?? '';
+			$parts     = array_filter( [ $dosage, $days ?: $tablets ?: $plan ] );
+			$custom    = esc_html( $drug . ( $parts ? ' - ' . implode( ', ', $parts ) : '' ) );
+		} else {
+			return $name;
+		}
 	}
 
 	// Preserve the <a> link wrapper if WooCommerce already added one
@@ -274,6 +290,27 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( $item, $ca
 
 		if ( $supply_str ) {
 			$rx_name = $drug . ' - ' . $supply_str;
+			$item->add_meta_data( 'Rx Summary', $rx_name );
+			$item->set_name( $rx_name );
+		}
+		return;
+	}
+
+	$sexual_health_drug_names = [
+		'compound-oral-tadalafil' => 'Tadalafil',
+		'compound-sildenafil'     => 'Sildenafil',
+		'testosterone'            => 'Testosterone Cypionate',
+	];
+	if ( isset( $sexual_health_drug_names[ $parent_slug ] ) ) {
+		$drug      = $sexual_health_drug_names[ $parent_slug ];
+		$variation = $values['variation'] ?? [];
+		$dosage    = $variation['attribute_pa_dosage']            ?? '';
+		$days      = $variation['attribute_pa_days']              ?? '';
+		$tablets   = $variation['attribute_pa_tablets']           ?? '';
+		$plan      = $variation['attribute_pa_subscription-plan'] ?? '';
+		$parts     = array_filter( [ $dosage, $days ?: $tablets ?: $plan ] );
+		if ( $parts ) {
+			$rx_name = $drug . ' - ' . implode( ', ', $parts );
 			$item->add_meta_data( 'Rx Summary', $rx_name );
 			$item->set_name( $rx_name );
 		}
@@ -414,6 +451,17 @@ add_action( 'wp_enqueue_scripts', function() {
 				get_stylesheet_directory_uri() . '/assets/js/peptide-pdp.js',
 				[],
 				'1.3.0',
+				true
+			);
+		}
+
+		$sexual_health_slugs = [ 'compound-oral-tadalafil', 'compound-sildenafil', 'testosterone' ];
+		if ( in_array( $product_slug, $sexual_health_slugs, true ) ) {
+			wp_enqueue_script(
+				'myogenix-sexual-health-pdp',
+				get_stylesheet_directory_uri() . '/assets/js/sexual-health-pdp.js',
+				[],
+				'1.0.0',
 				true
 			);
 		}

@@ -25,9 +25,12 @@ $peptide_slugs = [
 ];
 $is_peptide = in_array( $slug, $peptide_slugs, true );
 
+$sexual_health_slugs = [ 'compound-oral-tadalafil', 'compound-sildenafil', 'testosterone' ];
+$is_sexual_health    = in_array( $slug, $sexual_health_slugs, true );
+
 // Suppress the "Please choose product options" notice on our custom PDPs —
 // it fires from the hidden WC form and confuses customers.
-if ( $is_weight_loss || $is_peptide ) {
+if ( $is_weight_loss || $is_peptide || $is_sexual_health ) {
 	remove_action( 'woocommerce_before_single_product', 'woocommerce_output_all_notices', 10 );
 }
 
@@ -872,6 +875,381 @@ if ( $is_weight_loss ) :
 							</button>
 							<div class="myogenix-pdp__cq-answer" id="pcq-4">
 								<p>Your peptide is compounded by a licensed U.S. FDA-registered 503A compounding pharmacy as a sterile injectable solution. It ships directly to your door in temperature-controlled, discreet packaging with all necessary supplies included.</p>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</section>
+
+	<!-- Explore More Treatment Lines -->
+	<section class="myogenix-pdp__explore">
+		<div class="myogenix-pdp__container">
+			<h2 class="myogenix-pdp__section-heading">Explore More Treatment Lines</h2>
+			<p class="myogenix-pdp__section-sub">The telehealth provider of choice for holistic care.</p>
+			<div class="myogenix-pdp__explore-grid">
+				<a href="<?php echo esc_url( home_url( '/weight-management/' ) ); ?>" class="myogenix-pdp__explore-link">
+					<img src="<?php echo $img_url( 'PDP Sections/mens health.png' ); ?>" alt="Weight Management" />
+				</a>
+				<a href="<?php echo esc_url( home_url( '/womens-health/' ) ); ?>" class="myogenix-pdp__explore-link">
+					<img src="<?php echo $img_url( 'PDP Sections/womens health.png' ); ?>" alt="Women's Health" />
+				</a>
+			</div>
+		</div>
+	</section>
+
+</div>
+
+<?php do_action( 'woocommerce_after_single_product' ); ?>
+
+<?php elseif ( $is_sexual_health ) :
+
+	// ─── Per-product config ────────────────────────────────────────────────────
+	$sexual_health_config = [
+		'compound-oral-tadalafil' => [
+			'name'            => 'Tadalafil',
+			'badge'           => 'Sexual Health',
+			'desc'            => 'Tadalafil (generic Cialis) is a PDE5 inhibitor prescribed for erectile dysfunction and benign prostatic hyperplasia. It provides long-lasting support — up to 36 hours — and is available as a lower-dose daily option.',
+			'includes'        => [
+				'90 compounded oral tablets',
+				'Dosing protocol card',
+			],
+			'primary_attr'    => 'pa_dosage',
+			'primary_label'   => 'Select Dosage',
+			'secondary_attr'  => null,
+			'secondary_label' => null,
+			'fixed_attrs'     => [ 'attribute_pa_tablets' => '90-tablets' ],
+		],
+		'compound-sildenafil' => [
+			'name'            => 'Sildenafil',
+			'badge'           => 'Sexual Health',
+			'desc'            => 'Sildenafil (generic Viagra) is a PDE5 inhibitor that increases blood flow to support erections when sexually stimulated. Fast-acting, widely studied, and available in multiple strengths.',
+			'includes'        => [
+				'Compounded oral sildenafil tablets',
+				'Dosing protocol card',
+			],
+			'primary_attr'    => 'pa_dosage',
+			'primary_label'   => 'Select Dosage',
+			'secondary_attr'  => 'pa_days',
+			'secondary_label' => 'Supply Length',
+			'fixed_attrs'     => [],
+		],
+		'testosterone' => [
+			'name'            => 'Testosterone Cypionate',
+			'badge'           => 'Hormone Therapy',
+			'desc'            => 'Testosterone Cypionate is a long-acting injectable testosterone used to treat hypogonadism (low T). It supports energy levels, muscle mass, libido, mood, and overall wellbeing.',
+			'includes'        => [
+				'Testosterone Cypionate injectable &middot; multi-dose vial',
+				'Syringes &amp; needles',
+				'Alcohol prep pads',
+				'Dosing protocol card',
+			],
+			'primary_attr'    => 'pa_subscription-plan',
+			'primary_label'   => 'Subscription Plan',
+			'secondary_attr'  => null,
+			'secondary_label' => null,
+			'fixed_attrs'     => [],
+		],
+	];
+	$shcfg = $sexual_health_config[ $slug ];
+
+	// ─── Build variation matrix from live WC data ──────────────────────────────
+	$attrs            = $product->get_attributes();
+	$primary_attr_key   = 'attribute_' . $shcfg['primary_attr'];
+	$secondary_attr_key = $shcfg['secondary_attr'] ? 'attribute_' . $shcfg['secondary_attr'] : null;
+
+	// Build label maps from WC attribute terms
+	$primary_labels   = [];
+	$secondary_labels = [];
+	if ( isset( $attrs[ $shcfg['primary_attr'] ] ) ) {
+		foreach ( $attrs[ $shcfg['primary_attr'] ]->get_terms() ?: [] as $t ) {
+			$primary_labels[ $t->slug ] = $t->name;
+		}
+	}
+	if ( $shcfg['secondary_attr'] && isset( $attrs[ $shcfg['secondary_attr'] ] ) ) {
+		foreach ( $attrs[ $shcfg['secondary_attr'] ]->get_terms() ?: [] as $t ) {
+			$secondary_labels[ $t->slug ] = $t->name;
+		}
+	}
+
+	// Build variation matrix: 1D { primary_slug: {id, price} } or 2D { primary_slug: { secondary_slug: {id, price} } }
+	$variation_matrix = [];
+	foreach ( $product->get_children() as $vid ) {
+		$v = wc_get_product( $vid );
+		if ( ! $v || 'publish' !== get_post_status( $vid ) ) continue;
+		$primary_slug = get_post_meta( $vid, $primary_attr_key, true );
+		if ( ! $primary_slug ) continue;
+		$price = (float) $v->get_price();
+		if ( $price <= 0 ) continue;
+
+		if ( $secondary_attr_key ) {
+			$secondary_slug = get_post_meta( $vid, $secondary_attr_key, true );
+			if ( ! $secondary_slug ) continue;
+			if ( ! isset( $variation_matrix[ $primary_slug ][ $secondary_slug ] ) ) {
+				$variation_matrix[ $primary_slug ][ $secondary_slug ] = [
+					'id'    => (int) $vid,
+					'price' => $price,
+				];
+			}
+		} else {
+			if ( ! isset( $variation_matrix[ $primary_slug ] ) ) {
+				$variation_matrix[ $primary_slug ] = [
+					'id'    => (int) $vid,
+					'price' => $price,
+				];
+			}
+		}
+	}
+
+	// Sort primary keys by term menu_order (preserves WP Admin ordering)
+	$primary_order = array_keys( $primary_labels );
+	uksort( $variation_matrix, function ( $a, $b ) use ( $primary_order ) {
+		return array_search( $a, $primary_order ) - array_search( $b, $primary_order );
+	} );
+
+	$primary_keys   = array_keys( $variation_matrix );
+	$secondary_keys = $secondary_attr_key && ! empty( $primary_keys )
+		? array_keys( $variation_matrix[ $primary_keys[0] ] )
+		: [];
+	$last_secondary = ! empty( $secondary_keys ) ? end( $secondary_keys ) : '';
+
+	// ─── Image ────────────────────────────────────────────────────────────────
+	$image_id  = $product->get_image_id();
+	$image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'large' ) : '';
+
+	remove_action( 'woocommerce_before_single_product_summary', 'woocommerce_show_product_images', 20 );
+
+	$img_url = function( $path ) {
+		$base  = get_stylesheet_directory_uri() . '/assets/images/';
+		$parts = explode( '/', $path );
+		return esc_url( $base . implode( '/', array_map( 'rawurlencode', $parts ) ) );
+	};
+
+	$steps = [
+		[ 'num' => 'PDP Sections/1.png', 'img' => 'PDP Sections/form.png',         'title' => 'Questionnaire',                  'desc' => 'Answer a few questions and share your medical details' ],
+		[ 'num' => 'PDP Sections/2.png', 'img' => 'PDP Sections/consultation.png', 'title' => 'Review and Approved by provider',  'desc' => 'Discuss your goals and receive expert recommendations' ],
+		[ 'num' => 'PDP Sections/3.png', 'img' => 'PDP Sections/box.png',          'title' => 'Receive medication',               'desc' => 'Medication and supplies shipped straight to your door' ],
+		[ 'num' => 'PDP Sections/4.png', 'img' => 'PDP Sections/calendar.png',     'title' => 'Monthly Monitoring',               'desc' => 'Stay on track with regular free check-ins to ensure progress' ],
+	];
+
+?>
+
+<div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'myogenix-pdp sexual-health-pdp', $product ); ?>>
+
+	<!-- Product Hero -->
+	<section class="pdp-hero" id="buy">
+		<div class="pdp-hero__inner">
+
+			<div class="pdp-hero__left">
+				<span class="pdp-hero__badge"><?php echo $shcfg['badge']; ?></span>
+				<h1 class="pdp-hero__title"><?php echo esc_html( $shcfg['name'] ); ?></h1>
+				<p class="pdp-hero__desc"><?php echo esc_html( $shcfg['desc'] ); ?></p>
+				<ul class="pdp-hero__bullets">
+					<li>Compounded &middot; FDA-registered facility</li>
+					<li>Provider-reviewed &middot; Prescription required</li>
+				</ul>
+
+				<?php if ( $image_url ) : ?>
+				<div class="pdp-hero__image-card">
+					<img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $shcfg['name'] ); ?>" loading="lazy" />
+				</div>
+				<?php endif; ?>
+
+				<div class="pdp-hero__trust-grid">
+					<div class="pdp-hero__trust-item">
+						<span class="pdp-hero__trust-icon" aria-hidden="true">
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+						</span>
+						<div class="pdp-hero__trust-text"><strong>Licensed providers</strong><span>Board-certified MDs</span></div>
+					</div>
+					<div class="pdp-hero__trust-item">
+						<span class="pdp-hero__trust-icon" aria-hidden="true">
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+						</span>
+						<div class="pdp-hero__trust-text"><strong>Compounded in USA</strong><span>FDA-registered facility</span></div>
+					</div>
+					<div class="pdp-hero__trust-item">
+						<span class="pdp-hero__trust-icon" aria-hidden="true">
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+						</span>
+						<div class="pdp-hero__trust-text"><strong>Free shipping</strong><span>Discreet packaging</span></div>
+					</div>
+					<div class="pdp-hero__trust-item">
+						<span class="pdp-hero__trust-icon" aria-hidden="true">
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+						</span>
+						<div class="pdp-hero__trust-text"><strong>Ongoing support</strong><span>Message your care team</span></div>
+					</div>
+				</div>
+			</div>
+
+			<div class="pdp-hero__right">
+
+				<!-- Hidden WC form — keeps variation hooks alive for plugins -->
+				<div class="pdp-hero__wc-hidden" aria-hidden="true" inert>
+					<?php
+					do_action( 'woocommerce_before_single_product_summary' );
+					do_action( 'woocommerce_single_product_summary' );
+					?>
+				</div>
+
+				<!-- Sexual health configurator -->
+				<div id="pdp-cfg" class="pdp-cfg"
+					data-product-id="<?php echo esc_attr( $product->get_id() ); ?>"
+					data-variation-matrix="<?php echo esc_attr( wp_json_encode( $variation_matrix ) ); ?>"
+					data-primary-attr="<?php echo esc_attr( $primary_attr_key ); ?>"
+					data-secondary-attr="<?php echo esc_attr( $secondary_attr_key ?? '' ); ?>"
+					data-fixed-attrs="<?php echo esc_attr( wp_json_encode( $shcfg['fixed_attrs'] ) ); ?>"
+					data-primary-labels="<?php echo esc_attr( wp_json_encode( $primary_labels ) ); ?>"
+					data-secondary-labels="<?php echo esc_attr( wp_json_encode( $secondary_labels ) ); ?>"
+				>
+					<!-- Primary selector (dosage or plan) -->
+					<p class="pdp-cfg__section-label"><?php echo esc_html( $shcfg['primary_label'] ); ?></p>
+					<div class="pdp-cfg__supply-row">
+						<?php
+						$is_first = true;
+						foreach ( $primary_keys as $p_slug ) :
+						?>
+						<button class="pdp-cfg__supply sh-pdp__primary-btn<?php echo $is_first ? ' pdp-cfg__supply--active' : ''; ?>"
+							data-primary="<?php echo esc_attr( $p_slug ); ?>">
+							<strong><?php echo esc_html( $primary_labels[ $p_slug ] ?? $p_slug ); ?></strong>
+						</button>
+						<?php
+						$is_first = false;
+						endforeach;
+						?>
+					</div>
+
+					<?php if ( $secondary_attr_key && ! empty( $secondary_keys ) ) : ?>
+					<!-- Secondary selector (days / supply length) -->
+					<p class="pdp-cfg__section-label"><?php echo esc_html( $shcfg['secondary_label'] ); ?></p>
+					<div class="pdp-cfg__supply-row">
+						<?php
+						$is_first = true;
+						foreach ( $secondary_keys as $s_slug ) :
+						?>
+						<button class="pdp-cfg__supply sh-pdp__secondary-btn<?php echo $is_first ? ' pdp-cfg__supply--active' : ''; ?>"
+							data-secondary="<?php echo esc_attr( $s_slug ); ?>">
+							<?php if ( $s_slug === $last_secondary && count( $secondary_keys ) > 1 ) : ?>
+							<span class="pdp-cfg__popular-tag">POPULAR</span>
+							<?php endif; ?>
+							<strong><?php echo esc_html( $secondary_labels[ $s_slug ] ?? $s_slug ); ?></strong>
+						</button>
+						<?php
+						$is_first = false;
+						endforeach;
+						?>
+					</div>
+					<?php endif; ?>
+
+					<!-- What's included -->
+					<div class="peptide-cfg__includes">
+						<p class="peptide-cfg__includes-title">What's included</p>
+						<ul class="peptide-cfg__includes-list">
+							<?php foreach ( $shcfg['includes'] as $include_item ) : ?>
+							<li class="peptide-cfg__includes-item">
+								<span class="peptide-cfg__includes-icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+								<?php echo $include_item; ?>
+							</li>
+							<?php endforeach; ?>
+						</ul>
+					</div>
+
+					<div id="sh-summary" class="pdp-cfg__summary"></div>
+
+					<button id="pdp-cta" class="pdp-cfg__cta">Go to Checkout &rarr;</button>
+					<p id="pdp-disclaimer" class="pdp-cfg__disclaimer">
+						One-time purchase. Order reviewed by a licensed provider before processing.
+					</p>
+
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- 4 Steps -->
+	<section class="myogenix-pdp__steps">
+		<div class="myogenix-pdp__container">
+			<h2 class="myogenix-pdp__section-heading">Personalized Healthcare in 4 Simple Steps</h2>
+			<p class="myogenix-pdp__section-sub">Get started with no insurance required.</p>
+			<div class="myogenix-pdp__steps-grid">
+				<?php foreach ( $steps as $step ) : ?>
+				<div class="myogenix-pdp__step-card">
+					<img class="myogenix-pdp__step-num" src="<?php echo $img_url( $step['num'] ); ?>" alt="" aria-hidden="true" />
+					<img class="myogenix-pdp__step-img" src="<?php echo $img_url( $step['img'] ); ?>" alt="<?php echo esc_attr( $step['title'] ); ?>" />
+					<h3 class="myogenix-pdp__step-title"><?php echo esc_html( $step['title'] ); ?></h3>
+					<p class="myogenix-pdp__step-desc"><?php echo esc_html( $step['desc'] ); ?></p>
+				</div>
+				<?php endforeach; ?>
+			</div>
+		</div>
+	</section>
+
+	<!-- Common Questions -->
+	<section class="myogenix-pdp__cq">
+		<div class="myogenix-pdp__container">
+			<div class="myogenix-pdp__cq-inner">
+
+				<div class="myogenix-pdp__cq-left">
+					<p class="myogenix-pdp__cq-label">FAQ</p>
+					<h2 class="myogenix-pdp__cq-heading">Common questions</h2>
+					<p class="myogenix-pdp__cq-sub">What you need to know about sexual health and hormone therapy ordering.</p>
+					<a href="#buy" class="myogenix-pdp__cq-btn">Order now &rarr;</a>
+				</div>
+
+				<div class="myogenix-pdp__cq-right">
+					<div class="myogenix-pdp__cq-list">
+
+						<div class="myogenix-pdp__cq-item">
+							<button class="myogenix-pdp__cq-question" aria-expanded="true" aria-controls="shcq-0">
+								<span>How is this medication prescribed and delivered?</span>
+								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
+							</button>
+							<div class="myogenix-pdp__cq-answer is-open" id="shcq-0">
+								<p>You complete a short health questionnaire online. A licensed provider reviews your order and, if appropriate, issues a prescription through our telehealth platform. Your medication is then compounded and shipped directly to your door in discreet packaging — no pharmacy visit required.</p>
+							</div>
+						</div>
+
+						<div class="myogenix-pdp__cq-item">
+							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="shcq-1">
+								<span>How quickly does it start working?</span>
+								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
+							</button>
+							<div class="myogenix-pdp__cq-answer" id="shcq-1">
+								<p>Onset time varies by compound. Sildenafil typically takes effect within 30–60 minutes and lasts 4–6 hours. Tadalafil has a longer onset of 1–2 hours but can remain effective for up to 36 hours, making it suitable for daily low-dose use. Testosterone Cypionate builds to therapeutic levels over 2–4 weeks of consistent treatment.</p>
+							</div>
+						</div>
+
+						<div class="myogenix-pdp__cq-item">
+							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="shcq-2">
+								<span>Why is a provider review required before my order ships?</span>
+								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
+							</button>
+							<div class="myogenix-pdp__cq-answer" id="shcq-2">
+								<p>We operate as a licensed telehealth clinic, not a supplement retailer. Every order is reviewed by a board-certified provider who confirms the compound, dose, and any contraindications before anything ships. This protects your safety and ensures you receive the correct protocol for your specific situation.</p>
+							</div>
+						</div>
+
+						<div class="myogenix-pdp__cq-item">
+							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="shcq-3">
+								<span>Do I need a new consultation for every refill?</span>
+								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
+							</button>
+							<div class="myogenix-pdp__cq-answer" id="shcq-3">
+								<p>No. Once your prescription is established, refills are straightforward. Your provider may request a brief check-in every few months to review your response and adjust dosing if needed — but there is no full consultation required for standard refills within an active treatment plan.</p>
+							</div>
+						</div>
+
+						<div class="myogenix-pdp__cq-item">
+							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="shcq-4">
+								<span>How is this compounded and where does it ship from?</span>
+								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
+							</button>
+							<div class="myogenix-pdp__cq-answer" id="shcq-4">
+								<p>All medications are compounded by a licensed U.S. FDA-registered 503A compounding pharmacy. Orders ship directly to your door in temperature-controlled, discreet packaging. All required supplies (syringes, prep pads, or dosing guides, depending on the product) are included.</p>
 							</div>
 						</div>
 
