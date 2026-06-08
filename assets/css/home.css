@@ -339,6 +339,13 @@ html {
   }
 }
 
+/* Full-width category box (peptides spans both columns on ≥640px) */
+@media (min-width: 640px) {
+  .hp-catbox--full {
+    grid-column: 1 / -1;
+  }
+}
+
 /* Category box card */
 .hp-catbox {
   background: #fff;
@@ -615,12 +622,16 @@ html {
   font-weight: 700;
   color: #000;
   margin-top: 4px;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 .hp-arrival-card__benefit {
   font-size: 12px;
   color: #71717a;
   line-height: 1.6;
   margin-top: 4px;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 .hp-arrival-card__foot {
   display: flex;

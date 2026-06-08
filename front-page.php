@@ -79,22 +79,18 @@ $hp_categories = [
 	[
 		'title'    => 'Mens Health',
 		'shop_url' => '/product-category/mens-health/',
-		'products' => [ 'testosterone', 'tadalafil', 'sildenafil', 'testosterone' ],
+		'products' => [ 'testosterone', 'tadalafil', 'sildenafil' ],
 	],
 	[
 		'title'    => 'Weight Loss',
 		'shop_url' => '/product-category/weight-loss/',
-		'products' => [ 'tirzepatide', 'semaglutide', 'tirzepatide', 'semaglutide' ],
-	],
-	[
-		'title'    => 'Sexual Health',
-		'shop_url' => '/product-category/sexual-health/',
-		'products' => [ 'tadalafil', 'sildenafil', 'tadalafil', 'sildenafil' ],
+		'products' => [ 'tirzepatide', 'semaglutide' ],
 	],
 	[
 		'title'    => 'Peptides',
 		'shop_url' => '/product-category/peptides-longevity/',
 		'products' => [ 'wolverine', 'tesamorelin', 'klow', 'glow' ],
+		'full'     => true,
 	],
 ];
 
@@ -253,7 +249,7 @@ $year        = (int) date( 'Y' );
 <section class="home-categories" aria-label="Programs">
 	<div class="home-categories__grid">
 		<?php foreach ( $hp_categories as $cat ) : ?>
-		<div class="hp-catbox">
+		<div class="hp-catbox<?php echo ! empty( $cat['full'] ) ? ' hp-catbox--full' : ''; ?>">
 			<div class="hp-catbox__header">
 				<h2 class="hp-catbox__title"><?php echo esc_html( $cat['title'] ); ?></h2>
 				<a href="<?php echo esc_url( home_url( $cat['shop_url'] ) ); ?>" class="hp-catbox__shopall">Shop all →</a>
@@ -299,7 +295,6 @@ $year        = (int) date( 'Y' );
 				</div>
 				<div class="hp-arrival-card__body">
 					<div class="hp-arrival-card__top">
-						<p class="hp-arrival-card__overline"><?php echo esc_html( $arr['generic'] ); ?></p>
 						<h3 class="hp-arrival-card__name"><?php echo esc_html( $m['name'] ); ?></h3>
 						<p class="hp-arrival-card__benefit"><?php echo esc_html( $arr['benefit'] ); ?></p>
 					</div>
