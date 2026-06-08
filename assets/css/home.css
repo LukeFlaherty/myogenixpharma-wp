@@ -486,6 +486,31 @@ html {
   background: #3f3f46;
 }
 
+/* Coming soon placeholder card */
+.hp-card--coming-soon {
+  border-style: dashed;
+  cursor: default;
+  pointer-events: none;
+}
+.hp-card--coming-soon:hover {
+  border-color: #e4e4e7;
+  box-shadow: none;
+}
+.hp-card--coming-soon .hp-card__img-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fafafa;
+}
+.hp-card__coming-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: #a1a1aa;
+  background: #f4f4f5;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
 /* =========================================================
    NEW ARRIVALS
    ========================================================= */

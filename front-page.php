@@ -13,6 +13,9 @@ $hp_ids = [
 	'tesamorelin'  => 2803,
 	'klow'         => 2819,
 	'glow'         => 1868,
+	'bpc'          => 4249,
+	'motsc'        => 4253,
+	'epithalon'    => 4257,
 	'tadalafil'    => 1886,
 	'sildenafil'   => 1883,
 	'testosterone' => 883,
@@ -25,6 +28,9 @@ $hp_meta = [
 	'tesamorelin'  => [ 'name' => 'Tesamorelin',    'tagline' => 'GH optimization',              'unit' => '/vial' ],
 	'klow'         => [ 'name' => 'Klow',           'tagline' => 'Metabolic support',            'unit' => '/vial' ],
 	'glow'         => [ 'name' => 'Glow',           'tagline' => 'Longevity & renewal',          'unit' => '/vial' ],
+	'bpc'          => [ 'name' => 'BPC-157',        'tagline' => 'Healing & repair',             'unit' => '/vial' ],
+	'motsc'        => [ 'name' => 'MOTSc',          'tagline' => 'Mitochondrial health',         'unit' => '/vial' ],
+	'epithalon'    => [ 'name' => 'Epithalon',      'tagline' => 'Longevity peptide',            'unit' => '/vial' ],
 	'tadalafil'    => [ 'name' => 'Tadalafil',      'tagline' => 'Daily ED support',             'unit' => '/mo'   ],
 	'sildenafil'   => [ 'name' => 'Sildenafil',     'tagline' => 'Fast-acting ED treatment',     'unit' => '/mo'   ],
 	'testosterone' => [ 'name' => 'Testosterone',   'tagline' => 'Hormone optimization',         'unit' => '/mo'   ],
@@ -89,7 +95,7 @@ $hp_categories = [
 	[
 		'title'    => 'Peptides',
 		'shop_url' => '/product-category/peptides-longevity/',
-		'products' => [ 'wolverine', 'tesamorelin', 'klow', 'glow' ],
+		'products' => [ 'wolverine', 'tesamorelin', 'klow', 'glow', 'bpc', 'motsc', 'epithalon' ],
 		'full'     => true,
 	],
 ];
@@ -256,9 +262,30 @@ $year        = (int) date( 'Y' );
 			</div>
 			<div class="hp-catbox__scroll-wrap">
 				<div class="hp-catbox__scroll">
-					<?php foreach ( $cat['products'] as $pkey ) {
-						echo hp_product_card( $pkey, $hp_products, $hp_meta );
-					} ?>
+					<?php
+					$rendered = 0;
+					foreach ( $cat['products'] as $pkey ) {
+						$card = hp_product_card( $pkey, $hp_products, $hp_meta );
+						if ( $card ) { echo $card; $rendered++; }
+					}
+					// Pad to minimum 3 with "coming soon" placeholders
+					for ( $i = $rendered; $i < 3; $i++ ) : ?>
+					<div class="hp-card hp-card--coming-soon" aria-label="Coming soon">
+						<div class="hp-card__img-wrap">
+							<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 48 48" aria-hidden="true" width="48" height="48">
+								<circle cx="24" cy="24" r="16" stroke="#d4d4d8" stroke-width="1.5" stroke-dasharray="4 3"/>
+								<path d="M24 16v8M24 28v2" stroke="#d4d4d8" stroke-width="1.5" stroke-linecap="round"/>
+							</svg>
+						</div>
+						<div class="hp-card__body">
+							<div class="hp-card__name" style="color:#a1a1aa;">More coming</div>
+							<div class="hp-card__tag">New products may be on the way</div>
+							<div class="hp-card__foot">
+								<span class="hp-card__coming-tag">Soon</span>
+							</div>
+						</div>
+					</div>
+					<?php endfor; ?>
 				</div>
 				<div class="hp-catbox__fade" aria-hidden="true"></div>
 			</div>
