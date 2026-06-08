@@ -11,6 +11,24 @@ add_action( 'wp_enqueue_scripts', function() {
 	);
 } );
 
+// ─── Home page assets ─────────────────────────────────────────────────────────
+add_action( 'wp_enqueue_scripts', function() {
+	if ( ! is_front_page() ) return;
+	wp_enqueue_style(
+		'myogenix-home',
+		get_stylesheet_directory_uri() . '/assets/css/home.css',
+		[],
+		'1.0.0'
+	);
+	wp_enqueue_script(
+		'myogenix-home',
+		get_stylesheet_directory_uri() . '/assets/js/home.js',
+		[],
+		'1.0.0',
+		true
+	);
+} );
+
 // ─── Retatrutide password gate ────────────────────────────────────────────────
 add_action( 'template_redirect', function () {
 	if ( ! is_page( 'retatrutide' ) ) return;
