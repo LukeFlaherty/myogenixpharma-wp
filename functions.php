@@ -494,3 +494,10 @@ add_action( 'wp_enqueue_scripts', function () {
 		true
 	);
 }, 20 );
+
+// Remove WooCommerce breadcrumb from all product PDPs.
+add_action( 'wp', function() {
+	if ( is_product() ) {
+		remove_action( 'woocommerce_before_main_content', 'woocommerce_breadcrumb', 20 );
+	}
+} );
