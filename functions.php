@@ -372,6 +372,36 @@ add_action( 'woocommerce_before_calculate_totals', function ( $cart ) {
 	}
 }, 10 );
 
+// For variable subscriptions whose cheapest variation bills every N months (N > 1),
+// show the per-month equivalent instead of the lump-sum total so archive/home-page
+// tiles display consistently with the PDP plan boxes (e.g. $567/3mo → $189/month).
+add_filter( 'woocommerce_variable_subscription_price_html', function ( $price_html, $product ) {
+	if ( ! class_exists( 'WC_Subscriptions_Product' ) ) return $price_html;
+
+	$min_variation_id = $product->get_meta( '_min_price_variation_id' );
+	if ( ! $min_variation_id ) return $price_html;
+
+	$variation = wc_get_product( $min_variation_id );
+	if ( ! $variation ) return $price_html;
+
+	$interval = (int) WC_Subscriptions_Product::get_interval( $variation );
+	if ( $interval <= 1 ) return $price_html;
+
+	$period = WC_Subscriptions_Product::get_period( $variation );
+	if ( 'month' !== $period ) return $price_html;
+
+	$price = (float) WC_Subscriptions_Product::get_price( $variation );
+	if ( $price <= 0 ) return $price_html;
+
+	return wcs_price_string( [
+		'recurring_amount'      => $price / $interval,
+		'subscription_interval' => 1,
+		'subscription_period'   => 'month',
+		'subscription_length'   => 0,
+		'trial_length'          => 0,
+	] );
+}, 10, 2 );
+
 // In WC Blocks checkout (Store API context), hide the confusing WC Subscriptions
 // price string ("$599 → $0.00/month") and sale badge ("Save $599/month") for
 // Prescribery-synced products. The "Expected Product Charge After Approval" row
