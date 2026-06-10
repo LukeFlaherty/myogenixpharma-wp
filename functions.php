@@ -519,3 +519,13 @@ add_action( 'wp', function() {
 		remove_action( 'woocommerce_before_main_content', 'woocommerce_breadcrumb', 20 );
 	}
 } );
+
+// Apartment / suite field (address_2) is optional.
+// The WC admin option woocommerce_checkout_address_2_field controls this,
+// but this filter guards against it being reset to 'required' again.
+add_filter( 'woocommerce_default_address_fields', function ( $fields ) {
+	if ( isset( $fields['address_2'] ) ) {
+		$fields['address_2']['required'] = false;
+	}
+	return $fields;
+} );
