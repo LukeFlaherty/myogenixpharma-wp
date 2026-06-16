@@ -31,7 +31,7 @@ $hp_meta = [
 	'bpc'          => [ 'name' => 'BPC-157',        'tagline' => 'Healing & repair',             'unit' => '/vial' ],
 	'motsc'        => [ 'name' => 'MOTSc',          'tagline' => 'Mitochondrial health',         'unit' => '/vial' ],
 	'epithalon'    => [ 'name' => 'Epithalon',      'tagline' => 'Longevity peptide',            'unit' => '/vial' ],
-	'tadalafil'    => [ 'name' => 'Tadalafil',      'tagline' => 'Daily ED support',             'unit' => '/mo'   ],
+	'tadalafil'    => [ 'name' => 'Tadalafil',      'tagline' => 'Daily ED support',             'unit' => '/mo', 'months_supply' => 3 ],
 	'sildenafil'   => [ 'name' => 'Sildenafil',     'tagline' => 'Fast-acting ED treatment',     'unit' => '/mo'   ],
 	'testosterone' => [ 'name' => 'Testosterone',   'tagline' => 'Hormone optimization',         'unit' => '/mo'   ],
 ];
@@ -50,6 +50,11 @@ foreach ( $hp_ids as $key => $id ) {
 				$raw_price = $raw_price / $interval;
 			}
 		}
+	}
+	// Non-subscription products sold as a multi-month supply use months_supply in $hp_meta.
+	$months = isset( $hp_meta[ $key ]['months_supply'] ) ? (int) $hp_meta[ $key ]['months_supply'] : 1;
+	if ( $months > 1 ) {
+		$raw_price = $raw_price / $months;
 	}
 	$hp_products[ $key ] = [
 		'price' => $raw_price,
