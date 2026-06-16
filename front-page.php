@@ -40,8 +40,19 @@ $hp_products = [];
 foreach ( $hp_ids as $key => $id ) {
 	$wc = wc_get_product( $id );
 	if ( ! $wc ) continue;
+	$raw_price = (float) $wc->get_price();
+	// Variable subscriptions billed every N months carry a lump-sum price; normalise to per-month.
+	if ( $wc->is_type( 'variable-subscription' ) && class_exists( 'WC_Subscriptions_Product' ) ) {
+		$min_var_id = $wc->get_meta( '_min_price_variation_id' );
+		if ( $min_var_id ) {
+			$interval = (int) WC_Subscriptions_Product::get_interval( $min_var_id );
+			if ( $interval > 1 && 'month' === WC_Subscriptions_Product::get_period( $min_var_id ) ) {
+				$raw_price = $raw_price / $interval;
+			}
+		}
+	}
 	$hp_products[ $key ] = [
-		'price' => (float) $wc->get_price(),
+		'price' => $raw_price,
 		'url'   => $wc->get_permalink(),
 		'image' => get_the_post_thumbnail_url( $id, 'large' ) ?: get_the_post_thumbnail_url( $id, 'full' ) ?: '',
 	];
