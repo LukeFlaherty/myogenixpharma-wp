@@ -518,11 +518,15 @@ add_action( 'wp_enqueue_scripts', function() {
 
 // Google Places address autocomplete on billing and shipping address_1 fields.
 // Works with both Classic WooCommerce checkout and WC Blocks (React-based).
-// Replace MYOGENIX_GOOGLE_MAPS_KEY with your real API key (Places API must be enabled).
-define( 'MYOGENIX_GOOGLE_MAPS_KEY', 'YOUR_GOOGLE_MAPS_API_KEY' );
+// Define MYOGENIX_GOOGLE_MAPS_KEY in wp-config.php (preferred) or here.
+// The Places API must be enabled on the key.
+if ( ! defined( 'MYOGENIX_GOOGLE_MAPS_KEY' ) ) {
+	define( 'MYOGENIX_GOOGLE_MAPS_KEY', '' );
+}
 
 add_action( 'wp_enqueue_scripts', function () {
 	if ( ! is_checkout() ) return;
+	if ( ! MYOGENIX_GOOGLE_MAPS_KEY ) return; // skip if key not configured
 
 	// Our script must load first so window.initCheckoutAutocomplete is defined
 	// before Google Maps calls it as its async callback.
