@@ -1,8 +1,8 @@
 /**
  * Sexual health PDP configurator.
- * Handles 1D (dosage only) and 2D (dosage × days) variable products.
+ * Handles 1D (dosage only) and 2D (dosage × tablets) variable products.
  * Reads config from data-* attributes on #pdp-cfg.
- * @version 1.0.0
+ * @version 1.0.1
  */
 ( function () {
 	'use strict';
@@ -79,18 +79,18 @@
 
 		var subLine = '';
 		if ( hasSecondary && state.secondary ) {
-			var selDays = extractNum( state.secondary );
-			if ( selDays > 0 ) {
-				var perDay = ( entry.price / selDays ).toFixed( 2 );
-				subLine = '$' + perDay + '/day';
+			var selTablets = extractNum( state.secondary );
+			if ( selTablets > 0 ) {
+				var perTablet = ( entry.price / selTablets ).toFixed( 2 );
+				subLine = '$' + perTablet + '/tablet';
 
-				// Savings vs scaling up the shortest supply to the same number of days
+				// Savings vs scaling up the shortest supply to the same number of tablets
 				var baseKey = secondaryKeys[0];
 				if ( baseKey !== state.secondary && matrix[ state.primary ] && matrix[ state.primary ][ baseKey ] ) {
-					var baseEntry  = matrix[ state.primary ][ baseKey ];
-					var baseDays   = extractNum( baseKey );
-					if ( baseDays > 0 ) {
-						var savings = Math.round( ( baseEntry.price / baseDays ) * selDays - entry.price );
+					var baseEntry    = matrix[ state.primary ][ baseKey ];
+					var baseTablets  = extractNum( baseKey );
+					if ( baseTablets > 0 ) {
+						var savings = Math.round( ( baseEntry.price / baseTablets ) * selTablets - entry.price );
 						if ( savings > 0 ) {
 							subLine += ' &nbsp;&middot;&nbsp; <strong class="pdp-cfg__summary-savings">Save $' + savings + '</strong>';
 						}
