@@ -933,7 +933,7 @@ if ( $is_weight_loss ) :
 			],
 			'primary_attr'    => 'pa_dosage',
 			'primary_label'   => 'Select Dosage',
-			'secondary_attr'  => 'pa_days',
+			'secondary_attr'  => 'pa_tablets',
 			'secondary_label' => 'Supply Length',
 			'fixed_attrs'     => [],
 		],
@@ -1124,7 +1124,7 @@ if ( $is_weight_loss ) :
 					</div>
 
 					<?php if ( $secondary_attr_key && ! empty( $secondary_keys ) ) : ?>
-					<!-- Secondary selector (days / supply length) -->
+					<!-- Secondary selector (tablets / supply length) -->
 					<p class="pdp-cfg__section-label"><?php echo esc_html( $shcfg['secondary_label'] ); ?></p>
 					<div class="pdp-cfg__supply-row">
 						<?php

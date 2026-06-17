@@ -509,7 +509,7 @@ add_action( 'wp_enqueue_scripts', function() {
 				'myogenix-sexual-health-pdp',
 				get_stylesheet_directory_uri() . '/assets/js/sexual-health-pdp.js',
 				[],
-				'1.0.0',
+				'1.0.1',
 				true
 			);
 		}
