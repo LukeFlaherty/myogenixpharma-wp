@@ -51,6 +51,24 @@ foreach ( $hp_ids as $key => $id ) {
 			}
 		}
 	}
+	// Tablet-count products (e.g. Sildenafil): each variant is N tablets = N/30 months.
+	// Find the minimum per-month price across all variations rather than using the overall minimum.
+	if ( $key === 'sildenafil' && $wc->is_type( 'variable' ) ) {
+		$min_per_month = PHP_FLOAT_MAX;
+		foreach ( $wc->get_children() as $vid ) {
+			$v = wc_get_product( $vid );
+			if ( ! $v || 'publish' !== get_post_status( $vid ) ) continue;
+			$price      = (float) $v->get_price();
+			if ( $price <= 0 ) continue;
+			$tab_slug   = get_post_meta( $vid, 'attribute_pa_tablets', true );
+			$tab_count  = (int) $tab_slug;
+			$var_months = $tab_count > 0 ? $tab_count / 30 : 1;
+			$per_month  = $price / $var_months;
+			if ( $per_month < $min_per_month ) $min_per_month = $per_month;
+		}
+		if ( $min_per_month < PHP_FLOAT_MAX ) $raw_price = $min_per_month;
+	}
+
 	// Non-subscription products sold as a multi-month supply use months_supply in $hp_meta.
 	$months = isset( $hp_meta[ $key ]['months_supply'] ) ? (int) $hp_meta[ $key ]['months_supply'] : 1;
 	if ( $months > 1 ) {
