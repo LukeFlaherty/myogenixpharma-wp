@@ -170,7 +170,7 @@ add_filter( 'woocommerce_cart_item_name', function ( $name, $cart_item, $cart_it
 		$supply_raw = $variation['attribute_pa_vial-wellness'] ?? $variation['attribute_pa_bottle'] ?? '';
 		$supply_map = [
 			'1-vial' => '1 vial', '2-vial' => '2 vials', '3-vial' => '3 vials',
-			'1-bottle' => '1 bottle', '2-bottle' => '2 bottles', '3-bottle' => '3 bottles',
+			'1-bottle' => '1 vial', '2-bottle' => '2 vials', '3-bottle' => '3 vials',
 		];
 		$supply_str = $supply_map[ $supply_raw ] ?? '';
 		$custom = esc_html( $drug . ( $supply_str ? ' - ' . $supply_str : '' ) );
@@ -302,7 +302,7 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( $item, $ca
 		$supply_slug = $variation['attribute_pa_vial-wellness'] ?? $variation['attribute_pa_bottle'] ?? '';
 		$supply_display = [
 			'1-vial' => '1 vial', '2-vial' => '2 vials', '3-vial' => '3 vials',
-			'1-bottle' => '1 bottle', '2-bottle' => '2 bottles', '3-bottle' => '3 bottles',
+			'1-bottle' => '1 vial', '2-bottle' => '2 vials', '3-bottle' => '3 vials',
 		];
 		$supply_str = $supply_display[ $supply_slug ] ?? $supply_slug;
 
