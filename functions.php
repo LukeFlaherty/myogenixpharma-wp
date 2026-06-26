@@ -11,6 +11,25 @@ add_action( 'wp_enqueue_scripts', function() {
 	);
 } );
 
+// ─── Site-wide navbar + home page assets ──────────────────────────────────────
+// home.css contains both navbar styles (used on all pages) and home-page section
+// styles (.home-hero, .home-categories, etc.) that only render on the front page.
+add_action( 'wp_enqueue_scripts', function() {
+	wp_enqueue_style(
+		'myogenix-home',
+		get_stylesheet_directory_uri() . '/assets/css/home.css',
+		[],
+		'1.3.0'
+	);
+	wp_enqueue_script(
+		'myogenix-home',
+		get_stylesheet_directory_uri() . '/assets/js/home.js',
+		[],
+		'1.3.0',
+		true
+	);
+} );
+
 // ─── Retatrutide password gate ────────────────────────────────────────────────
 add_action( 'template_redirect', function () {
 	if ( ! is_page( 'retatrutide' ) ) return;
@@ -440,13 +459,16 @@ add_action( 'wp_enqueue_scripts', function() {
 	}
 }, 20 );
 
-// Enqueue PDP styles and scripts on single product pages, weight-loss category, and retatrutide page
+// Enqueue PDP styles and scripts on single product pages, category pages, and retatrutide page
 add_action( 'wp_enqueue_scripts', function() {
 	$is_pdp    = is_singular( 'product' );
 	$is_wm_cat = is_tax( 'product_cat', 'weight-loss' );
+	$is_mh_cat = is_tax( 'product_cat', 'mens-health' );
+	$is_sh_cat = is_tax( 'product_cat', 'sexual-health' );
+	$is_pl_cat = is_tax( 'product_cat', 'peptides-longevity' );
 	$is_rtd    = is_page( 'retatrutide' );
 
-	if ( $is_pdp || $is_wm_cat || $is_rtd ) {
+	if ( $is_pdp || $is_wm_cat || $is_mh_cat || $is_sh_cat || $is_pl_cat || $is_rtd ) {
 		wp_enqueue_style(
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
