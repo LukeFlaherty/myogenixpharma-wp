@@ -1739,3 +1739,107 @@ a.rtd-bundle-atc {
 .peptide-pdp #peptide-summary {
 	margin-top: 4px;
 }
+
+/* ==========================================================================
+   Category page — single-product modifier (mens-health: 1 card)
+   ========================================================================== */
+
+.myogenix-cat__products-grid--single {
+	grid-template-columns: 1fr;
+	max-width: 600px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/* ==========================================================================
+   Category page — compact product grid (peptides-longevity)
+   ========================================================================== */
+
+.myogenix-cat__products--compact {
+	background: #fff;
+}
+
+.myogenix-cat__compact-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	gap: 24px;
+	margin-top: 40px;
+}
+
+.myogenix-cat__compact-card {
+	border: 1px solid var(--pdp-border, #e5e7eb);
+	border-radius: 12px;
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	text-decoration: none;
+	color: var(--pdp-dark, #111);
+	transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.myogenix-cat__compact-card:hover {
+	box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+	transform: translateY(-2px);
+	text-decoration: none;
+	color: var(--pdp-dark, #111);
+}
+
+.myogenix-cat__compact-card-img {
+	width: 100%;
+	aspect-ratio: 1 / 1;
+	object-fit: contain;
+	border-radius: 8px;
+	background: #f5f5f5;
+	padding: 12px;
+}
+
+.myogenix-cat__compact-card-type {
+	font-size: 0.7rem;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--pdp-muted, #666);
+	margin: 0;
+}
+
+.myogenix-cat__compact-card-name {
+	font-size: 1.1rem;
+	font-weight: 800;
+	color: var(--pdp-dark, #111);
+	margin: 0;
+	line-height: 1.2;
+}
+
+.myogenix-cat__compact-card-price {
+	font-size: 1.05rem;
+	font-weight: 700;
+	color: var(--pdp-purple, #5b4bc4);
+	margin: 0;
+}
+
+.myogenix-cat__compact-card-cta {
+	margin-top: auto;
+	display: block;
+	text-align: center;
+	width: 100%;
+	padding: 10px 16px;
+	font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+	.myogenix-cat__compact-grid {
+		grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+		gap: 16px;
+	}
+}
+
+@media (max-width: 480px) {
+	.myogenix-cat__compact-grid {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 12px;
+	}
+	.myogenix-cat__compact-card {
+		padding: 14px;
+	}
+}
