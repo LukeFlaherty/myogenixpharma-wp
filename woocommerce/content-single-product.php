@@ -1035,12 +1035,12 @@ if ( $is_weight_loss ) :
 		[ 'num' => 'PDP Sections/4.png', 'img' => 'PDP Sections/calendar.png',     'title' => 'Monthly Monitoring',               'desc' => 'Stay on track with regular free check-ins to ensure progress' ],
 	];
 
-	// ─── TRT state gating — update $trt_allowed_states to restrict availability ──
-	// Remove any state abbreviation from this list to block orders from that state.
+	// ─── TRT state gating — 48 states per Myogenix service policy ───────────────
+	// Alaska (AK) and Mississippi (MS) excluded. Update this list as coverage changes.
 	$trt_allowed_states = [
-		'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
+		'AL',       'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
 		'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
-		'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+		'MA', 'MI', 'MN',       'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
 		'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
 		'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY',
 	];
@@ -1141,23 +1141,35 @@ if ( $is_weight_loss ) :
 						Your State
 						<span class="trt-state__required">Required</span>
 					</p>
-					<div class="pdp-cfg__dose-select-wrap">
-						<select id="trt-state-select" class="pdp-cfg__dose-select">
-							<option value="">Select your state&hellip;</option>
+					<div class="trt-state__picker" id="trt-state-picker">
+						<button class="trt-state__trigger" id="trt-state-trigger" type="button"
+							aria-haspopup="listbox" aria-expanded="false" aria-label="Select your state">
+							<span id="trt-state-display" class="trt-state__trigger-text trt-state__trigger-text--placeholder">Select your state&hellip;</span>
+							<span class="trt-state__chevron" aria-hidden="true">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+							</span>
+						</button>
+						<ul class="trt-state__options" id="trt-state-options" role="listbox" aria-label="Select your state">
 							<?php foreach ( $all_us_states as $code => $name ) : ?>
-							<option value="<?php echo esc_attr( $code ); ?>"><?php echo esc_html( $name ); ?></option>
+							<li class="trt-state__option" role="option" data-value="<?php echo esc_attr( $code ); ?>" aria-selected="false"><?php echo esc_html( $name ); ?></li>
 							<?php endforeach; ?>
-						</select>
-						<span class="pdp-cfg__dose-chevron" aria-hidden="true">
-							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-						</span>
+						</ul>
 					</div>
+					<input type="hidden" id="trt-state-value" value="">
 					<p id="trt-state-status" class="trt-state__status"></p>
-					<div id="trt-state-error" class="trt-state__error" style="display:none;">
-						<span class="trt-state__error-icon" aria-hidden="true">
-							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-						</span>
-						We don&rsquo;t currently serve your state. Please check back &mdash; we&rsquo;re expanding.
+					<div id="trt-state-error" class="trt-state__unavailable" style="display:none;">
+						<div class="trt-state__unavailable-header">
+							<div class="trt-state__unavailable-icon" aria-hidden="true">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+							</div>
+							<p class="trt-state__unavailable-title">Not available in your state</p>
+						</div>
+						<p class="trt-state__unavailable-desc">
+							We currently offer TRT services in 48 states. We&rsquo;re not yet licensed to prescribe in your area, but we&rsquo;re actively expanding coverage.
+						</p>
+						<a href="mailto:support@myogenixpharma.com" class="trt-state__unavailable-link">
+							Contact us about future availability &rarr;
+						</a>
 					</div>
 					<?php endif; ?>
 
