@@ -1035,6 +1035,31 @@ if ( $is_weight_loss ) :
 		[ 'num' => 'PDP Sections/4.png', 'img' => 'PDP Sections/calendar.png',     'title' => 'Monthly Monitoring',               'desc' => 'Stay on track with regular free check-ins to ensure progress' ],
 	];
 
+	// ─── TRT state gating — update $trt_allowed_states to restrict availability ──
+	// Remove any state abbreviation from this list to block orders from that state.
+	$trt_allowed_states = [
+		'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
+		'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
+		'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+		'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
+		'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY',
+	];
+	$all_us_states = [
+		'AL' => 'Alabama',        'AK' => 'Alaska',         'AZ' => 'Arizona',       'AR' => 'Arkansas',
+		'CA' => 'California',     'CO' => 'Colorado',       'CT' => 'Connecticut',   'DE' => 'Delaware',
+		'FL' => 'Florida',        'GA' => 'Georgia',        'HI' => 'Hawaii',        'ID' => 'Idaho',
+		'IL' => 'Illinois',       'IN' => 'Indiana',        'IA' => 'Iowa',          'KS' => 'Kansas',
+		'KY' => 'Kentucky',       'LA' => 'Louisiana',      'ME' => 'Maine',         'MD' => 'Maryland',
+		'MA' => 'Massachusetts',  'MI' => 'Michigan',       'MN' => 'Minnesota',     'MS' => 'Mississippi',
+		'MO' => 'Missouri',       'MT' => 'Montana',        'NE' => 'Nebraska',      'NV' => 'Nevada',
+		'NH' => 'New Hampshire',  'NJ' => 'New Jersey',     'NM' => 'New Mexico',    'NY' => 'New York',
+		'NC' => 'North Carolina', 'ND' => 'North Dakota',   'OH' => 'Ohio',          'OK' => 'Oklahoma',
+		'OR' => 'Oregon',         'PA' => 'Pennsylvania',   'RI' => 'Rhode Island',  'SC' => 'South Carolina',
+		'SD' => 'South Dakota',   'TN' => 'Tennessee',      'TX' => 'Texas',         'UT' => 'Utah',
+		'VT' => 'Vermont',        'VA' => 'Virginia',       'WA' => 'Washington',    'WV' => 'West Virginia',
+		'WI' => 'Wisconsin',      'WY' => 'Wyoming',
+	];
+
 ?>
 
 <div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'myogenix-pdp sexual-health-pdp', $product ); ?>>
@@ -1105,7 +1130,37 @@ if ( $is_weight_loss ) :
 					data-fixed-attrs="<?php echo esc_attr( wp_json_encode( $shcfg['fixed_attrs'] ) ); ?>"
 					data-primary-labels="<?php echo esc_attr( wp_json_encode( $primary_labels ) ); ?>"
 					data-secondary-labels="<?php echo esc_attr( wp_json_encode( $secondary_labels ) ); ?>"
+					<?php if ( $slug === 'testosterone' ) : ?>
+					data-trt-allowed-states="<?php echo esc_attr( wp_json_encode( $trt_allowed_states ) ); ?>"
+					<?php endif; ?>
 				>
+
+					<?php if ( $slug === 'testosterone' ) : ?>
+					<!-- TRT: state eligibility gate -->
+					<p class="pdp-cfg__section-label">
+						Your State
+						<span class="trt-state__required">Required</span>
+					</p>
+					<div class="pdp-cfg__dose-select-wrap">
+						<select id="trt-state-select" class="pdp-cfg__dose-select">
+							<option value="">Select your state&hellip;</option>
+							<?php foreach ( $all_us_states as $code => $name ) : ?>
+							<option value="<?php echo esc_attr( $code ); ?>"><?php echo esc_html( $name ); ?></option>
+							<?php endforeach; ?>
+						</select>
+						<span class="pdp-cfg__dose-chevron" aria-hidden="true">
+							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+						</span>
+					</div>
+					<p id="trt-state-status" class="trt-state__status"></p>
+					<div id="trt-state-error" class="trt-state__error" style="display:none;">
+						<span class="trt-state__error-icon" aria-hidden="true">
+							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+						</span>
+						We don&rsquo;t currently serve your state. Please check back &mdash; we&rsquo;re expanding.
+					</div>
+					<?php endif; ?>
+
 					<!-- Primary selector (dosage or plan) -->
 					<p class="pdp-cfg__section-label"><?php echo esc_html( $shcfg['primary_label'] ); ?></p>
 					<div class="pdp-cfg__supply-row">
