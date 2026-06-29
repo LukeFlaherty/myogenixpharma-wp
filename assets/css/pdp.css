@@ -615,13 +615,15 @@
 .trt-state__picker {
 	position: relative;
 	margin-bottom: 8px;
+	width: 100%;
 }
 
 .trt-state__trigger {
-	width: 100%;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
+	width: 100% !important;
+	display: flex !important;
+	flex-direction: row !important;
+	align-items: center !important;
+	justify-content: space-between !important;
 	gap: 8px;
 	border: 1.5px solid var(--pdp-border) !important;
 	border-radius: 8px !important;
