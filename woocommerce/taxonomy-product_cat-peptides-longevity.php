@@ -13,6 +13,7 @@ get_header( 'shop' );
  * @hooked woocommerce_output_content_wrapper - 10 (outputs opening divs)
  * @hooked woocommerce_breadcrumb - 20
  */
+remove_action( 'woocommerce_before_main_content', 'woocommerce_breadcrumb', 20 );
 do_action( 'woocommerce_before_main_content' );
 
 // Display name and tagline overrides for known products — falls back to WC title for unlisted ones.
@@ -84,25 +85,7 @@ $steps = [
 		<div class="myogenix-pdp__container">
 			<p class="myogenix-cat__hero-label">Peptides & Longevity</p>
 			<h1 class="myogenix-cat__hero-title">Performance & Longevity Peptides</h1>
-			<p class="myogenix-cat__hero-desc">Compounded injectable peptides for tissue recovery, hormone optimization, and cellular longevity. Provider-reviewed and shipped cold-chain from our FDA-registered facility.</p>
-			<div class="myogenix-cat__hero-trust">
-				<div class="myogenix-cat__hero-trust-item">
-					<span aria-hidden="true">🏥</span>
-					<span>Licensed providers</span>
-				</div>
-				<div class="myogenix-cat__hero-trust-item">
-					<span aria-hidden="true">✏️</span>
-					<span>FDA-registered facility</span>
-				</div>
-				<div class="myogenix-cat__hero-trust-item">
-					<span aria-hidden="true">❄️</span>
-					<span>Cold-chain shipping</span>
-				</div>
-				<div class="myogenix-cat__hero-trust-item">
-					<span aria-hidden="true">💬</span>
-					<span>Ongoing provider support</span>
-				</div>
-			</div>
+			<p class="myogenix-cat__hero-desc">Compounded injectable peptides for recovery, performance, and longevity. Provider-reviewed and cold-chain shipped.</p>
 		</div>
 	</section>
 
