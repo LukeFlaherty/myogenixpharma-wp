@@ -13,6 +13,7 @@ get_header( 'shop' );
  * @hooked woocommerce_output_content_wrapper - 10 (outputs opening divs)
  * @hooked woocommerce_breadcrumb - 20
  */
+remove_action( 'woocommerce_before_main_content', 'woocommerce_breadcrumb', 20 );
 do_action( 'woocommerce_before_main_content' );
 
 // Load both weight management products by slug
@@ -111,25 +112,7 @@ $steps = [
 		<div class="myogenix-pdp__container">
 			<p class="myogenix-cat__hero-label">Weight Management</p>
 			<h1 class="myogenix-cat__hero-title">Medical Weight Loss Programs</h1>
-			<p class="myogenix-cat__hero-desc">Provider-reviewed, compounded GLP-1 medications shipped directly to your door. No insurance required.</p>
-			<div class="myogenix-cat__hero-trust">
-				<div class="myogenix-cat__hero-trust-item">
-					<span aria-hidden="true">🏥</span>
-					<span>Licensed providers</span>
-				</div>
-				<div class="myogenix-cat__hero-trust-item">
-					<span aria-hidden="true">✏️</span>
-					<span>FDA-registered facility</span>
-				</div>
-				<div class="myogenix-cat__hero-trust-item">
-					<span aria-hidden="true">🚚</span>
-					<span>Free discreet shipping</span>
-				</div>
-				<div class="myogenix-cat__hero-trust-item">
-					<span aria-hidden="true">💬</span>
-					<span>Ongoing provider support</span>
-				</div>
-			</div>
+			<p class="myogenix-cat__hero-desc">Compounded GLP-1 medications, reviewed by a licensed provider. No insurance required.</p>
 		</div>
 	</section>
 
@@ -159,12 +142,6 @@ $steps = [
 					<div class="myogenix-cat__product-image">
 						<img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $cfg['title'] ); ?>" loading="lazy" />
 					</div>
-					<ul class="myogenix-cat__product-bullets">
-						<?php foreach ( $cfg['bullets'] as $bullet ) : ?>
-						<li><?php echo esc_html( $bullet ); ?></li>
-						<?php endforeach; ?>
-					</ul>
-					<hr class="myogenix-cat__product-divider" />
 					<?php if ( $min_price ) : ?>
 					<div class="myogenix-cat__product-price">
 						<span class="myogenix-cat__product-price-label">Starting from</span>

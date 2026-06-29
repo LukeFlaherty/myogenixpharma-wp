@@ -1089,10 +1089,11 @@
 
 /* Category Hero */
 .myogenix-cat__hero {
-	background: #1a1a1a;
-	color: #fff;
-	padding: 72px 0 80px;
+	background: #fff;
+	color: var(--pdp-dark);
+	padding: 60px 0 64px;
 	text-align: center;
+	border-bottom: 1px solid #e8e8e8;
 }
 
 .myogenix-cat__hero-label {
@@ -1100,39 +1101,24 @@
 	font-weight: 700;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
-	color: #888;
+	color: var(--pdp-muted);
 	margin: 0 0 16px;
 }
 
 .myogenix-cat__hero-title {
 	font-size: 3.25rem;
 	font-weight: 900;
-	color: #fff;
+	color: var(--pdp-dark);
 	margin: 0 0 18px;
 	line-height: 1.05;
 }
 
 .myogenix-cat__hero-desc {
 	font-size: 1.1rem;
-	color: #bbb;
-	margin: 0 auto 36px;
+	color: var(--pdp-muted);
+	margin: 0 auto 0;
 	max-width: 560px;
 	line-height: 1.65;
-}
-
-.myogenix-cat__hero-trust {
-	display: flex;
-	justify-content: center;
-	gap: 40px;
-	flex-wrap: wrap;
-}
-
-.myogenix-cat__hero-trust-item {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	font-size: 0.875rem;
-	color: #aaa;
 }
 
 /* Product Cards Section */
