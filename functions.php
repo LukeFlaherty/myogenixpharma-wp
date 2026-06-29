@@ -473,7 +473,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
 			[],
-			'1.4.0'
+			'1.5.0'
 		);
 	}
 
@@ -514,6 +514,16 @@ add_action( 'wp_enqueue_scripts', function() {
 				get_stylesheet_directory_uri() . '/assets/js/sexual-health-pdp.js',
 				[],
 				'1.0.1',
+				true
+			);
+		}
+
+		if ( $product_slug === 'testosterone' ) {
+			wp_enqueue_script(
+				'myogenix-trt-pdp',
+				get_stylesheet_directory_uri() . '/assets/js/trt-pdp.js',
+				[],
+				'1.0.0',
 				true
 			);
 		}
