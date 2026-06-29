@@ -397,8 +397,9 @@ $year     = (int) date( 'Y' );
 				<p class="home-footer__col-heading">Programs</p>
 				<ul class="home-footer__links">
 					<li><a href="<?php echo esc_url( home_url( '/product-category/weight-loss/' ) ); ?>">Weight Management</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/product/compound-tirzepatide/' ) ); ?>">Tirzepatide</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/product/compound-semaglutide/' ) ); ?>">Semaglutide</a></li>
+					<li><a href="<?php echo esc_url( home_url( '/product-category/mens-health/' ) ); ?>">Mens Health</a></li>
+					<li><a href="<?php echo esc_url( home_url( '/product-category/sexual-health/' ) ); ?>">Sexual Health</a></li>
+					<li><a href="<?php echo esc_url( home_url( '/product-category/peptides-longevity/' ) ); ?>">Peptides &amp; Longevity</a></li>
 				</ul>
 			</div>
 
