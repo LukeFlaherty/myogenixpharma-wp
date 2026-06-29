@@ -473,7 +473,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
 			[],
-			'1.5.0'
+			'1.6.0'
 		);
 	}
 
@@ -523,7 +523,7 @@ add_action( 'wp_enqueue_scripts', function() {
 				'myogenix-trt-pdp',
 				get_stylesheet_directory_uri() . '/assets/js/trt-pdp.js',
 				[],
-				'1.0.0',
+				'1.1.0',
 				true
 			);
 		}

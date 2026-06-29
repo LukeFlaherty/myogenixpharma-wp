@@ -610,13 +610,124 @@
 	vertical-align: middle;
 }
 
+/* ── Custom dropdown ────────────────────────────────────────────────────── */
+
+.trt-state__picker {
+	position: relative;
+	margin-bottom: 8px;
+}
+
+.trt-state__trigger {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	border: 1.5px solid var(--pdp-border);
+	border-radius: 8px;
+	padding: 12px 14px;
+	font-size: 0.9375rem;
+	font-weight: 500;
+	color: var(--pdp-dark);
+	background: #fff;
+	cursor: pointer;
+	text-align: left;
+	transition: border-color 0.15s ease;
+}
+
+.trt-state__trigger:hover {
+	border-color: #bbb;
+}
+
+.trt-state__trigger:focus {
+	outline: none;
+	border-color: #bbb;
+}
+
+.trt-state__trigger:focus-visible {
+	outline: 2px solid var(--pdp-purple);
+	outline-offset: 2px;
+}
+
+.trt-state__trigger--open {
+	border-color: var(--pdp-dark);
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+.trt-state__trigger-text {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.trt-state__trigger-text--placeholder {
+	color: #aaa;
+	font-weight: 400;
+}
+
+.trt-state__chevron {
+	flex-shrink: 0;
+	color: var(--pdp-muted);
+	display: flex;
+	transition: transform 0.2s ease;
+}
+
+.trt-state__trigger--open .trt-state__chevron {
+	transform: rotate( 180deg );
+}
+
+.trt-state__options {
+	display: none;
+	position: absolute;
+	top: 100%;
+	left: 0;
+	right: 0;
+	background: #fff;
+	border: 1.5px solid var(--pdp-dark);
+	border-top: none;
+	border-bottom-left-radius: 8px;
+	border-bottom-right-radius: 8px;
+	max-height: 232px;
+	overflow-y: auto;
+	z-index: 200;
+	list-style: none;
+	margin: 0;
+	padding: 4px 0;
+	box-shadow: 0 8px 24px rgba( 0, 0, 0, 0.1 );
+}
+
+.trt-state__options--open {
+	display: block;
+}
+
+.trt-state__option {
+	padding: 9px 14px;
+	font-size: 0.875rem;
+	color: var(--pdp-dark);
+	cursor: pointer;
+	line-height: 1.3;
+	user-select: none;
+}
+
+.trt-state__option--highlighted {
+	background: #f4f4f4;
+}
+
+.trt-state__option--selected {
+	font-weight: 600;
+}
+
+/* ── Status line (geolocation feedback) ─────────────────────────────────── */
+
 .trt-state__status {
 	font-size: 0.75rem;
 	color: var(--pdp-muted);
-	margin: -6px 0 14px;
+	margin: 0 0 14px;
 	min-height: 1.1em;
 	line-height: 1.4;
-	transition: color 0.2s ease;
 }
 
 .trt-state__status--loading {
@@ -637,32 +748,69 @@
 }
 
 @keyframes trt-spin {
-	to { transform: rotate(360deg); }
+	to { transform: rotate( 360deg ); }
 }
 
 .trt-state__status--detected {
 	color: #1a7a3c;
 }
 
-.trt-state__error {
-	display: flex;
-	align-items: flex-start;
-	gap: 8px;
-	background: #fdf0f0;
-	border: 1px solid #f0c8c8;
-	border-radius: 8px;
-	padding: 10px 12px;
-	font-size: 0.8rem;
-	color: #b91c1c;
-	line-height: 1.5;
+/* ── Unavailable-state card ──────────────────────────────────────────────── */
+
+.trt-state__unavailable {
+	background: #fff8f8;
+	border: 1.5px solid #fca5a5;
+	border-radius: 10px;
+	padding: 16px;
 	margin-bottom: 14px;
 }
 
-.trt-state__error-icon {
-	flex-shrink: 0;
-	margin-top: 1px;
-	color: #b91c1c;
+.trt-state__unavailable-header {
 	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 10px;
+}
+
+.trt-state__unavailable-icon {
+	width: 28px;
+	height: 28px;
+	background: #fee2e2;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	color: #b91c1c;
+}
+
+.trt-state__unavailable-title {
+	font-size: 0.9rem;
+	font-weight: 700;
+	color: var(--pdp-dark);
+	margin: 0;
+	line-height: 1.3;
+}
+
+.trt-state__unavailable-desc {
+	font-size: 0.8rem;
+	color: #555;
+	line-height: 1.6;
+	margin: 0 0 12px;
+}
+
+.trt-state__unavailable-link {
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--pdp-dark);
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.trt-state__unavailable-link:hover {
+	color: var(--pdp-dark);
+	opacity: 0.7;
+	text-decoration: underline;
 }
 
 .pdp-cfg__disclaimer {
@@ -1087,11 +1235,18 @@
 	transform: translateX(-50%);
 }
 
+/* Remove WC content wrapper top spacing so hero touches the navbar */
+body.tax-product_cat #primary,
+body.tax-product_cat #main {
+	margin-top: 0;
+	padding-top: 0;
+}
+
 /* Category Hero */
 .myogenix-cat__hero {
 	background: #fff;
 	color: var(--pdp-dark);
-	padding: 60px 0 64px;
+	padding: 32px 0;
 	text-align: center;
 	border-bottom: 1px solid #e8e8e8;
 }
