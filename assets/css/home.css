@@ -57,6 +57,15 @@ html {
   -webkit-backdrop-filter: blur(8px);
   border-bottom: 1px solid #e4e4e7;
 }
+/* Slide nav below WP admin bar when visible (logged-in users) */
+.admin-bar .home-nav {
+  top: 32px;
+}
+@media screen and (max-width: 782px) {
+  .admin-bar .home-nav {
+    top: 46px;
+  }
+}
 .home-nav__inner {
   display: flex;
   align-items: center;
