@@ -30,6 +30,17 @@ add_action( 'wp_enqueue_scripts', function() {
 	);
 } );
 
+// ─── TRT Article page styles ─────────────────────────────────────────────────
+add_action( 'wp_enqueue_scripts', function() {
+	if ( ! is_page_template( 'page-trt-article.php' ) ) return;
+	wp_enqueue_style(
+		'myogenix-trt-article',
+		get_stylesheet_directory_uri() . '/assets/css/trt-article.css',
+		[ 'myogenix-home' ],
+		'1.0.0'
+	);
+} );
+
 // ─── Retatrutide password gate ────────────────────────────────────────────────
 add_action( 'template_redirect', function () {
 	if ( ! is_page( 'retatrutide' ) ) return;
