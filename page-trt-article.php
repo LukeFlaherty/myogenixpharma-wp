@@ -40,15 +40,6 @@ get_header();
 
 <div class="trt-article">
 
-	<!-- Breadcrumb -->
-	<nav class="trt-article__breadcrumb" aria-label="Breadcrumb">
-		<a href="<?php echo esc_url( home_url( '/' ) ); ?>">Home</a>
-		<span aria-hidden="true">/</span>
-		<a href="<?php echo esc_url( home_url( '/mens-health/' ) ); ?>">Men's Health</a>
-		<span aria-hidden="true">/</span>
-		<span aria-current="page">How to Legally Buy Testosterone Online</span>
-	</nav>
-
 	<!-- Article Header -->
 	<header class="trt-article__header">
 		<span class="trt-article__kicker">Men's Health &middot; Testosterone</span>
