@@ -87,7 +87,7 @@ get_header();
 			</div>
 			<div class="trt-cta-block__action">
 				<a href="<?php echo $trt_url; ?>" class="trt-cta-block__btn">Start Now &rarr;</a>
-				<p class="trt-cta-block__price">From <strong>$567</strong>/mo &middot; Consultation included</p>
+				<p class="trt-cta-block__price">From <strong>$567</strong> / 3 months &middot; Consultation included</p>
 			</div>
 		</div>
 
@@ -150,7 +150,7 @@ get_header();
 			</div>
 			<div class="trt-cta-block__action">
 				<a href="<?php echo $trt_url; ?>" class="trt-cta-block__btn">Start Now &rarr;</a>
-				<p class="trt-cta-block__price">From <strong>$567</strong>/mo</p>
+				<p class="trt-cta-block__price">From <strong>$567</strong> / 3 months</p>
 			</div>
 		</div>
 
@@ -192,7 +192,7 @@ get_header();
 			</div>
 			<div class="trt-cta-block__action">
 				<a href="<?php echo $trt_url; ?>" class="trt-cta-block__btn">Get Started &rarr;</a>
-				<p class="trt-cta-block__price">From <strong>$567</strong>/mo &middot; Consultation included</p>
+				<p class="trt-cta-block__price">From <strong>$567</strong> / 3 months &middot; Consultation included</p>
 			</div>
 		</div>
 
@@ -234,7 +234,7 @@ get_header();
 				<li>90-day reassessments to keep your treatment optimized</li>
 			</ul>
 			<a href="<?php echo $trt_url; ?>" class="trt-simple-cta__btn">Start Now &rarr;</a>
-			<span class="trt-simple-cta__price">From $567/mo &middot; Doctor consultation included</span>
+			<span class="trt-simple-cta__price">From $567 / 3 months &middot; Doctor consultation included</span>
 		</div>
 
 		<h2>Follow the TRT regimen prescribed by your physician</h2>
@@ -261,7 +261,7 @@ get_header();
 			</div>
 			<div class="trt-cta-block__action">
 				<a href="<?php echo $trt_url; ?>" class="trt-cta-block__btn">Get Started &rarr;</a>
-				<p class="trt-cta-block__price">From <strong>$567</strong>/mo &middot; Consultation included</p>
+				<p class="trt-cta-block__price">From <strong>$567</strong> / 3 months &middot; Consultation included</p>
 			</div>
 		</div>
 
@@ -308,7 +308,7 @@ get_header();
 	<div class="trt-sticky-bar__inner">
 		<div class="trt-sticky-bar__info">
 			<div class="trt-sticky-bar__pricing">
-				Testosterone Cypionate &mdash; <strong>$567/mo</strong>
+				Testosterone Cypionate &mdash; <strong>$567 / 3 months</strong>
 				<span class="trt-sticky-bar__incl">(+ Doctor Consultation Included)</span>
 			</div>
 			<div class="trt-sticky-bar__avail">
