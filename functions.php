@@ -19,7 +19,7 @@ add_action( 'wp_enqueue_scripts', function() {
 		'myogenix-home',
 		get_stylesheet_directory_uri() . '/assets/css/home.css',
 		[],
-		'1.4.0'
+		'1.4.1'
 	);
 	wp_enqueue_script(
 		'myogenix-home',

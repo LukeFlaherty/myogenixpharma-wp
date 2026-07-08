@@ -59,11 +59,11 @@ html {
 }
 /* Slide nav below WP admin bar when visible (logged-in users) */
 .admin-bar .home-nav {
-  top: 32px;
+  top: 0;
 }
 @media screen and (max-width: 782px) {
   .admin-bar .home-nav {
-    top: 46px;
+    top: 0;
   }
 }
 /* Gutenberg global-styles injects margin-block-start:24px on all .wp-site-blocks children
