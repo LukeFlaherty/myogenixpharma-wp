@@ -141,7 +141,7 @@ get_header();
 
 		<p>Testosterone is a male steroid hormone — though testosterone replacement therapy is not the same as taking anabolic steroids for performance enhancement. Since testosterone was first synthesized, bad actors have attempted to sell it without appropriate medical oversight.</p>
 
-		<p>The US government's Anabolic Steroids Control Act of 1990 placed testosterone and other anabolic-androgenic steroids (AAS) in Schedule III of the Controlled Substances Act — substances with a moderate to low potential for dependence when used outside of proper medical care.<sup>1</sup></p>
+		<p>The US government's Anabolic Steroids Control Act of 1990 placed testosterone and other anabolic-androgenic steroids (AAS) in Schedule III of the Controlled Substances Act — substances with a moderate to low potential for dependence when used outside of proper medical care.</p>
 
 		<p>Legitimate providers follow all of these rules. If any pharmacy or physician tells you a prescription isn't required, walk away.</p>
 
@@ -250,7 +250,7 @@ get_header();
 
 		<p>Some men start TRT hoping to get leaner, build muscle faster, or boost their sex drive. While TRT can deliver all of these benefits, they are not enough on their own to justify a prescription — and they are definitely not a reason to modify your regimen without your doctor's approval.</p>
 
-		<p>You are on TRT to restore testosterone levels that have dropped significantly below what the American Urological Association (AUA) categorizes as normal.<sup>2</sup> By restoring those levels, you help your entire body function the way it should — energy, mood, bone density, cardiovascular health, and more.</p>
+		<p>You are on TRT to restore testosterone levels that have dropped significantly below what the American Urological Association (AUA) categorizes as normal. By restoring those levels, you help your entire body function the way it should — energy, mood, bone density, cardiovascular health, and more.</p>
 
 		<p>Adjusting your dose or protocol without your doctor's sign-off is not only risky to your health — it can be illegal and invalidate your prescription entirely.</p>
 
@@ -303,29 +303,8 @@ get_header();
 		</div>
 	</section>
 
-	<!-- Sources -->
-	<div class="trt-sources">
-		<details>
-			<summary>Sources &amp; References</summary>
-			<ol>
-				<li>Drug Enforcement Administration. <em>Drug Scheduling — Schedule III.</em> <a href="https://www.dea.gov/drug-information/drug-scheduling" target="_blank" rel="noopener noreferrer">dea.gov</a>. Accessed July 2026.</li>
-				<li>American Urological Association. <em>Testosterone Deficiency Guideline.</em> <a href="https://www.auanet.org/guidelines-and-quality/guidelines/testosterone-deficiency-guideline" target="_blank" rel="noopener noreferrer">auanet.org</a>. Accessed July 2026.</li>
-			</ol>
-		</details>
-	</div>
-
 	<!-- Article Footer -->
 	<footer class="trt-article-footer">
-		<div class="trt-article-footer__badges">
-			<div class="trt-article-footer__legitscript">
-				<img
-					src="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/images/legitscript-certified.png' ); ?>"
-					alt="LegitScript Certified"
-					width="80"
-					height="87"
-				/>
-			</div>
-		</div>
 		<p class="trt-article-footer__disclaimer">
 			<strong>Medical Disclaimer:</strong> The information provided in this article is for educational purposes only and does not constitute medical advice. Testosterone replacement therapy carries risks and is only appropriate for individuals with a clinically confirmed deficiency, as determined by a licensed physician. Always consult a qualified healthcare provider before starting any hormone therapy. Results vary by individual. Myogenix providers comply with all applicable state and federal regulations governing the prescription and dispensing of controlled substances.
 		</p>
