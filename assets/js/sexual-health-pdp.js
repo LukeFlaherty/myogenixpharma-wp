@@ -2,7 +2,7 @@
  * Sexual health PDP configurator.
  * Handles 1D (dosage only) and 2D (dosage × tablets) variable products.
  * Reads config from data-* attributes on #pdp-cfg.
- * @version 1.0.2
+ * @version 1.0.3
  */
 ( function () {
 	'use strict';
@@ -73,6 +73,32 @@
 		var entry = getEntry();
 		if ( ! entry ) { el.innerHTML = ''; return; }
 
+		// 1D multi-month plan (e.g. TRT 3-month): show per-month as the headline price
+		if ( ! hasSecondary ) {
+			var months = extractNum( state.primary );
+			if ( months > 1 ) {
+				var perMonth = entry.price / months;
+				var monthRows = '';
+				for ( var m = 1; m <= months; m++ ) {
+					monthRows +=
+						'<div class="pdp-cfg__summary-line">' +
+							'<span>Month ' + m + '</span>' +
+							'<span>' + fmt( perMonth ) + '</span>' +
+						'</div>';
+				}
+				el.innerHTML =
+					'<span class="pdp-cfg__summary-label">Checkout Details</span>' +
+					'<div class="pdp-cfg__summary-month-price">' + fmt( perMonth ) + '<span class="pdp-cfg__summary-month-unit">/month</span></div>' +
+					monthRows +
+					'<div class="pdp-cfg__summary-total">' +
+						'<span>Total billed today</span>' +
+						'<strong class="pdp-cfg__summary-total-price">' + fmt( entry.price ) + '</strong>' +
+					'</div>' +
+					'<p class="pdp-cfg__summary-charged-note">Full amount charged at once — not split into monthly payments.</p>';
+				return;
+			}
+		}
+
 		var primaryLabel   = primaryLabels[ state.primary ]   || state.primary;
 		var secondaryLabel = state.secondary ? ( secondaryLabels[ state.secondary ] || state.secondary ) : '';
 		var label = primaryLabel + ( secondaryLabel ? ' &middot; ' + secondaryLabel : '' );
@@ -96,11 +122,6 @@
 						}
 					}
 				}
-			}
-		} else if ( ! hasSecondary ) {
-			var months = extractNum( state.primary );
-			if ( months > 1 ) {
-				subLine = fmt( entry.price / months ) + '/month';
 			}
 		}
 

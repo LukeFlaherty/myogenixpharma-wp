@@ -484,7 +484,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
 			[],
-			'1.6.2'
+			'1.6.3'
 		);
 	}
 
@@ -524,7 +524,7 @@ add_action( 'wp_enqueue_scripts', function() {
 				'myogenix-sexual-health-pdp',
 				get_stylesheet_directory_uri() . '/assets/js/sexual-health-pdp.js',
 				[],
-				'1.0.2',
+				'1.0.3',
 				true
 			);
 		}
@@ -540,6 +540,179 @@ add_action( 'wp_enqueue_scripts', function() {
 		}
 	}
 } );
+
+/**
+ * Render product category scrollers (hp-catbox pattern from the home page).
+ *
+ * @param string[] $category_slugs  Keys: 'mens-health', 'weight-loss', 'peptides'.
+ * @param int      $exclude_id      WC product ID to omit (avoids listing the current PDP).
+ */
+function myogenix_render_product_scrollers( array $category_slugs, int $exclude_id = 0 ): void {
+	$all_ids = [
+		'tirzepatide'  => 4063,
+		'semaglutide'  => 4041,
+		'wolverine'    => 2606,
+		'tesamorelin'  => 2803,
+		'klow'         => 2819,
+		'glow'         => 1868,
+		'bpc'          => 4249,
+		'motsc'        => 4253,
+		'epithalon'    => 4257,
+		'tadalafil'    => 1886,
+		'sildenafil'   => 1883,
+		'testosterone' => 883,
+	];
+	$all_meta = [
+		'tirzepatide'  => [ 'name' => 'Tirzepatide',   'tagline' => 'Dual-action GLP-1 therapy',  'unit' => '/mo'   ],
+		'semaglutide'  => [ 'name' => 'Semaglutide',   'tagline' => 'Proven GLP-1 therapy',       'unit' => '/mo'   ],
+		'wolverine'    => [ 'name' => 'Wolverine',      'tagline' => 'Elite tissue recovery',      'unit' => '/vial' ],
+		'tesamorelin'  => [ 'name' => 'Tesamorelin',    'tagline' => 'GH optimization',            'unit' => '/vial' ],
+		'klow'         => [ 'name' => 'Klow',           'tagline' => 'Metabolic support',          'unit' => '/vial' ],
+		'glow'         => [ 'name' => 'Glow',           'tagline' => 'Longevity & renewal',        'unit' => '/vial' ],
+		'bpc'          => [ 'name' => 'BPC-157',        'tagline' => 'Healing & repair',           'unit' => '/vial' ],
+		'motsc'        => [ 'name' => 'MOTSc',          'tagline' => 'Mitochondrial health',       'unit' => '/vial' ],
+		'epithalon'    => [ 'name' => 'Epithalon',      'tagline' => 'Longevity peptide',          'unit' => '/vial' ],
+		'tadalafil'    => [ 'name' => 'Tadalafil',      'tagline' => 'Daily ED support',           'unit' => '/mo', 'months_supply' => 3 ],
+		'sildenafil'   => [ 'name' => 'Sildenafil',     'tagline' => 'Fast-acting ED treatment',   'unit' => '/mo'   ],
+		'testosterone' => [ 'name' => 'Testosterone',   'tagline' => 'Hormone optimization',       'unit' => '/mo'   ],
+	];
+	$all_categories = [
+		'mens-health' => [
+			'title'    => 'Mens Health',
+			'shop_url' => '/product-category/mens-health/',
+			'products' => [ 'testosterone', 'tadalafil', 'sildenafil' ],
+		],
+		'weight-loss' => [
+			'title'    => 'Weight Loss',
+			'shop_url' => '/product-category/weight-loss/',
+			'products' => [ 'tirzepatide', 'semaglutide' ],
+		],
+		'peptides' => [
+			'title'    => 'Peptides',
+			'shop_url' => '/product-category/peptides-longevity/',
+			'products' => [ 'wolverine', 'tesamorelin', 'klow', 'glow', 'bpc', 'motsc', 'epithalon' ],
+			'full'     => true,
+		],
+	];
+
+	// Collect all product keys needed across the requested categories.
+	$needed_keys = [];
+	foreach ( $category_slugs as $cat_slug ) {
+		if ( isset( $all_categories[ $cat_slug ] ) ) {
+			foreach ( $all_categories[ $cat_slug ]['products'] as $pkey ) {
+				$needed_keys[ $pkey ] = true;
+			}
+		}
+	}
+
+	// Load WC product data once.
+	$products = [];
+	foreach ( array_keys( $needed_keys ) as $key ) {
+		$id = $all_ids[ $key ] ?? 0;
+		if ( ! $id || $id === $exclude_id ) continue;
+		$wc = wc_get_product( $id );
+		if ( ! $wc ) continue;
+		$raw_price = (float) $wc->get_price();
+		// Normalise variable-subscription lump-sum to per-month
+		if ( $wc->is_type( 'variable-subscription' ) && class_exists( 'WC_Subscriptions_Product' ) ) {
+			$min_var_id = $wc->get_meta( '_min_price_variation_id' );
+			if ( $min_var_id ) {
+				$interval = (int) WC_Subscriptions_Product::get_interval( $min_var_id );
+				if ( $interval > 1 && 'month' === WC_Subscriptions_Product::get_period( $min_var_id ) ) {
+					$raw_price = $raw_price / $interval;
+				}
+			}
+		}
+		// Sildenafil: derive lowest per-month price across tablet-count variations
+		if ( $key === 'sildenafil' && $wc->is_type( 'variable' ) ) {
+			$min_per_month = PHP_FLOAT_MAX;
+			foreach ( $wc->get_children() as $vid ) {
+				$v = wc_get_product( $vid );
+				if ( ! $v || 'publish' !== get_post_status( $vid ) ) continue;
+				$price     = (float) $v->get_price();
+				if ( $price <= 0 ) continue;
+				$tab_slug  = get_post_meta( $vid, 'attribute_pa_tablets', true );
+				$tab_count = (int) $tab_slug;
+				$months    = $tab_count > 0 ? $tab_count / 30 : 1;
+				$per_month = $price / $months;
+				if ( $per_month < $min_per_month ) $min_per_month = $per_month;
+			}
+			if ( $min_per_month < PHP_FLOAT_MAX ) $raw_price = $min_per_month;
+		}
+		$months = isset( $all_meta[ $key ]['months_supply'] ) ? (int) $all_meta[ $key ]['months_supply'] : 1;
+		if ( $months > 1 ) $raw_price = $raw_price / $months;
+		$products[ $key ] = [
+			'price' => $raw_price,
+			'url'   => $wc->get_permalink(),
+			'image' => get_the_post_thumbnail_url( $id, 'large' ) ?: get_the_post_thumbnail_url( $id, 'full' ) ?: '',
+		];
+	}
+
+	// Render scrollers.
+	echo '<div class="home-categories__grid">';
+	foreach ( $category_slugs as $cat_slug ) {
+		if ( ! isset( $all_categories[ $cat_slug ] ) ) continue;
+		$cat        = $all_categories[ $cat_slug ];
+		$full_class = ! empty( $cat['full'] ) ? ' hp-catbox--full' : '';
+		echo '<div class="hp-catbox' . $full_class . '">';
+		echo '<div class="hp-catbox__header">';
+		echo '<h3 class="hp-catbox__title">' . esc_html( $cat['title'] ) . '</h3>';
+		echo '<a href="' . esc_url( home_url( $cat['shop_url'] ) ) . '" class="hp-catbox__shopall">Shop all →</a>';
+		echo '</div>';
+		echo '<div class="hp-catbox__scroll-wrap"><div class="hp-catbox__scroll">';
+		$rendered = 0;
+		foreach ( $cat['products'] as $pkey ) {
+			if ( empty( $products[ $pkey ] ) ) continue;
+			$p     = $products[ $pkey ];
+			$m     = $all_meta[ $pkey ];
+			$price = '$' . number_format( $p['price'], 0 );
+			printf(
+				'<a href="%s" class="hp-card" aria-label="%s">
+					<div class="hp-card__img-wrap">
+						<img src="%s" alt="%s" class="hp-card__img" loading="lazy" width="176" height="176">
+					</div>
+					<div class="hp-card__body">
+						<div class="hp-card__name">%s</div>
+						<div class="hp-card__tag">%s</div>
+						<div class="hp-card__foot">
+							<span class="hp-card__price">%s<span class="hp-card__unit">%s</span></span>
+							<span class="hp-card__btn" aria-hidden="true">Shop →</span>
+						</div>
+					</div>
+				</a>',
+				esc_url( $p['url'] ),
+				esc_attr( $m['name'] ),
+				esc_url( $p['image'] ),
+				esc_attr( $m['name'] ),
+				esc_html( $m['name'] ),
+				esc_html( $m['tagline'] ),
+				esc_html( $price ),
+				esc_html( $m['unit'] )
+			);
+			$rendered++;
+		}
+		for ( $i = $rendered; $i < 3; $i++ ) {
+			echo '<div class="hp-card hp-card--coming-soon" aria-label="Coming soon">
+				<div class="hp-card__img-wrap">
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 48 48" aria-hidden="true" width="48" height="48">
+						<circle cx="24" cy="24" r="16" stroke="#d4d4d8" stroke-width="1.5" stroke-dasharray="4 3"/>
+						<path d="M24 16v8M24 28v2" stroke="#d4d4d8" stroke-width="1.5" stroke-linecap="round"/>
+					</svg>
+				</div>
+				<div class="hp-card__body">
+					<div class="hp-card__name" style="color:#a1a1aa;">More coming</div>
+					<div class="hp-card__tag">New products may be on the way</div>
+					<div class="hp-card__foot"><span class="hp-card__coming-tag">Soon</span></div>
+				</div>
+			</div>';
+		}
+		echo '</div>'; // .hp-catbox__scroll
+		echo '<div class="hp-catbox__fade" aria-hidden="true"></div>';
+		echo '</div>'; // .hp-catbox__scroll-wrap
+		echo '</div>'; // .hp-catbox
+	}
+	echo '</div>'; // .home-categories__grid
+}
 
 // Google Places address autocomplete on billing and shipping address_1 fields.
 // Works with both Classic WooCommerce checkout and WC Blocks (React-based).

@@ -1198,34 +1198,14 @@
    ========================================================================== */
 
 .myogenix-pdp__explore {
-	background: #fff;
+	background: #fafafa;
 	padding: 80px 0;
 	border-top: 1px solid #ebebeb;
 }
 
-.myogenix-pdp__explore-grid {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 24px;
-	max-width: 840px;
-	margin: 0 auto;
-}
-
-.myogenix-pdp__explore-link {
-	display: block;
-	border-radius: 12px;
-	overflow: hidden;
-	transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.myogenix-pdp__explore-link:hover {
-	opacity: 0.9;
-	transform: translateY(-2px);
-}
-
-.myogenix-pdp__explore-link img {
-	width: 100%;
-	display: block;
+.myogenix-pdp__explore .home-categories__grid {
+	margin-top: 40px;
+	max-width: none;
 }
 
 /* ==========================================================================
@@ -1891,6 +1871,30 @@ a.rtd-bundle-atc {
 	flex-shrink: 0;
 	margin-top: 1px;
 	color: var(--pdp-dark, #1a1a1a);
+}
+
+/* Multi-month plan: big per-month headline price */
+.pdp-cfg__summary-month-price {
+	font-size: 2rem;
+	font-weight: 800;
+	color: var(--pdp-dark);
+	margin: 4px 0 14px;
+	line-height: 1;
+}
+
+.pdp-cfg__summary-month-unit {
+	font-size: 1rem;
+	font-weight: 500;
+	color: var(--pdp-light);
+	margin-left: 2px;
+}
+
+/* "Full amount charged at once" note under the total */
+.pdp-cfg__summary-charged-note {
+	font-size: 0.75rem;
+	color: var(--pdp-light);
+	margin: 8px 0 0;
+	line-height: 1.4;
 }
 
 /* Peptide summary sub-line (per-unit + savings) */
