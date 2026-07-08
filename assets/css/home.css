@@ -66,6 +66,15 @@ html {
     top: 46px;
   }
 }
+/* Gutenberg global-styles injects margin-block-start:24px on all .wp-site-blocks children
+   except :first-child. The skip-link <a> is first-child, so the nav gets 24px. Zero it out. */
+header.home-nav {
+  margin-block-start: 0 !important;
+}
+/* Non-home pages: give more breathing room between nav bottom and page content */
+body:not(.home) header.home-nav + * {
+  margin-block-start: 48px !important;
+}
 .home-nav__inner {
   display: flex;
   align-items: center;
