@@ -369,9 +369,13 @@ do_action( 'woocommerce_before_single_product' );
 		<div class="myo-faq__wrap">
 
 			<div class="myo-faq__header">
-				<p class="myo-faq__eyebrow">FAQ</p>
-				<h2 class="myo-faq__title">Common questions</h2>
-				<p class="myo-faq__desc">Everything you need to know about retatrutide, dosing, and ordering.</p>
+				<div class="myo-faq__header-left">
+					<p class="myo-faq__eyebrow">FAQ</p>
+					<h2 class="myo-faq__title">Answers to the questions that come up most.</h2>
+				</div>
+				<div class="myo-faq__header-right">
+					<p class="myo-faq__desc">Everything you need to know about retatrutide, dosing, partner access, and what to expect as your treatment progresses.</p>
+				</div>
 			</div>
 
 			<div class="myo-faq__list">
@@ -379,7 +383,7 @@ do_action( 'woocommerce_before_single_product' );
 				<div class="myo-faq__item">
 					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="rtd-faq-0">
 						<span class="myo-faq__q">What is retatrutide and how does it differ from semaglutide and tirzepatide?</span>
-						<span class="myo-faq__icon" aria-hidden="true"></span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 					</button>
 					<div class="myo-faq__panel" id="rtd-faq-0">
 						<div class="myo-faq__panel-inner">
@@ -391,7 +395,7 @@ do_action( 'woocommerce_before_single_product' );
 				<div class="myo-faq__item">
 					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="rtd-faq-1">
 						<span class="myo-faq__q">How does dosing escalation work for retatrutide?</span>
-						<span class="myo-faq__icon" aria-hidden="true"></span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 					</button>
 					<div class="myo-faq__panel" id="rtd-faq-1">
 						<div class="myo-faq__panel-inner">
@@ -403,7 +407,7 @@ do_action( 'woocommerce_before_single_product' );
 				<div class="myo-faq__item">
 					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="rtd-faq-2">
 						<span class="myo-faq__q">Why is access to this program restricted?</span>
-						<span class="myo-faq__icon" aria-hidden="true"></span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 					</button>
 					<div class="myo-faq__panel" id="rtd-faq-2">
 						<div class="myo-faq__panel-inner">
@@ -415,7 +419,7 @@ do_action( 'woocommerce_before_single_product' );
 				<div class="myo-faq__item">
 					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="rtd-faq-3">
 						<span class="myo-faq__q">Do I need a new consultation for refills?</span>
-						<span class="myo-faq__icon" aria-hidden="true"></span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 					</button>
 					<div class="myo-faq__panel" id="rtd-faq-3">
 						<div class="myo-faq__panel-inner">
@@ -427,11 +431,23 @@ do_action( 'woocommerce_before_single_product' );
 				<div class="myo-faq__item">
 					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="rtd-faq-4">
 						<span class="myo-faq__q">How is this compounded and where does it ship from?</span>
-						<span class="myo-faq__icon" aria-hidden="true"></span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 					</button>
 					<div class="myo-faq__panel" id="rtd-faq-4">
 						<div class="myo-faq__panel-inner">
 							<p>Your retatrutide is compounded by a licensed U.S. FDA-registered 503A pharmacy as a sterile injectable solution. It ships in temperature-controlled packaging with syringes and all necessary supplies.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="rtd-faq-5">
+						<span class="myo-faq__q">What side effects should I expect compared to semaglutide or tirzepatide?</span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+					</button>
+					<div class="myo-faq__panel" id="rtd-faq-5">
+						<div class="myo-faq__panel-inner">
+							<p>The side effect profile is broadly similar to other GLP-1/GIP agonists — nausea, reduced appetite, and mild gastrointestinal discomfort are most common, particularly early in treatment or after a dose increase. Because of the added glucagon activation, retatrutide has a stronger effect on energy expenditure, so close monitoring during escalation is especially important.</p>
 						</div>
 					</div>
 				</div>

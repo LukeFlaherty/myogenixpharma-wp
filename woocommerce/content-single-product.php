@@ -448,9 +448,13 @@ if ( $is_weight_loss ) :
 		<div class="myo-faq__wrap">
 
 			<div class="myo-faq__header">
-				<p class="myo-faq__eyebrow">FAQ</p>
-				<h2 class="myo-faq__title">Common questions</h2>
-				<p class="myo-faq__desc">Everything you need to know about the program, dosing, and ordering.</p>
+				<div class="myo-faq__header-left">
+					<p class="myo-faq__eyebrow">FAQ</p>
+					<h2 class="myo-faq__title">Answers to the questions that come up most.</h2>
+				</div>
+				<div class="myo-faq__header-right">
+					<p class="myo-faq__desc">Everything you need to know about the program, dosing, and ordering — before you start or as you scale.</p>
+				</div>
 			</div>
 
 			<div class="myo-faq__list">
@@ -458,7 +462,7 @@ if ( $is_weight_loss ) :
 				<div class="myo-faq__item">
 					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="wm-faq-0">
 						<span class="myo-faq__q">What is tirzepatide and how is it different from semaglutide?</span>
-						<span class="myo-faq__icon" aria-hidden="true"></span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 					</button>
 					<div class="myo-faq__panel" id="wm-faq-0">
 						<div class="myo-faq__panel-inner">
@@ -470,11 +474,11 @@ if ( $is_weight_loss ) :
 				<div class="myo-faq__item">
 					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="wm-faq-1">
 						<span class="myo-faq__q">How does dosing escalation work?</span>
-						<span class="myo-faq__icon" aria-hidden="true"></span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 					</button>
 					<div class="myo-faq__panel" id="wm-faq-1">
 						<div class="myo-faq__panel-inner">
-							<p>We start most patients at 2.5 mg weekly to minimize side effects, then increase by 2.5 mg every 4 weeks based on your tolerance and progress. Typical escalation runs 2.5 → 5 → 7.5 → 10 → 12.5 → 15 mg. Your provider reviews your response at each stage and adjusts accordingly — you're never escalated faster than is clinically appropriate.</p>
+							<p>We start most patients at 2.5 mg weekly to minimize side effects, then increase by 2.5 mg every 4 weeks based on tolerance and progress. Typical escalation runs 2.5 → 5 → 7.5 → 10 → 12.5 → 15 mg. Your provider reviews your response at each stage — you're never escalated faster than is clinically appropriate.</p>
 						</div>
 					</div>
 				</div>
@@ -482,23 +486,23 @@ if ( $is_weight_loss ) :
 				<div class="myo-faq__item">
 					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="wm-faq-2">
 						<span class="myo-faq__q">Do I need a new consultation every month?</span>
-						<span class="myo-faq__icon" aria-hidden="true"></span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 					</button>
 					<div class="myo-faq__panel" id="wm-faq-2">
 						<div class="myo-faq__panel-inner">
-							<p>No. Once your treatment plan is established and your prescription is active, refills ship automatically on your chosen schedule. Your provider may request a brief check-in every few months to review progress and adjust dosing if needed — but there's no new full consultation required for standard refills.</p>
+							<p>No. Once your treatment plan is established and your prescription is active, refills ship automatically on your chosen schedule. Your provider may request a brief check-in every few months to review progress and adjust dosing if needed — but no new full consultation is required for standard refills.</p>
 						</div>
 					</div>
 				</div>
 
 				<div class="myo-faq__item">
 					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="wm-faq-3">
-						<span class="myo-faq__q">What if my provider adjusts my dose?</span>
-						<span class="myo-faq__icon" aria-hidden="true"></span>
+						<span class="myo-faq__q">What happens if my provider adjusts my dose?</span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 					</button>
 					<div class="myo-faq__panel" id="wm-faq-3">
 						<div class="myo-faq__panel-inner">
-							<p>If a dose adjustment is needed, your provider will update your prescription and your next shipment will automatically reflect the new dosage. You'll be notified through your patient portal. No additional consultation or fee is required for dose changes within your active treatment plan.</p>
+							<p>Your provider updates your prescription and your next shipment automatically reflects the new dosage. You're notified through your patient portal. No additional consultation or fee is required for dose changes within your active treatment plan.</p>
 						</div>
 					</div>
 				</div>
@@ -506,23 +510,35 @@ if ( $is_weight_loss ) :
 				<div class="myo-faq__item">
 					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="wm-faq-4">
 						<span class="myo-faq__q">How is this compounded and where does it ship from?</span>
-						<span class="myo-faq__icon" aria-hidden="true"></span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 					</button>
 					<div class="myo-faq__panel" id="wm-faq-4">
 						<div class="myo-faq__panel-inner">
-							<p>Your tirzepatide is compounded by a licensed U.S. FDA-registered 503A compounding pharmacy. It's prepared as a sterile injectable solution and ships directly to your door in temperature-controlled packaging — along with syringes and all necessary supplies.</p>
+							<p>Your tirzepatide is compounded by a licensed U.S. FDA-registered 503A compounding pharmacy as a sterile injectable solution. It ships directly to your door in temperature-controlled packaging — along with syringes and all necessary supplies.</p>
 						</div>
 					</div>
 				</div>
 
 				<div class="myo-faq__item">
 					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="wm-faq-5">
-						<span class="myo-faq__q">Can I cancel my subscription?</span>
-						<span class="myo-faq__icon" aria-hidden="true"></span>
+						<span class="myo-faq__q">Can I pause or cancel my subscription?</span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 					</button>
 					<div class="myo-faq__panel" id="wm-faq-5">
 						<div class="myo-faq__panel-inner">
-							<p>Yes. You can pause or cancel your subscription at any time through your Myogenix Pharma patient portal or by contacting our support team. We ask for at least 5 business days' notice before your next billing date. There are no long-term contracts or cancellation fees.</p>
+							<p>Yes. You can pause or cancel at any time through your Myogenix Pharma patient portal or by contacting our support team. We ask for at least 5 business days' notice before your next billing date. No long-term contracts, no cancellation fees.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="wm-faq-6">
+						<span class="myo-faq__q">What side effects should I expect?</span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+					</button>
+					<div class="myo-faq__panel" id="wm-faq-6">
+						<div class="myo-faq__panel-inner">
+							<p>The most common side effects are gastrointestinal — nausea, mild stomach discomfort, and reduced appetite — particularly in the first few weeks or after a dose increase. These are usually transient and resolve as your body adjusts. Starting at a low dose and escalating slowly is the best way to minimize them.</p>
 						</div>
 					</div>
 				</div>
@@ -821,9 +837,13 @@ if ( $is_weight_loss ) :
 		<div class="myo-faq__wrap">
 
 			<div class="myo-faq__header">
-				<p class="myo-faq__eyebrow">FAQ</p>
-				<h2 class="myo-faq__title">Common questions</h2>
-				<p class="myo-faq__desc">Everything you need to know about peptide therapy, ordering, and what to expect.</p>
+				<div class="myo-faq__header-left">
+					<p class="myo-faq__eyebrow">FAQ</p>
+					<h2 class="myo-faq__title">Answers to the questions that come up most.</h2>
+				</div>
+				<div class="myo-faq__header-right">
+					<p class="myo-faq__desc">Everything you need to know about peptide therapy, ordering, and what to expect before your first vial arrives.</p>
+				</div>
 			</div>
 
 			<div class="myo-faq__list">
@@ -831,7 +851,7 @@ if ( $is_weight_loss ) :
 				<div class="myo-faq__item">
 					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="pep-faq-0">
 						<span class="myo-faq__q">How is this peptide administered?</span>
-						<span class="myo-faq__icon" aria-hidden="true"></span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 					</button>
 					<div class="myo-faq__panel" id="pep-faq-0">
 						<div class="myo-faq__panel-inner">
@@ -843,7 +863,7 @@ if ( $is_weight_loss ) :
 				<div class="myo-faq__item">
 					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="pep-faq-1">
 						<span class="myo-faq__q">How long until I see results?</span>
-						<span class="myo-faq__icon" aria-hidden="true"></span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 					</button>
 					<div class="myo-faq__panel" id="pep-faq-1">
 						<div class="myo-faq__panel-inner">
@@ -855,7 +875,7 @@ if ( $is_weight_loss ) :
 				<div class="myo-faq__item">
 					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="pep-faq-2">
 						<span class="myo-faq__q">Why is a provider review required before my order ships?</span>
-						<span class="myo-faq__icon" aria-hidden="true"></span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 					</button>
 					<div class="myo-faq__panel" id="pep-faq-2">
 						<div class="myo-faq__panel-inner">
@@ -867,7 +887,7 @@ if ( $is_weight_loss ) :
 				<div class="myo-faq__item">
 					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="pep-faq-3">
 						<span class="myo-faq__q">How do I store my peptide vials?</span>
-						<span class="myo-faq__icon" aria-hidden="true"></span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 					</button>
 					<div class="myo-faq__panel" id="pep-faq-3">
 						<div class="myo-faq__panel-inner">
@@ -879,11 +899,23 @@ if ( $is_weight_loss ) :
 				<div class="myo-faq__item">
 					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="pep-faq-4">
 						<span class="myo-faq__q">How is this compounded and where does it ship from?</span>
-						<span class="myo-faq__icon" aria-hidden="true"></span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 					</button>
 					<div class="myo-faq__panel" id="pep-faq-4">
 						<div class="myo-faq__panel-inner">
 							<p>Your peptide is compounded by a licensed U.S. FDA-registered 503A compounding pharmacy as a sterile injectable solution. It ships directly to your door in temperature-controlled, discreet packaging with all necessary supplies included.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="pep-faq-5">
+						<span class="myo-faq__q">Can I order more than one peptide at once?</span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+					</button>
+					<div class="myo-faq__panel" id="pep-faq-5">
+						<div class="myo-faq__panel-inner">
+							<p>Yes. Each peptide is ordered individually and your provider reviews the full picture of what you're using. If you're stacking compounds, mention it in your questionnaire so your provider can confirm the combination is appropriate for your goals.</p>
 						</div>
 					</div>
 				</div>
@@ -1265,9 +1297,13 @@ if ( $is_weight_loss ) :
 		<div class="myo-faq__wrap">
 
 			<div class="myo-faq__header">
-				<p class="myo-faq__eyebrow">FAQ</p>
-				<h2 class="myo-faq__title">Common questions</h2>
-				<p class="myo-faq__desc">What you need to know about sexual health and hormone therapy ordering.</p>
+				<div class="myo-faq__header-left">
+					<p class="myo-faq__eyebrow">FAQ</p>
+					<h2 class="myo-faq__title">Answers to the questions that come up most.</h2>
+				</div>
+				<div class="myo-faq__header-right">
+					<p class="myo-faq__desc">What you need to know about sexual health and hormone therapy — before you order and as you progress through treatment.</p>
+				</div>
 			</div>
 
 			<div class="myo-faq__list">
@@ -1275,7 +1311,7 @@ if ( $is_weight_loss ) :
 				<div class="myo-faq__item">
 					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="sh-faq-0">
 						<span class="myo-faq__q">How is this medication prescribed and delivered?</span>
-						<span class="myo-faq__icon" aria-hidden="true"></span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 					</button>
 					<div class="myo-faq__panel" id="sh-faq-0">
 						<div class="myo-faq__panel-inner">
@@ -1287,7 +1323,7 @@ if ( $is_weight_loss ) :
 				<div class="myo-faq__item">
 					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="sh-faq-1">
 						<span class="myo-faq__q">How quickly does it start working?</span>
-						<span class="myo-faq__icon" aria-hidden="true"></span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 					</button>
 					<div class="myo-faq__panel" id="sh-faq-1">
 						<div class="myo-faq__panel-inner">
@@ -1299,11 +1335,11 @@ if ( $is_weight_loss ) :
 				<div class="myo-faq__item">
 					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="sh-faq-2">
 						<span class="myo-faq__q">Why is a provider review required before my order ships?</span>
-						<span class="myo-faq__icon" aria-hidden="true"></span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 					</button>
 					<div class="myo-faq__panel" id="sh-faq-2">
 						<div class="myo-faq__panel-inner">
-							<p>We operate as a licensed telehealth clinic, not a supplement retailer. Every order is reviewed by a board-certified provider who confirms the compound, dose, and any contraindications before anything ships. This protects your safety and ensures you receive the correct protocol for your specific situation.</p>
+							<p>We operate as a licensed telehealth clinic, not a supplement retailer. Every order is reviewed by a board-certified provider who confirms the compound, dose, and any contraindications before anything ships. This protects your safety and ensures you receive the correct protocol.</p>
 						</div>
 					</div>
 				</div>
@@ -1311,11 +1347,11 @@ if ( $is_weight_loss ) :
 				<div class="myo-faq__item">
 					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="sh-faq-3">
 						<span class="myo-faq__q">Do I need a new consultation for every refill?</span>
-						<span class="myo-faq__icon" aria-hidden="true"></span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 					</button>
 					<div class="myo-faq__panel" id="sh-faq-3">
 						<div class="myo-faq__panel-inner">
-							<p>No. Once your prescription is established, refills are straightforward. Your provider may request a brief check-in every few months to review your response and adjust dosing if needed — but there is no full consultation required for standard refills within an active treatment plan.</p>
+							<p>No. Once your prescription is established, refills are straightforward. Your provider may request a brief check-in every few months to review your response and adjust dosing if needed — no full consultation is required for standard refills within an active treatment plan.</p>
 						</div>
 					</div>
 				</div>
@@ -1323,11 +1359,23 @@ if ( $is_weight_loss ) :
 				<div class="myo-faq__item">
 					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="sh-faq-4">
 						<span class="myo-faq__q">How is this compounded and where does it ship from?</span>
-						<span class="myo-faq__icon" aria-hidden="true"></span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 					</button>
 					<div class="myo-faq__panel" id="sh-faq-4">
 						<div class="myo-faq__panel-inner">
 							<p>All medications are compounded by a licensed U.S. FDA-registered 503A compounding pharmacy. Orders ship directly to your door in temperature-controlled, discreet packaging. All required supplies (syringes, prep pads, or dosing guides, depending on the product) are included.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="sh-faq-5">
+						<span class="myo-faq__q">Is this safe to take with other medications?</span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+					</button>
+					<div class="myo-faq__panel" id="sh-faq-5">
+						<div class="myo-faq__panel-inner">
+							<p>Your provider reviews your complete medication list as part of the intake questionnaire. PDE5 inhibitors (sildenafil, tadalafil) are contraindicated with nitrates and should be used cautiously with alpha-blockers. Testosterone therapy has its own interaction profile. Disclose all current medications and supplements during intake — your provider will advise before prescribing.</p>
 						</div>
 					</div>
 				</div>

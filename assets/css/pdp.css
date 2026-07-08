@@ -1063,7 +1063,7 @@
    Custom FAQ — isolated from Elementor
    ========================================================================== */
 
-/* Scoped box-sizing reset — prevents Elementor from bleeding in */
+/* Scoped box-sizing reset */
 .myo-faq,
 .myo-faq *,
 .myo-faq *::before,
@@ -1072,65 +1072,102 @@
 }
 
 .myo-faq {
-	background: #0d0d0d;
-	padding: 80px 20px;
-	border-top: 1px solid rgba(255, 255, 255, 0.07);
+	background: #fff;
+	padding: 72px 20px;
+	border-top: 1px solid #ebebeb;
 	overflow: hidden;
 	width: 100%;
 }
 
 .myo-faq__wrap {
-	max-width: 800px;
+	max-width: 900px;
 	margin: 0 auto;
 	padding: 0;
 }
 
+/* Two-column header */
 .myo-faq__header {
-	text-align: center;
-	margin-bottom: 56px;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 40px;
+	align-items: end;
+	margin-bottom: 40px;
+	padding-bottom: 40px;
+	border-bottom: 1px solid #e8e8e8;
+}
+
+.myo-faq__header-left {
+	min-width: 0;
 }
 
 .myo-faq__eyebrow {
-	display: block;
-	font-size: 0.7rem;
-	font-weight: 700;
-	letter-spacing: 0.12em;
-	text-transform: uppercase;
-	color: rgba(255, 255, 255, 0.4);
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: #888;
 	margin: 0 0 14px;
-	padding: 0;
+	padding: 5px 12px 5px 9px;
+	background: #f3f3f3;
+	border-radius: 20px;
 	line-height: 1;
+	text-transform: none;
+	letter-spacing: 0;
+}
+
+.myo-faq__eyebrow::before {
+	content: '';
+	display: inline-block;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: #aaa;
+	flex-shrink: 0;
 }
 
 .myo-faq__title {
-	font-size: 2.4rem;
+	font-size: 2rem;
 	font-weight: 800;
-	color: #fff;
-	margin: 0 0 16px;
+	color: #111;
+	margin: 0;
 	padding: 0;
-	line-height: 1.1;
+	line-height: 1.15;
 	letter-spacing: -0.02em;
 }
 
+.myo-faq__header-right {
+	min-width: 0;
+}
+
 .myo-faq__desc {
-	font-size: 1rem;
-	color: rgba(255, 255, 255, 0.5);
+	font-size: 0.975rem;
+	color: #666;
 	margin: 0;
 	padding: 0;
 	line-height: 1.65;
 }
 
+/* Cards */
 .myo-faq__list {
-	border-top: 1px solid rgba(255, 255, 255, 0.1);
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
 	margin: 0;
 	padding: 0;
 	list-style: none;
 }
 
 .myo-faq__item {
-	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-	margin: 0;
-	padding: 0;
+	border: 1.5px solid #e5e5e5;
+	border-radius: 12px;
+	overflow: hidden;
+	background: #fff;
+	transition: border-color 0.2s ease;
+}
+
+.myo-faq__item:has(.myo-faq__btn[aria-expanded="true"]) {
+	border-color: #ccc;
 }
 
 .myo-faq__btn {
@@ -1147,23 +1184,22 @@
 	align-items: center;
 	justify-content: space-between;
 	width: 100%;
-	padding: 24px 0;
-	gap: 20px;
+	padding: 18px 20px;
+	gap: 16px;
 	/* Text */
-	font-size: 1rem;
+	font-size: 0.975rem;
 	font-weight: 600;
-	color: #fff !important;
+	color: #111 !important;
 	text-align: left;
-	line-height: 1.45;
+	line-height: 1.4;
 	cursor: pointer;
 	transition: color 0.2s ease;
-	/* Prevent overflow */
 	min-width: 0;
 	max-width: 100%;
 }
 
 .myo-faq__btn:hover {
-	color: rgba(255, 255, 255, 0.65) !important;
+	color: #444 !important;
 	background: none !important;
 }
 
@@ -1172,7 +1208,7 @@
 }
 
 .myo-faq__btn:focus-visible {
-	outline: 2px solid rgba(255, 255, 255, 0.35);
+	outline: 2px solid #ccc;
 	outline-offset: 2px;
 	border-radius: 2px;
 }
@@ -1186,39 +1222,27 @@
 
 .myo-faq__icon {
 	flex-shrink: 0;
-	width: 26px;
-	height: 26px;
+	width: 28px;
+	height: 28px;
 	border-radius: 50%;
-	border: 1.5px solid rgba(255, 255, 255, 0.25);
+	border: 1.5px solid #d8d8d8;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	transition: transform 0.25s ease, border-color 0.2s ease;
-	position: relative;
+	color: #666;
+	background: #fff;
+	transition: transform 0.25s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
-.myo-faq__icon::before,
-.myo-faq__icon::after {
-	content: '';
-	position: absolute;
-	background: rgba(255, 255, 255, 0.8);
-	border-radius: 2px;
-	transition: opacity 0.25s ease;
-}
-
-.myo-faq__icon::before {
-	width: 10px;
-	height: 1.5px;
-}
-
-.myo-faq__icon::after {
-	width: 1.5px;
-	height: 10px;
+.myo-faq__icon svg {
+	display: block;
+	overflow: visible;
 }
 
 .myo-faq__btn[aria-expanded="true"] .myo-faq__icon {
-	transform: rotate(45deg);
-	border-color: rgba(255, 255, 255, 0.5);
+	transform: rotate(180deg);
+	border-color: #aaa;
+	color: #333;
 }
 
 .myo-faq__panel {
@@ -1232,29 +1256,31 @@
 }
 
 .myo-faq__panel-inner {
-	padding-bottom: 24px;
+	padding: 0 20px 18px;
+	border-top: 1px solid #f0f0f0;
+	padding-top: 14px;
 }
 
 .myo-faq__panel-inner p {
 	margin: 0;
 	padding: 0;
-	font-size: 0.95rem;
+	font-size: 0.925rem;
 	line-height: 1.75;
-	color: rgba(255, 255, 255, 0.55);
+	color: #555;
 }
 
 .myo-faq__cta {
-	margin-top: 48px;
-	text-align: center;
+	margin-top: 32px;
+	text-align: left;
 }
 
 .myo-faq__cta-btn {
 	display: inline-block;
-	background: #fff;
-	color: #0d0d0d !important;
-	padding: 14px 32px;
+	background: #111;
+	color: #fff !important;
+	padding: 13px 28px;
 	border-radius: 10px;
-	font-size: 0.95rem;
+	font-size: 0.925rem;
 	font-weight: 700;
 	text-decoration: none !important;
 	letter-spacing: 0.01em;
@@ -1262,8 +1288,8 @@
 }
 
 .myo-faq__cta-btn:hover {
-	opacity: 0.85;
-	color: #0d0d0d !important;
+	opacity: 0.8;
+	color: #fff !important;
 	text-decoration: none !important;
 }
 
@@ -1421,7 +1447,7 @@
    ========================================================================== */
 
 .myogenix-pdp__explore {
-	background: #fafafa;
+	background: #fff;
 	padding: 80px 0;
 	border-top: 1px solid #ebebeb;
 }
@@ -1429,6 +1455,11 @@
 .myogenix-pdp__explore .home-categories__grid {
 	margin-top: 40px;
 	max-width: none;
+}
+
+.myogenix-pdp__explore .hp-catbox {
+	background: #f9f9f9;
+	border-color: #f0f0f0;
 }
 
 /* ==========================================================================
@@ -1650,20 +1681,32 @@ body.tax-product_cat #main {
 
 	/* myo-faq mobile adjustments */
 	.myo-faq {
-		padding: 56px 16px;
-	}
-
-	.myo-faq__title {
-		font-size: 1.85rem;
+		padding: 52px 16px;
 	}
 
 	.myo-faq__header {
-		margin-bottom: 40px;
+		grid-template-columns: 1fr;
+		gap: 16px;
+		margin-bottom: 28px;
+		padding-bottom: 28px;
+	}
+
+	.myo-faq__title {
+		font-size: 1.65rem;
 	}
 
 	.myo-faq__btn {
-		font-size: 0.95rem;
-		padding: 20px 0;
+		font-size: 0.925rem;
+		padding: 16px 16px;
+	}
+
+	.myo-faq__panel-inner {
+		padding: 0 16px 16px;
+		padding-top: 12px;
+	}
+
+	.myo-faq__cta {
+		text-align: center;
 	}
 
 	.myogenix-pdp__explore-grid {
