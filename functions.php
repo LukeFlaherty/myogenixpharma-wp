@@ -484,7 +484,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
 			[],
-			'1.6.3'
+			'1.7.0'
 		);
 	}
 
@@ -497,7 +497,7 @@ add_action( 'wp_enqueue_scripts', function() {
 				'myogenix-pdp',
 				get_stylesheet_directory_uri() . '/assets/js/pdp.js',
 				[],
-				'1.4.0',
+				'1.5.0',
 				true
 			);
 		}
@@ -513,7 +513,7 @@ add_action( 'wp_enqueue_scripts', function() {
 				'myogenix-peptide-pdp',
 				get_stylesheet_directory_uri() . '/assets/js/peptide-pdp.js',
 				[],
-				'1.3.0',
+				'1.4.0',
 				true
 			);
 		}
@@ -524,7 +524,7 @@ add_action( 'wp_enqueue_scripts', function() {
 				'myogenix-sexual-health-pdp',
 				get_stylesheet_directory_uri() . '/assets/js/sexual-health-pdp.js',
 				[],
-				'1.0.3',
+				'1.1.0',
 				true
 			);
 		}

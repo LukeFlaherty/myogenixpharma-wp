@@ -444,84 +444,95 @@ if ( $is_weight_loss ) :
 	</section>
 
 	<!-- Common Questions Section -->
-	<section class="myogenix-pdp__cq">
-		<div class="myogenix-pdp__container">
-			<div class="myogenix-pdp__cq-inner">
+	<section class="myo-faq">
+		<div class="myo-faq__wrap">
 
-				<div class="myogenix-pdp__cq-left">
-					<p class="myogenix-pdp__cq-label">FAQ</p>
-					<h2 class="myogenix-pdp__cq-heading">Common questions</h2>
-					<p class="myogenix-pdp__cq-sub">Everything you need to know about the program, dosing, and ordering.</p>
-					<a href="#buy" class="myogenix-pdp__cq-btn">Configure your program &rarr;</a>
+			<div class="myo-faq__header">
+				<p class="myo-faq__eyebrow">FAQ</p>
+				<h2 class="myo-faq__title">Common questions</h2>
+				<p class="myo-faq__desc">Everything you need to know about the program, dosing, and ordering.</p>
+			</div>
+
+			<div class="myo-faq__list">
+
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="wm-faq-0">
+						<span class="myo-faq__q">What is tirzepatide and how is it different from semaglutide?</span>
+						<span class="myo-faq__icon" aria-hidden="true"></span>
+					</button>
+					<div class="myo-faq__panel" id="wm-faq-0">
+						<div class="myo-faq__panel-inner">
+							<p>Tirzepatide is a dual GIP/GLP-1 receptor agonist — it activates two metabolic pathways simultaneously. Semaglutide only activates the GLP-1 receptor. Clinical trials (SURMOUNT-1) show tirzepatide produced significantly greater average weight loss than semaglutide across comparable doses.</p>
+						</div>
+					</div>
 				</div>
 
-				<div class="myogenix-pdp__cq-right">
-					<div class="myogenix-pdp__cq-list">
-
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="true" aria-controls="myogenix-cq-0">
-								<span>What is tirzepatide and how is it different from semaglutide?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer is-open" id="myogenix-cq-0">
-								<p>Tirzepatide is a dual GIP/GLP-1 receptor agonist — it activates two metabolic pathways simultaneously. Semaglutide only activates the GLP-1 receptor. Clinical trials (SURMOUNT-1) show tirzepatide produced significantly greater average weight loss than semaglutide across comparable doses.</p>
-							</div>
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="wm-faq-1">
+						<span class="myo-faq__q">How does dosing escalation work?</span>
+						<span class="myo-faq__icon" aria-hidden="true"></span>
+					</button>
+					<div class="myo-faq__panel" id="wm-faq-1">
+						<div class="myo-faq__panel-inner">
+							<p>We start most patients at 2.5 mg weekly to minimize side effects, then increase by 2.5 mg every 4 weeks based on your tolerance and progress. Typical escalation runs 2.5 → 5 → 7.5 → 10 → 12.5 → 15 mg. Your provider reviews your response at each stage and adjusts accordingly — you're never escalated faster than is clinically appropriate.</p>
 						</div>
+					</div>
+				</div>
 
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="myogenix-cq-1">
-								<span>How does dosing escalation work?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer" id="myogenix-cq-1">
-								<p>We start most patients at 2.5 mg weekly to minimize side effects, then increase by 2.5 mg every 4 weeks based on your tolerance and progress. Typical escalation runs 2.5 → 5 → 7.5 → 10 → 12.5 → 15 mg. Your provider reviews your response at each stage and adjusts accordingly — you're never escalated faster than is clinically appropriate.</p>
-							</div>
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="wm-faq-2">
+						<span class="myo-faq__q">Do I need a new consultation every month?</span>
+						<span class="myo-faq__icon" aria-hidden="true"></span>
+					</button>
+					<div class="myo-faq__panel" id="wm-faq-2">
+						<div class="myo-faq__panel-inner">
+							<p>No. Once your treatment plan is established and your prescription is active, refills ship automatically on your chosen schedule. Your provider may request a brief check-in every few months to review progress and adjust dosing if needed — but there's no new full consultation required for standard refills.</p>
 						</div>
+					</div>
+				</div>
 
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="myogenix-cq-2">
-								<span>Do I need a new consultation every month?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer" id="myogenix-cq-2">
-								<p>No. Once your treatment plan is established and your prescription is active, refills ship automatically on your chosen schedule. Your provider may request a brief check-in every few months to review progress and adjust dosing if needed — but there's no new full consultation required for standard refills.</p>
-							</div>
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="wm-faq-3">
+						<span class="myo-faq__q">What if my provider adjusts my dose?</span>
+						<span class="myo-faq__icon" aria-hidden="true"></span>
+					</button>
+					<div class="myo-faq__panel" id="wm-faq-3">
+						<div class="myo-faq__panel-inner">
+							<p>If a dose adjustment is needed, your provider will update your prescription and your next shipment will automatically reflect the new dosage. You'll be notified through your patient portal. No additional consultation or fee is required for dose changes within your active treatment plan.</p>
 						</div>
+					</div>
+				</div>
 
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="myogenix-cq-3">
-								<span>What if my provider adjusts my dose?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer" id="myogenix-cq-3">
-								<p>If a dose adjustment is needed, your provider will update your prescription and your next shipment will automatically reflect the new dosage. You'll be notified through your patient portal. No additional consultation or fee is required for dose changes within your active treatment plan.</p>
-							</div>
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="wm-faq-4">
+						<span class="myo-faq__q">How is this compounded and where does it ship from?</span>
+						<span class="myo-faq__icon" aria-hidden="true"></span>
+					</button>
+					<div class="myo-faq__panel" id="wm-faq-4">
+						<div class="myo-faq__panel-inner">
+							<p>Your tirzepatide is compounded by a licensed U.S. FDA-registered 503A compounding pharmacy. It's prepared as a sterile injectable solution and ships directly to your door in temperature-controlled packaging — along with syringes and all necessary supplies.</p>
 						</div>
+					</div>
+				</div>
 
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="myogenix-cq-4">
-								<span>How is this compounded and where does it ship from?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer" id="myogenix-cq-4">
-								<p>Your tirzepatide is compounded by a licensed U.S. FDA-registered 503A compounding pharmacy. It's prepared as a sterile injectable solution and ships directly to your door in temperature-controlled packaging — along with syringes and all necessary supplies.</p>
-							</div>
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="wm-faq-5">
+						<span class="myo-faq__q">Can I cancel my subscription?</span>
+						<span class="myo-faq__icon" aria-hidden="true"></span>
+					</button>
+					<div class="myo-faq__panel" id="wm-faq-5">
+						<div class="myo-faq__panel-inner">
+							<p>Yes. You can pause or cancel your subscription at any time through your Myogenix Pharma patient portal or by contacting our support team. We ask for at least 5 business days' notice before your next billing date. There are no long-term contracts or cancellation fees.</p>
 						</div>
-
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="myogenix-cq-5">
-								<span>Can I cancel my subscription?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer" id="myogenix-cq-5">
-								<p>Yes. You can pause or cancel your subscription at any time through your Myogenix Pharma patient portal or by contacting our support team. We ask for at least 5 business days' notice before your next billing date. There are no long-term contracts or cancellation fees.</p>
-							</div>
-						</div>
-
 					</div>
 				</div>
 
 			</div>
+
+			<div class="myo-faq__cta">
+				<a href="#buy" class="myo-faq__cta-btn">Configure your program &rarr;</a>
+			</div>
+
 		</div>
 	</section>
 
@@ -806,74 +817,83 @@ if ( $is_weight_loss ) :
 	</section>
 
 	<!-- Common Questions -->
-	<section class="myogenix-pdp__cq">
-		<div class="myogenix-pdp__container">
-			<div class="myogenix-pdp__cq-inner">
+	<section class="myo-faq">
+		<div class="myo-faq__wrap">
 
-				<div class="myogenix-pdp__cq-left">
-					<p class="myogenix-pdp__cq-label">FAQ</p>
-					<h2 class="myogenix-pdp__cq-heading">Common questions</h2>
-					<p class="myogenix-pdp__cq-sub">Everything you need to know about peptide therapy, ordering, and what to expect.</p>
-					<a href="#buy" class="myogenix-pdp__cq-btn">Order now &rarr;</a>
+			<div class="myo-faq__header">
+				<p class="myo-faq__eyebrow">FAQ</p>
+				<h2 class="myo-faq__title">Common questions</h2>
+				<p class="myo-faq__desc">Everything you need to know about peptide therapy, ordering, and what to expect.</p>
+			</div>
+
+			<div class="myo-faq__list">
+
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="pep-faq-0">
+						<span class="myo-faq__q">How is this peptide administered?</span>
+						<span class="myo-faq__icon" aria-hidden="true"></span>
+					</button>
+					<div class="myo-faq__panel" id="pep-faq-0">
+						<div class="myo-faq__panel-inner">
+							<p>Your peptide is formulated as a sterile injectable solution and administered subcutaneously (under the skin) using a small insulin-style syringe. All necessary supplies — syringes, bacteriostatic water where required, and alcohol swabs — are included with your order.</p>
+						</div>
+					</div>
 				</div>
 
-				<div class="myogenix-pdp__cq-right">
-					<div class="myogenix-pdp__cq-list">
-
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="true" aria-controls="pcq-0">
-								<span>How is this peptide administered?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer is-open" id="pcq-0">
-								<p>Your peptide is formulated as a sterile injectable solution and administered subcutaneously (under the skin) using a small insulin-style syringe. All necessary supplies — syringes, bacteriostatic water where required, and alcohol swabs — are included with your order.</p>
-							</div>
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="pep-faq-1">
+						<span class="myo-faq__q">How long until I see results?</span>
+						<span class="myo-faq__icon" aria-hidden="true"></span>
+					</button>
+					<div class="myo-faq__panel" id="pep-faq-1">
+						<div class="myo-faq__panel-inner">
+							<p>Results vary by compound and individual. Tissue-repair peptides like BPC-157 and the Wolverine Stack often show faster response (2–4 weeks). Longer-acting agents like MOTSc, Epithalon, and Sermorelin may require 4–8 weeks of consistent use for the full effect to become apparent.</p>
 						</div>
+					</div>
+				</div>
 
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="pcq-1">
-								<span>How long until I see results?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer" id="pcq-1">
-								<p>Results vary by compound and individual. Tissue-repair peptides like BPC-157 and the Wolverine Stack often show faster response (2–4 weeks). Longer-acting agents like MOTSc, Epithalon, and Sermorelin may require 4–8 weeks of consistent use for the full effect to become apparent.</p>
-							</div>
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="pep-faq-2">
+						<span class="myo-faq__q">Why is a provider review required before my order ships?</span>
+						<span class="myo-faq__icon" aria-hidden="true"></span>
+					</button>
+					<div class="myo-faq__panel" id="pep-faq-2">
+						<div class="myo-faq__panel-inner">
+							<p>We operate as a licensed telehealth clinic, not a supplement retailer. Every order is reviewed by a board-certified provider who confirms the compound and dose are appropriate for you before anything ships. This protects your safety and ensures you receive the correct protocol.</p>
 						</div>
+					</div>
+				</div>
 
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="pcq-2">
-								<span>Why is a provider review required before my order ships?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer" id="pcq-2">
-								<p>We operate as a licensed telehealth clinic, not a supplement retailer. Every order is reviewed by a board-certified provider who confirms the compound and dose are appropriate for you before anything ships. This protects your safety and ensures you receive the correct protocol.</p>
-							</div>
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="pep-faq-3">
+						<span class="myo-faq__q">How do I store my peptide vials?</span>
+						<span class="myo-faq__icon" aria-hidden="true"></span>
+					</button>
+					<div class="myo-faq__panel" id="pep-faq-3">
+						<div class="myo-faq__panel-inner">
+							<p>Lyophilized (dry) peptides can be stored at room temperature short-term or refrigerated for longer shelf life. After reconstitution with bacteriostatic water, store refrigerated at 2–8&deg;C and use within 28 days. Never freeze reconstituted peptides — freezing degrades peptide integrity.</p>
 						</div>
+					</div>
+				</div>
 
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="pcq-3">
-								<span>How do I store my peptide vials?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer" id="pcq-3">
-								<p>Lyophilized (dry) peptides can be stored at room temperature short-term or refrigerated for longer shelf life. After reconstitution with bacteriostatic water, store refrigerated at 2–8&deg;C and use within 28 days. Never freeze reconstituted peptides — freezing degrades peptide integrity.</p>
-							</div>
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="pep-faq-4">
+						<span class="myo-faq__q">How is this compounded and where does it ship from?</span>
+						<span class="myo-faq__icon" aria-hidden="true"></span>
+					</button>
+					<div class="myo-faq__panel" id="pep-faq-4">
+						<div class="myo-faq__panel-inner">
+							<p>Your peptide is compounded by a licensed U.S. FDA-registered 503A compounding pharmacy as a sterile injectable solution. It ships directly to your door in temperature-controlled, discreet packaging with all necessary supplies included.</p>
 						</div>
-
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="pcq-4">
-								<span>How is this compounded and where does it ship from?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer" id="pcq-4">
-								<p>Your peptide is compounded by a licensed U.S. FDA-registered 503A compounding pharmacy as a sterile injectable solution. It ships directly to your door in temperature-controlled, discreet packaging with all necessary supplies included.</p>
-							</div>
-						</div>
-
 					</div>
 				</div>
 
 			</div>
+
+			<div class="myo-faq__cta">
+				<a href="#buy" class="myo-faq__cta-btn">Order now &rarr;</a>
+			</div>
+
 		</div>
 	</section>
 
@@ -1241,74 +1261,83 @@ if ( $is_weight_loss ) :
 	</section>
 
 	<!-- Common Questions -->
-	<section class="myogenix-pdp__cq">
-		<div class="myogenix-pdp__container">
-			<div class="myogenix-pdp__cq-inner">
+	<section class="myo-faq">
+		<div class="myo-faq__wrap">
 
-				<div class="myogenix-pdp__cq-left">
-					<p class="myogenix-pdp__cq-label">FAQ</p>
-					<h2 class="myogenix-pdp__cq-heading">Common questions</h2>
-					<p class="myogenix-pdp__cq-sub">What you need to know about sexual health and hormone therapy ordering.</p>
-					<a href="#buy" class="myogenix-pdp__cq-btn">Order now &rarr;</a>
+			<div class="myo-faq__header">
+				<p class="myo-faq__eyebrow">FAQ</p>
+				<h2 class="myo-faq__title">Common questions</h2>
+				<p class="myo-faq__desc">What you need to know about sexual health and hormone therapy ordering.</p>
+			</div>
+
+			<div class="myo-faq__list">
+
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="sh-faq-0">
+						<span class="myo-faq__q">How is this medication prescribed and delivered?</span>
+						<span class="myo-faq__icon" aria-hidden="true"></span>
+					</button>
+					<div class="myo-faq__panel" id="sh-faq-0">
+						<div class="myo-faq__panel-inner">
+							<p>You complete a short health questionnaire online. A licensed provider reviews your order and, if appropriate, issues a prescription through our telehealth platform. Your medication is then compounded and shipped directly to your door in discreet packaging — no pharmacy visit required.</p>
+						</div>
+					</div>
 				</div>
 
-				<div class="myogenix-pdp__cq-right">
-					<div class="myogenix-pdp__cq-list">
-
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="true" aria-controls="shcq-0">
-								<span>How is this medication prescribed and delivered?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer is-open" id="shcq-0">
-								<p>You complete a short health questionnaire online. A licensed provider reviews your order and, if appropriate, issues a prescription through our telehealth platform. Your medication is then compounded and shipped directly to your door in discreet packaging — no pharmacy visit required.</p>
-							</div>
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="sh-faq-1">
+						<span class="myo-faq__q">How quickly does it start working?</span>
+						<span class="myo-faq__icon" aria-hidden="true"></span>
+					</button>
+					<div class="myo-faq__panel" id="sh-faq-1">
+						<div class="myo-faq__panel-inner">
+							<p>Onset time varies by compound. Sildenafil typically takes effect within 30–60 minutes and lasts 4–6 hours. Tadalafil has a longer onset of 1–2 hours but can remain effective for up to 36 hours, making it suitable for daily low-dose use. Testosterone Cypionate builds to therapeutic levels over 2–4 weeks of consistent treatment.</p>
 						</div>
+					</div>
+				</div>
 
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="shcq-1">
-								<span>How quickly does it start working?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer" id="shcq-1">
-								<p>Onset time varies by compound. Sildenafil typically takes effect within 30–60 minutes and lasts 4–6 hours. Tadalafil has a longer onset of 1–2 hours but can remain effective for up to 36 hours, making it suitable for daily low-dose use. Testosterone Cypionate builds to therapeutic levels over 2–4 weeks of consistent treatment.</p>
-							</div>
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="sh-faq-2">
+						<span class="myo-faq__q">Why is a provider review required before my order ships?</span>
+						<span class="myo-faq__icon" aria-hidden="true"></span>
+					</button>
+					<div class="myo-faq__panel" id="sh-faq-2">
+						<div class="myo-faq__panel-inner">
+							<p>We operate as a licensed telehealth clinic, not a supplement retailer. Every order is reviewed by a board-certified provider who confirms the compound, dose, and any contraindications before anything ships. This protects your safety and ensures you receive the correct protocol for your specific situation.</p>
 						</div>
+					</div>
+				</div>
 
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="shcq-2">
-								<span>Why is a provider review required before my order ships?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer" id="shcq-2">
-								<p>We operate as a licensed telehealth clinic, not a supplement retailer. Every order is reviewed by a board-certified provider who confirms the compound, dose, and any contraindications before anything ships. This protects your safety and ensures you receive the correct protocol for your specific situation.</p>
-							</div>
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="sh-faq-3">
+						<span class="myo-faq__q">Do I need a new consultation for every refill?</span>
+						<span class="myo-faq__icon" aria-hidden="true"></span>
+					</button>
+					<div class="myo-faq__panel" id="sh-faq-3">
+						<div class="myo-faq__panel-inner">
+							<p>No. Once your prescription is established, refills are straightforward. Your provider may request a brief check-in every few months to review your response and adjust dosing if needed — but there is no full consultation required for standard refills within an active treatment plan.</p>
 						</div>
+					</div>
+				</div>
 
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="shcq-3">
-								<span>Do I need a new consultation for every refill?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer" id="shcq-3">
-								<p>No. Once your prescription is established, refills are straightforward. Your provider may request a brief check-in every few months to review your response and adjust dosing if needed — but there is no full consultation required for standard refills within an active treatment plan.</p>
-							</div>
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="sh-faq-4">
+						<span class="myo-faq__q">How is this compounded and where does it ship from?</span>
+						<span class="myo-faq__icon" aria-hidden="true"></span>
+					</button>
+					<div class="myo-faq__panel" id="sh-faq-4">
+						<div class="myo-faq__panel-inner">
+							<p>All medications are compounded by a licensed U.S. FDA-registered 503A compounding pharmacy. Orders ship directly to your door in temperature-controlled, discreet packaging. All required supplies (syringes, prep pads, or dosing guides, depending on the product) are included.</p>
 						</div>
-
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="shcq-4">
-								<span>How is this compounded and where does it ship from?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer" id="shcq-4">
-								<p>All medications are compounded by a licensed U.S. FDA-registered 503A compounding pharmacy. Orders ship directly to your door in temperature-controlled, discreet packaging. All required supplies (syringes, prep pads, or dosing guides, depending on the product) are included.</p>
-							</div>
-						</div>
-
 					</div>
 				</div>
 
 			</div>
+
+			<div class="myo-faq__cta">
+				<a href="#buy" class="myo-faq__cta-btn">Order now &rarr;</a>
+			</div>
+
 		</div>
 	</section>
 

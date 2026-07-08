@@ -1060,7 +1060,215 @@
 }
 
 /* ==========================================================================
-   Common Questions Section
+   Custom FAQ — isolated from Elementor
+   ========================================================================== */
+
+/* Scoped box-sizing reset — prevents Elementor from bleeding in */
+.myo-faq,
+.myo-faq *,
+.myo-faq *::before,
+.myo-faq *::after {
+	box-sizing: border-box;
+}
+
+.myo-faq {
+	background: #0d0d0d;
+	padding: 80px 20px;
+	border-top: 1px solid rgba(255, 255, 255, 0.07);
+	overflow: hidden;
+	width: 100%;
+}
+
+.myo-faq__wrap {
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 0;
+}
+
+.myo-faq__header {
+	text-align: center;
+	margin-bottom: 56px;
+}
+
+.myo-faq__eyebrow {
+	display: block;
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.4);
+	margin: 0 0 14px;
+	padding: 0;
+	line-height: 1;
+}
+
+.myo-faq__title {
+	font-size: 2.4rem;
+	font-weight: 800;
+	color: #fff;
+	margin: 0 0 16px;
+	padding: 0;
+	line-height: 1.1;
+	letter-spacing: -0.02em;
+}
+
+.myo-faq__desc {
+	font-size: 1rem;
+	color: rgba(255, 255, 255, 0.5);
+	margin: 0;
+	padding: 0;
+	line-height: 1.65;
+}
+
+.myo-faq__list {
+	border-top: 1px solid rgba(255, 255, 255, 0.1);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.myo-faq__item {
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	margin: 0;
+	padding: 0;
+}
+
+.myo-faq__btn {
+	/* Full Elementor reset */
+	-webkit-appearance: none;
+	appearance: none;
+	background: none !important;
+	border: none !important;
+	border-radius: 0 !important;
+	outline: none;
+	box-shadow: none !important;
+	/* Layout */
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	padding: 24px 0;
+	gap: 20px;
+	/* Text */
+	font-size: 1rem;
+	font-weight: 600;
+	color: #fff !important;
+	text-align: left;
+	line-height: 1.45;
+	cursor: pointer;
+	transition: color 0.2s ease;
+	/* Prevent overflow */
+	min-width: 0;
+	max-width: 100%;
+}
+
+.myo-faq__btn:hover {
+	color: rgba(255, 255, 255, 0.65) !important;
+	background: none !important;
+}
+
+.myo-faq__btn:focus {
+	outline: none;
+}
+
+.myo-faq__btn:focus-visible {
+	outline: 2px solid rgba(255, 255, 255, 0.35);
+	outline-offset: 2px;
+	border-radius: 2px;
+}
+
+.myo-faq__q {
+	flex: 1 1 auto;
+	min-width: 0;
+	word-break: break-word;
+	overflow-wrap: break-word;
+}
+
+.myo-faq__icon {
+	flex-shrink: 0;
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	border: 1.5px solid rgba(255, 255, 255, 0.25);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: transform 0.25s ease, border-color 0.2s ease;
+	position: relative;
+}
+
+.myo-faq__icon::before,
+.myo-faq__icon::after {
+	content: '';
+	position: absolute;
+	background: rgba(255, 255, 255, 0.8);
+	border-radius: 2px;
+	transition: opacity 0.25s ease;
+}
+
+.myo-faq__icon::before {
+	width: 10px;
+	height: 1.5px;
+}
+
+.myo-faq__icon::after {
+	width: 1.5px;
+	height: 10px;
+}
+
+.myo-faq__btn[aria-expanded="true"] .myo-faq__icon {
+	transform: rotate(45deg);
+	border-color: rgba(255, 255, 255, 0.5);
+}
+
+.myo-faq__panel {
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.35s ease;
+}
+
+.myo-faq__panel.is-open {
+	max-height: 600px;
+}
+
+.myo-faq__panel-inner {
+	padding-bottom: 24px;
+}
+
+.myo-faq__panel-inner p {
+	margin: 0;
+	padding: 0;
+	font-size: 0.95rem;
+	line-height: 1.75;
+	color: rgba(255, 255, 255, 0.55);
+}
+
+.myo-faq__cta {
+	margin-top: 48px;
+	text-align: center;
+}
+
+.myo-faq__cta-btn {
+	display: inline-block;
+	background: #fff;
+	color: #0d0d0d !important;
+	padding: 14px 32px;
+	border-radius: 10px;
+	font-size: 0.95rem;
+	font-weight: 700;
+	text-decoration: none !important;
+	letter-spacing: 0.01em;
+	transition: opacity 0.2s ease;
+}
+
+.myo-faq__cta-btn:hover {
+	opacity: 0.85;
+	color: #0d0d0d !important;
+	text-decoration: none !important;
+}
+
+/* ==========================================================================
+   Legacy FAQ — category pages only (myogenix-pdp__cq-*)
    ========================================================================== */
 
 .myogenix-pdp__cq {
@@ -1149,7 +1357,7 @@
 }
 
 .myogenix-pdp__cq-question:hover {
-	color: #888 !important;
+	color: #888;
 }
 
 .myogenix-pdp__cq-question:focus {
@@ -1191,6 +1399,21 @@
 .myogenix-pdp__cq-answer p {
 	margin: 0;
 	padding-bottom: 20px;
+}
+
+@media ( max-width: 768px ) {
+	.myogenix-pdp__cq-heading {
+		font-size: 1.75rem;
+	}
+
+	.myogenix-pdp__cq-inner {
+		grid-template-columns: 1fr;
+		gap: 36px;
+	}
+
+	.myogenix-pdp__cq-left {
+		position: static;
+	}
 }
 
 /* ==========================================================================
@@ -1417,8 +1640,7 @@ body.tax-product_cat #main {
 		font-size: 1.5rem;
 	}
 
-	.myogenix-pdp__how-heading,
-	.myogenix-pdp__cq-heading {
+	.myogenix-pdp__how-heading {
 		font-size: 1.75rem;
 	}
 
@@ -1426,13 +1648,22 @@ body.tax-product_cat #main {
 		grid-template-columns: 1fr;
 	}
 
-	.myogenix-pdp__cq-inner {
-		grid-template-columns: 1fr;
-		gap: 36px;
+	/* myo-faq mobile adjustments */
+	.myo-faq {
+		padding: 56px 16px;
 	}
 
-	.myogenix-pdp__cq-left {
-		position: static;
+	.myo-faq__title {
+		font-size: 1.85rem;
+	}
+
+	.myo-faq__header {
+		margin-bottom: 40px;
+	}
+
+	.myo-faq__btn {
+		font-size: 0.95rem;
+		padding: 20px 0;
 	}
 
 	.myogenix-pdp__explore-grid {

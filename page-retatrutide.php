@@ -365,73 +365,83 @@ do_action( 'woocommerce_before_single_product' );
 	</section>
 
 	<!-- FAQ -->
-	<section class="myogenix-pdp__cq">
-		<div class="myogenix-pdp__container">
-			<div class="myogenix-pdp__cq-inner">
+	<section class="myo-faq">
+		<div class="myo-faq__wrap">
 
-				<div class="myogenix-pdp__cq-left">
-					<p class="myogenix-pdp__cq-label">FAQ</p>
-					<h2 class="myogenix-pdp__cq-heading">Common questions</h2>
-					<p class="myogenix-pdp__cq-sub">Everything you need to know about retatrutide, dosing, and ordering.</p>
-					<a href="#buy" class="myogenix-pdp__cq-btn">Configure your program &rarr;</a>
-				</div>
+			<div class="myo-faq__header">
+				<p class="myo-faq__eyebrow">FAQ</p>
+				<h2 class="myo-faq__title">Common questions</h2>
+				<p class="myo-faq__desc">Everything you need to know about retatrutide, dosing, and ordering.</p>
+			</div>
 
-				<div class="myogenix-pdp__cq-right">
-					<div class="myogenix-pdp__cq-list">
+			<div class="myo-faq__list">
 
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="true" aria-controls="rtd-cq-0">
-								<span>What is retatrutide and how does it differ from semaglutide and tirzepatide?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer is-open" id="rtd-cq-0">
-								<p>Retatrutide is the first triple agonist, simultaneously activating GIP, GLP-1, and glucagon receptors. Semaglutide targets only GLP-1; tirzepatide targets GIP and GLP-1. By adding glucagon receptor activation, retatrutide further increases energy expenditure — making it one of the most potent metabolic agents in clinical development.</p>
-							</div>
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="rtd-faq-0">
+						<span class="myo-faq__q">What is retatrutide and how does it differ from semaglutide and tirzepatide?</span>
+						<span class="myo-faq__icon" aria-hidden="true"></span>
+					</button>
+					<div class="myo-faq__panel" id="rtd-faq-0">
+						<div class="myo-faq__panel-inner">
+							<p>Retatrutide is the first triple agonist, simultaneously activating GIP, GLP-1, and glucagon receptors. Semaglutide targets only GLP-1; tirzepatide targets GIP and GLP-1. By adding glucagon receptor activation, retatrutide further increases energy expenditure — making it one of the most potent metabolic agents in clinical development.</p>
 						</div>
-
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="rtd-cq-1">
-								<span>How does dosing escalation work for retatrutide?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer" id="rtd-cq-1">
-								<p>Typical escalation starts at 1–2 mg/week and increases gradually every 4 weeks based on tolerance. Doses range from 1 mg/week up to 12 mg/week. Each vial contains a 4-week supply at the selected weekly dose. Your provider reviews progress at each stage and adjusts accordingly.</p>
-							</div>
-						</div>
-
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="rtd-cq-2">
-								<span>Why is access to this program restricted?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer" id="rtd-cq-2">
-								<p>Retatrutide is a newer compound with a higher potency profile. We currently offer it exclusively through verified clinic partner referrals to ensure every patient has appropriate clinical oversight and tighter monitoring during dose escalation.</p>
-							</div>
-						</div>
-
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="rtd-cq-3">
-								<span>Do I need a new consultation for refills?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer" id="rtd-cq-3">
-								<p>No. Once your treatment plan is established, refills ship on your chosen schedule. Your provider may request a brief check-in every few months, but no new full consultation is required for standard refills.</p>
-							</div>
-						</div>
-
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="rtd-cq-4">
-								<span>How is this compounded and where does it ship from?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer" id="rtd-cq-4">
-								<p>Your retatrutide is compounded by a licensed U.S. FDA-registered 503A pharmacy as a sterile injectable solution. It ships in temperature-controlled packaging with syringes and all necessary supplies.</p>
-							</div>
-						</div>
-
 					</div>
 				</div>
+
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="rtd-faq-1">
+						<span class="myo-faq__q">How does dosing escalation work for retatrutide?</span>
+						<span class="myo-faq__icon" aria-hidden="true"></span>
+					</button>
+					<div class="myo-faq__panel" id="rtd-faq-1">
+						<div class="myo-faq__panel-inner">
+							<p>Typical escalation starts at 1–2 mg/week and increases gradually every 4 weeks based on tolerance. Doses range from 1 mg/week up to 12 mg/week. Each vial contains a 4-week supply at the selected weekly dose. Your provider reviews progress at each stage and adjusts accordingly.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="rtd-faq-2">
+						<span class="myo-faq__q">Why is access to this program restricted?</span>
+						<span class="myo-faq__icon" aria-hidden="true"></span>
+					</button>
+					<div class="myo-faq__panel" id="rtd-faq-2">
+						<div class="myo-faq__panel-inner">
+							<p>Retatrutide is a newer compound with a higher potency profile. We currently offer it exclusively through verified clinic partner referrals to ensure every patient has appropriate clinical oversight and tighter monitoring during dose escalation.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="rtd-faq-3">
+						<span class="myo-faq__q">Do I need a new consultation for refills?</span>
+						<span class="myo-faq__icon" aria-hidden="true"></span>
+					</button>
+					<div class="myo-faq__panel" id="rtd-faq-3">
+						<div class="myo-faq__panel-inner">
+							<p>No. Once your treatment plan is established, refills ship on your chosen schedule. Your provider may request a brief check-in every few months, but no new full consultation is required for standard refills.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="rtd-faq-4">
+						<span class="myo-faq__q">How is this compounded and where does it ship from?</span>
+						<span class="myo-faq__icon" aria-hidden="true"></span>
+					</button>
+					<div class="myo-faq__panel" id="rtd-faq-4">
+						<div class="myo-faq__panel-inner">
+							<p>Your retatrutide is compounded by a licensed U.S. FDA-registered 503A pharmacy as a sterile injectable solution. It ships in temperature-controlled packaging with syringes and all necessary supplies.</p>
+						</div>
+					</div>
+				</div>
+
 			</div>
+
+			<div class="myo-faq__cta">
+				<a href="#buy" class="myo-faq__cta-btn">Configure your program &rarr;</a>
+			</div>
+
 		</div>
 	</section>
 

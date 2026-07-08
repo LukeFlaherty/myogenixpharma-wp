@@ -25,23 +25,23 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		items.forEach( function ( btn ) {
 			btn.addEventListener( 'click', function () {
 				var isExpanded = this.getAttribute( 'aria-expanded' ) === 'true';
-				var answer     = document.getElementById( this.getAttribute( 'aria-controls' ) );
-				if ( ! answer ) return;
+				var panel      = document.getElementById( this.getAttribute( 'aria-controls' ) );
+				if ( ! panel ) return;
 
 				items.forEach( function ( other ) {
 					if ( other === btn ) return;
 					other.setAttribute( 'aria-expanded', 'false' );
-					var otherAns = document.getElementById( other.getAttribute( 'aria-controls' ) );
-					if ( otherAns ) otherAns.classList.remove( 'is-open' );
+					var otherPanel = document.getElementById( other.getAttribute( 'aria-controls' ) );
+					if ( otherPanel ) otherPanel.classList.remove( 'is-open' );
 				} );
 
 				this.setAttribute( 'aria-expanded', String( ! isExpanded ) );
-				answer.classList.toggle( 'is-open', ! isExpanded );
+				panel.classList.toggle( 'is-open', ! isExpanded );
 			} );
 		} );
 	}
 
-	initAccordion( '.myogenix-pdp__cq-question' );
+	initAccordion( '.myo-faq__btn' );
 
 	/* -----------------------------------------------------------------------
 	   Product configurator
