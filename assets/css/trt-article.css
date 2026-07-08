@@ -4,7 +4,7 @@
    ========================================================================== */
 
 :root {
-	--art-purple:  #5b4bc4;
+	--art-purple:  #ef4444;
 	--art-orange:  #e8962a;
 	--art-dark:    #1a1a1a;
 	--art-text:    #2d2d2d;
@@ -149,7 +149,6 @@
 
 .trt-takeaway {
 	background: var(--art-bg);
-	border-left: 4px solid var(--art-purple);
 	border-radius: 8px;
 	padding: 24px 28px;
 	margin: 0 0 2em;
@@ -212,8 +211,8 @@
 }
 
 .trt-cta-block--accent {
-	background: linear-gradient(135deg, #f8f5ff 0%, #fff 100%);
-	border-color: #c5b8f0;
+	background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+	border-color: #fca5a5;
 }
 
 .trt-cta-block__img {
@@ -273,7 +272,7 @@
 }
 
 .trt-cta-block__btn:hover {
-	background: #4a3aad;
+	background: #dc2626;
 	color: #fff !important;
 }
 
@@ -440,7 +439,7 @@
 }
 
 .trt-simple-cta__btn:hover {
-	background: #4a3aad;
+	background: #dc2626;
 	color: #fff !important;
 }
 
@@ -538,7 +537,7 @@
 	font-size: 0.7rem;
 	font-weight: 700;
 	color: var(--art-purple);
-	background: #f0eeff;
+	background: #fef2f2;
 	border-radius: 4px;
 	padding: 2px 7px;
 	margin-bottom: 10px;
