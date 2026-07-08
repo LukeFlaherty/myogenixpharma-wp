@@ -620,7 +620,7 @@
 	left: 0;
 	right: 0;
 	background: #0d0d0d;
-	border-top: 3px solid var(--art-orange);
+	border-top: 3px solid #ef4444;
 	z-index: 9999;
 	padding: 14px 40px;
 }
@@ -676,8 +676,8 @@
 
 .trt-sticky-bar__btn {
 	display: inline-block;
-	background: #e8e44a;
-	color: #0d0d0d !important;
+	background: #ef4444;
+	color: #fff !important;
 	font-weight: 800;
 	font-size: 0.95rem;
 	padding: 13px 36px;
@@ -688,7 +688,7 @@
 	flex-shrink: 0;
 }
 
-.trt-sticky-bar__btn:hover { background: #d4d038; }
+.trt-sticky-bar__btn:hover { background: #dc2626; }
 
 /* push page content up so sticky bar doesn't cover footer */
 body.page-template-page-trt-article {

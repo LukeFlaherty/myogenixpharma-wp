@@ -37,7 +37,7 @@ add_action( 'wp_enqueue_scripts', function() {
 		'myogenix-trt-article',
 		get_stylesheet_directory_uri() . '/assets/css/trt-article.css',
 		[ 'myogenix-home' ],
-		'1.1.0'
+		'1.2.0'
 	);
 } );
 
