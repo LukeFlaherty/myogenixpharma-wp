@@ -88,86 +88,35 @@ rsync -avz --progress \
 
 | Environment | URL | Branch | Purpose |
 |---|---|---|---|
-| Production | `https://myogenixpharma.com` | `main` | Live site |
-| Staging | `https://staging-b59c-ecom-adamb01445d7f0c-kpnrf.wpcomstaging.com` | `staging` | Pre-deploy testing |
+| Production | `https://myogenixpharma.com` | `main` | Live site — only environment in use |
 
-**Staging is the primary preview environment.** It has all plugins licensed and configured, real product data, and mirrors production exactly. Always verify on staging before merging to main.
-
-### Critical: after any production → staging database sync
-
-WordPress.com's sync copies the database but does NOT preserve all staging-specific state. After every sync, run these steps in order:
-
-1. **Activate the child theme** (sync often resets this):
-   ```bash
-   ssh ecom-adamb01445d7f0c-kpnrf.wordpress.com@ssh.wp.com "wp theme activate myogenix-theme"
-   ```
-2. **Flush Elementor cache** (CSS regenerates with correct staging URLs):
-   ```bash
-   ssh ecom-adamb01445d7f0c-kpnrf.wordpress.com@ssh.wp.com "wp cache flush && wp elementor flush-css"
-   ```
-3. **Re-apply Elementor Single Product exclude conditions** (sync overwrites these from production):
-   ```bash
-   ssh ecom-adamb01445d7f0c-kpnrf.wordpress.com@ssh.wp.com "
-   wp post meta update 990 _elementor_conditions '[\"include/product\",\"exclude/singular/product/4063\",\"exclude/singular/product/4041\",\"exclude/singular/product/4537\"]' --format=json &&
-   wp option update elementor_pro_theme_builder_conditions '{\"single\":{\"990\":[\"include\/product\",\"exclude\/singular\/product\/4063\",\"exclude\/singular\/product\/4041\",\"exclude\/singular\/product\/4537\"]},\"archive\":{\"2039\":[\"include\/product_archive\/shop_page\"]},\"elementor_head\":{\"1695\":[\"include\/general\"]},\"elementor_body_end\":{\"1636\":[\"include\/woocommerce\"]},\"footer\":{\"914\":[\"include\/general\"]},\"header\":{\"898\":[\"include\/general\"]}}' --format=json &&
-   wp cache flush && wp elementor flush-css
-   "
-   ```
-4. If the site still looks broken in Elementor, go to **Elementor → Tools → Clear Files & Data**, then hard refresh.
-5. Do NOT try Elementor → Tools → Replace URL — WordPress.com staging sync handles URL replacement automatically (it returns 0 rows affected).
-6. If Elementor CSS files 404 after clearing, switch **Elementor → Settings → Performance → CSS Print Method → Internal Embedding**, save, clear again.
-
-If nothing works: **Jetpack → Activity Log → restore to the snapshot before the sync**. The git-deployed theme files survive a database-only restore.
-
----
+**Deploy directly to production.** Push to `main` and verify on the live site.
 
 ## Deploy Pipeline
 
 Deploys are automatic via WordPress.com GitHub Deployments (native, no GitHub Actions required).
 
-- Push to `staging` branch → deploys to staging site in ~30 seconds
 - Push to `main` branch → deploys to production in ~30 seconds
 
-### Standard workflow — every change follows this path
+**Staging is not used.** Deploy directly to production on the `main` branch.
+
+### Standard workflow
 
 ```bash
-# Always start on staging
-git checkout staging
+git checkout main
 
 # Make changes, commit
-git add .
+git add <files>
 git commit -m "describe what you changed"
-git push
+git push origin main
 
-# Wait ~30 seconds, verify on staging URL:
-# https://staging-b59c-ecom-adamb01445d7f0c-kpnrf.wpcomstaging.com
-# Test the specific page/feature you changed. Check console, check mobile, check real product data.
-
-# When confirmed good, promote to production:
-git checkout main
-git merge staging
-git push
-
-# Return to staging for next work
-git checkout staging
+# Site is live in ~30 seconds
+# Verify on https://myogenixpharma.com
 ```
 
 **Rules:**
-- Never commit directly to `main`
-- Never merge to `main` without first verifying on staging URL
-- If staging breaks, fix on staging branch before touching main
-- Pull before pushing if working across machines: `git pull origin staging`
-
-### What the staging check needs to cover
-
-For any template or WooCommerce change, verify on staging:
-- The page loads without PHP errors (check server logs in WordPress.com dashboard → Logs if anything looks off)
-- Add-to-cart works
-- Variations update price display
-- Subscription pricing shows correctly
-- Affiliate tracking cookie still sets (test with `?ref=123` in URL, check browser cookies for `affwp_ref`)
-- Checkout reaches Stripe payment step
-- Mobile layout renders
+- Always work on and push to `main`
+- Pull before pushing if working across machines: `git pull origin main`
 
 ---
 
