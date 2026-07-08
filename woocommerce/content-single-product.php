@@ -529,18 +529,10 @@ if ( $is_weight_loss ) :
 	<section class="myogenix-pdp__explore">
 		<div class="myogenix-pdp__container">
 			<h2 class="myogenix-pdp__section-heading">Explore More Treatment Lines</h2>
-			<p class="myogenix-pdp__section-sub">The telehealth provider of choice for holistic care.</p>
-			<div class="myogenix-pdp__explore-grid">
-				<a href="<?php echo esc_url( home_url( '/mens-health/' ) ); ?>" class="myogenix-pdp__explore-link">
-					<img src="<?php echo $img_url( 'PDP Sections/mens health.png' ); ?>" alt="Men's Health" />
-				</a>
-				<a href="<?php echo esc_url( home_url( '/womens-health/' ) ); ?>" class="myogenix-pdp__explore-link">
-					<img src="<?php echo $img_url( 'PDP Sections/womens health.png' ); ?>" alt="Women's Health" />
-				</a>
-			</div>
+			<p class="myogenix-pdp__section-sub">Provider-reviewed programs for every health goal.</p>
+			<?php myogenix_render_product_scrollers( [ 'weight-loss', 'peptides' ], $product->get_id() ); ?>
 		</div>
 	</section>
-
 
 </div>
 
@@ -889,15 +881,8 @@ if ( $is_weight_loss ) :
 	<section class="myogenix-pdp__explore">
 		<div class="myogenix-pdp__container">
 			<h2 class="myogenix-pdp__section-heading">Explore More Treatment Lines</h2>
-			<p class="myogenix-pdp__section-sub">The telehealth provider of choice for holistic care.</p>
-			<div class="myogenix-pdp__explore-grid">
-				<a href="<?php echo esc_url( home_url( '/weight-management/' ) ); ?>" class="myogenix-pdp__explore-link">
-					<img src="<?php echo $img_url( 'PDP Sections/mens health.png' ); ?>" alt="Weight Management" />
-				</a>
-				<a href="<?php echo esc_url( home_url( '/womens-health/' ) ); ?>" class="myogenix-pdp__explore-link">
-					<img src="<?php echo $img_url( 'PDP Sections/womens health.png' ); ?>" alt="Women's Health" />
-				</a>
-			</div>
+			<p class="myogenix-pdp__section-sub">Provider-reviewed programs for every health goal.</p>
+			<?php myogenix_render_product_scrollers( [ 'peptides' ], $product->get_id() ); ?>
 		</div>
 	</section>
 
@@ -1331,15 +1316,8 @@ if ( $is_weight_loss ) :
 	<section class="myogenix-pdp__explore">
 		<div class="myogenix-pdp__container">
 			<h2 class="myogenix-pdp__section-heading">Explore More Treatment Lines</h2>
-			<p class="myogenix-pdp__section-sub">The telehealth provider of choice for holistic care.</p>
-			<div class="myogenix-pdp__explore-grid">
-				<a href="<?php echo esc_url( home_url( '/weight-management/' ) ); ?>" class="myogenix-pdp__explore-link">
-					<img src="<?php echo $img_url( 'PDP Sections/mens health.png' ); ?>" alt="Weight Management" />
-				</a>
-				<a href="<?php echo esc_url( home_url( '/womens-health/' ) ); ?>" class="myogenix-pdp__explore-link">
-					<img src="<?php echo $img_url( 'PDP Sections/womens health.png' ); ?>" alt="Women's Health" />
-				</a>
-			</div>
+			<p class="myogenix-pdp__section-sub">Provider-reviewed programs for every health goal.</p>
+			<?php myogenix_render_product_scrollers( [ 'mens-health', 'peptides' ], $product->get_id() ); ?>
 		</div>
 	</section>
 
