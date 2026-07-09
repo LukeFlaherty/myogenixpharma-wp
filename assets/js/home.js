@@ -13,16 +13,12 @@
     });
   }
 
-  // ── FAQ accordion (matches .myo-faq behavior on PDP, pdp.js) ──
-  // home.js loads on every page (it also drives the sitewide navbar), but PDP/
-  // peptide/sexual-health pages already run their own accordion init on the same
-  // .myo-faq__btn markup. Without this guard, two click handlers fire per click
-  // and immediately cancel each other out, leaving the FAQ un-clickable there.
-  // Scope this block to the home page only, where home.js is the sole accordion.
-  if (!document.body.classList.contains('myogenix-home-page')) {
-    return;
-  }
-
+  // ── FAQ accordion (site-wide: home page, category pages, and any PDP that
+  //    doesn't load its own pdp.js/peptide-pdp.js/sexual-health-pdp.js) ──
+  // home.js is enqueued unconditionally on every page, so this is the single
+  // shared accordion handler for .myo-faq__btn. PDP-specific scripts must NOT
+  // duplicate this logic (see pdp.js) — two click listeners on the same button
+  // toggle aria-expanded twice per click and cancel each other out.
   var faqBtns = Array.prototype.slice.call(document.querySelectorAll('.myo-faq__btn'));
 
   faqBtns.forEach(function (btn) {

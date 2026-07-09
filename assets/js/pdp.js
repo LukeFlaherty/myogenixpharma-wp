@@ -18,30 +18,10 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	}
 
 	/* -----------------------------------------------------------------------
-	   Accordion helper (Common Questions section)
+	   FAQ accordion is handled site-wide by home.js (enqueued on every page) —
+	   don't duplicate it here, two listeners on the same button cancel each
+	   other's toggle out.
 	----------------------------------------------------------------------- */
-	function initAccordion( selector ) {
-		var items = Array.prototype.slice.call( document.querySelectorAll( selector ) );
-		items.forEach( function ( btn ) {
-			btn.addEventListener( 'click', function () {
-				var isExpanded = this.getAttribute( 'aria-expanded' ) === 'true';
-				var panel      = document.getElementById( this.getAttribute( 'aria-controls' ) );
-				if ( ! panel ) return;
-
-				items.forEach( function ( other ) {
-					if ( other === btn ) return;
-					other.setAttribute( 'aria-expanded', 'false' );
-					var otherPanel = document.getElementById( other.getAttribute( 'aria-controls' ) );
-					if ( otherPanel ) otherPanel.classList.remove( 'is-open' );
-				} );
-
-				this.setAttribute( 'aria-expanded', String( ! isExpanded ) );
-				panel.classList.toggle( 'is-open', ! isExpanded );
-			} );
-		} );
-	}
-
-	initAccordion( '.myo-faq__btn' );
 
 	/* -----------------------------------------------------------------------
 	   Product configurator

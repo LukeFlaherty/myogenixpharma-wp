@@ -102,24 +102,8 @@
 
 	render();
 
-	// FAQ accordion
-	( function () {
-		var btns = Array.prototype.slice.call( document.querySelectorAll( '.myo-faq__btn' ) );
-		btns.forEach( function ( btn ) {
-			btn.addEventListener( 'click', function () {
-				var isExpanded = this.getAttribute( 'aria-expanded' ) === 'true';
-				var panel      = document.getElementById( this.getAttribute( 'aria-controls' ) );
-				if ( ! panel ) return;
-				btns.forEach( function ( other ) {
-					if ( other === btn ) return;
-					other.setAttribute( 'aria-expanded', 'false' );
-					var op = document.getElementById( other.getAttribute( 'aria-controls' ) );
-					if ( op ) op.classList.remove( 'is-open' );
-				} );
-				this.setAttribute( 'aria-expanded', String( ! isExpanded ) );
-				panel.classList.toggle( 'is-open', ! isExpanded );
-			} );
-		} );
-	}() );
+	// FAQ accordion is handled site-wide by home.js (enqueued on every page) —
+	// don't duplicate it here, two listeners on the same button cancel each
+	// other's toggle out.
 
 }() );
