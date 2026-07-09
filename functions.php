@@ -595,7 +595,7 @@ function myogenix_render_product_scrollers( array $category_slugs, int $exclude_
 		'wolverine'    => [ 'name' => 'Wolverine',      'tagline' => 'Elite tissue recovery',      'unit' => '/vial' ],
 		'tesamorelin'  => [ 'name' => 'Tesamorelin',    'tagline' => 'GH optimization',            'unit' => '/vial' ],
 		'klow'         => [ 'name' => 'Klow',           'tagline' => 'Metabolic support',          'unit' => '/vial' ],
-		'glow'         => [ 'name' => 'Glow',           'tagline' => 'Longevity & renewal',        'unit' => '/vial' ],
+		'glow'         => [ 'name' => 'Glutathione',    'tagline' => 'Longevity & renewal',        'unit' => '/vial' ],
 		'bpc'          => [ 'name' => 'BPC-157',        'tagline' => 'Healing & repair',           'unit' => '/vial' ],
 		'motsc'        => [ 'name' => 'MOTSc',          'tagline' => 'Mitochondrial health',       'unit' => '/vial' ],
 		'epithalon'    => [ 'name' => 'Epithalon',      'tagline' => 'Longevity peptide',          'unit' => '/vial' ],
