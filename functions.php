@@ -76,6 +76,18 @@ add_action( 'wp_enqueue_scripts', function() {
 	wp_dequeue_script( 'widget-woocommerce-menu-cart' );
 }, PHP_INT_MAX );
 
+// TEMP DEBUG — remove after diagnosing why the dequeue above isn't taking effect.
+add_action( 'wp_head', function() {
+	if ( ! is_page_template( 'page-reach-a-concierge.php' ) ) return;
+	global $wp_styles;
+	$handles = [ 'elementor-post-898-css', 'widget-nav-menu-css', 'widget-off-canvas-css', 'widget-woocommerce-menu-cart-css' ];
+	echo "\n<!-- RAC-DEBUG queue-at-wp_head-999999: ";
+	foreach ( $handles as $h ) {
+		echo $h . '=' . ( in_array( $h, $wp_styles->queue, true ) ? 'QUEUED' : 'not-queued' ) . ' ';
+	}
+	echo "-->\n";
+}, 999999 );
+
 // ─── Retatrutide password gate ────────────────────────────────────────────────
 add_action( 'template_redirect', function () {
 	if ( ! is_page( 'retatrutide' ) ) return;
