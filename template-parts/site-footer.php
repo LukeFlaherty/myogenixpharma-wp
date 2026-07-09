@@ -41,6 +41,7 @@ $_footer_year     = (int) date( 'Y' );
 					<li><a href="<?php echo esc_url( home_url( '/#how-it-works' ) ); ?>">How it works</a></li>
 					<li><a href="<?php echo esc_url( home_url( '/#faq' ) ); ?>">FAQ</a></li>
 					<li><a href="<?php echo esc_url( home_url( '/affiliates/' ) ); ?>">Affiliate Program</a></li>
+					<li><a href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Reach a Concierge</a></li>
 				</ul>
 			</div>
 
