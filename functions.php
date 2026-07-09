@@ -484,7 +484,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
 			[],
-			'1.8.1'
+			'1.9.0'
 		);
 	}
 
@@ -761,3 +761,98 @@ add_filter( 'woocommerce_default_address_fields', function ( $fields ) {
 	}
 	return $fields;
 } );
+
+/* ==========================================================================
+   Product FAQ — meta box + render helper
+   ========================================================================== */
+
+add_action( 'add_meta_boxes', function() {
+	add_meta_box(
+		'myogenix_product_faq',
+		'Product FAQ (6 Questions)',
+		'myogenix_faq_meta_box_html',
+		'product',
+		'normal',
+		'default'
+	);
+} );
+
+function myogenix_faq_meta_box_html( $post ) {
+	$faqs = get_post_meta( $post->ID, '_product_faq', true );
+	if ( ! is_array( $faqs ) ) {
+		$faqs = [];
+	}
+	while ( count( $faqs ) < 6 ) {
+		$faqs[] = [ 'q' => '', 'a' => '' ];
+	}
+	wp_nonce_field( 'myogenix_faq_save', 'myogenix_faq_nonce' );
+	echo '<p style="color:#666;font-size:13px;margin:0 0 16px;">These 6 questions appear in the FAQ accordion on the product page. Plain text only — no HTML.</p>';
+	for ( $i = 0; $i < 6; $i++ ) :
+		$border = $i > 0 ? 'border-top:1px solid #eee;padding-top:16px;' : '';
+		?>
+		<div style="<?= $border ?>margin-bottom:16px;">
+			<p style="margin:0 0 6px;font-weight:600;font-size:13px;color:#1d2327;">Q<?= $i + 1 ?></p>
+			<input type="text" name="product_faq[<?= $i ?>][q]"
+				   value="<?= esc_attr( $faqs[ $i ]['q'] ?? '' ) ?>"
+				   style="width:100%;margin-bottom:6px;" placeholder="Question..." />
+			<textarea name="product_faq[<?= $i ?>][a]" rows="3"
+					  style="width:100%;resize:vertical;" placeholder="Answer..."><?= esc_textarea( $faqs[ $i ]['a'] ?? '' ) ?></textarea>
+		</div>
+		<?php
+	endfor;
+}
+
+add_action( 'save_post_product', function( $post_id ) {
+	if ( ! isset( $_POST['myogenix_faq_nonce'] ) ) return;
+	if ( ! wp_verify_nonce( $_POST['myogenix_faq_nonce'], 'myogenix_faq_save' ) ) return;
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) return;
+	if ( ! current_user_can( 'edit_post', $post_id ) ) return;
+
+	$raw  = isset( $_POST['product_faq'] ) ? (array) $_POST['product_faq'] : [];
+	$faqs = [];
+	foreach ( $raw as $item ) {
+		$faqs[] = [
+			'q' => sanitize_text_field( $item['q'] ?? '' ),
+			'a' => sanitize_textarea_field( $item['a'] ?? '' ),
+		];
+	}
+	update_post_meta( $post_id, '_product_faq', array_slice( $faqs, 0, 6 ) );
+} );
+
+function myogenix_render_product_faq( $product_id ) {
+	$faqs = get_post_meta( $product_id, '_product_faq', true );
+	if ( ! is_array( $faqs ) ) return;
+	$faqs = array_values( array_filter( $faqs, fn( $f ) => ! empty( $f['q'] ) ) );
+	if ( empty( $faqs ) ) return;
+	?>
+	<section class="myo-faq">
+		<div class="myo-faq__wrap">
+			<div class="myo-faq__header">
+				<span class="myo-faq__eyebrow">FAQ</span>
+				<h2 class="myo-faq__title">Common questions</h2>
+				<p class="myo-faq__desc">Everything you need to know about the program, ordering, and what to expect before and after you start.</p>
+			</div>
+			<div class="myo-faq__list">
+				<?php foreach ( $faqs as $idx => $item ) :
+					$panel_id = 'pdp-faq-' . intval( $product_id ) . '-' . $idx;
+				?>
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="<?= esc_attr( $panel_id ) ?>">
+						<span class="myo-faq__q"><?= esc_html( $item['q'] ) ?></span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+					</button>
+					<div class="myo-faq__panel" id="<?= esc_attr( $panel_id ) ?>">
+						<div class="myo-faq__panel-inner">
+							<p><?= nl2br( esc_html( $item['a'] ) ) ?></p>
+						</div>
+					</div>
+				</div>
+				<?php endforeach; ?>
+			</div>
+			<div class="myo-faq__cta">
+				<a href="#buy" class="myo-faq__cta-btn">Get started &rarr;</a>
+			</div>
+		</div>
+	</section>
+	<?php
+}
