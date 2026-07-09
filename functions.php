@@ -63,20 +63,17 @@ add_action( 'wp_enqueue_scripts', function() {
 // our own navbar — see header.php). The site footer (#914) still needs Elementor,
 // so its CSS/JS stays; only the unused header-template (#898) and header-only
 // widget assets (nav menu, off-canvas, mini-cart) are removed.
+// Priority 100 so this runs after Elementor's own wp_enqueue_scripts registration.
 add_action( 'wp_enqueue_scripts', function() {
 	if ( ! is_page_template( 'page-reach-a-concierge.php' ) ) return;
-	add_action( 'wp_print_styles', function() {
-		wp_dequeue_style( 'elementor-post-898-css' );
-		wp_dequeue_style( 'widget-nav-menu-css' );
-		wp_dequeue_style( 'widget-off-canvas-css' );
-		wp_dequeue_style( 'widget-woocommerce-menu-cart-css' );
-	}, 20 );
-	add_action( 'wp_print_scripts', function() {
-		wp_dequeue_script( 'widget-nav-menu' );
-		wp_dequeue_script( 'widget-off-canvas' );
-		wp_dequeue_script( 'widget-woocommerce-menu-cart' );
-	}, 20 );
-}, 20 );
+	wp_dequeue_style( 'elementor-post-898-css' );
+	wp_dequeue_style( 'widget-nav-menu-css' );
+	wp_dequeue_style( 'widget-off-canvas-css' );
+	wp_dequeue_style( 'widget-woocommerce-menu-cart-css' );
+	wp_dequeue_script( 'widget-nav-menu' );
+	wp_dequeue_script( 'widget-off-canvas' );
+	wp_dequeue_script( 'widget-woocommerce-menu-cart' );
+}, 100 );
 
 // ─── Retatrutide password gate ────────────────────────────────────────────────
 add_action( 'template_redirect', function () {
