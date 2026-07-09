@@ -59,27 +59,14 @@ add_action( 'wp_enqueue_scripts', function() {
 	);
 } );
 
-// Drop the Elementor assets this page never uses (header widgets are bypassed by
-// our own navbar — see header.php). Only the unused header-template (#898) and
-// header-only widget assets (nav menu, off-canvas, mini-cart) are removed here;
-// the footer template (#914) is also bypassed sitewide (see footer.php) but its
-// leftover CSS/JS handles aren't dequeued yet.
-// Runs at the lowest possible priority so it fires after Elementor Pro's own
-// (late-priority) theme-builder asset registration on wp_enqueue_scripts.
-// These are force-printed by Elementor Pro's theme-builder location matcher via
-// direct wp_styles()->do_item() / wp_print_styles( $handles ) calls, which ignore
-// the normal dequeue — a plain wp_dequeue_style() has no effect. Deregistering
-// them removes the handle entirely so the forced print has nothing to output.
-add_action( 'wp_enqueue_scripts', function() {
-	if ( ! is_page_template( 'page-reach-a-concierge.php' ) ) return;
-	wp_deregister_style( 'elementor-post-898-css' );
-	wp_deregister_style( 'widget-nav-menu-css' );
-	wp_deregister_style( 'widget-off-canvas-css' );
-	wp_deregister_style( 'widget-woocommerce-menu-cart-css' );
-	wp_deregister_script( 'widget-nav-menu' );
-	wp_deregister_script( 'widget-off-canvas' );
-	wp_deregister_script( 'widget-woocommerce-menu-cart' );
-}, PHP_INT_MAX );
+// NOTE: Elementor Pro's Header template (#898) is excluded from this page via an
+// "exclude/singular/page/4757" condition set directly in the database (both
+// _elementor_conditions postmeta on post 898 and the elementor_pro_theme_builder_conditions
+// option cache — see CLAUDE.md "Elementor Conditions Management"). That's the only
+// thing that actually stops its CSS/JS from loading here: Elementor Pro force-prints
+// theme-builder assets via direct wp_styles()->do_item() calls that ignore
+// wp_dequeue_style()/wp_deregister_style() entirely, so PHP-side removal doesn't work —
+// the page has to be excluded from the template's match conditions instead.
 
 // ─── Retatrutide password gate ────────────────────────────────────────────────
 add_action( 'template_redirect', function () {
