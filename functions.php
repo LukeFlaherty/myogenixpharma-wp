@@ -54,7 +54,7 @@ add_action( 'wp_enqueue_scripts', function() {
 		'myogenix-reach-a-concierge',
 		get_stylesheet_directory_uri() . '/assets/js/reach-a-concierge.js',
 		[],
-		'1.5.0',
+		'1.6.0',
 		true
 	);
 } );

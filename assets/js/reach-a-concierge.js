@@ -14,12 +14,7 @@
 
 		if (!form) return;
 
-		// Prefill email from Klaviyo URL param, e.g. ?email=jane%40example.com
-		var params = new URLSearchParams(window.location.search);
-		var prefillEmail = params.get('email');
-		if (prefillEmail) {
-			emailEl.value = decodeURIComponent(prefillEmail);
-		}
+		messageEl.value = 'Send me more information!';
 
 		// Click-to-toggle product cards.
 		productsEl.addEventListener('click', function (e) {

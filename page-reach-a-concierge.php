@@ -1,7 +1,7 @@
 <?php
 /**
  * Template Name: Reach a Concierge
- * Description: Klaviyo landing page — prefilled contact form for concierge follow-up. Submits to GHL webhook.
+ * Description: Klaviyo landing page — contact form for concierge follow-up. Submits to GHL webhook.
  */
 
 defined( 'ABSPATH' ) || exit;
