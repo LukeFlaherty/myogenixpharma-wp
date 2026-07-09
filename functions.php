@@ -25,7 +25,7 @@ add_action( 'wp_enqueue_scripts', function() {
 		'myogenix-home',
 		get_stylesheet_directory_uri() . '/assets/js/home.js',
 		[],
-		'1.5.0',
+		'1.5.1',
 		true
 	);
 } );
