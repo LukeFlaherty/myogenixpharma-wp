@@ -524,7 +524,7 @@ add_action( 'wp_enqueue_scripts', function() {
 				'myogenix-sexual-health-pdp',
 				get_stylesheet_directory_uri() . '/assets/js/sexual-health-pdp.js',
 				[],
-				'1.1.0',
+				'1.1.1',
 				true
 			);
 		}
@@ -572,7 +572,7 @@ function myogenix_render_product_scrollers( array $category_slugs, int $exclude_
 		'bpc'          => [ 'name' => 'BPC-157',        'tagline' => 'Healing & repair',           'unit' => '/vial' ],
 		'motsc'        => [ 'name' => 'MOTSc',          'tagline' => 'Mitochondrial health',       'unit' => '/vial' ],
 		'epithalon'    => [ 'name' => 'Epithalon',      'tagline' => 'Longevity peptide',          'unit' => '/vial' ],
-		'tadalafil'    => [ 'name' => 'Tadalafil',      'tagline' => 'Daily ED support',           'unit' => '/mo', 'months_supply' => 3 ],
+		'tadalafil'    => [ 'name' => 'Tadalafil',      'tagline' => 'Daily ED support',           'unit' => '/tablet', 'tablets_supply' => 90 ],
 		'sildenafil'   => [ 'name' => 'Sildenafil',     'tagline' => 'Fast-acting ED treatment',   'unit' => '/mo'   ],
 		'testosterone' => [ 'name' => 'Testosterone',   'tagline' => 'Hormone optimization',       'unit' => '/mo'   ],
 	];
@@ -641,6 +641,8 @@ function myogenix_render_product_scrollers( array $category_slugs, int $exclude_
 		}
 		$months = isset( $all_meta[ $key ]['months_supply'] ) ? (int) $all_meta[ $key ]['months_supply'] : 1;
 		if ( $months > 1 ) $raw_price = $raw_price / $months;
+		$tablets_supply = isset( $all_meta[ $key ]['tablets_supply'] ) ? (int) $all_meta[ $key ]['tablets_supply'] : 0;
+		if ( $tablets_supply > 0 ) $raw_price = $raw_price / $tablets_supply;
 		$products[ $key ] = [
 			'price' => $raw_price,
 			'url'   => $wc->get_permalink(),
@@ -663,9 +665,10 @@ function myogenix_render_product_scrollers( array $category_slugs, int $exclude_
 		$rendered = 0;
 		foreach ( $cat['products'] as $pkey ) {
 			if ( empty( $products[ $pkey ] ) ) continue;
-			$p     = $products[ $pkey ];
-			$m     = $all_meta[ $pkey ];
-			$price = '$' . number_format( $p['price'], 0 );
+			$p       = $products[ $pkey ];
+			$m       = $all_meta[ $pkey ];
+			$decimals = ( '/tablet' === $m['unit'] ) ? 2 : 0;
+			$price   = '$' . number_format( $p['price'], $decimals );
 			printf(
 				'<a href="%s" class="hp-card" aria-label="%s">
 					<div class="hp-card__img-wrap">

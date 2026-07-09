@@ -2,7 +2,7 @@
  * Sexual health PDP configurator.
  * Handles 1D (dosage only) and 2D (dosage × tablets) variable products.
  * Reads config from data-* attributes on #pdp-cfg.
- * @version 1.0.3
+ * @version 1.0.4
  */
 ( function () {
 	'use strict';
@@ -20,10 +20,18 @@
 	var primaryLabels   = JSON.parse( cfg.getAttribute( 'data-primary-labels' )   || '{}' );
 	var secondaryLabels = JSON.parse( cfg.getAttribute( 'data-secondary-labels' ) || '{}' );
 	var productId       = cfg.getAttribute( 'data-product-id' ) || '';
+	var monthlyBilling  = cfg.getAttribute( 'data-monthly-billing' ) === '1';
 
 	var primaryKeys   = Object.keys( matrix );
 	var hasSecondary  = !! secondaryAttr;
 	var secondaryKeys = [];
+
+	// Fixed tablet count baked into fixedAttrs (e.g. Tadalafil: always 90 tablets).
+	// Used to show a per-tablet subline on 1D (dosage-only) products.
+	var fixedTabletKey = Object.keys( fixedAttrs ).filter( function ( k ) {
+		return /tablets/i.test( k );
+	} )[ 0 ];
+	var fixedTabletCount = fixedTabletKey ? extractNum( fixedAttrs[ fixedTabletKey ] ) : 0;
 
 	if ( hasSecondary && primaryKeys.length ) {
 		secondaryKeys = Object.keys( matrix[ primaryKeys[0] ] );
@@ -73,8 +81,10 @@
 		var entry = getEntry();
 		if ( ! entry ) { el.innerHTML = ''; return; }
 
-		// 1D multi-month plan (e.g. TRT 3-month): show per-month as the headline price
-		if ( ! hasSecondary ) {
+		// 1D multi-month plan (e.g. TRT 3-month): show per-month as the headline price.
+		// Gated on data-monthly-billing so only the subscription-plan product (TRT) hits
+		// this path — other 1D products (e.g. Tadalafil, keyed by dosage) must not.
+		if ( ! hasSecondary && monthlyBilling ) {
 			var months = extractNum( state.primary );
 			if ( months > 1 ) {
 				var perMonth = entry.price / months;
@@ -123,6 +133,9 @@
 					}
 				}
 			}
+		} else if ( ! hasSecondary && fixedTabletCount > 0 ) {
+			// e.g. Tadalafil: dosage-only product with a fixed tablet fill — show per-tablet price.
+			subLine = fmt( entry.price / fixedTabletCount ) + '/tablet';
 		}
 
 		el.innerHTML =

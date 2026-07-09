@@ -967,6 +967,7 @@ if ( $is_weight_loss ) :
 					data-fixed-attrs="<?php echo esc_attr( wp_json_encode( $shcfg['fixed_attrs'] ) ); ?>"
 					data-primary-labels="<?php echo esc_attr( wp_json_encode( $primary_labels ) ); ?>"
 					data-secondary-labels="<?php echo esc_attr( wp_json_encode( $secondary_labels ) ); ?>"
+					data-monthly-billing="<?php echo $slug === 'testosterone' ? '1' : '0'; ?>"
 					<?php if ( $slug === 'testosterone' ) : ?>
 					data-trt-allowed-states="<?php echo esc_attr( wp_json_encode( $trt_allowed_states ) ); ?>"
 					<?php endif; ?>
