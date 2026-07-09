@@ -41,6 +41,24 @@ add_action( 'wp_enqueue_scripts', function() {
 	);
 } );
 
+// ─── Reach a Concierge page styles/script ────────────────────────────────────
+add_action( 'wp_enqueue_scripts', function() {
+	if ( ! is_page_template( 'page-reach-a-concierge.php' ) ) return;
+	wp_enqueue_style(
+		'myogenix-reach-a-concierge',
+		get_stylesheet_directory_uri() . '/assets/css/reach-a-concierge.css',
+		[],
+		'1.0.0'
+	);
+	wp_enqueue_script(
+		'myogenix-reach-a-concierge',
+		get_stylesheet_directory_uri() . '/assets/js/reach-a-concierge.js',
+		[],
+		'1.0.0',
+		true
+	);
+} );
+
 // ─── Retatrutide password gate ────────────────────────────────────────────────
 add_action( 'template_redirect', function () {
 	if ( ! is_page( 'retatrutide' ) ) return;
