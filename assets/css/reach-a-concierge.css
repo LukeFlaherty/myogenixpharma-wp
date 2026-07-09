@@ -155,9 +155,21 @@ body.page-template-page-reach-a-concierge header.home-nav + * {
 	margin-bottom: 8px;
 }
 
+/* Mobile: one scrollable row instead of stacking into 2x2. */
 @media (max-width: 480px) {
 	.rac-products {
-		grid-template-columns: repeat(2, 1fr);
+		display: flex;
+		overflow-x: auto;
+		overflow-y: hidden;
+		gap: 10px;
+		padding-bottom: 4px;
+		scroll-snap-type: x proximity;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.rac-product-card.rac-product-card {
+		flex: 0 0 100px;
+		scroll-snap-align: start;
 	}
 }
 
@@ -209,12 +221,17 @@ body.page-template-page-reach-a-concierge header.home-nav + * {
 	border-radius: 10px;
 	overflow: hidden;
 	background: #f7f7f8;
+	padding: 10px;
+	box-sizing: border-box;
 }
 
 .rac-product-card__img {
 	width: 100%;
 	height: 100%;
-	object-fit: cover;
+	/* Source bottle photos aren't cropped/framed consistently — contain (rather
+	   than cover) keeps every bottle at the same relative scale instead of one
+	   photo's crop making its bottle look larger than the others. */
+	object-fit: contain;
 	display: block;
 }
 

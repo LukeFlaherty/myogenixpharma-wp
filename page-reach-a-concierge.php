@@ -11,10 +11,10 @@ defined( 'ABSPATH' ) || exit;
 // Semaglutide, sexual-health -> Tadalafil, peptides-longevity -> BPC-157
 // (most-ordered peptide).
 $rac_categories = [
-	[ 'label' => 'TRT / Men\'s Health',   'product_id' => 883 ],
-	[ 'label' => 'Weight Loss',           'product_id' => 4041 ],
-	[ 'label' => 'Sexual Health',         'product_id' => 1886 ],
-	[ 'label' => 'Peptides',              'product_id' => 4249 ],
+	[ 'label' => 'TRT',           'product_id' => 883 ],
+	[ 'label' => 'Weight Loss',   'product_id' => 4041 ],
+	[ 'label' => 'Sexual Health', 'product_id' => 1886 ],
+	[ 'label' => 'Peptides',      'product_id' => 4249 ],
 ];
 foreach ( $rac_categories as &$rac_cat ) {
 	$rac_cat_product   = wc_get_product( $rac_cat['product_id'] );
