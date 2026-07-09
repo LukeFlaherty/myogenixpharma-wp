@@ -60,9 +60,10 @@ add_action( 'wp_enqueue_scripts', function() {
 } );
 
 // Drop the Elementor assets this page never uses (header widgets are bypassed by
-// our own navbar — see header.php). The site footer (#914) still needs Elementor,
-// so its CSS/JS stays; only the unused header-template (#898) and header-only
-// widget assets (nav menu, off-canvas, mini-cart) are removed.
+// our own navbar — see header.php). Only the unused header-template (#898) and
+// header-only widget assets (nav menu, off-canvas, mini-cart) are removed here;
+// the footer template (#914) is also bypassed sitewide (see footer.php) but its
+// leftover CSS/JS handles aren't dequeued yet.
 // Runs at the lowest possible priority so it fires after Elementor Pro's own
 // (late-priority) theme-builder asset registration on wp_enqueue_scripts.
 // These are force-printed by Elementor Pro's theme-builder location matcher via
