@@ -48,7 +48,21 @@ foreach ( array_keys( $mh_config ) as $slug ) {
 	foreach ( $product->get_children() as $vid ) {
 		if ( 'publish' !== get_post_status( $vid ) ) continue;
 		$price = (float) get_post_meta( $vid, '_price', true );
-		if ( $price > 0 && ( null === $min || $price < $min ) ) {
+		if ( $price <= 0 ) continue;
+
+		// Subscription variations bill every N months (N > 1) as a lump sum;
+		// normalize to per-month so "Starting from" matches the PDP/home-page
+		// figure instead of showing the full multi-month charge (e.g. TRT's
+		// $567/3mo -> $189/month).
+		if ( class_exists( 'WC_Subscriptions_Product' ) ) {
+			$interval = (int) WC_Subscriptions_Product::get_interval( $vid );
+			$period   = WC_Subscriptions_Product::get_period( $vid );
+			if ( $interval > 1 && 'month' === $period ) {
+				$price = $price / $interval;
+			}
+		}
+
+		if ( null === $min || $price < $min ) {
 			$min = $price;
 		}
 	}
