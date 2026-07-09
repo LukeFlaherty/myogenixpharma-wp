@@ -484,7 +484,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
 			[],
-			'1.9.2'
+			'1.9.3'
 		);
 	}
 
@@ -834,14 +834,17 @@ function myogenix_render_product_faq( $product_id ) {
 			</div>
 			<div class="myo-faq__list">
 				<?php foreach ( $faqs as $idx => $item ) :
-					$panel_id = 'pdp-faq-' . intval( $product_id ) . '-' . $idx;
+					$panel_id   = 'pdp-faq-' . intval( $product_id ) . '-' . $idx;
+					$is_first   = ( $idx === 0 );
+					$expanded   = $is_first ? 'true' : 'false';
+					$open_class = $is_first ? ' is-open' : '';
 				?>
 				<div class="myo-faq__item">
-					<button class="myo-faq__btn" type="button" aria-expanded="false" aria-controls="<?= esc_attr( $panel_id ) ?>">
+					<button class="myo-faq__btn" type="button" aria-expanded="<?= $expanded ?>" aria-controls="<?= esc_attr( $panel_id ) ?>">
 						<span class="myo-faq__q"><?= esc_html( $item['q'] ) ?></span>
 						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 					</button>
-					<div class="myo-faq__panel" id="<?= esc_attr( $panel_id ) ?>">
+					<div class="myo-faq__panel<?= $open_class ?>" id="<?= esc_attr( $panel_id ) ?>">
 						<div class="myo-faq__panel-inner">
 							<p><?= nl2br( esc_html( $item['a'] ) ) ?></p>
 						</div>

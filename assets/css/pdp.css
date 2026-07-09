@@ -1072,7 +1072,7 @@
 
 .myo-faq {
 	background: #fff;
-	padding: 40px 20px 48px;
+	padding: 24px 0 32px;
 	width: 100%;
 }
 
@@ -1169,6 +1169,7 @@
 	white-space: normal;
 	overflow-wrap: break-word;
 	word-break: break-word;
+	text-align: left !important;
 }
 
 /* Icon sits at far right, never shrinks */
