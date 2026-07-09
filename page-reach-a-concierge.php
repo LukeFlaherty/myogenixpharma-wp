@@ -6,29 +6,21 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$products = wc_get_products( [
-	'status'  => 'publish',
-	'limit'   => -1,
-	'orderby' => 'title',
-	'order'   => 'ASC',
-	'return'  => 'objects',
-] );
-
-// One representative bottle image per category, rather than each product's own photo —
-// keeps the selector scannable when every product is shown at once.
-// mens-health -> Testosterone Cypionate, weight-loss -> Semaglutide,
-// sexual-health -> Tadalafil, peptides-longevity -> BPC-157 (most-ordered peptide).
-$rac_category_reps = [
-	'mens-health'         => 883,
-	'weight-loss'         => 4041,
-	'sexual-health'       => 1886,
-	'peptides-longevity'  => 4249,
+// Four main categories, each shown as a single representative bottle — not a
+// card per product. mens-health -> Testosterone Cypionate, weight-loss ->
+// Semaglutide, sexual-health -> Tadalafil, peptides-longevity -> BPC-157
+// (most-ordered peptide).
+$rac_categories = [
+	[ 'label' => 'TRT / Men\'s Health',   'product_id' => 883 ],
+	[ 'label' => 'Weight Loss',           'product_id' => 4041 ],
+	[ 'label' => 'Sexual Health',         'product_id' => 1886 ],
+	[ 'label' => 'Peptides',              'product_id' => 4249 ],
 ];
-$rac_category_images = [];
-foreach ( $rac_category_reps as $cat_slug => $rep_id ) {
-	$rep_product = wc_get_product( $rep_id );
-	$rac_category_images[ $cat_slug ] = $rep_product ? wp_get_attachment_image_url( $rep_product->get_image_id(), 'thumbnail' ) : wc_placeholder_img_src( 'thumbnail' );
+foreach ( $rac_categories as &$rac_cat ) {
+	$rac_cat_product   = wc_get_product( $rac_cat['product_id'] );
+	$rac_cat['image']  = $rac_cat_product ? wp_get_attachment_image_url( $rac_cat_product->get_image_id(), 'medium' ) : wc_placeholder_img_src( 'medium' );
 }
+unset( $rac_cat );
 
 get_header();
 ?>
@@ -59,19 +51,15 @@ get_header();
 				<label class="rac-label" for="rac-phone">Phone number <span class="rac-label__optional">(optional)</span></label>
 				<input type="tel" id="rac-phone" name="phone" class="rac-input" placeholder="(555) 123-4567" autocomplete="tel" />
 
-				<label class="rac-label">Products I'm curious about</label>
+				<label class="rac-label">What are you interested in?</label>
 			</div>
-			<div id="rac-products" class="rac-products" role="group" aria-label="Products I'm curious about">
-				<?php foreach ( $products as $product ) :
-					$terms    = get_the_terms( $product->get_id(), 'product_cat' );
-					$cat_slug = ( $terms && ! is_wp_error( $terms ) ) ? $terms[0]->slug : '';
-					$img_url  = $rac_category_images[ $cat_slug ] ?? wc_placeholder_img_src( 'thumbnail' );
-					?>
-					<button type="button" class="rac-product-card" data-product="<?php echo esc_attr( $product->get_name() ); ?>" aria-pressed="false">
+			<div id="rac-products" class="rac-products" role="group" aria-label="What are you interested in?">
+				<?php foreach ( $rac_categories as $rac_cat ) : ?>
+					<button type="button" class="rac-product-card" data-product="<?php echo esc_attr( $rac_cat['label'] ); ?>" aria-pressed="false">
 						<span class="rac-product-card__img-wrap">
-							<img src="<?php echo esc_url( $img_url ); ?>" alt="" loading="lazy" class="rac-product-card__img" />
+							<img src="<?php echo esc_url( $rac_cat['image'] ); ?>" alt="" loading="lazy" class="rac-product-card__img" />
 						</span>
-						<span class="rac-product-card__name"><?php echo esc_html( $product->get_name() ); ?></span>
+						<span class="rac-product-card__name"><?php echo esc_html( $rac_cat['label'] ); ?></span>
 						<span class="rac-product-card__check" aria-hidden="true">&#10003;</span>
 					</button>
 				<?php endforeach; ?>

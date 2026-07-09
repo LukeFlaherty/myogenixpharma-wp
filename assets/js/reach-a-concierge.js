@@ -34,7 +34,7 @@
 
 			var email = emailEl.value.trim();
 			var phone = phoneEl.value.trim();
-			var selectedProducts = Array.prototype.map.call(
+			var selectedCategories = Array.prototype.map.call(
 				productsEl.querySelectorAll('.rac-product-card[aria-pressed="true"]'),
 				function (card) { return card.getAttribute('data-product'); }
 			);
@@ -50,14 +50,25 @@
 			btn.disabled = true;
 			btn.textContent = 'Sending…';
 
+			// GHL contact fields don't include "products interested in" out of the
+			// box, so also send a single pre-formatted "notes" string — map the
+			// workflow's Notes/custom field to {{notes}} in addition to (or instead
+			// of) the discrete fields below.
+			var interestsText = selectedCategories.length ? selectedCategories.join(', ') : 'None selected';
+			var notesLines = [ 'Interested in: ' + interestsText ];
+			if (message) notesLines.push('Message: ' + message);
+			var notes = notesLines.join('\n');
+
 			fetch(WEBHOOK_URL, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					email: email,
 					phone: phone,
-					products: selectedProducts,
+					categories: selectedCategories,
+					categories_text: interestsText,
 					message: message,
+					notes: notes,
 					source: 'Reach a Concierge Page'
 				})
 			}).then(function () {
