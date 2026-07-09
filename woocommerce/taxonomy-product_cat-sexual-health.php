@@ -102,6 +102,42 @@ $steps = [
 		'desc'  => 'Stay on track with regular free check-ins to ensure progress',
 	],
 ];
+
+// "How it works" — same design/content as the home page's home-how/hp-step section
+$hp_steps = [
+	[ 'num' => '01', 'img' => $img_url( 'PDP Sections/form.png' ),         'title' => 'Questionnaire',                    'desc' => 'Answer a few questions and share your medical details.'                          ],
+	[ 'num' => '02', 'img' => $img_url( 'PDP Sections/consultation.png' ), 'title' => 'Reviewed & approved by provider',  'desc' => 'Discuss your goals and receive expert recommendations.'                          ],
+	[ 'num' => '03', 'img' => $img_url( 'PDP Sections/box.png' ),          'title' => 'Receive medication',               'desc' => 'Medication and supplies shipped straight to your door.'                          ],
+	[ 'num' => '04', 'img' => $img_url( 'PDP Sections/calendar.png' ),     'title' => 'Monthly monitoring',               'desc' => 'Stay on track with regular free check-ins to ensure progress.'                   ],
+];
+
+// FAQ — same accordion design as the PDPs (.myo-faq), category-specific content
+$faqs = [
+	[
+		'q' => 'What is the difference between tadalafil and sildenafil?',
+		'a' => 'Both are PDE5 inhibitors that work by the same mechanism — increasing blood flow to support erections. The key difference is duration: sildenafil works within 30–60 minutes and lasts 4–6 hours, making it ideal for planned activity. Tadalafil lasts up to 36 hours and is also available as a once-daily low dose, which eliminates the need to time your medication at all.',
+	],
+	[
+		'q' => 'How quickly does each medication work?',
+		'a' => 'Sildenafil typically takes effect within 30–60 minutes and should be taken on an empty stomach for fastest absorption. Tadalafil as-needed takes effect in 30–45 minutes. Daily low-dose tadalafil builds steady-state levels that provide continuous readiness without timing. A heavy meal can slow absorption of either medication.',
+	],
+	[
+		'q' => 'Do I need a prescription?',
+		'a' => 'Yes — all ED medications require a valid prescription. Our process handles this for you. After you place your order and complete the health intake, a licensed provider reviews your information and issues a prescription if clinically appropriate. Your card is not charged until the order is approved. There is no separate consultation fee.',
+	],
+	[
+		'q' => 'Are there any contraindications I should know about?',
+		'a' => 'PDE5 inhibitors should not be taken with nitrate medications (such as nitroglycerin) as this combination can cause a dangerous drop in blood pressure. They should also be used with caution in patients with certain cardiovascular conditions. Your provider reviews your health intake for these contraindications before approving any order — if your profile is not a match, they will decline the order and inform you.',
+	],
+	[
+		'q' => 'What\'s included in my order?',
+		'a' => 'Your shipment includes the compounded oral tablets in the prescribed dose and quantity. Everything ships from a licensed U.S. FDA-registered 503A compounding pharmacy in discreet packaging with no indication of contents on the outside. Free standard shipping is included on all orders.',
+	],
+	[
+		'q' => 'Can I cancel or pause my program?',
+		'a' => 'Yes. You can pause or cancel at any time through your patient portal or by contacting our support team. We ask for at least 5 business days\' notice before your next billing date. There are no long-term contracts or cancellation fees.',
+	],
+];
 ?>
 
 <div class="myogenix-pdp myogenix-cat">
@@ -180,158 +216,61 @@ $steps = [
 		</div>
 	</section>
 
-	<!-- How It Works Section -->
-	<section class="myogenix-pdp__how-it-works">
-		<div class="myogenix-pdp__container">
-			<p class="myogenix-pdp__how-label">PROCESS</p>
-			<h2 class="myogenix-pdp__how-heading">How it works</h2>
-			<p class="myogenix-pdp__how-sub">From your first order to your ongoing program — here's what to expect at every step.</p>
-			<div class="myogenix-pdp__how-grid">
-
-				<div class="myogenix-pdp__how-card">
-					<div class="myogenix-pdp__how-card-top">
-						<div class="myogenix-pdp__how-icon" aria-hidden="true">
-							<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-								<rect x="8" y="2" width="8" height="4" rx="1"/>
-								<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-								<line x1="9" y1="11" x2="15" y2="11"/>
-								<line x1="9" y1="15" x2="13" y2="15"/>
-							</svg>
-						</div>
-						<span class="myogenix-pdp__how-num">01</span>
+	<!-- How It Works Section (home page design) -->
+	<section class="home-how" id="how-it-works" aria-label="How it works">
+		<div class="hp-inner">
+			<div class="home-how__header">
+				<p class="home-how__overline">Process</p>
+				<h2 class="home-how__heading">How it works</h2>
+				<p class="home-how__desc">From your first order to your ongoing program — here's what to expect at every step.</p>
+			</div>
+			<div class="home-how__steps">
+				<?php foreach ( $hp_steps as $step ) : ?>
+				<div class="hp-step">
+					<div class="hp-step__img-wrap">
+						<img src="<?php echo esc_url( $step['img'] ); ?>" alt="<?php echo esc_attr( $step['title'] ); ?>" class="hp-step__img" loading="lazy" width="400" height="300">
 					</div>
-					<h3 class="myogenix-pdp__how-title">Complete your intake</h3>
-					<p class="myogenix-pdp__how-desc">Answer a short health questionnaire so our providers have the clinical context they need. Takes about 5 minutes.</p>
-				</div>
-
-				<div class="myogenix-pdp__how-card">
-					<div class="myogenix-pdp__how-card-top">
-						<div class="myogenix-pdp__how-icon" aria-hidden="true">
-							<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-								<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-								<circle cx="12" cy="7" r="4"/>
-							</svg>
-						</div>
-						<span class="myogenix-pdp__how-num">02</span>
+					<div class="hp-step__body">
+						<p class="hp-step__num"><?php echo esc_html( $step['num'] ); ?></p>
+						<h3 class="hp-step__title"><?php echo esc_html( $step['title'] ); ?></h3>
+						<p class="hp-step__desc"><?php echo esc_html( $step['desc'] ); ?></p>
 					</div>
-					<h3 class="myogenix-pdp__how-title">Provider reviews &amp; approves</h3>
-					<p class="myogenix-pdp__how-desc">A licensed provider reviews your order within 24 hours. They confirm the medication and dose is clinically appropriate before it ships.</p>
 				</div>
-
-				<div class="myogenix-pdp__how-card">
-					<div class="myogenix-pdp__how-card-top">
-						<div class="myogenix-pdp__how-icon" aria-hidden="true">
-							<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-								<rect x="1" y="3" width="15" height="13" rx="1"/>
-								<path d="M16 8h4l3 3v5h-7V8z"/>
-								<circle cx="5.5" cy="18.5" r="2.5"/>
-								<circle cx="18.5" cy="18.5" r="2.5"/>
-							</svg>
-						</div>
-						<span class="myogenix-pdp__how-num">03</span>
-					</div>
-					<h3 class="myogenix-pdp__how-title">Shipped discreetly</h3>
-					<p class="myogenix-pdp__how-desc">Your medication ships from an FDA-registered compounding pharmacy in plain, discreet packaging with no indication of contents.</p>
-				</div>
-
-				<div class="myogenix-pdp__how-card">
-					<div class="myogenix-pdp__how-card-top">
-						<div class="myogenix-pdp__how-icon" aria-hidden="true">
-							<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-								<line x1="18" y1="20" x2="18" y2="10"/>
-								<line x1="12" y1="20" x2="12" y2="4"/>
-								<line x1="6" y1="20" x2="6" y2="14"/>
-								<line x1="2" y1="20" x2="22" y2="20"/>
-							</svg>
-						</div>
-						<span class="myogenix-pdp__how-num">04</span>
-					</div>
-					<h3 class="myogenix-pdp__how-title">Adjust as needed</h3>
-					<p class="myogenix-pdp__how-desc">Your dose or medication can be adjusted at any time. Update your next shipment directly from your account — no new consultation required for subscribers.</p>
-				</div>
-
+				<?php endforeach; ?>
 			</div>
 		</div>
 	</section>
 
-	<!-- Common Questions Section -->
-	<section class="myogenix-pdp__cq">
-		<div class="myogenix-pdp__container">
-			<div class="myogenix-pdp__cq-inner">
-
-				<div class="myogenix-pdp__cq-left">
-					<p class="myogenix-pdp__cq-label">FAQ</p>
-					<h2 class="myogenix-pdp__cq-heading">Common questions</h2>
-					<p class="myogenix-pdp__cq-sub">Everything you need to know about ED medications, dosing, and how our program works.</p>
-					<a href="#" class="myogenix-pdp__cq-btn" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Choose your medication &rarr;</a>
-				</div>
-
-				<div class="myogenix-pdp__cq-right">
-					<div class="myogenix-pdp__cq-list">
-
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="true" aria-controls="sh-cq-0">
-								<span>What is the difference between tadalafil and sildenafil?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer is-open" id="sh-cq-0">
-								<p>Both are PDE5 inhibitors that work by the same mechanism — increasing blood flow to support erections. The key difference is duration: sildenafil works within 30–60 minutes and lasts 4–6 hours, making it ideal for planned activity. Tadalafil lasts up to 36 hours and is also available as a once-daily low dose, which eliminates the need to time your medication at all.</p>
-							</div>
+	<!-- FAQ (PDP design) -->
+	<section class="myo-faq" id="faq" aria-label="Frequently asked questions">
+		<div class="myo-faq__wrap">
+			<div class="myo-faq__header">
+				<span class="myo-faq__eyebrow">FAQ</span>
+				<h2 class="myo-faq__title">Common questions</h2>
+				<p class="myo-faq__desc">Everything you need to know about ED medications, dosing, and how our program works.</p>
+			</div>
+			<div class="myo-faq__list">
+				<?php foreach ( $faqs as $i => $faq ) :
+					$panel_id   = 'sh-faq-' . $i;
+					$is_first   = ( $i === 0 );
+					$expanded   = $is_first ? 'true' : 'false';
+					$open_class = $is_first ? ' is-open' : '';
+				?>
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="<?php echo esc_attr( $expanded ); ?>" aria-controls="<?php echo esc_attr( $panel_id ); ?>">
+						<span class="myo-faq__q"><?php echo esc_html( $faq['q'] ); ?></span>
+						<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+					</button>
+					<div class="myo-faq__panel<?php echo esc_attr( $open_class ); ?>" id="<?php echo esc_attr( $panel_id ); ?>">
+						<div class="myo-faq__panel-inner">
+							<p><?php echo esc_html( $faq['a'] ); ?></p>
 						</div>
-
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="sh-cq-1">
-								<span>How quickly does each medication work?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer" id="sh-cq-1">
-								<p>Sildenafil typically takes effect within 30–60 minutes and should be taken on an empty stomach for fastest absorption. Tadalafil as-needed takes effect in 30–45 minutes. Daily low-dose tadalafil builds steady-state levels that provide continuous readiness without timing. A heavy meal can slow absorption of either medication.</p>
-							</div>
-						</div>
-
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="sh-cq-2">
-								<span>Do I need a prescription?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer" id="sh-cq-2">
-								<p>Yes — all ED medications require a valid prescription. Our process handles this for you. After you place your order and complete the health intake, a licensed provider reviews your information and issues a prescription if clinically appropriate. Your card is not charged until the order is approved. There is no separate consultation fee.</p>
-							</div>
-						</div>
-
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="sh-cq-3">
-								<span>Are there any contraindications I should know about?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer" id="sh-cq-3">
-								<p>PDE5 inhibitors should not be taken with nitrate medications (such as nitroglycerin) as this combination can cause a dangerous drop in blood pressure. They should also be used with caution in patients with certain cardiovascular conditions. Your provider reviews your health intake for these contraindications before approving any order — if your profile is not a match, they will decline the order and inform you.</p>
-							</div>
-						</div>
-
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="sh-cq-4">
-								<span>What's included in my order?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer" id="sh-cq-4">
-								<p>Your shipment includes the compounded oral tablets in the prescribed dose and quantity. Everything ships from a licensed U.S. FDA-registered 503A compounding pharmacy in discreet packaging with no indication of contents on the outside. Free standard shipping is included on all orders.</p>
-							</div>
-						</div>
-
-						<div class="myogenix-pdp__cq-item">
-							<button class="myogenix-pdp__cq-question" aria-expanded="false" aria-controls="sh-cq-5">
-								<span>Can I cancel or pause my program?</span>
-								<span class="myogenix-pdp__cq-icon" aria-hidden="true">+</span>
-							</button>
-							<div class="myogenix-pdp__cq-answer" id="sh-cq-5">
-								<p>Yes. You can pause or cancel at any time through your patient portal or by contacting our support team. We ask for at least 5 business days' notice before your next billing date. There are no long-term contracts or cancellation fees.</p>
-							</div>
-						</div>
-
 					</div>
 				</div>
-
+				<?php endforeach; ?>
+			</div>
+			<div class="myo-faq__cta">
+				<a href="#" class="myo-faq__cta-btn" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Choose your medication &rarr;</a>
 			</div>
 		</div>
 	</section>
@@ -353,17 +292,6 @@ $steps = [
 	</section>
 
 </div>
-
-<script>
-document.querySelectorAll( '.myogenix-pdp__cq-question' ).forEach( function( btn ) {
-	btn.addEventListener( 'click', function() {
-		var expanded = this.getAttribute( 'aria-expanded' ) === 'true';
-		this.setAttribute( 'aria-expanded', String( !expanded ) );
-		var answer = document.getElementById( this.getAttribute( 'aria-controls' ) );
-		if ( answer ) answer.classList.toggle( 'is-open', !expanded );
-	} );
-} );
-</script>
 
 <?php
 /**
