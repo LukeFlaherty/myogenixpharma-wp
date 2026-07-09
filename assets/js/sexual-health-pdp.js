@@ -2,7 +2,7 @@
  * Sexual health PDP configurator.
  * Handles 1D (dosage only) and 2D (dosage × tablets) variable products.
  * Reads config from data-* attributes on #pdp-cfg.
- * @version 1.0.4
+ * @version 1.2.0
  */
 ( function () {
 	'use strict';
@@ -21,6 +21,8 @@
 	var secondaryLabels = JSON.parse( cfg.getAttribute( 'data-secondary-labels' ) || '{}' );
 	var productId       = cfg.getAttribute( 'data-product-id' ) || '';
 	var monthlyBilling  = cfg.getAttribute( 'data-monthly-billing' ) === '1';
+	var flatFeePrice    = parseFloat( cfg.getAttribute( 'data-flat-fee-price' ) || '0' );
+	var flatFeeLabel    = cfg.getAttribute( 'data-flat-fee-label' ) || '';
 
 	var primaryKeys   = Object.keys( matrix );
 	var hasSecondary  = !! secondaryAttr;
@@ -81,30 +83,22 @@
 		var entry = getEntry();
 		if ( ! entry ) { el.innerHTML = ''; return; }
 
-		// 1D multi-month plan (e.g. TRT 3-month): show per-month as the headline price.
+		// 1D multi-month plan (e.g. TRT 3-month): show the flat consult/bloodwork
+		// fee as the headline "due today" price instead of the medication total.
+		// The $/month medication breakdown is shown later, at checkout, once the
+		// order has actually been approved for treatment.
 		// Gated on data-monthly-billing so only the subscription-plan product (TRT) hits
 		// this path — other 1D products (e.g. Tadalafil, keyed by dosage) must not.
 		if ( ! hasSecondary && monthlyBilling ) {
-			var months = extractNum( state.primary );
-			if ( months > 1 ) {
-				var perMonth = entry.price / months;
-				var monthRows = '';
-				for ( var m = 1; m <= months; m++ ) {
-					monthRows +=
-						'<div class="pdp-cfg__summary-line">' +
-							'<span>Month ' + m + '</span>' +
-							'<span>' + fmt( perMonth ) + '</span>' +
-						'</div>';
-				}
+			if ( flatFeePrice > 0 ) {
 				el.innerHTML =
 					'<span class="pdp-cfg__summary-label">Checkout Details</span>' +
-					'<div class="pdp-cfg__summary-month-price">' + fmt( perMonth ) + '<span class="pdp-cfg__summary-month-unit">/month</span></div>' +
-					monthRows +
+					'<div class="pdp-cfg__summary-month-price">' + fmt( flatFeePrice ) + '</div>' +
+					'<p class="pdp-cfg__summary-sub">' + flatFeeLabel + '</p>' +
 					'<div class="pdp-cfg__summary-total">' +
 						'<span>Total billed today</span>' +
-						'<strong class="pdp-cfg__summary-total-price">' + fmt( entry.price ) + '</strong>' +
-					'</div>' +
-					'<p class="pdp-cfg__summary-charged-note">Full amount charged at once — not split into monthly payments.</p>';
+						'<strong class="pdp-cfg__summary-total-price">' + fmt( flatFeePrice ) + '</strong>' +
+					'</div>';
 				return;
 			}
 		}

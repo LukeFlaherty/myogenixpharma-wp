@@ -699,6 +699,10 @@ if ( $is_weight_loss ) :
 			'secondary_attr'  => null,
 			'secondary_label' => null,
 			'fixed_attrs'     => [ 'attribute_pa_tablets' => '90-tablets' ],
+			'cta_label'       => 'Go to Checkout',
+			'disclaimer'      => 'One-time purchase. Order reviewed by a licensed provider before processing.',
+			'flat_fee_price'  => 0,
+			'flat_fee_label'  => '',
 		],
 		'compound-sildenafil' => [
 			'name'            => 'Sildenafil',
@@ -713,6 +717,10 @@ if ( $is_weight_loss ) :
 			'secondary_attr'  => 'pa_tablets',
 			'secondary_label' => 'Supply Length',
 			'fixed_attrs'     => [],
+			'cta_label'       => 'Go to Checkout',
+			'disclaimer'      => 'One-time purchase. Order reviewed by a licensed provider before processing.',
+			'flat_fee_price'  => 0,
+			'flat_fee_label'  => '',
 		],
 		'testosterone' => [
 			'name'            => 'Testosterone Cypionate',
@@ -722,6 +730,9 @@ if ( $is_weight_loss ) :
 				'Testosterone Cypionate injectable &middot; multi-dose vial',
 				'Syringes &amp; needles',
 				'Alcohol prep pads',
+				'Future Bloodwork',
+				'Ongoing Doctor Consults',
+				'Free Shipping',
 				'Dosing protocol card',
 			],
 			'primary_attr'    => 'pa_subscription-plan',
@@ -729,6 +740,10 @@ if ( $is_weight_loss ) :
 			'secondary_attr'  => null,
 			'secondary_label' => null,
 			'fixed_attrs'     => [],
+			'cta_label'       => 'Schedule Bloodwork',
+			'disclaimer'      => 'Order reviewed by a licensed provider before processing.',
+			'flat_fee_price'  => 165,
+			'flat_fee_label'  => 'Male Hormone Panel & Initial Doctor Consult',
 		],
 	];
 	$shcfg = $sexual_health_config[ $slug ];
@@ -908,6 +923,8 @@ if ( $is_weight_loss ) :
 					data-primary-labels="<?php echo esc_attr( wp_json_encode( $primary_labels ) ); ?>"
 					data-secondary-labels="<?php echo esc_attr( wp_json_encode( $secondary_labels ) ); ?>"
 					data-monthly-billing="<?php echo $slug === 'testosterone' ? '1' : '0'; ?>"
+					data-flat-fee-price="<?php echo esc_attr( $shcfg['flat_fee_price'] ); ?>"
+					data-flat-fee-label="<?php echo esc_attr( $shcfg['flat_fee_label'] ); ?>"
 					<?php if ( $slug === 'testosterone' ) : ?>
 					data-trt-allowed-states="<?php echo esc_attr( wp_json_encode( $trt_allowed_states ) ); ?>"
 					<?php endif; ?>
@@ -1005,9 +1022,9 @@ if ( $is_weight_loss ) :
 
 					<div id="sh-summary" class="pdp-cfg__summary"></div>
 
-					<button id="pdp-cta" class="pdp-cfg__cta">Go to Checkout &rarr;</button>
+					<button id="pdp-cta" class="pdp-cfg__cta"><?php echo esc_html( $shcfg['cta_label'] ); ?> &rarr;</button>
 					<p id="pdp-disclaimer" class="pdp-cfg__disclaimer">
-						One-time purchase. Order reviewed by a licensed provider before processing.
+						<?php echo esc_html( $shcfg['disclaimer'] ); ?>
 					</p>
 
 				</div>

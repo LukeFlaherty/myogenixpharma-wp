@@ -551,7 +551,7 @@ add_action( 'wp_enqueue_scripts', function() {
 				'myogenix-sexual-health-pdp',
 				get_stylesheet_directory_uri() . '/assets/js/sexual-health-pdp.js',
 				[],
-				'1.1.1',
+				'1.2.0',
 				true
 			);
 		}
@@ -889,3 +889,48 @@ function myogenix_render_product_faq( $product_id ) {
 	</section>
 	<?php
 }
+
+// ─── TRT checkout notice styles ──────────────────────────────────────────────
+add_action( 'wp_enqueue_scripts', function() {
+	if ( ! is_checkout() ) return;
+	wp_enqueue_style(
+		'myogenix-checkout-trt',
+		get_stylesheet_directory_uri() . '/assets/css/checkout-trt.css',
+		[],
+		'1.0.0'
+	);
+} );
+
+/**
+ * TRT checkout notice: the $165 due today only covers the bloodwork panel and
+ * initial doctor consult. If approved for treatment, the patient is then
+ * billed $567 quarterly ($189/mo x 3) for the medication itself. Shown only
+ * when a testosterone item is in the cart, on the checkout page.
+ */
+add_action( 'woocommerce_review_order_before_payment', function () {
+	if ( ! function_exists( 'WC' ) || ! WC()->cart ) return;
+
+	$has_trt = false;
+	foreach ( WC()->cart->get_cart() as $cart_item ) {
+		$parent_id = $cart_item['product_id'] ?? 0;
+		$product   = wc_get_product( $parent_id );
+		if ( $product && 'testosterone' === $product->get_slug() ) {
+			$has_trt = true;
+			break;
+		}
+	}
+	if ( ! $has_trt ) return;
+	?>
+	<div class="myo-trt-checkout-notice">
+		<p class="myo-trt-checkout-notice__title">After the Doctor Consult, if you are approved for treatment</p>
+		<div class="myo-trt-checkout-notice__price"><?php echo wc_price( 189 ); ?><span>/month</span></div>
+		<div class="myo-trt-checkout-notice__rows">
+			<div class="myo-trt-checkout-notice__row"><span>Month 1</span><span><?php echo wc_price( 189 ); ?></span></div>
+			<div class="myo-trt-checkout-notice__row"><span>Month 2</span><span><?php echo wc_price( 189 ); ?></span></div>
+			<div class="myo-trt-checkout-notice__row"><span>Month 3</span><span><?php echo wc_price( 189 ); ?></span></div>
+		</div>
+		<p class="myo-trt-checkout-notice__note">Full amount charged quarterly &mdash; not split into monthly payments.</p>
+		<p class="myo-trt-checkout-notice__note">Processed only after approved for treatment.</p>
+	</div>
+	<?php
+} );
