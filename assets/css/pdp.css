@@ -1129,9 +1129,11 @@
 	border-radius: 0 !important;
 	outline: none;
 	box-shadow: none !important;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
+	display: flex !important;
+	flex-direction: row !important;
+	flex-wrap: nowrap !important;
+	align-items: center !important;
+	justify-content: space-between !important;
 	width: 100%;
 	padding: 15px 0;
 	gap: 16px;
