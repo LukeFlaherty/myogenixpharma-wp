@@ -1,6 +1,20 @@
 .rac-page {
+	position: relative;
 	background: #fff;
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Checkerboard grid texture behind the entire page, not just the hero. */
+.rac-page__grid {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	background-image:
+		linear-gradient(to right, #000 1px, transparent 1px),
+		linear-gradient(to bottom, #000 1px, transparent 1px);
+	background-size: 48px 48px;
+	opacity: 0.03;
+	z-index: 0;
 }
 
 /* home.css forces 48px margin-top on whatever follows the navbar on non-home
@@ -14,20 +28,8 @@ body.page-template-page-reach-a-concierge header.home-nav + * {
 /* ── Hero (mirrors .home-hero) ─────────────────────────── */
 .rac-hero {
 	position: relative;
-	background: #fff;
+	z-index: 1;
 	padding: 40px 16px 24px;
-	overflow: hidden;
-}
-
-.rac-hero__grid {
-	position: absolute;
-	inset: 0;
-	pointer-events: none;
-	background-image:
-		linear-gradient(to right, #000 1px, transparent 1px),
-		linear-gradient(to bottom, #000 1px, transparent 1px);
-	background-size: 48px 48px;
-	opacity: 0.03;
 }
 
 .rac-hero__content {
@@ -90,6 +92,8 @@ body.page-template-page-reach-a-concierge header.home-nav + * {
 
 /* ── Card ──────────────────────────────────────────────── */
 .rac-card {
+	position: relative;
+	z-index: 1;
 	width: 100%;
 	max-width: 780px;
 	margin: 0 auto;
@@ -157,30 +161,46 @@ body.page-template-page-reach-a-concierge header.home-nav + * {
 	}
 }
 
-.rac-product-card {
+/* Native <button> elements carry browser/theme default chrome (Hello Elementor's
+   reset.css restyles raw `button` and `button:hover` globally). Reset explicitly
+   and use !important on the interactive states so nothing bleeds through. */
+.rac-product-card.rac-product-card {
 	position: relative;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	gap: 3px;
 	padding: 6px 4px;
-	border: 1.5px solid #e5e5e5;
+	border: 1.5px solid #e5e5e5 !important;
 	border-radius: 8px;
-	background: #fff;
+	background-color: #fff !important;
+	color: #333 !important;
 	cursor: pointer;
 	font-family: inherit;
 	text-align: center;
-	transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+	appearance: none;
+	-webkit-appearance: none;
+	-webkit-tap-highlight-color: transparent;
+	transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
 }
 
-.rac-product-card:hover {
-	border-color: #c7bcf0;
+.rac-product-card.rac-product-card:hover,
+.rac-product-card.rac-product-card:focus-visible {
+	border-color: #573abd !important;
+	background-color: #f9f8fe !important;
+	color: #333 !important;
+	outline: none;
 }
 
-.rac-product-card[aria-pressed="true"] {
-	border-color: #573abd;
-	background: #f5f2fe;
+.rac-product-card.rac-product-card[aria-pressed="true"] {
+	border-color: #573abd !important;
+	background-color: #f5f2fe !important;
+	color: #333 !important;
 	box-shadow: 0 0 0 1px #573abd;
+}
+
+.rac-product-card.rac-product-card[aria-pressed="true"]:hover {
+	background-color: #ede8fc !important;
 }
 
 .rac-product-card__img-wrap {

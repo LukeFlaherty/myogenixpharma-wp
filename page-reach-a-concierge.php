@@ -34,19 +34,19 @@ get_header();
 ?>
 
 <div class="rac-page">
+	<div class="rac-page__grid" aria-hidden="true"></div>
 
 	<!-- ═══════════════════════════════════════════════════
 	     HERO
 	════════════════════════════════════════════════════ -->
 	<section class="rac-hero">
-		<div class="rac-hero__grid" aria-hidden="true"></div>
 		<div class="rac-hero__content">
 			<div class="rac-hero__pill">
 				<span class="rac-hero__pill-dot" aria-hidden="true"></span>
-				<span class="rac-hero__pill-text">Concierge follow-up</span>
+				<span class="rac-hero__pill-text">Get 1-on-1 Guidance</span>
 			</div>
-			<h1 class="rac-hero__headline">Let's find the right plan for you.</h1>
-			<p class="rac-hero__sub">Tell us what you're interested in below. A member of our care team will personally review your request and reach out to you directly — no forms, no waiting rooms, just a real conversation about your goals.</p>
+			<h1 class="rac-hero__headline">Get More Info</h1>
+			<p class="rac-hero__sub">Tell us what you're interested in below. A member of our care team will personally review your request and reach out to you directly.</p>
 		</div>
 	</section>
 
