@@ -14,6 +14,22 @@ $products = wc_get_products( [
 	'return'  => 'objects',
 ] );
 
+// One representative bottle image per category, rather than each product's own photo —
+// keeps the selector scannable when every product is shown at once.
+// mens-health -> Testosterone Cypionate, weight-loss -> Semaglutide,
+// sexual-health -> Tadalafil, peptides-longevity -> BPC-157 (most-ordered peptide).
+$rac_category_reps = [
+	'mens-health'         => 883,
+	'weight-loss'         => 4041,
+	'sexual-health'       => 1886,
+	'peptides-longevity'  => 4249,
+];
+$rac_category_images = [];
+foreach ( $rac_category_reps as $cat_slug => $rep_id ) {
+	$rep_product = wc_get_product( $rep_id );
+	$rac_category_images[ $cat_slug ] = $rep_product ? wp_get_attachment_image_url( $rep_product->get_image_id(), 'thumbnail' ) : wc_placeholder_img_src( 'thumbnail' );
+}
+
 get_header();
 ?>
 
@@ -36,17 +52,20 @@ get_header();
 
 	<div class="rac-card">
 		<form id="rac-form" novalidate>
-			<label class="rac-label" for="rac-email">Email</label>
-			<input type="email" id="rac-email" name="email" class="rac-input" placeholder="you@example.com" required autocomplete="email" />
+			<div class="rac-field">
+				<label class="rac-label" for="rac-email">Email</label>
+				<input type="email" id="rac-email" name="email" class="rac-input" placeholder="you@example.com" required autocomplete="email" />
 
-			<label class="rac-label" for="rac-phone">Phone number <span class="rac-label__optional">(optional)</span></label>
-			<input type="tel" id="rac-phone" name="phone" class="rac-input" placeholder="(555) 123-4567" autocomplete="tel" />
+				<label class="rac-label" for="rac-phone">Phone number <span class="rac-label__optional">(optional)</span></label>
+				<input type="tel" id="rac-phone" name="phone" class="rac-input" placeholder="(555) 123-4567" autocomplete="tel" />
 
-			<label class="rac-label">Products I'm curious about</label>
+				<label class="rac-label">Products I'm curious about</label>
+			</div>
 			<div id="rac-products" class="rac-products" role="group" aria-label="Products I'm curious about">
 				<?php foreach ( $products as $product ) :
-					$img_id  = $product->get_image_id();
-					$img_url = $img_id ? wp_get_attachment_image_url( $img_id, 'thumbnail' ) : wc_placeholder_img_src( 'thumbnail' );
+					$terms    = get_the_terms( $product->get_id(), 'product_cat' );
+					$cat_slug = ( $terms && ! is_wp_error( $terms ) ) ? $terms[0]->slug : '';
+					$img_url  = $rac_category_images[ $cat_slug ] ?? wc_placeholder_img_src( 'thumbnail' );
 					?>
 					<button type="button" class="rac-product-card" data-product="<?php echo esc_attr( $product->get_name() ); ?>" aria-pressed="false">
 						<span class="rac-product-card__img-wrap">
@@ -58,11 +77,13 @@ get_header();
 				<?php endforeach; ?>
 			</div>
 
-			<label class="rac-label" for="rac-message">Additional message</label>
-			<textarea id="rac-message" name="message" class="rac-input rac-textarea" rows="4" placeholder="Anything else we should know?"></textarea>
+			<div class="rac-field">
+				<label class="rac-label rac-label--message" for="rac-message">Additional message</label>
+				<textarea id="rac-message" name="message" class="rac-input rac-textarea" rows="4" placeholder="Anything else we should know?"></textarea>
 
-			<button type="submit" id="rac-submit" class="rac-submit">Contact Me</button>
-			<div id="rac-error" class="rac-error" role="alert"></div>
+				<button type="submit" id="rac-submit" class="rac-submit">Contact Me</button>
+				<div id="rac-error" class="rac-error" role="alert"></div>
+			</div>
 		</form>
 
 		<div id="rac-success" class="rac-success" style="display:none;">

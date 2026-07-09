@@ -48,16 +48,35 @@ add_action( 'wp_enqueue_scripts', function() {
 		'myogenix-reach-a-concierge',
 		get_stylesheet_directory_uri() . '/assets/css/reach-a-concierge.css',
 		[],
-		'1.1.0'
+		'1.2.0'
 	);
 	wp_enqueue_script(
 		'myogenix-reach-a-concierge',
 		get_stylesheet_directory_uri() . '/assets/js/reach-a-concierge.js',
 		[],
-		'1.1.0',
+		'1.2.0',
 		true
 	);
 } );
+
+// Drop the Elementor assets this page never uses (header widgets are bypassed by
+// our own navbar — see header.php). The site footer (#914) still needs Elementor,
+// so its CSS/JS stays; only the unused header-template (#898) and header-only
+// widget assets (nav menu, off-canvas, mini-cart) are removed.
+add_action( 'wp_enqueue_scripts', function() {
+	if ( ! is_page_template( 'page-reach-a-concierge.php' ) ) return;
+	add_action( 'wp_print_styles', function() {
+		wp_dequeue_style( 'elementor-post-898-css' );
+		wp_dequeue_style( 'widget-nav-menu-css' );
+		wp_dequeue_style( 'widget-off-canvas-css' );
+		wp_dequeue_style( 'widget-woocommerce-menu-cart-css' );
+	}, 20 );
+	add_action( 'wp_print_scripts', function() {
+		wp_dequeue_script( 'widget-nav-menu' );
+		wp_dequeue_script( 'widget-off-canvas' );
+		wp_dequeue_script( 'widget-woocommerce-menu-cart' );
+	}, 20 );
+}, 20 );
 
 // ─── Retatrutide password gate ────────────────────────────────────────────────
 add_action( 'template_redirect', function () {

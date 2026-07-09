@@ -3,6 +3,14 @@
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
+/* home.css forces 48px margin-top on whatever follows the navbar on non-home
+   pages ("give more breathing room"). This page already has its own hero
+   padding, so cancel that rule out — same technique the home page itself
+   uses by virtue of carrying the .home body class. */
+body.page-template-page-reach-a-concierge header.home-nav + * {
+	margin-block-start: 0 !important;
+}
+
 /* ── Hero (mirrors .home-hero) ─────────────────────────── */
 .rac-hero {
 	position: relative;
@@ -83,10 +91,16 @@
 /* ── Card ──────────────────────────────────────────────── */
 .rac-card {
 	width: 100%;
-	max-width: 560px;
+	max-width: 780px;
 	margin: 0 auto;
 	padding: 8px 16px 60px;
 	box-sizing: border-box;
+}
+
+.rac-field {
+	max-width: 560px;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .rac-label {
@@ -100,6 +114,10 @@
 .rac-label__optional {
 	font-weight: 400;
 	color: #999;
+}
+
+.rac-label--message {
+	margin-top: 18px;
 }
 
 .rac-input {
@@ -128,14 +146,14 @@
 /* ── Product cards (click-to-toggle multi-select) ───────── */
 .rac-products {
 	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 10px;
+	grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+	gap: 6px;
 	margin-bottom: 8px;
 }
 
 @media (max-width: 480px) {
 	.rac-products {
-		grid-template-columns: repeat(2, 1fr);
+		grid-template-columns: repeat(4, 1fr);
 	}
 }
 
@@ -144,10 +162,10 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 6px;
-	padding: 10px 8px 12px;
+	gap: 3px;
+	padding: 6px 4px;
 	border: 1.5px solid #e5e5e5;
-	border-radius: 12px;
+	border-radius: 8px;
 	background: #fff;
 	cursor: pointer;
 	font-family: inherit;
@@ -168,7 +186,7 @@
 .rac-product-card__img-wrap {
 	width: 100%;
 	aspect-ratio: 1 / 1;
-	border-radius: 8px;
+	border-radius: 5px;
 	overflow: hidden;
 	background: #f7f7f8;
 }
@@ -181,22 +199,26 @@
 }
 
 .rac-product-card__name {
-	font-size: 12px;
+	font-size: 9.5px;
 	font-weight: 600;
 	color: #333;
-	line-height: 1.3;
+	line-height: 1.2;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
 }
 
 .rac-product-card__check {
 	position: absolute;
-	top: 6px;
-	right: 6px;
-	width: 20px;
-	height: 20px;
+	top: 2px;
+	right: 2px;
+	width: 14px;
+	height: 14px;
 	border-radius: 9999px;
 	background: #573abd;
 	color: #fff;
-	font-size: 12px;
+	font-size: 9px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -216,28 +238,34 @@
 	color: #999;
 }
 
-/* ── Submit ────────────────────────────────────────────── */
-.rac-submit {
-	display: block;
-	width: 100%;
-	padding: 16px;
-	background: #ef4444;
-	color: #fff;
-	border: none;
-	border-radius: 10px;
-	font-size: 15px;
-	font-weight: 700;
-	cursor: pointer;
-	letter-spacing: 0.5px;
-	margin-top: 6px;
+/* ── Submit ────────────────────────────────────────────────
+   Specificity is deliberately stacked (id + two classes) and backed with
+   !important so nothing from Elementor/theme resets (which set raw `button`
+   and `button[type=submit]` styles globally on every page) can leak through. */
+#rac-submit.rac-submit.rac-submit {
+	display: block !important;
+	width: 100% !important;
+	padding: 16px !important;
+	background: #ef4444 !important;
+	color: #fff !important;
+	border: none !important;
+	border-radius: 10px !important;
+	font-size: 15px !important;
+	font-weight: 700 !important;
+	cursor: pointer !important;
+	letter-spacing: 0.5px !important;
+	margin-top: 6px !important;
+	text-align: center !important;
 	transition: background 0.2s;
 }
 
-.rac-submit:hover {
-	background: #dc2626;
+#rac-submit.rac-submit.rac-submit:hover,
+#rac-submit.rac-submit.rac-submit:focus {
+	background: #dc2626 !important;
+	color: #fff !important;
 }
 
-.rac-submit:disabled {
+#rac-submit.rac-submit.rac-submit:disabled {
 	opacity: 0.6;
 	pointer-events: none;
 }
