@@ -264,7 +264,7 @@ body:not(.home) header.home-nav + * {
 .home-hero {
   position: relative;
   background: #fff;
-  padding: 80px 16px 56px;
+  padding: 40px 16px 24px;
   overflow: hidden;
 }
 .home-hero__grid {
@@ -283,7 +283,7 @@ body:not(.home) header.home-nav + * {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 20px;
+  gap: 12px;
   max-width: 1024px;
   margin: 0 auto;
 }
@@ -342,7 +342,7 @@ body:not(.home) header.home-nav + * {
 .home-categories {
   background: #fafafa;
   border-top: 1px solid #f4f4f5;
-  padding: 48px 16px;
+  padding: 20px 16px 48px;
 }
 .home-categories__grid {
   display: grid;

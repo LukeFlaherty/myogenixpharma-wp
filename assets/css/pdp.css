@@ -3,6 +3,14 @@
    Scoped to .myogenix-pdp to avoid conflicts with Elementor pages
    ========================================================================== */
 
+/* Override the sitewide Jetpack "Additional CSS" rule that caps
+   .site-main at max-width:80% on all viewports — it squeezes the
+   entire PDP (hero, steps, FAQ). #main gives this enough specificity
+   to win over that !important rule without touching it site-wide. */
+body.single-product #main.site-main {
+	max-width: 95% !important;
+}
+
 .myogenix-pdp {
 	--pdp-purple:      #5b4bc4;
 	--pdp-dark:        #1a1a1a;
