@@ -1072,7 +1072,7 @@
 
 .myo-faq {
 	background: #fff;
-	padding: 24px 0 32px;
+	padding: 24px 16px 32px;
 	width: 100%;
 }
 
@@ -1136,7 +1136,7 @@
 	align-items: center !important;
 	width: 100% !important;
 	box-sizing: border-box !important;
-	padding: 15px 0;
+	padding: 15px 0 !important;
 	gap: 0;
 	font-size: 0.925rem;
 	font-weight: 600;
@@ -1206,7 +1206,7 @@
 }
 
 .myo-faq__panel-inner {
-	padding: 0 0 16px;
+	padding: 0 0 18px 0 !important;
 }
 
 .myo-faq__panel-inner p {
