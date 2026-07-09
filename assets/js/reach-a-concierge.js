@@ -4,12 +4,13 @@
 	var WEBHOOK_URL = 'https://services.leadconnectorhq.com/hooks/CTnsDDgYzrLg4A5wA7Q3/webhook-trigger/67a479f9-e823-4253-b8b7-b6fc1bf5f6ab';
 
 	document.addEventListener('DOMContentLoaded', function () {
-		var form      = document.getElementById('rac-form');
-		var emailEl   = document.getElementById('rac-email');
-		var productsEl = document.getElementById('rac-products');
-		var messageEl = document.getElementById('rac-message');
-		var errEl     = document.getElementById('rac-error');
-		var btn       = document.getElementById('rac-submit');
+		var form        = document.getElementById('rac-form');
+		var emailEl     = document.getElementById('rac-email');
+		var phoneEl     = document.getElementById('rac-phone');
+		var productsEl  = document.getElementById('rac-products');
+		var messageEl   = document.getElementById('rac-message');
+		var errEl       = document.getElementById('rac-error');
+		var btn         = document.getElementById('rac-submit');
 
 		if (!form) return;
 
@@ -20,13 +21,22 @@
 			emailEl.value = decodeURIComponent(prefillEmail);
 		}
 
+		// Click-to-toggle product cards.
+		productsEl.addEventListener('click', function (e) {
+			var card = e.target.closest('.rac-product-card');
+			if (!card) return;
+			var pressed = card.getAttribute('aria-pressed') === 'true';
+			card.setAttribute('aria-pressed', pressed ? 'false' : 'true');
+		});
+
 		form.addEventListener('submit', function (e) {
 			e.preventDefault();
 
 			var email = emailEl.value.trim();
+			var phone = phoneEl.value.trim();
 			var selectedProducts = Array.prototype.map.call(
-				productsEl.selectedOptions || [],
-				function (opt) { return opt.value; }
+				productsEl.querySelectorAll('.rac-product-card[aria-pressed="true"]'),
+				function (card) { return card.getAttribute('data-product'); }
 			);
 			var message = messageEl.value.trim();
 
@@ -45,6 +55,7 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					email: email,
+					phone: phone,
 					products: selectedProducts,
 					message: message,
 					source: 'Reach a Concierge Page'
