@@ -63,7 +63,8 @@ add_action( 'wp_enqueue_scripts', function() {
 // our own navbar — see header.php). The site footer (#914) still needs Elementor,
 // so its CSS/JS stays; only the unused header-template (#898) and header-only
 // widget assets (nav menu, off-canvas, mini-cart) are removed.
-// Priority 100 so this runs after Elementor's own wp_enqueue_scripts registration.
+// Runs at the lowest possible priority so it fires after Elementor Pro's own
+// (late-priority) theme-builder asset registration on wp_enqueue_scripts.
 add_action( 'wp_enqueue_scripts', function() {
 	if ( ! is_page_template( 'page-reach-a-concierge.php' ) ) return;
 	wp_dequeue_style( 'elementor-post-898-css' );
@@ -73,7 +74,7 @@ add_action( 'wp_enqueue_scripts', function() {
 	wp_dequeue_script( 'widget-nav-menu' );
 	wp_dequeue_script( 'widget-off-canvas' );
 	wp_dequeue_script( 'widget-woocommerce-menu-cart' );
-}, 100 );
+}, PHP_INT_MAX );
 
 // ─── Retatrutide password gate ────────────────────────────────────────────────
 add_action( 'template_redirect', function () {
