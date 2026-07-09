@@ -82,7 +82,7 @@
 			var entry = supplyMap[ state.supply ];
 			if ( ! entry || ! entry.id ) return;
 
-			var url = '/?add-to-cart=' + encodeURIComponent( productId ) +
+			var url = window.location.pathname + '?add-to-cart=' + encodeURIComponent( productId ) +
 			          '&variation_id='  + encodeURIComponent( String( entry.id ) ) +
 			          '&'               + encodeURIComponent( supplyAttr ) +
 			          '='               + encodeURIComponent( state.supply );

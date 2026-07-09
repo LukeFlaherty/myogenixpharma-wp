@@ -179,7 +179,7 @@
 				params += '&' + encodeURIComponent( k ) + '=' + encodeURIComponent( fixedAttrs[ k ] );
 			} );
 
-			window.location.href = '/?' + params;
+			window.location.href = window.location.pathname + '?' + params;
 		} );
 	}
 
