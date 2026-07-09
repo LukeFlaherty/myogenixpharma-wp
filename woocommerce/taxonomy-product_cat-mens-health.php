@@ -78,33 +78,6 @@ $img_url = function( $path ) {
 	return esc_url( $base . implode( '/', array_map( 'rawurlencode', $parts ) ) );
 };
 
-$steps = [
-	[
-		'num'   => 'PDP Sections/1.png',
-		'img'   => 'PDP Sections/form.png',
-		'title' => 'Questionnaire',
-		'desc'  => 'Answer a few questions and share your medical details',
-	],
-	[
-		'num'   => 'PDP Sections/2.png',
-		'img'   => 'PDP Sections/consultation.png',
-		'title' => 'Review and Approved by provider',
-		'desc'  => 'Discuss your goals and receive expert recommendations',
-	],
-	[
-		'num'   => 'PDP Sections/3.png',
-		'img'   => 'PDP Sections/box.png',
-		'title' => 'Receive medication',
-		'desc'  => 'Medication and supplies shipped straight to your door',
-	],
-	[
-		'num'   => 'PDP Sections/4.png',
-		'img'   => 'PDP Sections/calendar.png',
-		'title' => 'Monthly Monitoring',
-		'desc'  => 'Stay on track with regular free check-ins to ensure progress',
-	],
-];
-
 // "How it works" — same design/content as the home page's home-how/hp-step section
 $hp_steps = [
 	[ 'num' => '01', 'img' => $img_url( 'PDP Sections/form.png' ),         'title' => 'Questionnaire',                    'desc' => 'Answer a few questions and share your medical details.'                          ],
@@ -200,24 +173,6 @@ $faqs = [
 		</div>
 	</section>
 
-	<!-- 4 Steps Section -->
-	<section class="myogenix-pdp__steps">
-		<div class="myogenix-pdp__container">
-			<h2 class="myogenix-pdp__section-heading">Personalized Healthcare in 4 Simple Steps</h2>
-			<p class="myogenix-pdp__section-sub">Get started with no insurance required.</p>
-			<div class="myogenix-pdp__steps-grid">
-				<?php foreach ( $steps as $step ) : ?>
-				<div class="myogenix-pdp__step-card">
-					<img class="myogenix-pdp__step-num" src="<?php echo $img_url( $step['num'] ); ?>" alt="" aria-hidden="true" />
-					<img class="myogenix-pdp__step-img" src="<?php echo $img_url( $step['img'] ); ?>" alt="<?php echo esc_attr( $step['title'] ); ?>" />
-					<h3 class="myogenix-pdp__step-title"><?php echo esc_html( $step['title'] ); ?></h3>
-					<p class="myogenix-pdp__step-desc"><?php echo esc_html( $step['desc'] ); ?></p>
-				</div>
-				<?php endforeach; ?>
-			</div>
-		</div>
-	</section>
-
 	<!-- How It Works Section (home page design) -->
 	<section class="home-how" id="how-it-works" aria-label="How it works">
 		<div class="hp-inner">
@@ -281,15 +236,8 @@ $faqs = [
 	<section class="myogenix-pdp__explore">
 		<div class="myogenix-pdp__container">
 			<h2 class="myogenix-pdp__section-heading">Explore More Treatment Lines</h2>
-			<p class="myogenix-pdp__section-sub">The telehealth provider of choice for holistic care.</p>
-			<div class="myogenix-pdp__explore-grid">
-				<a href="<?php echo esc_url( home_url( '/product-category/weight-loss/' ) ); ?>" class="myogenix-pdp__explore-link">
-					<img src="<?php echo $img_url( 'PDP Sections/weight management.png' ); ?>" alt="Weight Management" />
-				</a>
-				<a href="<?php echo esc_url( home_url( '/product-category/sexual-health/' ) ); ?>" class="myogenix-pdp__explore-link">
-					<img src="<?php echo $img_url( 'PDP Sections/sexual health.png' ); ?>" alt="Sexual Health" />
-				</a>
-			</div>
+			<p class="myogenix-pdp__section-sub">Provider-reviewed programs for every health goal.</p>
+			<?php myogenix_render_product_scrollers( [ 'weight-loss', 'peptides' ] ); ?>
 		</div>
 	</section>
 
