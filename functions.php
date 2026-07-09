@@ -65,28 +65,20 @@ add_action( 'wp_enqueue_scripts', function() {
 // widget assets (nav menu, off-canvas, mini-cart) are removed.
 // Runs at the lowest possible priority so it fires after Elementor Pro's own
 // (late-priority) theme-builder asset registration on wp_enqueue_scripts.
+// These are force-printed by Elementor Pro's theme-builder location matcher via
+// direct wp_styles()->do_item() / wp_print_styles( $handles ) calls, which ignore
+// the normal dequeue — a plain wp_dequeue_style() has no effect. Deregistering
+// them removes the handle entirely so the forced print has nothing to output.
 add_action( 'wp_enqueue_scripts', function() {
 	if ( ! is_page_template( 'page-reach-a-concierge.php' ) ) return;
-	wp_dequeue_style( 'elementor-post-898-css' );
-	wp_dequeue_style( 'widget-nav-menu-css' );
-	wp_dequeue_style( 'widget-off-canvas-css' );
-	wp_dequeue_style( 'widget-woocommerce-menu-cart-css' );
-	wp_dequeue_script( 'widget-nav-menu' );
-	wp_dequeue_script( 'widget-off-canvas' );
-	wp_dequeue_script( 'widget-woocommerce-menu-cart' );
+	wp_deregister_style( 'elementor-post-898-css' );
+	wp_deregister_style( 'widget-nav-menu-css' );
+	wp_deregister_style( 'widget-off-canvas-css' );
+	wp_deregister_style( 'widget-woocommerce-menu-cart-css' );
+	wp_deregister_script( 'widget-nav-menu' );
+	wp_deregister_script( 'widget-off-canvas' );
+	wp_deregister_script( 'widget-woocommerce-menu-cart' );
 }, PHP_INT_MAX );
-
-// TEMP DEBUG — remove after diagnosing why the dequeue above isn't taking effect.
-add_action( 'wp_head', function() {
-	if ( ! is_page_template( 'page-reach-a-concierge.php' ) ) return;
-	global $wp_styles;
-	$handles = [ 'elementor-post-898-css', 'widget-nav-menu-css', 'widget-off-canvas-css', 'widget-woocommerce-menu-cart-css' ];
-	echo "\n<!-- RAC-DEBUG queue-at-wp_head-999999: ";
-	foreach ( $handles as $h ) {
-		echo $h . '=' . ( in_array( $h, $wp_styles->queue, true ) ? 'QUEUED' : 'not-queued' ) . ' ';
-	}
-	echo "-->\n";
-}, 999999 );
 
 // ─── Retatrutide password gate ────────────────────────────────────────────────
 add_action( 'template_redirect', function () {
