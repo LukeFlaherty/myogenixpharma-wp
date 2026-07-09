@@ -1129,22 +1129,22 @@
 	border-radius: 0 !important;
 	outline: none;
 	box-shadow: none !important;
+	/* Force full-width row layout regardless of Elementor overrides */
 	display: flex !important;
 	flex-direction: row !important;
 	flex-wrap: nowrap !important;
 	align-items: center !important;
-	justify-content: space-between !important;
-	width: 100%;
+	width: 100% !important;
+	box-sizing: border-box !important;
 	padding: 15px 0;
-	gap: 16px;
+	gap: 0;
 	font-size: 0.925rem;
 	font-weight: 600;
 	color: #111 !important;
 	text-align: left;
-	line-height: 1.4;
+	line-height: 1.45;
 	cursor: pointer;
 	transition: color 0.2s ease;
-	min-width: 0;
 }
 
 .myo-faq__btn:hover {
@@ -1161,20 +1161,27 @@
 	outline-offset: 2px;
 }
 
+/* Question text fills all available space, icon is pushed to far right */
 .myo-faq__q {
-	flex: 1 1 auto;
+	flex: 1 1 0%;
 	min-width: 0;
+	padding-right: 16px;
+	white-space: normal;
+	overflow-wrap: break-word;
+	word-break: break-word;
 }
 
+/* Icon sits at far right, never shrinks */
 .myo-faq__icon {
-	flex-shrink: 0;
+	flex: 0 0 20px;
 	width: 20px;
 	height: 20px;
-	display: flex;
+	display: flex !important;
 	align-items: center;
 	justify-content: center;
 	color: #aaa;
 	transition: transform 0.25s ease, color 0.2s ease;
+	margin-left: auto;
 }
 
 .myo-faq__icon svg {
