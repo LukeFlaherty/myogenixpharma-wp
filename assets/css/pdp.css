@@ -1627,7 +1627,7 @@ body.tax-product_cat #main {
 
 	/* myo-faq mobile adjustments */
 	.myo-faq {
-		padding: 52px 16px;
+		padding: 52px 10px;
 	}
 
 	.myo-faq__header {
@@ -1643,11 +1643,11 @@ body.tax-product_cat #main {
 
 	.myo-faq__btn {
 		font-size: 0.925rem;
-		padding: 16px 16px;
+		padding: 16px 0;
 	}
 
 	.myo-faq__panel-inner {
-		padding: 0 16px 16px;
+		padding: 0 0 16px;
 		padding-top: 12px;
 	}
 
