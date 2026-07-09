@@ -847,113 +847,209 @@ body:not(.home) header.home-nav + * {
 }
 
 /* =========================================================
-   FAQ
+   FAQ (PDP-style — matches .myo-faq on product pages, pdp.css)
    ========================================================= */
-.home-faq {
+.myo-faq,
+.myo-faq *,
+.myo-faq *::before,
+.myo-faq *::after {
+  box-sizing: border-box;
+}
+
+.myo-faq {
   background: #fff;
   border-top: 1px solid #f4f4f5;
   padding: 80px 16px;
-}
-.home-faq__layout {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 40px;
-}
-@media (min-width: 1024px) {
-  .home-faq__layout {
-    grid-template-columns: 1fr 2fr;
-    gap: 80px;
-    align-items: start;
-  }
-}
-.home-faq__sidebar {}
-.home-faq__overline {
-  font-size: 12px;
-  font-weight: 600;
-  color: #a1a1aa;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-.home-faq__heading {
-  font-size: 30px;
-  font-weight: 700;
-  color: #000;
-  margin: 8px 0 0;
-}
-.home-faq__sub {
-  font-size: 14px;
-  color: #71717a;
-  line-height: 1.6;
-  margin-top: 12px;
-}
-.home-faq__cta {
-  display: inline-block;
-  margin-top: 24px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #fff;
-  background: #000;
-  padding: 12px 20px;
-  border-radius: 12px;
-  transition: background 150ms ease;
-}
-.home-faq__cta:hover {
-  background: #27272a;
-  color: #fff;
+  width: 100%;
 }
 
-/* Accordion */
-.home-faq__accordion {}
-.hp-faq-item {
-  border-bottom: 1px solid #f4f4f5;
+.myo-faq__wrap {
+  max-width: 760px;
+  margin: 0 auto;
 }
-.hp-faq-item:first-child {
-  border-top: 1px solid #f4f4f5;
+
+.myo-faq__header {
+  margin-bottom: 24px;
 }
-.hp-faq-btn {
-  width: 100%;
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 16px 0;
-  text-align: left;
+
+.myo-faq__eyebrow {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #999;
+  margin: 0 0 10px;
 }
-.hp-faq-question {
-  font-size: 14px;
+
+.myo-faq__title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #111;
+  margin: 0 0 6px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.myo-faq__desc {
+  font-size: 0.875rem;
+  color: #888;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.myo-faq__list {
+  border-top: 1px solid #e8e8e8;
+  margin: 0;
+  padding: 0;
+}
+
+.myo-faq__item {
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.myo-faq__btn {
+  -webkit-appearance: none;
+  appearance: none;
+  background: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  outline: none;
+  box-shadow: none !important;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 15px 0 !important;
+  gap: 0;
+  font-size: 0.925rem;
   font-weight: 600;
-  color: #000;
-  line-height: 1.4;
+  color: #111 !important;
+  text-align: left;
+  line-height: 1.45;
+  cursor: pointer;
+  transition: color 0.2s ease;
 }
-.hp-faq-icon {
-  font-size: 16px;
-  font-weight: 400;
-  color: #a1a1aa;
-  flex-shrink: 0;
-  line-height: 1;
-  transition: transform 200ms ease, color 200ms ease;
-  margin-top: 1px;
+
+.myo-faq__btn:hover {
+  color: #555 !important;
+  background: none !important;
 }
-.hp-faq-item.is-open .hp-faq-icon {
-  transform: rotate(45deg);
-  color: #000;
+
+.myo-faq__btn:focus {
+  outline: none;
 }
-.hp-faq-answer {
+
+.myo-faq__btn:focus-visible {
+  outline: 2px solid #ccc;
+  outline-offset: 2px;
+}
+
+.myo-faq__q {
+  flex: 1 1 0%;
+  min-width: 0;
+  padding-right: 16px;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  text-align: left !important;
+}
+
+.myo-faq__icon {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
+  transition: transform 0.25s ease, color 0.2s ease;
+  margin-left: auto;
+}
+
+.myo-faq__icon svg {
+  display: block;
+  overflow: visible;
+}
+
+.myo-faq__btn[aria-expanded="true"] .myo-faq__icon {
+  transform: rotate(180deg);
+  color: #555;
+}
+
+.myo-faq__panel {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 200ms ease;
+  transition: max-height 0.3s ease;
 }
-.hp-faq-item.is-open .hp-faq-answer {
-  max-height: 400px;
+
+.myo-faq__panel.is-open {
+  max-height: 600px;
 }
-.hp-faq-answer-inner {
-  font-size: 14px;
-  color: #71717a;
-  line-height: 1.6;
-  padding-bottom: 16px;
+
+.myo-faq__panel-inner {
+  padding: 0 0 18px 0 !important;
+}
+
+.myo-faq__panel-inner p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.75;
+  color: #666;
+}
+
+.myo-faq__cta {
+  margin-top: 24px;
+}
+
+.myo-faq__cta-btn {
+  display: inline-block;
+  background: #111;
+  color: #fff !important;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none !important;
+  letter-spacing: 0.01em;
+  transition: opacity 0.2s ease;
+}
+
+.myo-faq__cta-btn:hover {
+  opacity: 0.8;
+  color: #fff !important;
+  text-decoration: none !important;
+}
+
+@media (max-width: 767px) {
+  .myo-faq {
+    padding: 52px 10px;
+  }
+
+  .myo-faq__header {
+    margin-bottom: 28px;
+    padding-bottom: 28px;
+  }
+
+  .myo-faq__title {
+    font-size: 1.65rem;
+  }
+
+  .myo-faq__btn {
+    font-size: 0.925rem;
+    padding: 16px 0;
+  }
+
+  .myo-faq__panel-inner {
+    padding: 0 0 16px;
+    padding-top: 12px;
+  }
+
+  .myo-faq__cta {
+    text-align: center;
+  }
 }
 
 /* =========================================================

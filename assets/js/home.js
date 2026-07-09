@@ -13,24 +13,24 @@
     });
   }
 
-  // ── FAQ accordion ──────────────────────────────────────
-  var items = document.querySelectorAll('.hp-faq-item');
+  // ── FAQ accordion (matches .myo-faq behavior on PDP, pdp.js) ──
+  var faqBtns = Array.prototype.slice.call(document.querySelectorAll('.myo-faq__btn'));
 
-  items.forEach(function (item) {
-    var btn = item.querySelector('.hp-faq-btn');
-    if (!btn) return;
-
+  faqBtns.forEach(function (btn) {
     btn.addEventListener('click', function () {
-      var isOpen = item.classList.contains('is-open');
-      // Close all
-      items.forEach(function (i) { i.classList.remove('is-open'); });
-      // Open this one if it was closed
-      if (!isOpen) item.classList.add('is-open');
+      var isExpanded = this.getAttribute('aria-expanded') === 'true';
+      var panel = document.getElementById(this.getAttribute('aria-controls'));
+      if (!panel) return;
+
+      faqBtns.forEach(function (other) {
+        if (other === btn) return;
+        other.setAttribute('aria-expanded', 'false');
+        var otherPanel = document.getElementById(other.getAttribute('aria-controls'));
+        if (otherPanel) otherPanel.classList.remove('is-open');
+      });
+
+      this.setAttribute('aria-expanded', String(!isExpanded));
+      panel.classList.toggle('is-open', !isExpanded);
     });
   });
-
-  // Open first item by default
-  if (items.length > 0) {
-    items[0].classList.add('is-open');
-  }
 })();

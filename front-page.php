@@ -346,31 +346,35 @@ $hp_faqs = [
 <!-- ═══════════════════════════════════════════════════
      FAQ
 ════════════════════════════════════════════════════ -->
-<section class="home-faq" id="faq" aria-label="Frequently asked questions">
-	<div class="hp-inner">
-		<div class="home-faq__layout">
-
-			<div class="home-faq__sidebar">
-				<p class="home-faq__overline">FAQ</p>
-				<h2 class="home-faq__heading">Common questions</h2>
-				<p class="home-faq__sub">Everything you need to know about the programs, dosing, and ordering.</p>
-				<a href="<?php echo esc_url( home_url( '/product-category/weight-loss/' ) ); ?>" class="home-faq__cta">Configure your program →</a>
-			</div>
-
-			<div class="home-faq__accordion" role="list">
-				<?php foreach ( $hp_faqs as $i => $faq ) : ?>
-				<div class="hp-faq-item" role="listitem">
-					<button class="hp-faq-btn" aria-expanded="<?php echo $i === 0 ? 'true' : 'false'; ?>">
-						<span class="hp-faq-question"><?php echo esc_html( $faq['q'] ); ?></span>
-						<span class="hp-faq-icon" aria-hidden="true">+</span>
-					</button>
-					<div class="hp-faq-answer">
-						<p class="hp-faq-answer-inner"><?php echo esc_html( $faq['a'] ); ?></p>
+<section class="myo-faq" id="faq" aria-label="Frequently asked questions">
+	<div class="myo-faq__wrap">
+		<div class="myo-faq__header">
+			<span class="myo-faq__eyebrow">FAQ</span>
+			<h2 class="myo-faq__title">Common questions</h2>
+			<p class="myo-faq__desc">Everything you need to know about the programs, dosing, and ordering.</p>
+		</div>
+		<div class="myo-faq__list">
+			<?php foreach ( $hp_faqs as $i => $faq ) :
+				$panel_id   = 'home-faq-' . $i;
+				$is_first   = ( $i === 0 );
+				$expanded   = $is_first ? 'true' : 'false';
+				$open_class = $is_first ? ' is-open' : '';
+			?>
+			<div class="myo-faq__item">
+				<button class="myo-faq__btn" type="button" aria-expanded="<?php echo esc_attr( $expanded ); ?>" aria-controls="<?php echo esc_attr( $panel_id ); ?>">
+					<span class="myo-faq__q"><?php echo esc_html( $faq['q'] ); ?></span>
+					<span class="myo-faq__icon" aria-hidden="true"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+				</button>
+				<div class="myo-faq__panel<?php echo esc_attr( $open_class ); ?>" id="<?php echo esc_attr( $panel_id ); ?>">
+					<div class="myo-faq__panel-inner">
+						<p><?php echo esc_html( $faq['a'] ); ?></p>
 					</div>
 				</div>
-				<?php endforeach; ?>
 			</div>
-
+			<?php endforeach; ?>
+		</div>
+		<div class="myo-faq__cta">
+			<a href="<?php echo esc_url( home_url( '/product-category/weight-loss/' ) ); ?>" class="myo-faq__cta-btn">Configure your program →</a>
 		</div>
 	</div>
 </section>
