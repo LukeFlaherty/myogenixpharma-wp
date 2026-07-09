@@ -653,7 +653,7 @@ function myogenix_render_product_scrollers( array $category_slugs, int $exclude_
 	foreach ( $category_slugs as $cat_slug ) {
 		if ( ! isset( $all_categories[ $cat_slug ] ) ) continue;
 		$cat        = $all_categories[ $cat_slug ];
-		$full_class = ( ! empty( $cat['full'] ) && count( $category_slugs ) > 2 ) ? ' hp-catbox--full' : '';
+		$full_class = ( ! empty( $cat['full'] ) && count( $category_slugs ) !== 2 ) ? ' hp-catbox--full' : '';
 		echo '<div class="hp-catbox' . $full_class . '">';
 		echo '<div class="hp-catbox__header">';
 		echo '<h3 class="hp-catbox__title">' . esc_html( $cat['title'] ) . '</h3>';
