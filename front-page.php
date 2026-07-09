@@ -31,7 +31,7 @@ $hp_meta = [
 	'bpc'          => [ 'name' => 'BPC-157',        'tagline' => 'Healing & repair',             'unit' => '/vial' ],
 	'motsc'        => [ 'name' => 'MOTSc',          'tagline' => 'Mitochondrial health',         'unit' => '/vial' ],
 	'epithalon'    => [ 'name' => 'Epithalon',      'tagline' => 'Longevity peptide',            'unit' => '/vial' ],
-	'tadalafil'    => [ 'name' => 'Tadalafil',      'tagline' => 'Daily ED support',             'unit' => '/mo', 'months_supply' => 3 ],
+	'tadalafil'    => [ 'name' => 'Tadalafil',      'tagline' => 'Daily ED support',             'unit' => '/tablet', 'tablets_supply' => 90 ],
 	'sildenafil'   => [ 'name' => 'Sildenafil',     'tagline' => 'Fast-acting ED treatment',     'unit' => '/mo'   ],
 	'testosterone' => [ 'name' => 'Testosterone',   'tagline' => 'Hormone optimization',         'unit' => '/mo'   ],
 ];
@@ -74,6 +74,11 @@ foreach ( $hp_ids as $key => $id ) {
 	if ( $months > 1 ) {
 		$raw_price = $raw_price / $months;
 	}
+	// Non-subscription products sold as a fixed tablet count use tablets_supply in $hp_meta.
+	$tablets_supply = isset( $hp_meta[ $key ]['tablets_supply'] ) ? (int) $hp_meta[ $key ]['tablets_supply'] : 0;
+	if ( $tablets_supply > 0 ) {
+		$raw_price = $raw_price / $tablets_supply;
+	}
 	$hp_products[ $key ] = [
 		'price' => $raw_price,
 		'url'   => $wc->get_permalink(),
@@ -85,9 +90,10 @@ foreach ( $hp_ids as $key => $id ) {
 if ( ! function_exists( 'hp_product_card' ) ) {
 	function hp_product_card( string $key, array $products, array $meta ): string {
 		if ( empty( $products[ $key ] ) ) return '';
-		$p     = $products[ $key ];
-		$m     = $meta[ $key ];
-		$price = '$' . number_format( $p['price'], 0 );
+		$p        = $products[ $key ];
+		$m        = $meta[ $key ];
+		$decimals = ( '/tablet' === $m['unit'] ) ? 2 : 0;
+		$price    = '$' . number_format( $p['price'], $decimals );
 		return sprintf(
 			'<a href="%s" class="hp-card" aria-label="%s">
 				<div class="hp-card__img-wrap">
