@@ -25,7 +25,7 @@ $peptide_slugs = [
 ];
 $is_peptide = in_array( $slug, $peptide_slugs, true );
 
-$sexual_health_slugs = [ 'compound-oral-tadalafil', 'compound-sildenafil', 'testosterone' ];
+$sexual_health_slugs = [ 'compound-oral-tadalafil', 'compound-sildenafil', 'testosterone', 'hcg' ];
 $is_sexual_health    = in_array( $slug, $sexual_health_slugs, true );
 
 // Suppress the "Please choose product options" notice on our custom PDPs —
@@ -744,6 +744,26 @@ if ( $is_weight_loss ) :
 			'disclaimer'      => 'Order reviewed by a licensed provider before processing.',
 			'flat_fee_price'  => 165,
 			'flat_fee_label'  => 'Male Hormone Panel & Initial Doctor Consult',
+		],
+		'hcg' => [
+			'name'            => 'HCG',
+			'badge'           => 'Men\'s Health',
+			'desc'            => 'HCG (Human Chorionic Gonadotropin) is a physician-prescribed injectable used to support natural testosterone production and testicular function, often alongside a personalized hormone optimization plan.',
+			'includes'        => [
+				'HCG injectable &middot; 10,000 IU vial',
+				'Syringes &amp; needles',
+				'Alcohol prep pads',
+				'Dosing protocol card',
+			],
+			'primary_attr'    => 'pa_dosage',
+			'primary_label'   => 'Strength',
+			'secondary_attr'  => null,
+			'secondary_label' => null,
+			'fixed_attrs'     => [],
+			'cta_label'       => 'Go to Checkout',
+			'disclaimer'      => 'One-time purchase. Order reviewed by a licensed provider before processing.',
+			'flat_fee_price'  => 0,
+			'flat_fee_label'  => '',
 		],
 	];
 	$shcfg = $sexual_health_config[ $slug ];
