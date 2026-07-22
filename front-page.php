@@ -19,6 +19,7 @@ $hp_ids = [
 	'tadalafil'    => 1886,
 	'sildenafil'   => 1883,
 	'testosterone' => 883,
+	'hcg'          => 4779,
 ];
 
 $hp_meta = [
@@ -34,6 +35,7 @@ $hp_meta = [
 	'tadalafil'    => [ 'name' => 'Tadalafil',      'tagline' => 'Daily ED support',             'unit' => '/tablet', 'tablets_supply' => 90 ],
 	'sildenafil'   => [ 'name' => 'Sildenafil',     'tagline' => 'Fast-acting ED treatment',     'unit' => '/mo'   ],
 	'testosterone' => [ 'name' => 'Testosterone',   'tagline' => 'Hormone optimization',         'unit' => '/mo'   ],
+	'hcg'          => [ 'name' => 'HCG',            'tagline' => 'Natural testosterone support',  'unit' => ''      ],
 ];
 
 $hp_products = [];
@@ -125,7 +127,7 @@ $hp_categories = [
 	[
 		'title'    => 'Mens Health',
 		'shop_url' => '/product-category/mens-health/',
-		'products' => [ 'testosterone', 'tadalafil', 'sildenafil' ],
+		'products' => [ 'testosterone', 'hcg', 'tadalafil', 'sildenafil' ],
 	],
 	[
 		'title'    => 'Weight Loss',

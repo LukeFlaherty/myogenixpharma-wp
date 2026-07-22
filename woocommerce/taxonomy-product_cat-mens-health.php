@@ -18,16 +18,34 @@ do_action( 'woocommerce_before_main_content' );
 
 $mh_config = [
 	'testosterone' => [
-		'badge'   => 'Testosterone Replacement Therapy',
-		'title'   => 'Testosterone Cypionate',
-		'desc'    => 'Clinically dosed injectable testosterone to restore optimal hormonal levels. Weekly or bi-weekly self-injection with ongoing provider monitoring.',
-		'bullets' => [
+		'badge'       => 'Testosterone Replacement Therapy',
+		'title'       => 'Testosterone Cypionate',
+		'desc'        => 'Clinically dosed injectable testosterone to restore optimal hormonal levels. Weekly or bi-weekly self-injection with ongoing provider monitoring.',
+		'bullets'     => [
 			'Provider-reviewed TRT program',
 			'Weekly or bi-weekly self-injection',
 			'Ongoing hormone monitoring included',
 			'Compounded in FDA-registered facility',
 		],
-		'url' => '/product/testosterone/',
+		'url'         => '/product/testosterone/',
+		'price_label' => 'Starting from',
+		'price_unit'  => '/month',
+		'cta_label'   => 'Configure Your Program',
+	],
+	'hcg' => [
+		'badge'       => "Men's Health",
+		'title'       => 'HCG',
+		'desc'        => 'Physician-prescribed HCG to support natural testosterone production and testicular function, often used alongside a hormone optimization plan.',
+		'bullets'     => [
+			'Provider-reviewed before shipping',
+			'Subcutaneous self-injection',
+			'Syringes & supplies included',
+			'Compounded in FDA-registered facility',
+		],
+		'url'         => '/product/hcg/',
+		'price_label' => 'One-time purchase',
+		'price_unit'  => '',
+		'cta_label'   => 'Go to Checkout',
 	],
 ];
 
@@ -112,6 +130,14 @@ $faqs = [
 		'q' => 'Can I pause or cancel my program?',
 		'a' => 'Yes. You can pause or cancel at any time through your patient portal or by contacting our support team. We ask for at least 5 business days\' notice before your next billing date. There are no long-term contracts or cancellation fees.',
 	],
+	[
+		'q' => 'What is HCG used for?',
+		'a' => 'HCG (human chorionic gonadotropin) supports natural testosterone production and testicular function, often alongside a TRT program or as part of a broader hormone optimization plan.',
+	],
+	[
+		'q' => 'Is HCG a subscription?',
+		'a' => 'No — HCG is a one-time purchase. You can reorder whenever you need your next vial, with no recurring subscription or commitment.',
+	],
 ];
 ?>
 
@@ -121,17 +147,17 @@ $faqs = [
 	<section class="myogenix-cat__hero">
 		<div class="myogenix-pdp__container">
 			<p class="myogenix-cat__hero-label">Men's Health</p>
-			<h1 class="myogenix-cat__hero-title">Testosterone Replacement Therapy</h1>
-			<p class="myogenix-cat__hero-desc">Compounded testosterone replacement, reviewed by a licensed provider. No insurance required.</p>
+			<h1 class="myogenix-cat__hero-title">Men's Health Treatments</h1>
+			<p class="myogenix-cat__hero-desc">Compounded hormone therapy and support, reviewed by a licensed provider. No insurance required.</p>
 		</div>
 	</section>
 
 	<!-- Product Cards -->
 	<section class="myogenix-cat__products">
 		<div class="myogenix-pdp__container">
-			<h2 class="myogenix-pdp__section-heading">Your TRT Program</h2>
-			<p class="myogenix-pdp__section-sub">Provider-reviewed testosterone replacement with supplies and ongoing monitoring included.</p>
-			<div class="myogenix-cat__products-grid myogenix-cat__products-grid--single">
+			<h2 class="myogenix-pdp__section-heading">Men's Health Programs</h2>
+			<p class="myogenix-pdp__section-sub">Provider-reviewed treatments with supplies and ongoing support included.</p>
+			<div class="myogenix-cat__products-grid<?php echo count( $mh_config ) === 1 ? ' myogenix-cat__products-grid--single' : ''; ?>">
 
 				<?php foreach ( $mh_config as $slug => $cfg ) :
 					$min_price = $mh_min_prices[ $slug ] ?? null;
@@ -156,14 +182,14 @@ $faqs = [
 					<?php endif; ?>
 					<?php if ( $min_price ) : ?>
 					<div class="myogenix-cat__product-price">
-						<span class="myogenix-cat__product-price-label">Starting from</span>
+						<span class="myogenix-cat__product-price-label"><?php echo esc_html( $cfg['price_label'] ); ?></span>
 						<strong class="myogenix-cat__product-price-value">
-							$<?php echo esc_html( number_format( $min_price, 0 ) ); ?><span>/month</span>
+							$<?php echo esc_html( number_format( $min_price, 0 ) ); ?><span><?php echo esc_html( $cfg['price_unit'] ); ?></span>
 						</strong>
 					</div>
 					<?php endif; ?>
 					<a href="<?php echo esc_url( $prod_url ); ?>" class="pdp-cfg__cta">
-						Configure Your Program &rarr;
+						<?php echo esc_html( $cfg['cta_label'] ); ?> &rarr;
 					</a>
 					<p class="pdp-cfg__disclaimer">Provider-reviewed before processing. Prescription required.</p>
 				</div>
@@ -204,7 +230,7 @@ $faqs = [
 			<div class="myo-faq__header">
 				<span class="myo-faq__eyebrow">FAQ</span>
 				<h2 class="myo-faq__title">Common questions</h2>
-				<p class="myo-faq__desc">Everything you need to know about testosterone therapy, dosing, and how our program works.</p>
+				<p class="myo-faq__desc">Everything you need to know about our men's health treatments, dosing, and how our program works.</p>
 			</div>
 			<div class="myo-faq__list">
 				<?php foreach ( $faqs as $i => $faq ) :
@@ -227,7 +253,7 @@ $faqs = [
 				<?php endforeach; ?>
 			</div>
 			<div class="myo-faq__cta">
-				<a href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>" class="myo-faq__cta-btn">Configure your program &rarr;</a>
+				<a href="<?php echo esc_url( home_url( '/product-category/mens-health/' ) ); ?>" class="myo-faq__cta-btn">Explore men's health treatments &rarr;</a>
 			</div>
 		</div>
 	</section>

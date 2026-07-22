@@ -588,6 +588,7 @@ function myogenix_render_product_scrollers( array $category_slugs, int $exclude_
 		'tadalafil'    => 1886,
 		'sildenafil'   => 1883,
 		'testosterone' => 883,
+		'hcg'          => 4779,
 	];
 	$all_meta = [
 		'tirzepatide'  => [ 'name' => 'Tirzepatide',   'tagline' => 'Dual-action GLP-1 therapy',  'unit' => '/mo'   ],
@@ -602,12 +603,13 @@ function myogenix_render_product_scrollers( array $category_slugs, int $exclude_
 		'tadalafil'    => [ 'name' => 'Tadalafil',      'tagline' => 'Daily ED support',           'unit' => '/tablet', 'tablets_supply' => 90 ],
 		'sildenafil'   => [ 'name' => 'Sildenafil',     'tagline' => 'Fast-acting ED treatment',   'unit' => '/mo'   ],
 		'testosterone' => [ 'name' => 'Testosterone',   'tagline' => 'Hormone optimization',       'unit' => '/mo'   ],
+		'hcg'          => [ 'name' => 'HCG',            'tagline' => 'Natural testosterone support', 'unit' => ''   ],
 	];
 	$all_categories = [
 		'mens-health' => [
 			'title'    => 'Mens Health',
 			'shop_url' => '/product-category/mens-health/',
-			'products' => [ 'testosterone', 'tadalafil', 'sildenafil' ],
+			'products' => [ 'testosterone', 'hcg', 'tadalafil', 'sildenafil' ],
 		],
 		'weight-loss' => [
 			'title'    => 'Weight Loss',
