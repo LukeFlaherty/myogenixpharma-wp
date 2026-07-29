@@ -14,8 +14,13 @@
   z-index: 200;
   background: #0a0a0a;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Anton', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+.rdx-nav a,
+.rdx-nav button,
+.rdx-nav__cta {
+  text-transform: uppercase;
 }
 .rdx-nav *,
 .rdx-nav *::before,
@@ -74,9 +79,9 @@
 }
 .rdx-nav__menu-list li a {
   display: block;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
   color: #e4e4e7;
   padding: 8px 14px;
   border-radius: 6px;
@@ -100,12 +105,12 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
   white-space: nowrap;
-  padding: 11px 20px;
-  border-radius: 8px;
+  padding: 12px 22px;
+  border-radius: 12px;
   transition: filter 150ms ease, background 150ms ease;
 }
 @media (min-width: 1024px) {
@@ -283,8 +288,9 @@ body.rdx-nav-open {
 }
 .rdx-nav__drawer-list li a {
   display: block;
-  font-size: 17px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
   color: #f4f4f5;
   padding: 16px 4px;
   transition: color 150ms ease;
@@ -319,4 +325,21 @@ body.rdx-nav-open {
   font-size: 14px;
   font-weight: 600;
   color: #e4e4e7;
+}
+
+/* =========================================================
+   Hide the site-wide exit-intent lead popup and GHL chat
+   widget on this page only. Both are injected globally by a
+   Code Snippet outside this repo (wp_footer output), so they
+   can't be removed at the source without affecting every page
+   — this suppresses them just here via CSS + a JS safety net
+   in home-redesign.js for anything CSS can't reach in time.
+   ========================================================= */
+body.myogenix-home-redesign-page #lcp-overlay,
+body.myogenix-home-redesign-page [id*="leadconnector" i],
+body.myogenix-home-redesign-page [class*="leadconnector" i],
+body.myogenix-home-redesign-page [id*="chat-widget" i],
+body.myogenix-home-redesign-page [class*="chat-widget" i],
+body.myogenix-home-redesign-page iframe[src*="leadconnectorhq"] {
+  display: none !important;
 }

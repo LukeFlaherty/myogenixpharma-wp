@@ -4,6 +4,31 @@
   // Isolated to page-home-redesign.php — see home-redesign.css for the
   // matching "rdx-" namespace. Does not touch/duplicate home.js's nav logic.
 
+  // ── Hide the site-wide exit-intent popup + GHL chat widget on this page ──
+  // Both are injected globally by a Code Snippet (wp_footer output) outside
+  // this repo, so they can't be removed at the source without affecting the
+  // rest of the site. home-redesign.css hides them by selector; this catches
+  // anything added after load or styled with inline styles that could beat
+  // the CSS (e.g. the chat widget's loader script runs async).
+  var WIDGET_SELECTOR = [
+    '#lcp-overlay',
+    '[id*="leadconnector" i]',
+    '[class*="leadconnector" i]',
+    '[id*="chat-widget" i]',
+    '[class*="chat-widget" i]',
+    'iframe[src*="leadconnectorhq"]'
+  ].join(',');
+
+  var hideWidgets = function () {
+    document.querySelectorAll(WIDGET_SELECTOR).forEach(function (el) {
+      el.style.setProperty('display', 'none', 'important');
+    });
+  };
+
+  hideWidgets();
+  var widgetObserver = new MutationObserver(hideWidgets);
+  widgetObserver.observe(document.body, { childList: true, subtree: true });
+
   var hamburger = document.querySelector('.rdx-nav__hamburger');
   var drawer = document.getElementById('rdx-mobile-menu');
   var overlay = document.getElementById('rdx-nav-overlay');

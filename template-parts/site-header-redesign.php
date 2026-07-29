@@ -20,7 +20,12 @@ $_rdx_cart_url        = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url()
 $_rdx_cart_count      = ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0;
 $_rdx_placeholder_url = home_url( isset( $wp->request ) ? $wp->request : '' );
 $_rdx_ask_url         = home_url( '/contact/' );
-$_rdx_arrow_url       = get_stylesheet_directory_uri() . '/assets/images/nav/arrow-white.svg';
+
+// Inline arrow icon — the provided arrow-white.svg is a Figma "recolor" export
+// (raster image + color-matrix mask) that includes an opaque white background
+// rect, so it renders as a solid square instead of a transparent arrow. A hand-
+// drawn inline SVG avoids that entirely and lets the icon inherit currentColor.
+$_rdx_arrow_svg = '<svg class="rdx-nav__cta-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 $_rdx_links = [
 	[ 'label' => 'How It Works',  'url' => $_rdx_placeholder_url ],
@@ -47,8 +52,8 @@ $_rdx_links = [
 
 		<div class="rdx-nav__actions">
 			<a href="<?php echo esc_url( $_rdx_placeholder_url ); ?>" class="rdx-nav__cta rdx-nav__cta--primary">
-				Start Your Evaluation
-				<img src="<?php echo esc_url( $_rdx_arrow_url ); ?>" alt="" class="rdx-nav__cta-arrow" aria-hidden="true">
+				Start Evaluation
+				<?php echo $_rdx_arrow_svg; ?>
 			</a>
 			<a href="<?php echo esc_url( $_rdx_ask_url ); ?>" class="rdx-nav__cta rdx-nav__cta--secondary">Ask a Question</a>
 
@@ -95,8 +100,8 @@ $_rdx_links = [
 	</ul>
 	<div class="rdx-nav__drawer-actions">
 		<a href="<?php echo esc_url( $_rdx_placeholder_url ); ?>" class="rdx-nav__cta rdx-nav__cta--primary">
-			Start Your Evaluation
-			<img src="<?php echo esc_url( $_rdx_arrow_url ); ?>" alt="" class="rdx-nav__cta-arrow" aria-hidden="true">
+			Start Evaluation
+			<?php echo $_rdx_arrow_svg; ?>
 		</a>
 		<a href="<?php echo esc_url( $_rdx_ask_url ); ?>" class="rdx-nav__cta rdx-nav__cta--secondary">Ask a Question</a>
 	</div>

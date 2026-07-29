@@ -36,16 +36,22 @@ add_action( 'wp_enqueue_scripts', function() {
 add_action( 'wp_enqueue_scripts', function() {
 	if ( ! is_page_template( 'page-home-redesign.php' ) ) return;
 	wp_enqueue_style(
+		'myogenix-home-redesign-font-anton',
+		'https://fonts.googleapis.com/css2?family=Anton&display=swap',
+		[],
+		null
+	);
+	wp_enqueue_style(
 		'myogenix-home-redesign',
 		get_stylesheet_directory_uri() . '/assets/css/home-redesign.css',
-		[],
-		'1.0.0'
+		[ 'myogenix-home-redesign-font-anton' ],
+		'1.1.0'
 	);
 	wp_enqueue_script(
 		'myogenix-home-redesign',
 		get_stylesheet_directory_uri() . '/assets/js/home-redesign.js',
 		[],
-		'1.0.0',
+		'1.1.0',
 		true
 	);
 } );
