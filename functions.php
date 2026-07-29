@@ -19,13 +19,13 @@ add_action( 'wp_enqueue_scripts', function() {
 		'myogenix-home',
 		get_stylesheet_directory_uri() . '/assets/css/home.css',
 		[],
-		'1.5.0'
+		'1.6.0'
 	);
 	wp_enqueue_script(
 		'myogenix-home',
 		get_stylesheet_directory_uri() . '/assets/js/home.js',
 		[],
-		'1.5.2',
+		'1.6.0',
 		true
 	);
 } );
