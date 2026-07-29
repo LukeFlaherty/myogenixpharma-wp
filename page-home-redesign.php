@@ -18,10 +18,10 @@ defined( 'ABSPATH' ) || exit;
 <meta name="robots" content="noindex, nofollow">
 <?php wp_head(); ?>
 </head>
-<body <?php body_class( 'myogenix-home-page' ); ?>>
+<body <?php body_class( 'myogenix-home-redesign-page' ); ?>>
 <?php wp_body_open(); ?>
 
-<?php get_template_part( 'template-parts/site-header' ); ?>
+<?php get_template_part( 'template-parts/site-header-redesign' ); ?>
 
 <main>
 	<!-- Sections below are built incrementally as the redesign progresses. -->

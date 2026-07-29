@@ -19,13 +19,33 @@ add_action( 'wp_enqueue_scripts', function() {
 		'myogenix-home',
 		get_stylesheet_directory_uri() . '/assets/css/home.css',
 		[],
-		'1.6.0'
+		'1.5.0'
 	);
 	wp_enqueue_script(
 		'myogenix-home',
 		get_stylesheet_directory_uri() . '/assets/js/home.js',
 		[],
-		'1.6.0',
+		'1.5.2',
+		true
+	);
+} );
+
+// ─── Home Redesign (Staging) page — isolated navbar, does NOT touch the
+// shared site-wide nav above. Only loads on page-home-redesign.php so other
+// pages are completely unaffected while the redesign is in progress.
+add_action( 'wp_enqueue_scripts', function() {
+	if ( ! is_page_template( 'page-home-redesign.php' ) ) return;
+	wp_enqueue_style(
+		'myogenix-home-redesign',
+		get_stylesheet_directory_uri() . '/assets/css/home-redesign.css',
+		[],
+		'1.0.0'
+	);
+	wp_enqueue_script(
+		'myogenix-home-redesign',
+		get_stylesheet_directory_uri() . '/assets/js/home-redesign.js',
+		[],
+		'1.0.0',
 		true
 	);
 } );
