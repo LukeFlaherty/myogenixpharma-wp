@@ -21,11 +21,11 @@ $_rdx_cart_count      = ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->
 $_rdx_placeholder_url = home_url( isset( $wp->request ) ? $wp->request : '' );
 $_rdx_ask_url         = home_url( '/contact/' );
 
-// Inline arrow icon — the provided arrow-white.svg is a Figma "recolor" export
-// (raster image + color-matrix mask) that includes an opaque white background
-// rect, so it renders as a solid square instead of a transparent arrow. A hand-
-// drawn inline SVG avoids that entirely and lets the icon inherit currentColor.
-$_rdx_arrow_svg = '<svg class="rdx-nav__cta-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+// Inline arrow icon, using the approved button-arrow-white-v2 path directly
+// (the original arrow-white.svg export was a Figma "recolor" raster+mask with
+// an opaque background rect that rendered as a solid square — this is the
+// clean vector approved in the hero asset sheet).
+$_rdx_arrow_svg = '<svg class="rdx-nav__cta-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M36.8 12.7 56.1 32 36.8 51.3l-6.4-6.4 8.4-8.4H7.9v-9h30.9l-8.4-8.4 6.4-6.4Z"/></svg>';
 
 $_rdx_links = [
 	[ 'label' => 'How It Works',  'url' => $_rdx_placeholder_url ],

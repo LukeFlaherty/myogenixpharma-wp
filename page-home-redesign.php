@@ -24,7 +24,8 @@ defined( 'ABSPATH' ) || exit;
 <?php get_template_part( 'template-parts/site-header-redesign' ); ?>
 
 <main>
-	<!-- Sections below are built incrementally as the redesign progresses. -->
+	<?php get_template_part( 'template-parts/home-redesign-hero' ); ?>
+	<!-- Additional sections are built incrementally as the redesign progresses. -->
 </main>
 
 <?php get_template_part( 'template-parts/site-footer' ); ?>

@@ -3,7 +3,33 @@
    Namespaced under "rdx-" so it never collides with home.css's
    .home-nav / .home-* classes, which stay live on the rest of
    the site untouched. Do not reuse these classes elsewhere.
+
+   Typography: Bebas Neue (condensed uppercase display sans) is
+   the page-wide type family for this redesign — used for nav,
+   headings, and CTA text throughout, not just the navbar.
    ========================================================= */
+body.myogenix-home-redesign-page {
+  font-family: 'Bebas Neue', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: #0a0a0a;
+}
+body.myogenix-home-redesign-page *,
+body.myogenix-home-redesign-page *::before,
+body.myogenix-home-redesign-page *::after {
+  box-sizing: border-box;
+}
+body.myogenix-home-redesign-page img {
+  display: block;
+  max-width: 100%;
+}
+body.myogenix-home-redesign-page .screen-reader-text {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+}
 
 /* =========================================================
    NAVBAR
@@ -14,18 +40,11 @@
   z-index: 200;
   background: #0a0a0a;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  font-family: 'Anton', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  -webkit-font-smoothing: antialiased;
 }
 .rdx-nav a,
 .rdx-nav button,
 .rdx-nav__cta {
   text-transform: uppercase;
-}
-.rdx-nav *,
-.rdx-nav *::before,
-.rdx-nav *::after {
-  box-sizing: border-box;
 }
 .rdx-nav a {
   text-decoration: none;
@@ -325,6 +344,178 @@ body.rdx-nav-open {
   font-size: 14px;
   font-weight: 600;
   color: #e4e4e7;
+}
+
+/* =========================================================
+   HERO
+   The two background crops (hero-bg-top / hero-bg-bottom) and the
+   foreground people/phone/bottle crop are baked-in photographic
+   crops from one approved reference composite, not modular
+   transparent layers — there's no alpha channel to key against.
+   Rather than force pixel-exact reconstruction of the reference,
+   this uses a standard flexible two-column layout (copy left,
+   photo right) which reads the same way and holds up responsively.
+   ========================================================= */
+.rdx-hero {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  padding-top: 64px;
+}
+.rdx-hero__bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center 30%;
+  background-repeat: no-repeat;
+}
+.rdx-hero__bg-fade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    rgba(0, 0, 0, 0.88) 0%,
+    rgba(0, 0, 0, 0.72) 32%,
+    rgba(0, 0, 0, 0.35) 58%,
+    rgba(0, 0, 0, 0.15) 100%
+  );
+}
+.rdx-hero__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 56px 24px 72px;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 40px;
+}
+@media (min-width: 900px) {
+  .rdx-hero__inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    padding: 72px 24px 96px;
+  }
+}
+
+/* ── Copy ── */
+.rdx-hero__copy {
+  max-width: 620px;
+  text-align: center;
+}
+@media (min-width: 900px) {
+  .rdx-hero__copy {
+    text-align: left;
+    flex: 0 1 560px;
+  }
+}
+.rdx-hero__eyebrow {
+  margin: 0 0 12px;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  color: #e0202f;
+  text-transform: uppercase;
+}
+.rdx-hero__headline {
+  margin: 0 0 20px;
+  line-height: 0.92;
+}
+.rdx-hero__headline-visual {
+  display: block;
+}
+.rdx-hero__headline-line {
+  position: relative;
+  display: block;
+  font-size: clamp(48px, 11vw, 108px);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+.rdx-hero__headline-line--accent {
+  color: #e0202f;
+}
+.rdx-hero__headline-line--white {
+  color: #f4f4f5;
+}
+/* Distressed grain overlay clipped to the letterforms via a duplicated
+   text layer — the approved assets don't include a standalone grunge
+   texture file, so this approximates the reference's gritty look with
+   an SVG feTurbulence noise pattern blended over the type. */
+.rdx-hero__headline-line::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.85 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  mix-blend-mode: overlay;
+  opacity: 0.6;
+  pointer-events: none;
+}
+.rdx-hero__tagline {
+  margin: 0 0 8px;
+  font-size: clamp(20px, 3vw, 28px);
+  letter-spacing: 0.02em;
+  color: #f4f4f5;
+  text-transform: uppercase;
+}
+.rdx-hero__sub {
+  margin: 0 0 28px;
+  font-size: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #d4d4d8;
+}
+.rdx-hero__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+@media (min-width: 900px) {
+  .rdx-hero__ctas {
+    justify-content: flex-start;
+  }
+}
+.rdx-hero__cta {
+  display: inline-flex;
+}
+
+/* ── Media ── */
+.rdx-hero__media {
+  flex: 0 1 560px;
+  max-width: 480px;
+  width: 100%;
+}
+@media (min-width: 900px) {
+  .rdx-hero__media {
+    max-width: none;
+  }
+}
+.rdx-hero__foreground {
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Bottom bleed strip — the red divider line baked into this crop's
+   top edge continues the background into whatever section comes next. ── */
+.rdx-hero__bleed {
+  position: relative;
+  z-index: 1;
+  height: 72px;
+  background-size: cover;
+  background-position: top center;
+  background-repeat: no-repeat;
+}
+@media (min-width: 900px) {
+  .rdx-hero__bleed {
+    height: 110px;
+  }
 }
 
 /* =========================================================
