@@ -44,9 +44,7 @@ $_rdx_hero_arrow    = '<svg class="rdx-nav__cta-arrow" xmlns="http://www.w3.org/
 		</div>
 
 		<div class="rdx-hero__media">
-			<img src="<?php echo esc_url( $_rdx_hero_img_base . 'hero-foreground.jpg' ); ?>" alt="Myogenix Pharma care team reviewing a patient's treatment plan on a tablet, with the care-journey app and a testosterone vial" class="rdx-hero__foreground" width="840" height="700">
+			<img src="<?php echo esc_url( $_rdx_hero_img_base . 'hero-foreground.png' ); ?>" alt="Myogenix Pharma care team reviewing a patient's treatment plan on a tablet, with the care-journey app and a testosterone vial" class="rdx-hero__foreground" width="649" height="649">
 		</div>
 	</div>
-
-	<div class="rdx-hero__bleed" style="background-image:url('<?php echo esc_url( $_rdx_hero_img_base . 'hero-bg-bottom.jpg' ); ?>');" aria-hidden="true"></div>
 </section>
