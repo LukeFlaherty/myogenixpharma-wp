@@ -10,13 +10,27 @@
 defined( 'ABSPATH' ) || exit;
 
 global $wp;
+$_rdx_hero_img_dir  = get_stylesheet_directory() . '/assets/images/hero/';
 $_rdx_hero_img_base = get_stylesheet_directory_uri() . '/assets/images/hero/';
 $_rdx_hero_cta_url  = home_url( isset( $wp->request ) ? $wp->request : '' );
 $_rdx_hero_ask_url  = home_url( '/contact/' );
 $_rdx_hero_arrow    = '<svg class="rdx-nav__cta-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M36.8 12.7 56.1 32 36.8 51.3l-6.4-6.4 8.4-8.4H7.9v-9h30.9l-8.4-8.4 6.4-6.4Z"/></svg>';
+
+// Cache-bust hero images by file mtime — these are referenced as raw
+// url()/src paths (not wp_enqueue_style/script), so nothing else forces
+// a browser/CDN to refetch them when the file content changes on deploy.
+if ( ! function_exists( 'myogenix_rdx_asset_url' ) ) {
+	function myogenix_rdx_asset_url( $filename, $dir, $base ) {
+		$path = $dir . $filename;
+		$ver  = file_exists( $path ) ? filemtime( $path ) : '1';
+		return $base . $filename . '?v=' . $ver;
+	}
+}
+$_rdx_hero_bg_url  = myogenix_rdx_asset_url( 'hero-bg-top.jpg', $_rdx_hero_img_dir, $_rdx_hero_img_base );
+$_rdx_hero_fg_url  = myogenix_rdx_asset_url( 'hero-foreground.png', $_rdx_hero_img_dir, $_rdx_hero_img_base );
 ?>
 <section class="rdx-hero" aria-label="Introduction">
-	<div class="rdx-hero__bg" style="background-image:url('<?php echo esc_url( $_rdx_hero_img_base . 'hero-bg-top.jpg' ); ?>');"></div>
+	<div class="rdx-hero__bg" style="background-image:url('<?php echo esc_url( $_rdx_hero_bg_url ); ?>');"></div>
 	<div class="rdx-hero__bg-fade" aria-hidden="true"></div>
 
 	<div class="rdx-hero__inner">
@@ -44,7 +58,7 @@ $_rdx_hero_arrow    = '<svg class="rdx-nav__cta-arrow" xmlns="http://www.w3.org/
 		</div>
 
 		<div class="rdx-hero__media">
-			<img src="<?php echo esc_url( $_rdx_hero_img_base . 'hero-foreground.png' ); ?>" alt="Myogenix Pharma care team reviewing a patient's treatment plan on a tablet, with the care-journey app and a testosterone vial" class="rdx-hero__foreground" width="649" height="649">
+			<img src="<?php echo esc_url( $_rdx_hero_fg_url ); ?>" alt="Myogenix Pharma care team reviewing a patient's treatment plan on a tablet, with the care-journey app and a testosterone vial" class="rdx-hero__foreground" width="649" height="649">
 		</div>
 	</div>
 </section>
