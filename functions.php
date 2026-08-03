@@ -45,13 +45,13 @@ add_action( 'wp_enqueue_scripts', function() {
 		'myogenix-home-redesign',
 		get_stylesheet_directory_uri() . '/assets/css/home-redesign.css',
 		[ 'myogenix-home-redesign-font-bebas' ],
-		'1.4.0'
+		'1.5.0'
 	);
 	wp_enqueue_script(
 		'myogenix-home-redesign',
 		get_stylesheet_directory_uri() . '/assets/js/home-redesign.js',
 		[],
-		'1.4.0',
+		'1.5.0',
 		true
 	);
 } );
