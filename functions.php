@@ -151,6 +151,14 @@ add_filter( 'woocommerce_add_cart_item_data', function ( $cart_item_data, $produ
 	return $cart_item_data;
 }, 10, 3 );
 
+// TRT — capture "I already have my own labs" flag from add-to-cart URL
+add_filter( 'woocommerce_add_cart_item_data', function ( $cart_item_data, $product_id ) {
+	if ( ! empty( $_REQUEST['own_labs'] ) && get_post_field( 'post_name', $product_id ) === 'testosterone' ) {
+		$cart_item_data['own_labs'] = '1';
+	}
+	return $cart_item_data;
+}, 10, 2 );
+
 // Display dose schedule in cart and checkout review with weekly breakdown.
 // Uses separate entries so WC Blocks checkout renders each as its own row.
 add_filter( 'woocommerce_get_item_data', function ( $item_data, $cart_item ) {
@@ -172,6 +180,12 @@ add_filter( 'woocommerce_get_item_data', function ( $item_data, $cart_item ) {
 				'value' => esc_html( $display . $weekly ),
 			];
 		}
+	}
+	if ( ! empty( $cart_item['own_labs'] ) ) {
+		$item_data[] = [
+			'key'   => 'Labs',
+			'value' => esc_html( 'Provided by patient' ),
+		];
 	}
 	return $item_data;
 }, 10, 2 );
@@ -398,6 +412,10 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( $item, $ca
 			$item->set_name( $rx_name );
 		}
 	}
+
+	if ( 'testosterone' === $parent_slug && ! empty( $values['own_labs'] ) ) {
+		$item->add_meta_data( 'Labs', 'Provided by patient (own labs discount applied)' );
+	}
 }, 10, 4 );
 
 // Look up the 1-vial price for a given dose slug on a weight management product.
@@ -454,6 +472,38 @@ add_action( 'woocommerce_before_calculate_totals', function ( $cart ) {
 		}
 	}
 }, 10 );
+
+// TRT — "I already have my own labs" discount.
+// Testosterone's actual $165 charge is not the product price — it's a "Consultation Fee"
+// added by the Prescribery plugin (class-prewoo-consultation-fees.php: apply_highest_consultation_fee(),
+// woocommerce_cart_calculate_fees, default priority 10) after zeroing the product price
+// (make_products_free_zero(), woocommerce_before_calculate_totals priority 99). So the discount
+// is applied as a second, negative fee rather than a price override, which that plugin would
+// otherwise clobber. Runs at priority 20 so the Consultation Fee already exists to read/cap against.
+add_action( 'woocommerce_cart_calculate_fees', function ( $cart ) {
+	if ( is_admin() && ! defined( 'DOING_AJAX' ) ) return;
+
+	$has_own_labs = false;
+	foreach ( $cart->get_cart() as $cart_item ) {
+		if ( ! empty( $cart_item['own_labs'] )
+			&& get_post_field( 'post_name', $cart_item['product_id'] ?? 0 ) === 'testosterone' ) {
+			$has_own_labs = true;
+			break;
+		}
+	}
+	if ( ! $has_own_labs ) return;
+
+	$consultation_fee_amount = 0;
+	foreach ( $cart->get_fees() as $fee ) {
+		if ( 'Consultation Fee' === $fee->name ) {
+			$consultation_fee_amount += $fee->amount;
+		}
+	}
+	$discount = min( 100, $consultation_fee_amount ); // $100 off, matches "save $100" PDP copy
+	if ( $discount <= 0 ) return;
+
+	$cart->add_fee( 'Own Labs Discount', -$discount, true );
+}, 20 );
 
 // For variable subscriptions whose cheapest variation bills every N months (N > 1),
 // show the per-month equivalent instead of the lump-sum total so archive/home-page
@@ -537,7 +587,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
 			[],
-			'1.9.7'
+			'1.9.8'
 		);
 	}
 
@@ -577,7 +627,7 @@ add_action( 'wp_enqueue_scripts', function() {
 				'myogenix-sexual-health-pdp',
 				get_stylesheet_directory_uri() . '/assets/js/sexual-health-pdp.js',
 				[],
-				'1.2.2',
+				'1.3.0',
 				true
 			);
 		}
@@ -938,18 +988,25 @@ add_action( 'wp_enqueue_scripts', function() {
 add_action( 'woocommerce_review_order_before_payment', function () {
 	if ( ! function_exists( 'WC' ) || ! WC()->cart ) return;
 
-	$has_trt = false;
+	$has_trt      = false;
+	$has_own_labs = false;
 	foreach ( WC()->cart->get_cart() as $cart_item ) {
 		$parent_id = $cart_item['product_id'] ?? 0;
 		$product   = wc_get_product( $parent_id );
 		if ( $product && 'testosterone' === $product->get_slug() ) {
 			$has_trt = true;
+			if ( ! empty( $cart_item['own_labs'] ) ) {
+				$has_own_labs = true;
+			}
 			break;
 		}
 	}
 	if ( ! $has_trt ) return;
 	?>
 	<div class="myo-trt-checkout-notice">
+		<?php if ( $has_own_labs ) : ?>
+		<p class="myo-trt-checkout-notice__note">Today's charge covers your initial doctor consult only &mdash; you've indicated you'll provide your own recent labs.</p>
+		<?php endif; ?>
 		<p class="myo-trt-checkout-notice__title">After the Doctor Consult, if you are approved for treatment</p>
 		<div class="myo-trt-checkout-notice__price"><?php echo wc_price( 189 ); ?><span>/month</span></div>
 		<div class="myo-trt-checkout-notice__rows">

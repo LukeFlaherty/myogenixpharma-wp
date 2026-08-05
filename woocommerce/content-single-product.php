@@ -744,6 +744,8 @@ if ( $is_weight_loss ) :
 			'disclaimer'      => 'Order reviewed by a licensed provider before processing.',
 			'flat_fee_price'  => 165,
 			'flat_fee_label'  => 'Male Hormone Panel & Initial Doctor Consult',
+			'flat_fee_price_own_labs' => 65,
+			'flat_fee_label_own_labs' => 'Initial Doctor Consult (labs provided by you)',
 		],
 		'hcg' => [
 			'name'            => 'HCG',
@@ -947,6 +949,8 @@ if ( $is_weight_loss ) :
 					data-flat-fee-label="<?php echo esc_attr( $shcfg['flat_fee_label'] ); ?>"
 					<?php if ( $slug === 'testosterone' ) : ?>
 					data-trt-allowed-states="<?php echo esc_attr( wp_json_encode( $trt_allowed_states ) ); ?>"
+					data-flat-fee-price-own-labs="<?php echo esc_attr( $shcfg['flat_fee_price_own_labs'] ); ?>"
+					data-flat-fee-label-own-labs="<?php echo esc_attr( $shcfg['flat_fee_label_own_labs'] ); ?>"
 					<?php endif; ?>
 				>
 
@@ -1039,6 +1043,15 @@ if ( $is_weight_loss ) :
 							<?php endforeach; ?>
 						</ul>
 					</div>
+
+					<?php if ( $slug === 'testosterone' ) : ?>
+					<!-- TRT: own-labs discount toggle -->
+					<label class="pdp-cfg__own-labs" for="pdp-own-labs">
+						<input type="checkbox" id="pdp-own-labs" class="pdp-cfg__own-labs-checkbox" />
+						<span class="pdp-cfg__own-labs-text">I already have my own recent labs &mdash; save $100</span>
+					</label>
+					<p class="pdp-cfg__own-labs-note">You'll confirm this during your intake after checkout.</p>
+					<?php endif; ?>
 
 					<div id="sh-summary" class="pdp-cfg__summary"></div>
 

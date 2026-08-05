@@ -476,6 +476,34 @@ body.single-product #main.site-main {
 	color: #b08030;
 }
 
+/* TRT: own-labs discount toggle */
+.pdp-cfg__own-labs {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	cursor: pointer;
+	margin-bottom: 4px;
+}
+
+.pdp-cfg__own-labs-checkbox {
+	flex-shrink: 0;
+	width: 18px;
+	height: 18px;
+	margin-top: 2px;
+}
+
+.pdp-cfg__own-labs-text {
+	font-size: 0.9rem;
+	font-weight: 600;
+	color: var(--pdp-dark);
+}
+
+.pdp-cfg__own-labs-note {
+	font-size: 0.75rem;
+	color: var(--pdp-light);
+	margin: 4px 0 14px 28px;
+}
+
 /* Order summary (JS-rendered) */
 .pdp-cfg__summary {
 	background: var(--pdp-bg-sub);

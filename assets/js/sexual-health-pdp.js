@@ -2,7 +2,7 @@
  * Sexual health PDP configurator.
  * Handles 1D (dosage only) and 2D (dosage × tablets) variable products.
  * Reads config from data-* attributes on #pdp-cfg.
- * @version 1.2.0
+ * @version 1.3.0
  */
 ( function () {
 	'use strict';
@@ -23,6 +23,8 @@
 	var monthlyBilling  = cfg.getAttribute( 'data-monthly-billing' ) === '1';
 	var flatFeePrice    = parseFloat( cfg.getAttribute( 'data-flat-fee-price' ) || '0' );
 	var flatFeeLabel    = cfg.getAttribute( 'data-flat-fee-label' ) || '';
+	var flatFeePriceOwnLabs = parseFloat( cfg.getAttribute( 'data-flat-fee-price-own-labs' ) || '0' );
+	var flatFeeLabelOwnLabs = cfg.getAttribute( 'data-flat-fee-label-own-labs' ) || '';
 
 	var primaryKeys   = Object.keys( matrix );
 	var hasSecondary  = !! secondaryAttr;
@@ -44,6 +46,7 @@
 	var state = {
 		primary:   primaryKeys[0],
 		secondary: secondaryKeys.length ? secondaryKeys[0] : null,
+		ownLabs:   false,
 	};
 
 	// ── Helpers ───────────────────────────────────────────────────────────────
@@ -90,14 +93,16 @@
 		// Gated on data-monthly-billing so only the subscription-plan product (TRT) hits
 		// this path — other 1D products (e.g. Tadalafil, keyed by dosage) must not.
 		if ( ! hasSecondary && monthlyBilling ) {
-			if ( flatFeePrice > 0 ) {
+			var displayFeePrice = ( state.ownLabs && flatFeePriceOwnLabs > 0 ) ? flatFeePriceOwnLabs : flatFeePrice;
+			var displayFeeLabel = ( state.ownLabs && flatFeeLabelOwnLabs ) ? flatFeeLabelOwnLabs : flatFeeLabel;
+			if ( displayFeePrice > 0 ) {
 				el.innerHTML =
 					'<span class="pdp-cfg__summary-label">Checkout Details</span>' +
-					'<div class="pdp-cfg__summary-month-price">' + fmt( flatFeePrice ) + '</div>' +
-					'<p class="pdp-cfg__summary-sub">' + flatFeeLabel + '</p>' +
+					'<div class="pdp-cfg__summary-month-price">' + fmt( displayFeePrice ) + '</div>' +
+					'<p class="pdp-cfg__summary-sub">' + displayFeeLabel + '</p>' +
 					'<div class="pdp-cfg__summary-total">' +
 						'<span>Total billed today</span>' +
-						'<strong class="pdp-cfg__summary-total-price">' + fmt( flatFeePrice ) + '</strong>' +
+						'<strong class="pdp-cfg__summary-total-price">' + fmt( displayFeePrice ) + '</strong>' +
 					'</div>';
 				return;
 			}
@@ -161,6 +166,14 @@
 		} );
 	} );
 
+	var ownLabsCheckbox = document.getElementById( 'pdp-own-labs' );
+	if ( ownLabsCheckbox ) {
+		ownLabsCheckbox.addEventListener( 'change', function () {
+			state.ownLabs = ownLabsCheckbox.checked;
+			render();
+		} );
+	}
+
 	var cta = document.getElementById( 'pdp-cta' );
 	if ( cta ) {
 		cta.addEventListener( 'click', function () {
@@ -179,6 +192,10 @@
 				params += '&' + encodeURIComponent( k ) + '=' + encodeURIComponent( fixedAttrs[ k ] );
 			} );
 
+			if ( state.ownLabs ) {
+				params += '&own_labs=1';
+			}
+
 			window.location.href = window.location.pathname + '?' + params;
 		} );
 	}
@@ -189,6 +206,8 @@
 		if ( e.persisted ) {
 			state.primary   = primaryKeys[0];
 			state.secondary = secondaryKeys.length ? secondaryKeys[0] : null;
+			state.ownLabs   = false;
+			if ( ownLabsCheckbox ) ownLabsCheckbox.checked = false;
 			render();
 		}
 	} );
