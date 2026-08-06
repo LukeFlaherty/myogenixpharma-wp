@@ -130,6 +130,18 @@ add_action( 'template_redirect', function () {
 	}
 } );
 
+// Hide the retatrutide page from on-site search results — the page itself is
+// still reachable directly (password-gated above), it just shouldn't surface
+// to anyone searching the site.
+add_action( 'pre_get_posts', function ( $query ) {
+	if ( is_admin() || ! $query->is_search() || ! $query->is_main_query() ) return;
+	$rtd_page = get_page_by_path( 'retatrutide' );
+	if ( ! $rtd_page ) return;
+	$excluded   = $query->get( 'post__not_in' );
+	$excluded[] = $rtd_page->ID;
+	$query->set( 'post__not_in', $excluded );
+} );
+
 
 // Convert a dose term slug (e.g. "10-mg") to its display name (e.g. "10 mg").
 // Checks pa_individual-dose first (production), then pa_dosage (staging).
