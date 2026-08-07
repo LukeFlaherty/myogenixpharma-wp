@@ -42,6 +42,15 @@ add_action( 'wp_enqueue_scripts', function() {
 	);
 } );
 
+// The coded front page does not use Elementor widgets. Leaving Elementor's
+// frontend bundle there produces a missing elementorFrontendConfig console error.
+add_action( 'wp_enqueue_scripts', function() {
+	if ( ! is_front_page() ) return;
+	foreach ( [ 'elementor-webpack-runtime', 'elementor-frontend-modules', 'elementor-frontend' ] as $handle ) {
+		wp_dequeue_script( $handle );
+	}
+}, 100 );
+
 // ─── Home Redesign (Staging) page — isolated navbar, does NOT touch the
 // shared site-wide nav above. Only loads on page-home-redesign.php so other
 // pages are completely unaffected while the redesign is in progress.
