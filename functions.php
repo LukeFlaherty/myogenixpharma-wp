@@ -31,7 +31,7 @@ add_action( 'wp_enqueue_scripts', function() {
 		'myogenix-grunge-redesign',
 		get_stylesheet_directory_uri() . '/assets/css/grunge-redesign.css',
 		[ 'myogenix-home', 'myogenix-grunge-fonts' ],
-		'0.1.3'
+		'0.1.4'
 	);
 	wp_enqueue_script(
 		'myogenix-home',
