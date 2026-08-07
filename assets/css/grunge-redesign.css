@@ -1701,6 +1701,10 @@ body.single-product .myogenix-pdp__explore .hp-catbox {
   backdrop-filter: blur(8px);
 }
 
+body.single-product .pdp-hero__wc-hidden {
+  display: none !important;
+}
+
 body.single-product .pdp-cfg {
   padding: 18px;
 }

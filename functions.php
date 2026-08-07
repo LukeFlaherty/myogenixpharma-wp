@@ -47,7 +47,7 @@ add_action( 'wp_enqueue_scripts', function() {
 add_action( 'wp_enqueue_scripts', function() {
 	$program_slugs = [ 'weight-management', 'mens-health', 'sexual-health', 'wellness', 'womens-health' ];
 	$product_category_slugs = [ 'weight-loss', 'mens-health', 'sexual-health', 'peptides-longevity', 'womens-health' ];
-	$is_coded_grunge_page = is_front_page() || is_page( $program_slugs );
+	$is_coded_grunge_page = is_front_page() || is_page( $program_slugs ) || is_singular( 'product' ) || is_page( 'retatrutide' );
 	if ( function_exists( 'is_product_category' ) && is_product_category( $product_category_slugs ) ) {
 		$is_coded_grunge_page = true;
 	}
