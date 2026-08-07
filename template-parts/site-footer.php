@@ -1,64 +1,64 @@
 <?php
 /**
- * Site-wide footer partial — included by footer.php (all pages) and front-page.php.
- * Computes its own variables so it can be dropped in anywhere.
+ * Site-wide grunge redesign footer.
  */
 defined( 'ABSPATH' ) || exit;
 
-$_footer_logo_url = wp_get_attachment_image_url( 16, 'full' ) ?: '';
-$_footer_logo_alt = get_bloginfo( 'name' );
-$_footer_year     = (int) date( 'Y' );
+$_grunge_asset = function( $path ) {
+	$base  = get_stylesheet_directory_uri() . '/assets/images/grunge-redesign/';
+	$parts = explode( '/', $path );
+	return esc_url( $base . implode( '/', array_map( 'rawurlencode', $parts ) ) );
+};
+
+$_footer_year = (int) date( 'Y' );
+$_footer_groups = [
+	'Programs' => [
+		[ 'Weight Management', home_url( '/weight-management/' ) ],
+		[ 'Peptides', home_url( '/wellness/' ) ],
+		[ 'Sexual Health', home_url( '/sexual-health/' ) ],
+		[ 'Mens Health', home_url( '/mens-health/' ) ],
+	],
+	'Company' => [
+		[ 'How it works', home_url( '/#how-it-works' ) ],
+		[ 'FAQ', home_url( '/#faq' ) ],
+		[ 'Affiliate Program', home_url( '/affiliate-registration/' ) ],
+		[ 'Concierge', home_url( '/reach-a-concierge/' ) ],
+	],
+	'Legal' => [
+		[ 'Privacy Policy', home_url( '/privacy-policy/' ) ],
+		[ 'Terms of Service', home_url( '/terms-of-service/' ) ],
+		[ 'Contact', home_url( '/reach-a-concierge/' ) ],
+	],
+];
 ?>
-<footer class="home-footer" role="contentinfo">
-	<div class="home-footer__inner">
-		<div class="home-footer__grid">
+<footer class="home-footer grunge-footer" role="contentinfo">
+	<div class="grunge-footer__texture" style="background-image:url('<?php echo $_grunge_asset( 'grunge black section bg blank.png' ); ?>')" aria-hidden="true"></div>
+	<div class="grunge-footer__shade" aria-hidden="true"></div>
 
-			<div class="home-footer__brand">
-				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php echo esc_attr( $_footer_logo_alt ); ?> home">
-					<?php if ( $_footer_logo_url ) : ?>
-						<img src="<?php echo esc_url( $_footer_logo_url ); ?>" alt="<?php echo esc_attr( $_footer_logo_alt ); ?>" class="home-footer__logo" width="auto" height="32">
-					<?php else : ?>
-						<span style="font-size:16px;font-weight:800;color:#000;"><?php echo esc_html( $_footer_logo_alt ); ?></span>
-					<?php endif; ?>
+	<div class="home-footer__inner grunge-footer__inner">
+		<div class="home-footer__grid grunge-footer__grid">
+			<div class="home-footer__brand grunge-footer__brand">
+				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?> home">
+					<img src="<?php echo $_grunge_asset( 'red and white logo.svg' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" class="home-footer__logo grunge-footer__logo" width="180" height="54">
 				</a>
-				<p class="home-footer__tagline">Configured for your protocol. FDA-registered compounding.</p>
+				<p class="home-footer__tagline grunge-footer__tagline">Concierge telehealth care, guided by humans.</p>
 			</div>
 
-			<div>
-				<p class="home-footer__col-heading">Programs</p>
-				<ul class="home-footer__links">
-					<li><a href="<?php echo esc_url( home_url( '/product-category/weight-loss/' ) ); ?>">Weight Management</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/product-category/mens-health/' ) ); ?>">Mens Health</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/product-category/sexual-health/' ) ); ?>">Sexual Health</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/product-category/peptides-longevity/' ) ); ?>">Peptides &amp; Longevity</a></li>
+			<?php foreach ( $_footer_groups as $_heading => $_links ) : ?>
+			<div class="grunge-footer__col">
+				<p class="home-footer__col-heading grunge-footer__col-heading"><?php echo esc_html( $_heading ); ?></p>
+				<ul class="home-footer__links grunge-footer__links">
+					<?php foreach ( $_links as $_link ) : ?>
+					<li><a href="<?php echo esc_url( $_link[1] ); ?>"><?php echo esc_html( $_link[0] ); ?></a></li>
+					<?php endforeach; ?>
 				</ul>
 			</div>
-
-			<div>
-				<p class="home-footer__col-heading">Company</p>
-				<ul class="home-footer__links">
-					<li><a href="<?php echo esc_url( home_url( '/about/' ) ); ?>">About</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/#how-it-works' ) ); ?>">How it works</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/#faq' ) ); ?>">FAQ</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/affiliates/' ) ); ?>">Affiliate Program</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Reach a Concierge</a></li>
-				</ul>
-			</div>
-
-			<div>
-				<p class="home-footer__col-heading">Legal</p>
-				<ul class="home-footer__links">
-					<li><a href="<?php echo esc_url( home_url( '/privacy-policy/' ) ); ?>">Privacy Policy</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/terms-of-service/' ) ); ?>">Terms of Service</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>">Contact</a></li>
-				</ul>
-			</div>
-
+			<?php endforeach; ?>
 		</div>
 
-		<div class="home-footer__bottom">
-			<p class="home-footer__copy">© <?php echo $_footer_year; ?> MyoGenix Pharma. For informational purposes only. Not medical advice.</p>
-			<p class="home-footer__disclaimer">Compounded medications are not FDA-approved.</p>
+		<div class="home-footer__bottom grunge-footer__bottom">
+			<p class="home-footer__copy grunge-footer__copy">© <?php echo $_footer_year; ?> MyoGenix Pharma. For informational purposes only. Not medical advice.</p>
+			<p class="home-footer__disclaimer grunge-footer__disclaimer">Compounded medications are not FDA-approved.</p>
 		</div>
 	</div>
 </footer>
