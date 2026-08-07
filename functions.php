@@ -45,7 +45,13 @@ add_action( 'wp_enqueue_scripts', function() {
 // The coded front page does not use Elementor widgets. Leaving Elementor's
 // frontend bundle there produces a missing elementorFrontendConfig console error.
 add_action( 'wp_enqueue_scripts', function() {
-	if ( ! is_front_page() ) return;
+	$program_slugs = [ 'weight-management', 'mens-health', 'sexual-health', 'wellness', 'womens-health' ];
+	$product_category_slugs = [ 'weight-loss', 'mens-health', 'sexual-health', 'peptides-longevity', 'womens-health' ];
+	$is_coded_grunge_page = is_front_page() || is_page( $program_slugs );
+	if ( function_exists( 'is_product_category' ) && is_product_category( $product_category_slugs ) ) {
+		$is_coded_grunge_page = true;
+	}
+	if ( ! $is_coded_grunge_page ) return;
 	foreach ( [ 'elementor-webpack-runtime', 'elementor-frontend-modules', 'elementor-frontend' ] as $handle ) {
 		wp_dequeue_script( $handle );
 	}
