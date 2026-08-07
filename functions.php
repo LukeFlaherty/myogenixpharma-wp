@@ -639,7 +639,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
 			[],
-			'1.9.8'
+			'1.9.9'
 		);
 	}
 
@@ -652,7 +652,7 @@ add_action( 'wp_enqueue_scripts', function() {
 				'myogenix-pdp',
 				get_stylesheet_directory_uri() . '/assets/js/pdp.js',
 				[],
-				'1.5.1',
+				'1.5.2',
 				true
 			);
 		}
@@ -673,7 +673,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			);
 		}
 
-		$sexual_health_slugs = [ 'compound-oral-tadalafil', 'compound-sildenafil', 'testosterone' ];
+		$sexual_health_slugs = [ 'compound-oral-tadalafil', 'compound-sildenafil', 'testosterone', 'hcg' ];
 		if ( in_array( $product_slug, $sexual_health_slugs, true ) ) {
 			wp_enqueue_script(
 				'myogenix-sexual-health-pdp',
@@ -816,7 +816,7 @@ function myogenix_render_product_scrollers( array $category_slugs, int $exclude_
 		echo '<div class="hp-catbox' . $full_class . '">';
 		echo '<div class="hp-catbox__header">';
 		echo '<h3 class="hp-catbox__title">' . esc_html( $cat['title'] ) . '</h3>';
-		echo '<a href="' . esc_url( home_url( $cat['shop_url'] ) ) . '" class="hp-catbox__shopall">Shop all →</a>';
+		echo '<a href="' . esc_url( home_url( $cat['shop_url'] ) ) . '" class="hp-catbox__shopall">Shop all</a>';
 		echo '</div>';
 		echo '<div class="hp-catbox__scroll-wrap"><div class="hp-catbox__scroll">';
 		$rendered = 0;
@@ -836,7 +836,7 @@ function myogenix_render_product_scrollers( array $category_slugs, int $exclude_
 						<div class="hp-card__tag">%s</div>
 						<div class="hp-card__foot">
 							<span class="hp-card__price">%s<span class="hp-card__unit">%s</span></span>
-							<span class="hp-card__btn" aria-hidden="true">Shop →</span>
+							<span class="hp-card__btn" aria-hidden="true">Shop</span>
 						</div>
 					</div>
 				</a>',
@@ -1013,7 +1013,7 @@ function myogenix_render_product_faq( $product_id ) {
 				<?php endforeach; ?>
 			</div>
 			<div class="myo-faq__cta">
-				<a href="#buy" class="myo-faq__cta-btn">Get started &rarr;</a>
+				<a href="#buy" class="myo-faq__cta-btn">Get started</a>
 			</div>
 		</div>
 	</section>

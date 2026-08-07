@@ -147,7 +147,10 @@ body.single-product header.home-nav + * {
 .grunge-category-product-card__body em::after,
 .pdp-cfg__cta::after,
 .pdp-hero__compare::after,
-.trt-state__unavailable-link::after {
+.trt-state__unavailable-link::after,
+.hp-catbox__shopall::after,
+.hp-card__btn::after,
+.myo-faq__cta-btn::after {
   content: "";
   width: 22px;
   height: 18px;

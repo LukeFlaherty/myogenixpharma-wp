@@ -539,7 +539,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		if ( ctaBtn ) {
 			ctaBtn.disabled = false;
 			ctaBtn.classList.remove( 'pdp-cfg__cta--loading' );
-			ctaBtn.textContent = 'Go to Checkout →';
+			ctaBtn.textContent = 'Go to Checkout';
 		}
 		render();
 	} );
