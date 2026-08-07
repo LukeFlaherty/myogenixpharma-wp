@@ -183,7 +183,7 @@ get_header();
 				</div>
 			</div>
 			<div class="grunge-hero__media">
-				<img src="<?php echo $myo_asset( 'mgrx-hero-team.webp' ); ?>" alt="MyoGenix care team" width="740" height="760" fetchpriority="high">
+				<img src="<?php echo $myo_asset( 'mgrx-hero-team.webp' ); ?>" alt="MyoGenix care team" width="740" height="760">
 			</div>
 		</div>
 	</section>
