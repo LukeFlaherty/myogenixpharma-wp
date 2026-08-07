@@ -6,6 +6,12 @@
 
 defined( 'ABSPATH' ) || exit;
 
+$grunge_template = locate_template( 'page-program-category.php' );
+if ( $grunge_template ) {
+	include $grunge_template;
+	return;
+}
+
 get_header( 'shop' );
 
 /**

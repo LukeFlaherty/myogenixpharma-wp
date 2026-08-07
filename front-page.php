@@ -172,14 +172,13 @@ get_header();
 			<div class="grunge-hero__copy">
 				<p class="grunge-kicker">25+ years of performance</p>
 				<h1 class="grunge-hero__title">
-					<span class="grunge-word grunge-word--white">Clinical</span>
-					<span class="grunge-word grunge-word--red">Performance</span>
-					<span class="grunge-word grunge-word--white">Care</span>
+					<span class="grunge-word grunge-word--red">MyoGenix</span>
+					<span class="grunge-word grunge-word--white">Pharma</span>
 				</h1>
-				<p class="grunge-hero__lead">Personalized treatment programs for weight, hormones, sexual health, and recovery. Performance care, guided by humans.</p>
+				<p class="grunge-hero__lead">Concierge telehealth for TRT <span>Performance care, guided by humans.</span></p>
 				<div class="grunge-hero__actions">
-					<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/weight-management/' ) ); ?>">Get started <span aria-hidden="true">-&gt;</span></a>
-					<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Talk to concierge <span aria-hidden="true">-&gt;</span></a>
+					<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">Start your evaluation <span aria-hidden="true">-&gt;</span></a>
+					<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <span aria-hidden="true">-&gt;</span></a>
 				</div>
 			</div>
 			<div class="grunge-hero__media">
@@ -204,9 +203,9 @@ get_header();
 		<div class="grunge-section__texture" style="background-image:url('<?php echo $myo_asset( 'grunge black section bg blank.png' ); ?>')" aria-hidden="true"></div>
 		<div class="grunge-container">
 			<div class="grunge-section__header">
-				<p class="grunge-kicker">The care path</p>
-				<h2>Built to move fast without skipping clinical review.</h2>
-				<p>From intake to delivery, the program is structured so every treatment decision has medical context behind it.</p>
+				<p class="grunge-kicker">How it works</p>
+				<h2>Getting evaluated <span class="grunge-text-red">is easier than ever</span></h2>
+				<p>Many patients complete the process in as little as <strong>1-2 weeks</strong></p>
 			</div>
 			<div class="grunge-steps">
 				<?php foreach ( $steps as $step ) : ?>
@@ -251,9 +250,9 @@ get_header();
 				<img src="<?php echo $myo_asset( 'mgrx-phone-care-journey.webp' ); ?>" alt="MyoGenix care journey" width="620" height="620" loading="lazy">
 			</div>
 			<div class="grunge-performance__copy">
-				<p class="grunge-kicker">Human guided</p>
-				<h2>Not a vending machine for prescriptions.</h2>
-				<p>MyoGenix pairs digital access with concierge support, diagnostic context, and provider-reviewed treatment planning.</p>
+				<p class="grunge-kicker">TRT care path</p>
+				<h2>Concierge telehealth <span class="grunge-text-red">for TRT</span></h2>
+				<p><span class="grunge-text-red">Physician-guided</span> treatment. Human support.</p>
 				<ul class="grunge-check-list">
 					<li>Online enrollment</li>
 					<li>Licensed providers</li>
@@ -261,6 +260,7 @@ get_header();
 					<li>Doorstep delivery</li>
 					<li>Human concierge support</li>
 				</ul>
+				<a class="grunge-btn grunge-btn--red grunge-inline-cta" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">Start TRT <span aria-hidden="true">-&gt;</span></a>
 			</div>
 		</div>
 	</section>
@@ -269,13 +269,14 @@ get_header();
 		<div class="grunge-symptoms__image" style="background-image:url('<?php echo $myo_asset( 'section bg guy w muscles.png' ); ?>')" aria-hidden="true"></div>
 		<div class="grunge-symptoms__shade" aria-hidden="true"></div>
 		<div class="grunge-container grunge-symptoms__content">
-			<p class="grunge-kicker">When performance drops</p>
-			<h2>Small signals can point to bigger health gaps.</h2>
-			<div class="grunge-symptom-grid">
+			<p class="grunge-kicker">Low T signals</p>
+			<h2>Common <span class="grunge-text-red">symptoms</span> of low T</h2>
+			<ul class="grunge-symptom-grid grunge-check-list">
 				<?php foreach ( $symptoms as $symptom ) : ?>
-				<span><?php echo esc_html( $symptom ); ?></span>
+				<li><?php echo esc_html( $symptom ); ?></li>
 				<?php endforeach; ?>
-			</div>
+			</ul>
+			<a class="grunge-btn grunge-btn--red grunge-inline-cta" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">See if TRT is right for you <span aria-hidden="true">-&gt;</span></a>
 		</div>
 	</section>
 
@@ -284,8 +285,8 @@ get_header();
 		<div class="grunge-container">
 			<div class="grunge-section__header grunge-section__header--split">
 				<div>
-					<p class="grunge-kicker">Featured protocols</p>
-					<h2>Popular starting points.</h2>
+					<p class="grunge-kicker">Our approach</p>
+					<h2>Not a hard sell. <span class="grunge-text-red">A human hand holder.</span></h2>
 				</div>
 				<a class="grunge-text-link" href="<?php echo esc_url( home_url( '/shop/' ) ); ?>">View shop <span aria-hidden="true">-&gt;</span></a>
 			</div>
@@ -311,6 +312,10 @@ get_header();
 
 	<section class="grunge-section grunge-trust">
 		<div class="grunge-container">
+			<div class="grunge-section__header">
+				<p class="grunge-kicker">Why athletes trust us</p>
+				<h2>25+ years of <span class="grunge-text-red">performance</span></h2>
+			</div>
 			<div class="grunge-trust__grid">
 				<?php foreach ( $trust_items as $item ) : ?>
 				<article class="grunge-trust-card">
@@ -328,8 +333,8 @@ get_header();
 		<div class="myo-faq__wrap grunge-faq__wrap">
 			<div class="myo-faq__header grunge-section__header">
 				<span class="myo-faq__eyebrow grunge-kicker">FAQ</span>
-				<h2 class="myo-faq__title">Common questions</h2>
-				<p class="myo-faq__desc">Everything you need to know about getting started with provider-guided care.</p>
+				<h2 class="myo-faq__title">Your questions. <span class="grunge-text-red">Answered.</span></h2>
+				<p class="myo-faq__desc"><a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <span aria-hidden="true">-&gt;</span></a></p>
 			</div>
 			<div class="myo-faq__list">
 				<?php foreach ( $faqs as $i => $faq ) :
@@ -356,8 +361,11 @@ get_header();
 		<div class="grunge-final-cta__texture" style="background-image:url('<?php echo $myo_asset( 'thin section bg.png' ); ?>')" aria-hidden="true"></div>
 		<div class="grunge-final-cta__inner">
 			<img src="<?php echo $myo_asset( 'red and white logo.svg' ); ?>" alt="" width="176" height="54" loading="lazy">
-			<h2>Ready to build your protocol?</h2>
-			<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/weight-management/' ) ); ?>">Start now <span aria-hidden="true">-&gt;</span></a>
+			<h2>Concierge care <span class="grunge-text-red">is live</span></h2>
+			<div class="grunge-final-cta__actions">
+				<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">Start your evaluation <span aria-hidden="true">-&gt;</span></a>
+				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <span aria-hidden="true">-&gt;</span></a>
+			</div>
 		</div>
 	</section>
 </main>

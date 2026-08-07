@@ -31,7 +31,7 @@ add_action( 'wp_enqueue_scripts', function() {
 		'myogenix-grunge-redesign',
 		get_stylesheet_directory_uri() . '/assets/css/grunge-redesign.css',
 		[ 'myogenix-home', 'myogenix-grunge-fonts' ],
-		'0.1.1'
+		'0.1.2'
 	);
 	wp_enqueue_script(
 		'myogenix-home',
@@ -50,6 +50,19 @@ add_action( 'wp_enqueue_scripts', function() {
 		wp_dequeue_script( $handle );
 	}
 }, 100 );
+
+// Program landing pages are now owned by coded theme templates. Several live
+// pages still have Elementor page-template metadata, so force the PHP template
+// for the redesign slugs instead of relying on the database-assigned template.
+add_filter( 'template_include', function( $template ) {
+	if ( ! is_page() ) return $template;
+
+	$program_slugs = [ 'weight-management', 'mens-health', 'sexual-health', 'wellness', 'womens-health' ];
+	if ( ! is_page( $program_slugs ) ) return $template;
+
+	$program_template = locate_template( 'page-program-category.php' );
+	return $program_template ?: $template;
+}, 50 );
 
 // ─── Home Redesign (Staging) page — isolated navbar, does NOT touch the
 // shared site-wide nav above. Only loads on page-home-redesign.php so other
