@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || exit;
 global $product;
 
 $slug           = $product->get_slug();
-$weight_loss    = [ 'compound-semaglutide', 'compound-tirzepatide' ];
+$weight_loss    = [ 'compound-semaglutide', 'compound-tirzepatide', 'compound-retatrutide' ];
 $is_weight_loss = in_array( $slug, $weight_loss, true );
 
 $peptide_slugs = [
@@ -54,7 +54,7 @@ if ( $is_weight_loss ) :
 			'title'             => 'Tirzepatide',
 			'desc'              => 'Tirzepatide activates both GIP and GLP-1 receptors, offering strong metabolic effects with once-weekly dosing.',
 			'compare_url'       => '/product/compound-semaglutide/',
-			'compare_txt'       => 'Compare with Semaglutide →',
+			'compare_txt'       => 'Compare with Semaglutide',
 			'doses'             => [ '10mg', '20mg', '30mg', '40mg', '50mg' ],
 			'supply_prices'     => [ 399.00, 599.00, 799.00 ],
 			'warning_threshold' => 10,
@@ -66,12 +66,24 @@ if ( $is_weight_loss ) :
 			'title'             => 'Semaglutide',
 			'desc'              => 'Semaglutide activates GLP-1 receptors to reduce appetite and improve blood sugar control with once-weekly dosing.',
 			'compare_url'       => '/product/compound-tirzepatide/',
-			'compare_txt'       => 'Compare with Tirzepatide →',
+			'compare_txt'       => 'Compare with Tirzepatide',
 			'doses'             => [ '1mg', '2mg', '4mg', '6mg', '10mg' ],
 			'supply_prices'     => [ 285.00, 379.00, 479.00 ],
 			'warning_threshold' => 1,
 			'pkg_dose_slugs'    => [ 'starter' => 'months-1-3-bundle', 'continuation' => 'months-4-6-bundle' ],
 			'pkg_prices'        => [ 'starter' => 549.00, 'continuation' => 799.00 ],
+		],
+		'compound-retatrutide' => [
+			'badge'             => 'GIP/GLP-1/Glucagon Triple Agonist',
+			'title'             => 'Retatrutide',
+			'desc'              => 'Retatrutide activates GIP, GLP-1, and glucagon receptors simultaneously for next-generation metabolic support.',
+			'compare_url'       => '/product/compound-tirzepatide/',
+			'compare_txt'       => 'Compare with Tirzepatide',
+			'doses'             => [ '2mg', '4mg', '8mg', '12mg' ],
+			'supply_prices'     => [ 299.00, 599.00, 899.00 ],
+			'warning_threshold' => 2,
+			'pkg_dose_slugs'    => [],
+			'pkg_prices'        => [],
 		],
 	];
 	$h = $hero[ $slug ];
@@ -341,7 +353,7 @@ if ( $is_weight_loss ) :
 					<div id="pdp-summary" class="pdp-cfg__summary"></div>
 
 					<!-- CTA -->
-					<button id="pdp-cta" class="pdp-cfg__cta">Go to Checkout &rarr;</button>
+					<button id="pdp-cta" class="pdp-cfg__cta">Go to Checkout</button>
 					<p id="pdp-disclaimer" class="pdp-cfg__disclaimer">
 						This is a one-time purchase. Your order will be reviewed by a licensed provider before processing.
 					</p>
@@ -631,7 +643,7 @@ if ( $is_weight_loss ) :
 
 					<div id="peptide-summary" class="pdp-cfg__summary"></div>
 
-					<button id="pdp-cta" class="pdp-cfg__cta">Go to Checkout &rarr;</button>
+					<button id="pdp-cta" class="pdp-cfg__cta">Go to Checkout</button>
 					<p id="pdp-disclaimer" class="pdp-cfg__disclaimer">
 						One-time purchase. Order reviewed by a licensed provider before processing.
 					</p>
@@ -987,7 +999,7 @@ if ( $is_weight_loss ) :
 							We currently offer TRT services in 48 states. We&rsquo;re not yet licensed to prescribe in your area, but we&rsquo;re actively expanding coverage.
 						</p>
 						<a href="mailto:support@myogenixpharma.com" class="trt-state__unavailable-link">
-							Contact us about future availability &rarr;
+							Contact us about future availability
 						</a>
 					</div>
 					<?php endif; ?>
@@ -1055,7 +1067,7 @@ if ( $is_weight_loss ) :
 
 					<div id="sh-summary" class="pdp-cfg__summary"></div>
 
-					<button id="pdp-cta" class="pdp-cfg__cta"><?php echo esc_html( $shcfg['cta_label'] ); ?> &rarr;</button>
+					<button id="pdp-cta" class="pdp-cfg__cta"><?php echo esc_html( $shcfg['cta_label'] ); ?></button>
 					<p id="pdp-disclaimer" class="pdp-cfg__disclaimer">
 						<?php echo esc_html( $shcfg['disclaimer'] ); ?>
 					</p>

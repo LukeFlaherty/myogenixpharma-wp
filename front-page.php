@@ -219,32 +219,8 @@ get_header();
 		</div>
 	</section>
 
-	<section class="grunge-section grunge-programs">
-		<div class="grunge-programs__bg" style="background-image:url('<?php echo $myo_asset( 'bg-genetic-wire.webp' ); ?>')" aria-hidden="true"></div>
-		<div class="grunge-container">
-			<div class="grunge-section__header grunge-section__header--split">
-				<div>
-					<p class="grunge-kicker">Treatment lines</p>
-					<h2>Choose the lane that matches your goals.</h2>
-				</div>
-				<p>Every program keeps the same promise: provider oversight, clear next steps, and real support when you need it.</p>
-			</div>
-			<div class="grunge-program-grid">
-				<?php foreach ( $programs as $program ) : ?>
-				<a class="grunge-program-card" href="<?php echo esc_url( $program['url'] ); ?>">
-					<img src="<?php echo $myo_asset( $program['image'] ); ?>" alt="" width="420" height="300" loading="lazy">
-					<div>
-						<h3><?php echo esc_html( $program['title'] ); ?></h3>
-						<p><?php echo esc_html( $program['text'] ); ?></p>
-						<span>Explore <span aria-hidden="true">-&gt;</span></span>
-					</div>
-				</a>
-				<?php endforeach; ?>
-			</div>
-		</div>
-	</section>
-
 	<section class="grunge-section grunge-performance">
+		<div class="grunge-programs__bg" style="background-image:url('<?php echo $myo_asset( 'bg-genetic-wire.webp' ); ?>')" aria-hidden="true"></div>
 		<div class="grunge-container grunge-performance__grid">
 			<div class="grunge-performance__media">
 				<img src="<?php echo $myo_asset( 'mgrx-phone-care-journey.webp' ); ?>" alt="MyoGenix care journey" width="620" height="620" loading="lazy">
@@ -266,9 +242,10 @@ get_header();
 	</section>
 
 	<section class="grunge-symptoms">
-		<div class="grunge-symptoms__image" style="background-image:url('<?php echo $myo_asset( 'section bg guy w muscles.png' ); ?>')" aria-hidden="true"></div>
+		<div class="grunge-symptoms__image" style="background-image:url('<?php echo $myo_asset( 'section bg 2.png' ); ?>')" aria-hidden="true"></div>
 		<div class="grunge-symptoms__shade" aria-hidden="true"></div>
 		<div class="grunge-container grunge-symptoms__content">
+			<img class="grunge-symptoms__person" src="<?php echo $myo_asset( 'guy-sad.webp' ); ?>" alt="" width="360" height="420" loading="lazy">
 			<p class="grunge-kicker">Low T signals</p>
 			<h2>Common <span class="grunge-text-red">symptoms</span> of low T</h2>
 			<ul class="grunge-symptom-grid grunge-check-list">
@@ -280,32 +257,33 @@ get_header();
 		</div>
 	</section>
 
-	<section class="grunge-section grunge-products">
+	<section class="grunge-section grunge-approach">
 		<div class="grunge-section__texture" style="background-image:url('<?php echo $myo_asset( 'red-dots-grid-background.webp' ); ?>')" aria-hidden="true"></div>
-		<div class="grunge-container">
-			<div class="grunge-section__header grunge-section__header--split">
-				<div>
+		<div class="grunge-container grunge-approach__grid">
+			<div class="grunge-section__header">
 					<p class="grunge-kicker">Our approach</p>
 					<h2>Not a hard sell. <span class="grunge-text-red">A human hand holder.</span></h2>
-				</div>
-				<a class="grunge-text-link" href="<?php echo esc_url( home_url( '/shop/' ) ); ?>">View shop <span aria-hidden="true">-&gt;</span></a>
 			</div>
-			<div class="grunge-product-grid">
-				<?php foreach ( $featured_keys as $key ) :
-					if ( empty( $products[ $key ] ) ) continue;
-					$product = $products[ $key ];
-				?>
-				<a class="grunge-product-card" href="<?php echo esc_url( $product['url'] ); ?>">
-					<?php if ( $product['image'] ) : ?>
-					<img src="<?php echo esc_url( $product['image'] ); ?>" alt="<?php echo esc_attr( $product['name'] ); ?>" width="300" height="300" loading="lazy">
-					<?php endif; ?>
+			<div class="grunge-approach__person">
+				<img src="<?php echo $myo_asset( 'guy-helping-2.webp' ); ?>" alt="" width="420" height="480" loading="lazy">
+			</div>
+			<div class="grunge-support-card">
+				<div class="grunge-support-card__brand">MyoGenix Pharma</div>
+				<div class="grunge-support-card__rows">
 					<div>
-						<h3><?php echo esc_html( $product['name'] ); ?></h3>
-						<p><?php echo esc_html( $product['line'] ); ?></p>
-						<strong><?php echo esc_html( $product['price'] ); ?><span><?php echo esc_html( $product['unit'] ); ?></span></strong>
+						<img src="<?php echo $myo_asset( 'headphones.svg' ); ?>" alt="" width="25" height="25" loading="lazy">
+						<p><span>Fast answers</span><small>Guided support</small></p>
 					</div>
-				</a>
-				<?php endforeach; ?>
+					<div>
+						<img src="<?php echo $myo_asset( 'doctor.svg' ); ?>" alt="" width="25" height="25" loading="lazy">
+						<p><span>Ask questions</span><small>We're here to help</small></p>
+					</div>
+					<div>
+						<img src="<?php echo $myo_asset( 'hospital-staff.webp' ); ?>" alt="" width="25" height="25" loading="lazy">
+						<p><span>Your care team</span><small>Real people</small></p>
+					</div>
+				</div>
+				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <span aria-hidden="true">-&gt;</span></a>
 			</div>
 		</div>
 	</section>

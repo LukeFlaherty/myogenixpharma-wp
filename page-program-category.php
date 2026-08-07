@@ -282,7 +282,7 @@ get_header();
 		<div class="grunge-final-cta__texture" style="background-image:url('<?php echo $myo_asset( 'thin section bg.png' ); ?>')" aria-hidden="true"></div>
 		<div class="grunge-final-cta__inner">
 			<img src="<?php echo $myo_asset( 'red and white logo.svg' ); ?>" alt="MyoGenix Pharma" width="176" height="54" loading="lazy">
-			<h2>Ready to start?</h2>
+			<h2>Ready to start? <span class="grunge-text-red">We are here to help.</span></h2>
 			<div class="grunge-final-cta__actions">
 				<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( $program['hero_cta'] ); ?>">Continue to evaluation <span aria-hidden="true">-&gt;</span></a>
 				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <span aria-hidden="true">-&gt;</span></a>
