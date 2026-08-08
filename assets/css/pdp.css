@@ -3920,13 +3920,14 @@ body.single-product .trt-grunge-pdp .pdp-hero__right {
 .grunge-product-pdp .hp-step__img-wrap {
 	height: auto;
 	min-height: 86px;
+	aspect-ratio: auto !important;
 	background: transparent;
 	border-radius: 0;
 }
 
 .grunge-product-pdp .hp-step__img {
-	width: 62px;
-	height: 62px;
+	width: 62px !important;
+	height: 62px !important;
 	margin: 16px auto 10px;
 	object-fit: contain;
 	filter: grayscale(1) brightness(2);
@@ -4105,6 +4106,16 @@ body.single-product .trt-grunge-pdp .pdp-hero__right {
 
 	.grunge-product-pdp .hp-step {
 		min-height: 206px;
+	}
+
+	.grunge-product-pdp .hp-step__img-wrap {
+		min-height: 74px;
+	}
+
+	.grunge-product-pdp .hp-step__img {
+		width: 54px !important;
+		height: 54px !important;
+		margin-top: 12px;
 	}
 
 	.grunge-product-pdp .myo-faq__cta {
