@@ -76,6 +76,17 @@
 		} );
 	} );
 
+	document.querySelectorAll( '.trt-pdp__select[data-pdp-supply]' ).forEach( function ( link ) {
+		link.addEventListener( 'click', function ( e ) {
+			var supply = link.getAttribute( 'data-pdp-supply' );
+			if ( ! supply || ! supplyMap[ supply ] ) return;
+			e.preventDefault();
+			state.supply = supply;
+			render();
+			cfg.scrollIntoView( { behavior: 'smooth', block: 'start' } );
+		} );
+	} );
+
 	var cta = document.getElementById( 'pdp-cta' );
 	if ( cta ) {
 		cta.addEventListener( 'click', function () {

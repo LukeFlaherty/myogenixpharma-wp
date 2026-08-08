@@ -53,6 +53,8 @@ if ( $is_weight_loss ) :
 			'badge'             => 'GIP/GLP-1 Receptor Agonist',
 			'title'             => 'Tirzepatide',
 			'desc'              => 'Tirzepatide activates both GIP and GLP-1 receptors, offering strong metabolic effects with once-weekly dosing.',
+			'hero_line'         => 'Dual-action metabolic care',
+			'hero_accent'       => 'Tirzepatide weekly support',
 			'compare_url'       => '/product/compound-semaglutide/',
 			'compare_txt'       => 'Compare with Semaglutide',
 			'doses'             => [ '10mg', '20mg', '30mg', '40mg', '50mg' ],
@@ -65,6 +67,8 @@ if ( $is_weight_loss ) :
 			'badge'             => 'GLP-1 Receptor Agonist',
 			'title'             => 'Semaglutide',
 			'desc'              => 'Semaglutide activates GLP-1 receptors to reduce appetite and improve blood sugar control with once-weekly dosing.',
+			'hero_line'         => 'Appetite and weight support',
+			'hero_accent'       => 'Semaglutide weekly care',
 			'compare_url'       => '/product/compound-tirzepatide/',
 			'compare_txt'       => 'Compare with Tirzepatide',
 			'doses'             => [ '1mg', '2mg', '4mg', '6mg', '10mg' ],
@@ -77,6 +81,8 @@ if ( $is_weight_loss ) :
 			'badge'             => 'GIP/GLP-1/Glucagon Triple Agonist',
 			'title'             => 'Retatrutide',
 			'desc'              => 'Retatrutide activates GIP, GLP-1, and glucagon receptors simultaneously for next-generation metabolic support.',
+			'hero_line'         => 'Advanced metabolic support',
+			'hero_accent'       => 'Retatrutide weekly care',
 			'compare_url'       => '/product/compound-tirzepatide/',
 			'compare_txt'       => 'Compare with Tirzepatide',
 			'doses'             => [ '2mg', '4mg', '8mg', '12mg' ],
@@ -234,7 +240,11 @@ if ( $is_weight_loss ) :
 			<div class="pdp-hero__left">
 				<span class="pdp-hero__badge"><?php echo esc_html( $h['badge'] ); ?></span>
 				<h1 class="pdp-hero__title"><?php echo esc_html( $h['title'] ); ?></h1>
-				<p class="pdp-hero__desc"><?php echo esc_html( $h['desc'] ); ?></p>
+				<p class="pdp-hero__desc"><?php echo esc_html( $h['hero_line'] ); ?> <span><?php echo esc_html( $h['hero_accent'] ); ?></span></p>
+				<div class="trt-pdp__hero-actions">
+					<a class="grunge-btn grunge-btn--red" href="#buy">Continue to evaluation <?php echo myogenix_grunge_arrow_svg(); ?></a>
+					<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
+				</div>
 				<ul class="pdp-hero__bullets">
 					<li>Compounded · FDA-registered facility</li>
 					<li>Provider-reviewed</li>
@@ -276,9 +286,6 @@ if ( $is_weight_loss ) :
 						</div>
 					</div>
 				</div>
-				<a href="<?php echo esc_url( $h['compare_url'] ); ?>" class="pdp-hero__compare">
-					<?php echo esc_html( $h['compare_txt'] ); ?>
-				</a>
 			</div>
 
 			</div>
@@ -357,6 +364,16 @@ if ( $is_weight_loss ) :
 					<div id="pdp-dose" class="pdp-cfg__doses-wrap"></div>
 					</div>
 
+					<div class="peptide-cfg__includes">
+						<p class="peptide-cfg__includes-title">What's included</p>
+						<ul class="peptide-cfg__includes-list">
+							<li class="peptide-cfg__includes-item"><span class="peptide-cfg__includes-icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Provider-reviewed treatment plan</li>
+							<li class="peptide-cfg__includes-item"><span class="peptide-cfg__includes-icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Personalized monthly dosing</li>
+							<li class="peptide-cfg__includes-item"><span class="peptide-cfg__includes-icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Prescription required if approved</li>
+							<li class="peptide-cfg__includes-item"><span class="peptide-cfg__includes-icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Concierge support</li>
+						</ul>
+					</div>
+
 					<!-- Order Summary -->
 					<div id="pdp-summary" class="pdp-cfg__summary"></div>
 
@@ -423,7 +440,7 @@ if ( $is_weight_loss ) :
 						<div><dt>Supply</dt><dd><?php echo esc_html( $plan['meta'] ); ?></dd></div>
 						<div><dt>Price</dt><dd><?php echo $plan['price'] ? '$' . esc_html( number_format( $plan['price'], 0 ) ) : 'Custom'; ?></dd></div>
 					</dl>
-					<a class="trt-pdp__select" href="#buy">Select Plan</a>
+					<a class="trt-pdp__select" href="#buy" data-pdp-months="<?php echo esc_attr( (int) $plan['title'] ); ?>">Select Plan</a>
 				</article>
 				<?php endforeach; ?>
 			</div>
@@ -435,7 +452,7 @@ if ( $is_weight_loss ) :
 		<div class="hp-inner">
 			<div class="home-how__header">
 					<p class="home-how__overline">How it works</p>
-					<h2 class="home-how__heading">Getting started is simple</h2>
+					<h2 class="home-how__heading"><span class="grunge-word grunge-word--white">Getting started</span><span class="grunge-word grunge-word--red">is simple</span></h2>
 					<p class="home-how__desc">From your intake to provider review, each step is built for clear, guided care.</p>
 			</div>
 			<div class="home-how__steps">
@@ -479,60 +496,80 @@ if ( $is_weight_loss ) :
 			'name'  => 'BPC-157',
 			'badge' => 'Tissue &amp; Joint Recovery',
 			'desc'  => 'BPC-157 is a synthetic peptide derived from a protective stomach protein, studied for its regenerative effects on tissue repair, joint health, and gut function.',
+			'hero_line' => 'Tissue and joint support',
+			'hero_accent' => 'BPC-157 recovery care',
 			'spec'  => 'BPC-157 · 3mg/ml · 5ml per vial',
 		],
 		'motsc' => [
 			'name'  => 'MOTSc',
 			'badge' => 'Mitochondrial Peptide',
 			'desc'  => 'MOTSc is a mitochondrial-derived peptide that activates AMPK pathways, supporting energy metabolism, insulin sensitivity, and cellular resilience.',
+			'hero_line' => 'Energy metabolism support',
+			'hero_accent' => 'MOTSc peptide care',
 			'spec'  => 'MOTSc · 2mg/ml · 5ml per vial',
 		],
 		'epithalon' => [
 			'name'  => 'Epithalon',
 			'badge' => 'Longevity Peptide',
 			'desc'  => 'Epithalon is a tetrapeptide that stimulates telomerase activity and regulates the pineal gland, supporting healthy aging and cellular longevity.',
+			'hero_line' => 'Healthy aging support',
+			'hero_accent' => 'Epithalon longevity care',
 			'spec'  => 'Epithalon · 2mg/ml · 5ml per vial',
 		],
 		'compound-injectable-nad' => [
 			'name'  => 'NAD+',
 			'badge' => 'Cellular Energy Support',
 			'desc'  => 'NAD+ is a critical coenzyme involved in cellular energy production, DNA repair, and sirtuin activation — supporting cognitive function, metabolism, and anti-aging pathways.',
+			'hero_line' => 'Cellular energy support',
+			'hero_accent' => 'NAD+ injectable care',
 			'spec'  => 'NAD+ · 100mg/ml · 10ml per vial',
 		],
 		'tesamorelin-ipamorelin' => [
 			'name'  => 'Tesamorelin / Ipamorelin',
 			'badge' => 'GH Secretagogue Blend',
 			'desc'  => 'A dual-action blend combining Tesamorelin (a GHRH analogue) with Ipamorelin (a GHRP), designed to pulse growth hormone release naturally and support lean body composition.',
+			'hero_line' => 'Lean body support',
+			'hero_accent' => 'Tesamorelin / Ipamorelin blend',
 			'spec'  => 'Tesamorelin 3mg + Ipamorelin 2mg · 5ml per vial',
 		],
 		'cjc1295-ipamorelin' => [
 			'name'  => 'CJC-1295 / Ipamorelin',
 			'badge' => 'GH Secretagogue Blend',
 			'desc'  => 'CJC-1295 extends the half-life of natural GH pulses while Ipamorelin provides a clean GH release — a popular stack for muscle recovery, fat loss, and sleep quality.',
+			'hero_line' => 'Recovery and sleep support',
+			'hero_accent' => 'CJC-1295 / Ipamorelin blend',
 			'spec'  => 'CJC-1295 1.2mg + Ipamorelin 2mg · 5ml per vial',
 		],
 		'klow-stack-bpc157-10mg-ghk-cu-50mg-tb50010mg-kpv-10mg' => [
 			'name'  => 'KLOW Stack',
 			'badge' => 'Recovery Peptide Stack',
 			'desc'  => 'The KLOW Stack combines BPC-157, GHK-Cu, TB-500, and KPV in a single vial — a comprehensive recovery peptide blend targeting tissue repair, inflammation, and systemic healing.',
+			'hero_line' => 'Comprehensive recovery support',
+			'hero_accent' => 'KLOW peptide stack',
 			'spec'  => 'BPC-157 3mg / GHK-Cu 10mg / TB-500 3mg / KPV 3mg · 5ml per vial',
 		],
 		'2606' => [
 			'name'  => 'Wolverine Stack',
 			'badge' => 'Recovery Peptide Stack',
 			'desc'  => 'The Wolverine Stack pairs BPC-157 with TB-500 for accelerated recovery and tissue regeneration — a go-to protocol for musculoskeletal injuries and chronic inflammation.',
+			'hero_line' => 'Tissue recovery support',
+			'hero_accent' => 'Wolverine peptide stack',
 			'spec'  => 'BPC-157 3mg + TB-500 3mg · 5ml per vial',
 		],
 		'compound-injectable-sermorelin' => [
 			'name'  => 'Sermorelin',
 			'badge' => 'Growth Hormone Secretagogue',
 			'desc'  => 'Sermorelin is a synthetic analogue of GHRH that stimulates natural growth hormone production, supporting sleep quality, lean mass, recovery, and metabolic health.',
+			'hero_line' => 'Recovery and sleep support',
+			'hero_accent' => 'Sermorelin peptide care',
 			'spec'  => 'Sermorelin · 10mg per vial',
 		],
 		'compound-injectable-glutathione' => [
 			'name'  => 'Glutathione',
 			'badge' => 'Master Antioxidant Therapy',
 			'desc'  => 'Glutathione is the body\'s master antioxidant, critical for oxidative stress management, immune function, and liver detoxification. Delivered as a sterile injectable for maximum bioavailability.',
+			'hero_line' => 'Antioxidant defense support',
+			'hero_accent' => 'Glutathione injectable care',
 			'spec'  => 'Glutathione · 200mg/ml · 10ml per vial',
 		],
 	];
@@ -611,7 +648,11 @@ if ( $is_weight_loss ) :
 			<div class="pdp-hero__left">
 				<span class="pdp-hero__badge"><?php echo $pcfg['badge']; ?></span>
 				<h1 class="pdp-hero__title"><?php echo esc_html( $pcfg['name'] ); ?></h1>
-				<p class="pdp-hero__desc"><?php echo esc_html( $pcfg['desc'] ); ?></p>
+				<p class="pdp-hero__desc"><?php echo esc_html( $pcfg['hero_line'] ); ?> <span><?php echo esc_html( $pcfg['hero_accent'] ); ?></span></p>
+				<div class="trt-pdp__hero-actions">
+					<a class="grunge-btn grunge-btn--red" href="#buy">Continue to evaluation <?php echo myogenix_grunge_arrow_svg(); ?></a>
+					<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
+				</div>
 				<ul class="pdp-hero__bullets">
 					<li>Compounded &middot; FDA-registered facility</li>
 					<li>Provider-reviewed &middot; Prescription required</li>
@@ -694,7 +735,7 @@ if ( $is_weight_loss ) :
 					</div>
 					</div>
 
-					<div class="peptide-cfg__includes">
+					<div class="peptide-cfg__includes peptide-cfg__includes--inline">
 						<p class="peptide-cfg__includes-title">What's included</p>
 						<ul class="peptide-cfg__includes-list">
 							<li class="peptide-cfg__includes-item">
@@ -759,7 +800,7 @@ if ( $is_weight_loss ) :
 			<div class="trt-pdp__plan-grid">
 				<?php
 				$plan_index = 0;
-				foreach ( $supply_map as $s_entry ) :
+				foreach ( $supply_map as $s_slug => $s_entry ) :
 					$plan_index++;
 				?>
 				<article class="trt-pdp__plan-card">
@@ -777,7 +818,7 @@ if ( $is_weight_loss ) :
 						<div><dt>Supply</dt><dd><?php echo esc_html( $s_entry['label'] ); ?></dd></div>
 						<div><dt>Price</dt><dd><?php echo '$' . esc_html( number_format( (float) $s_entry['price'], 0 ) ); ?></dd></div>
 					</dl>
-					<a class="trt-pdp__select" href="#buy">Select Plan</a>
+					<a class="trt-pdp__select" href="#buy" data-pdp-supply="<?php echo esc_attr( $s_slug ); ?>">Select Plan</a>
 				</article>
 				<?php endforeach; ?>
 			</div>
@@ -789,7 +830,7 @@ if ( $is_weight_loss ) :
 		<div class="hp-inner">
 			<div class="home-how__header">
 					<p class="home-how__overline">How it works</p>
-					<h2 class="home-how__heading">Getting started is simple</h2>
+					<h2 class="home-how__heading"><span class="grunge-word grunge-word--white">Getting started</span><span class="grunge-word grunge-word--red">is simple</span></h2>
 					<p class="home-how__desc">From your intake to provider review, each step is built for clear, guided care.</p>
 			</div>
 			<div class="home-how__steps">
@@ -833,6 +874,8 @@ if ( $is_weight_loss ) :
 			'name'            => 'Tadalafil',
 			'badge'           => 'Sexual Health',
 			'desc'            => 'Tadalafil (generic Cialis) is a PDE5 inhibitor prescribed for erectile dysfunction and benign prostatic hyperplasia. It provides long-lasting support — up to 36 hours — and is available as a lower-dose daily option.',
+			'hero_line'       => 'Long-lasting performance support',
+			'hero_accent'     => 'Tadalafil sexual health care',
 			'includes'        => [
 				'90 compounded oral tablets',
 				'Dosing protocol card',
@@ -851,6 +894,8 @@ if ( $is_weight_loss ) :
 			'name'            => 'Sildenafil',
 			'badge'           => 'Sexual Health',
 			'desc'            => 'Sildenafil (generic Viagra) is a PDE5 inhibitor that increases blood flow to support erections when sexually stimulated. Fast-acting, widely studied, and available in multiple strengths.',
+			'hero_line'       => 'Fast-acting performance support',
+			'hero_accent'     => 'Sildenafil sexual health care',
 			'includes'        => [
 				'Compounded oral sildenafil tablets',
 				'Dosing protocol card',
@@ -869,6 +914,8 @@ if ( $is_weight_loss ) :
 			'name'            => 'Testosterone Cypionate',
 			'badge'           => 'Provider-reviewed men\'s health',
 			'desc'            => 'Testosterone Cypionate is a long-acting injectable testosterone used to treat hypogonadism (low T). It supports energy levels, muscle mass, libido, mood, and overall wellbeing.',
+			'hero_line'       => 'Provider-managed TRT',
+			'hero_accent'     => 'Testosterone Cypionate',
 			'includes'        => [
 				'Safe, effective, supported',
 				'Prescription required',
@@ -891,6 +938,8 @@ if ( $is_weight_loss ) :
 			'name'            => 'HCG',
 			'badge'           => 'Men\'s Health',
 			'desc'            => 'HCG (Human Chorionic Gonadotropin) is a physician-prescribed injectable used to support natural testosterone production and testicular function, often alongside a personalized hormone optimization plan.',
+			'hero_line'       => 'Hormone function support',
+			'hero_accent'     => 'HCG men\'s health care',
 			'includes'        => [
 				'HCG injectable &middot; 10,000 IU vial',
 				'Syringes &amp; needles',
@@ -1037,10 +1086,14 @@ if ( $is_weight_loss ) :
 					<a class="grunge-btn grunge-btn--red" href="#build-plan">Continue to evaluation <?php echo myogenix_grunge_arrow_svg(); ?></a>
 					<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				</div>
-				<?php else : ?>
-				<h1 class="pdp-hero__title"><?php echo esc_html( $shcfg['name'] ); ?></h1>
-				<p class="pdp-hero__desc"><?php echo esc_html( $shcfg['desc'] ); ?></p>
-				<?php endif; ?>
+					<?php else : ?>
+					<h1 class="pdp-hero__title"><?php echo esc_html( $shcfg['name'] ); ?></h1>
+					<p class="pdp-hero__desc"><?php echo esc_html( $shcfg['hero_line'] ); ?> <span><?php echo esc_html( $shcfg['hero_accent'] ); ?></span></p>
+					<div class="trt-pdp__hero-actions">
+						<a class="grunge-btn grunge-btn--red" href="#buy">Continue to evaluation <?php echo myogenix_grunge_arrow_svg(); ?></a>
+						<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
+					</div>
+					<?php endif; ?>
 				<ul class="pdp-hero__bullets">
 					<li>Compounded &middot; FDA-registered facility</li>
 					<li>Provider-reviewed &middot; Prescription required</li>
@@ -1119,12 +1172,12 @@ if ( $is_weight_loss ) :
 					<div class="trt-pdp__static-row trt-pdp__static-row--strength" aria-label="Vial strength">
 						<p class="pdp-cfg__section-label">1. Vial Strength</p>
 						<div class="pdp-cfg__supply-row">
-							<button class="pdp-cfg__supply pdp-cfg__supply--active" type="button" aria-pressed="true">
-								<strong>200 mg/ml vial</strong>
-							</button>
-							<button class="pdp-cfg__supply" type="button" aria-pressed="false">
-								<strong>400 mg/ml vial</strong>
-							</button>
+								<button class="pdp-cfg__supply pdp-cfg__supply--active trt-pdp__strength-btn" type="button" aria-pressed="true" data-trt-strength="200 mg/ml vial">
+									<strong>200 mg/ml vial</strong>
+								</button>
+								<button class="pdp-cfg__supply trt-pdp__strength-btn" type="button" aria-pressed="false" data-trt-strength="400 mg/ml vial">
+									<strong>400 mg/ml vial</strong>
+								</button>
 						</div>
 					</div>
 					<?php endif; ?>
@@ -1230,7 +1283,13 @@ if ( $is_weight_loss ) :
 					</div>
 
 					<!-- What's included -->
-					<div class="peptide-cfg__includes">
+						<?php
+						$sh_config_option_count = 1 + ( $secondary_attr_key && ! empty( $secondary_keys ) ? 1 : 0 );
+						if ( 'testosterone' === $slug ) {
+							$sh_config_option_count = 3;
+						}
+						?>
+						<div class="peptide-cfg__includes<?php echo $sh_config_option_count < 2 ? ' peptide-cfg__includes--inline' : ''; ?>">
 						<p class="peptide-cfg__includes-title">What's included</p>
 						<ul class="peptide-cfg__includes-list">
 							<?php foreach ( $shcfg['includes'] as $include_item ) : ?>
@@ -1280,7 +1339,7 @@ if ( $is_weight_loss ) :
 			<div class="trt-pdp__plans-copy">
 				<p class="grunge-kicker">Choose your starting point</p>
 				<?php if ( $slug === 'testosterone' ) : ?>
-				<h2><span class="grunge-word grunge-word--white">200 mg/ml vial</span><span class="grunge-word grunge-word--red">1 vial</span></h2>
+					<h2><span class="grunge-word grunge-word--white" data-trt-plan-strength>200 mg/ml vial</span><span class="grunge-word grunge-word--red" data-trt-plan-supply>1 vial</span></h2>
 				<p>Testosterone cypionate is an injectable testosterone ester used for provider-managed testosterone replacement therapy in patients with clinically low levels.</p>
 				<?php else : ?>
 				<h2><span class="grunge-word grunge-word--white"><?php echo esc_html( $shcfg['name'] ); ?></span><span class="grunge-word grunge-word--red"><?php echo esc_html( $shcfg['primary_label'] ); ?></span></h2>
@@ -1290,11 +1349,11 @@ if ( $is_weight_loss ) :
 			<div class="trt-pdp__plan-grid">
 				<?php
 				if ( $slug === 'testosterone' ) :
-					$trt_plan_cards = [
-						[ 'title' => '1 Vial',  'supply' => '~30 day supply', 'qty' => '1 vial' ],
-						[ 'title' => '2 Vials', 'supply' => '~60 day supply', 'qty' => '2 vials', 'popular' => true ],
-						[ 'title' => '3 Vials', 'supply' => '~90 day supply', 'qty' => '3 vials' ],
-					];
+						$trt_plan_cards = [
+							[ 'title' => '1 Vial',  'supply' => '~30 day supply', 'qty' => '1 vial', 'primary' => $primary_keys[0] ?? '' ],
+							[ 'title' => '2 Vials', 'supply' => '~60 day supply', 'qty' => '2 vials', 'primary' => $primary_keys[1] ?? '', 'popular' => true ],
+							[ 'title' => '3 Vials', 'supply' => '~90 day supply', 'qty' => '3 vials', 'primary' => $primary_keys[2] ?? '' ],
+						];
 					foreach ( $trt_plan_cards as $plan ) :
 				?>
 				<article class="trt-pdp__plan-card">
@@ -1307,11 +1366,11 @@ if ( $is_weight_loss ) :
 						<li>Muscle mass &amp; mood support for low-T patients</li>
 					</ul>
 					<dl>
-						<div><dt>Strength</dt><dd>200 mg/ml vial</dd></div>
-						<div><dt>Supply</dt><dd><?php echo esc_html( $plan['qty'] ); ?></dd></div>
-					</dl>
-					<a class="trt-pdp__select" href="#build-plan">Select Plan</a>
-				</article>
+							<div><dt>Strength</dt><dd data-trt-card-strength>200 mg/ml vial</dd></div>
+							<div><dt>Supply</dt><dd><?php echo esc_html( $plan['qty'] ); ?></dd></div>
+						</dl>
+						<a class="trt-pdp__select" href="#build-plan" data-pdp-primary="<?php echo esc_attr( $plan['primary'] ); ?>">Select Plan</a>
+					</article>
 				<?php
 					endforeach;
 				else :
@@ -1340,8 +1399,8 @@ if ( $is_weight_loss ) :
 						<?php endif; ?>
 						<div><dt>Price</dt><dd><?php echo '$' . esc_html( number_format( (float) $entry['price'], 0 ) ); ?></dd></div>
 					</dl>
-					<a class="trt-pdp__select" href="#build-plan">Select Plan</a>
-				</article>
+						<a class="trt-pdp__select" href="#build-plan" data-pdp-primary="<?php echo esc_attr( $p_slug ); ?>"<?php echo $secondary_attr_key && ! empty( $secondary_keys ) ? ' data-pdp-secondary="' . esc_attr( $secondary_keys[0] ) . '"' : ''; ?>>Select Plan</a>
+					</article>
 				<?php
 					endforeach;
 				endif;
@@ -1358,7 +1417,7 @@ if ( $is_weight_loss ) :
 		<div class="hp-inner">
 			<div class="home-how__header">
 					<p class="home-how__overline">How it works</p>
-					<h2 class="home-how__heading">Getting started is simple</h2>
+						<h2 class="home-how__heading"><span class="grunge-word grunge-word--white">Getting started</span><span class="grunge-word grunge-word--red">is simple</span></h2>
 					<p class="home-how__desc">From your intake to provider review, each step is built for clear, guided care.</p>
 			</div>
 			<div class="home-how__steps">

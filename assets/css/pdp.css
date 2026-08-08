@@ -10,7 +10,6 @@
 body.single-product #main.site-main {
 	max-width: 95% !important;
 }
-
 .myogenix-pdp {
 	--pdp-purple:      #5b4bc4;
 	--pdp-dark:        #1a1a1a;
@@ -4120,5 +4119,335 @@ body.single-product .trt-grunge-pdp .pdp-hero__right {
 
 	.grunge-product-pdp .myo-faq__cta {
 		grid-template-columns: 1fr;
+	}
+}
+
+/* ==========================================================================
+   PDP Build Your Plan final overrides
+   ========================================================================== */
+
+body.single-product .grunge-product-pdp .pdp-hero__right,
+body.single-product .trt-grunge-pdp .pdp-hero__right {
+	border: 1px solid rgba(255, 255, 255, 0.22);
+	box-shadow: none !important;
+}
+
+.grunge-product-pdp .pdp-cfg,
+.trt-grunge-pdp .pdp-cfg,
+.grunge-product-pdp .pdp-cfg *,
+.trt-grunge-pdp .pdp-cfg * {
+	font-family: var(--myo-font-body, "Poppins", sans-serif);
+}
+
+.grunge-product-pdp .pdp-cfg,
+.trt-grunge-pdp .pdp-cfg {
+	border: 0 !important;
+	background: transparent !important;
+	padding: 0 !important;
+}
+
+.grunge-product-pdp .pdp-cfg::before,
+.trt-grunge-pdp .pdp-cfg::before {
+	font-family: var(--myo-font-body, "Poppins", sans-serif);
+	font-size: 0.82rem;
+	font-weight: 900;
+	letter-spacing: 0.18em;
+}
+
+.grunge-product-pdp .pdp-cfg__section-label,
+.trt-grunge-pdp .pdp-cfg__section-label,
+.grunge-product-pdp .trt-state__status,
+.trt-grunge-pdp .trt-state__status,
+.grunge-product-pdp .pdp-cfg__own-labs-note,
+.trt-grunge-pdp .pdp-cfg__own-labs-note,
+.grunge-product-pdp .pdp-cfg__disclaimer,
+.trt-grunge-pdp .pdp-cfg__disclaimer {
+	font-family: var(--myo-font-body, "Poppins", sans-serif) !important;
+	font-size: 0.88rem !important;
+	font-weight: 800 !important;
+	letter-spacing: 0.08em !important;
+	line-height: 1.25 !important;
+}
+
+.grunge-product-pdp .pdp-cfg__pkg,
+.grunge-product-pdp .pdp-cfg__supply,
+.trt-grunge-pdp .pdp-cfg__pkg,
+.trt-grunge-pdp .pdp-cfg__supply,
+.grunge-product-pdp .trt-state__trigger,
+.trt-grunge-pdp .trt-state__trigger {
+	min-height: 64px;
+	padding: 14px 16px !important;
+	border-color: rgba(255, 255, 255, 0.26) !important;
+	background:
+		linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+		rgba(0, 0, 0, 0.58) !important;
+	transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.grunge-product-pdp .pdp-cfg__pkg:hover,
+.grunge-product-pdp .pdp-cfg__supply:hover,
+.trt-grunge-pdp .pdp-cfg__pkg:hover,
+.trt-grunge-pdp .pdp-cfg__supply:hover {
+	transform: translateY(-1px);
+	border-color: rgba(220, 38, 38, 0.72) !important;
+}
+
+.grunge-product-pdp .pdp-cfg__pkg strong,
+.grunge-product-pdp .pdp-cfg__supply strong,
+.trt-grunge-pdp .pdp-cfg__pkg strong,
+.trt-grunge-pdp .pdp-cfg__supply strong,
+.grunge-product-pdp .trt-state__trigger-text,
+.trt-grunge-pdp .trt-state__trigger-text {
+	font-family: var(--myo-font-body, "Poppins", sans-serif) !important;
+	font-size: 1.02rem !important;
+	font-weight: 800 !important;
+	letter-spacing: 0.01em !important;
+	line-height: 1.18 !important;
+	text-transform: none !important;
+}
+
+.grunge-product-pdp .pdp-cfg__pkg span,
+.grunge-product-pdp .pdp-cfg__supply span:not(.pdp-cfg__popular-tag),
+.trt-grunge-pdp .pdp-cfg__pkg span,
+.trt-grunge-pdp .pdp-cfg__supply span:not(.pdp-cfg__popular-tag) {
+	font-family: var(--myo-font-body, "Poppins", sans-serif) !important;
+	font-size: 0.82rem !important;
+	font-weight: 600 !important;
+	line-height: 1.35 !important;
+	text-transform: none !important;
+}
+
+.grunge-product-pdp .pdp-cfg__dose-card,
+.trt-grunge-pdp .pdp-cfg__dose-card {
+	background:
+		linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
+		rgba(0, 0, 0, 0.62);
+	color: #fff;
+}
+
+.grunge-product-pdp .pdp-cfg__dose-select,
+.trt-grunge-pdp .pdp-cfg__dose-select,
+.grunge-product-pdp .pdp-cfg__dose-static,
+.trt-grunge-pdp .pdp-cfg__dose-static {
+	min-height: 54px;
+	border: 1px solid rgba(220, 38, 38, 0.65) !important;
+	background: #080808 !important;
+	color: #fff !important;
+	font-size: 1rem;
+	font-weight: 800;
+}
+
+.grunge-product-pdp .pdp-cfg__dose-month-label,
+.trt-grunge-pdp .pdp-cfg__dose-month-label,
+.grunge-product-pdp .pdp-cfg__dose-detail,
+.trt-grunge-pdp .pdp-cfg__dose-detail,
+.grunge-product-pdp .pdp-cfg__dose-detail strong,
+.trt-grunge-pdp .pdp-cfg__dose-detail strong {
+	color: #d4d4d8;
+}
+
+.grunge-product-pdp .pdp-cfg__dose-badge,
+.trt-grunge-pdp .pdp-cfg__dose-badge {
+	border-radius: 0;
+	background: rgba(220, 38, 38, 0.18);
+	color: #fff;
+}
+
+.grunge-product-pdp .pdp-cfg__summary,
+.trt-grunge-pdp .pdp-cfg__summary,
+.grunge-product-pdp .peptide-cfg__includes,
+.trt-grunge-pdp .peptide-cfg__includes {
+	border: 1px solid rgba(255, 255, 255, 0.16) !important;
+	background:
+		repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.028) 0 1px, transparent 1px 8px),
+		rgba(6, 6, 6, 0.82) !important;
+	padding: 18px !important;
+}
+
+.grunge-product-pdp .peptide-cfg__includes--inline,
+.trt-grunge-pdp .peptide-cfg__includes--inline {
+	grid-column: 1 !important;
+	grid-row: auto !important;
+	margin-top: 2px;
+}
+
+.grunge-product-pdp .peptide-cfg__includes-title,
+.trt-grunge-pdp .peptide-cfg__includes-title,
+.grunge-product-pdp .pdp-cfg__summary-label,
+.trt-grunge-pdp .pdp-cfg__summary-label {
+	font-size: 0.78rem !important;
+	font-weight: 900 !important;
+	letter-spacing: 0.12em !important;
+}
+
+.grunge-product-pdp .peptide-cfg__includes-item,
+.trt-grunge-pdp .peptide-cfg__includes-item,
+.grunge-product-pdp .pdp-cfg__summary-line,
+.trt-grunge-pdp .pdp-cfg__summary-line,
+.grunge-product-pdp .pdp-cfg__summary-sub,
+.trt-grunge-pdp .pdp-cfg__summary-sub {
+	font-size: 0.9rem !important;
+	line-height: 1.5 !important;
+}
+
+.grunge-product-pdp .pdp-cfg__summary-total,
+.trt-grunge-pdp .pdp-cfg__summary-total {
+	font-size: 1rem !important;
+	font-weight: 800 !important;
+}
+
+.grunge-product-pdp .pdp-cfg__summary-total-price,
+.trt-grunge-pdp .pdp-cfg__summary-total-price {
+	font-size: 2rem !important;
+	font-weight: 900 !important;
+}
+
+.grunge-product-pdp .pdp-cfg__cta,
+.trt-grunge-pdp .pdp-cfg__cta {
+	font-family: var(--myo-font-body, "Poppins", sans-serif) !important;
+	font-size: 1rem !important;
+	font-weight: 900 !important;
+	letter-spacing: 0.04em !important;
+}
+
+.grunge-product-pdp .home-how__heading,
+.trt-grunge-pdp .home-how__heading {
+	color: transparent !important;
+}
+
+.grunge-product-pdp .home-how__heading .grunge-word,
+.trt-grunge-pdp .home-how__heading .grunge-word {
+	display: block;
+}
+
+.grunge-product-pdp .myo-faq__btn,
+.trt-grunge-pdp .myo-faq__btn {
+	padding-right: 28px !important;
+	padding-left: 28px !important;
+}
+
+.grunge-product-pdp .myo-faq__panel-inner,
+.trt-grunge-pdp .myo-faq__panel-inner {
+	padding-right: 28px !important;
+	padding-left: 28px !important;
+}
+
+@media (max-width: 600px) {
+	body.single-product .grunge-product-pdp .pdp-hero__inner,
+	body.single-product .trt-grunge-pdp .pdp-hero__inner {
+		padding-top: 46px !important;
+	}
+
+	.grunge-product-pdp .pdp-cfg__supply-row,
+	.trt-grunge-pdp .pdp-cfg__supply-row {
+		grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+		gap: 7px;
+	}
+
+	.grunge-product-pdp .pdp-cfg__supply-row:has(> .pdp-cfg__supply:only-child),
+	.trt-grunge-pdp .pdp-cfg__supply-row:has(> .pdp-cfg__supply:only-child) {
+		grid-template-columns: 1fr !important;
+	}
+
+	.grunge-product-pdp .pdp-cfg__pkg-row,
+	.trt-grunge-pdp .pdp-cfg__pkg-row,
+	.grunge-product-pdp .pdp-cfg__doses-wrap,
+	.trt-grunge-pdp .pdp-cfg__doses-wrap {
+		grid-template-columns: 1fr !important;
+	}
+
+	.grunge-product-pdp .pdp-cfg__supply,
+	.trt-grunge-pdp .pdp-cfg__supply {
+		min-height: 62px;
+		padding: 10px 6px !important;
+	}
+
+	.grunge-product-pdp .pdp-cfg__supply strong,
+	.trt-grunge-pdp .pdp-cfg__supply strong,
+	.grunge-product-pdp .trt-state__trigger-text,
+	.trt-grunge-pdp .trt-state__trigger-text {
+		font-size: clamp(0.72rem, 3vw, 0.9rem) !important;
+	}
+
+	.grunge-product-pdp .pdp-cfg__supply span:not(.pdp-cfg__popular-tag),
+	.trt-grunge-pdp .pdp-cfg__supply span:not(.pdp-cfg__popular-tag) {
+		font-size: clamp(0.62rem, 2.55vw, 0.76rem) !important;
+	}
+
+	.grunge-product-pdp .trt-pdp__plan-card h3,
+	.trt-grunge-pdp .trt-pdp__plan-card h3 {
+		font-size: 3rem;
+	}
+
+	.grunge-product-pdp .trt-pdp__plan-card li,
+	.trt-grunge-pdp .trt-pdp__plan-card li {
+		font-size: 1.2rem;
+	}
+
+	.grunge-product-pdp .trt-pdp__plan-card li::before,
+	.trt-grunge-pdp .trt-pdp__plan-card li::before {
+		width: 24px;
+		height: 24px;
+		margin-right: 10px;
+		vertical-align: -6px;
+	}
+
+	.grunge-product-pdp .home-how__heading,
+	.trt-grunge-pdp .home-how__heading,
+	.grunge-product-pdp .myo-faq__title,
+	.trt-grunge-pdp .myo-faq__title {
+		font-size: 3.45rem !important;
+	}
+
+	.grunge-product-pdp .hp-step,
+	.trt-grunge-pdp .hp-step {
+		min-height: 0;
+		padding: 34px 22px 24px;
+	}
+
+	.grunge-product-pdp .hp-step__img-wrap,
+	.trt-grunge-pdp .hp-step__img-wrap {
+		min-height: 104px !important;
+	}
+
+	.grunge-product-pdp .hp-step__img,
+	.trt-grunge-pdp .hp-step__img {
+		width: 76px !important;
+		height: 76px !important;
+	}
+
+	.grunge-product-pdp .hp-step__title,
+	.trt-grunge-pdp .hp-step__title {
+		font-size: 2.9rem !important;
+	}
+
+	.grunge-product-pdp .hp-step__desc,
+	.trt-grunge-pdp .hp-step__desc {
+		font-size: 1.64rem !important;
+		line-height: 1.35 !important;
+	}
+
+	.grunge-product-pdp .myo-faq__wrap,
+	.trt-grunge-pdp .myo-faq__wrap {
+		display: grid;
+		grid-template-columns: 1fr !important;
+		gap: 24px;
+	}
+
+	.grunge-product-pdp .myo-faq__list,
+	.trt-grunge-pdp .myo-faq__list,
+	.grunge-product-pdp .myo-faq__cta,
+	.trt-grunge-pdp .myo-faq__cta,
+	.grunge-product-pdp .trt-pdp__faq-disclaimer,
+	.trt-grunge-pdp .trt-pdp__faq-disclaimer {
+		grid-column: 1 !important;
+	}
+
+	.grunge-product-pdp .myo-faq__btn,
+	.trt-grunge-pdp .myo-faq__btn,
+	.grunge-product-pdp .myo-faq__panel-inner,
+	.trt-grunge-pdp .myo-faq__panel-inner {
+		padding-right: 18px !important;
+		padding-left: 18px !important;
 	}
 }

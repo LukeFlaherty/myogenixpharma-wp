@@ -383,6 +383,21 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		} );
 	} );
 
+	Array.prototype.slice.call( document.querySelectorAll( '.trt-pdp__select[data-pdp-months]' ) ).forEach( function ( link ) {
+		link.addEventListener( 'click', function ( e ) {
+			var months = parseInt( link.getAttribute( 'data-pdp-months' ), 10 );
+			var target = cfg.querySelector( '.pdp-cfg__supply[data-months="' + months + '"]' );
+			var customPkg = cfg.querySelector( '.pdp-cfg__pkg[data-pkg="custom"]' );
+			if ( ! target ) return;
+			e.preventDefault();
+			if ( customPkg && state.packageType !== 'custom' ) {
+				customPkg.click();
+			}
+			target.click();
+			cfg.scrollIntoView( { behavior: 'smooth', block: 'start' } );
+		} );
+	} );
+
 	/* -----------------------------------------------------------------------
 	   CTA — GET-based add-to-cart.
 	   Variation lookup uses first-month dose (determines price tier).

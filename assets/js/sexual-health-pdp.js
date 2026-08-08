@@ -47,6 +47,7 @@
 		primary:   primaryKeys[0],
 		secondary: secondaryKeys.length ? secondaryKeys[0] : null,
 		ownLabs:   false,
+		strength:  '200 mg/ml vial',
 	};
 
 	// ── Helpers ───────────────────────────────────────────────────────────────
@@ -100,6 +101,7 @@
 					'<span class="pdp-cfg__summary-label">Plan review first</span>' +
 					'<div class="pdp-cfg__summary-month-price">Personalized after provider review.</div>' +
 					'<p class="pdp-cfg__summary-sub">' + displayFeeLabel + '</p>' +
+					'<div class="pdp-cfg__summary-line"><span>Vial strength</span><strong>' + state.strength + '</strong></div>' +
 					'<div class="pdp-cfg__summary-total">' +
 						'<span>Total today</span>' +
 						'<strong class="pdp-cfg__summary-total-price">' + fmt( displayFeePrice ) + '</strong>' +
@@ -166,6 +168,44 @@
 		} );
 	} );
 
+	document.querySelectorAll( '.trt-pdp__strength-btn' ).forEach( function ( btn ) {
+		btn.addEventListener( 'click', function () {
+			state.strength = btn.getAttribute( 'data-trt-strength' ) || btn.textContent.trim();
+			document.querySelectorAll( '.trt-pdp__strength-btn' ).forEach( function ( b ) {
+				var active = b === btn;
+				b.classList.toggle( 'pdp-cfg__supply--active', active );
+				b.setAttribute( 'aria-pressed', active ? 'true' : 'false' );
+			} );
+			document.querySelectorAll( '[data-trt-card-strength]' ).forEach( function ( el ) {
+				el.textContent = state.strength;
+			} );
+			document.querySelectorAll( '[data-trt-plan-strength]' ).forEach( function ( el ) {
+				el.textContent = state.strength;
+			} );
+			render();
+		} );
+	} );
+
+	document.querySelectorAll( '.trt-pdp__select[data-pdp-primary]' ).forEach( function ( link ) {
+		link.addEventListener( 'click', function ( e ) {
+			var primary = link.getAttribute( 'data-pdp-primary' );
+			var secondary = link.getAttribute( 'data-pdp-secondary' );
+			if ( ! primary || ! matrix[ primary ] ) return;
+			e.preventDefault();
+			state.primary = primary;
+			if ( hasSecondary && secondary ) {
+				state.secondary = secondary;
+			}
+			var supplyLabel = link.closest( '.trt-pdp__plan-card' );
+			supplyLabel = supplyLabel ? supplyLabel.querySelector( 'h3' ) : null;
+			document.querySelectorAll( '[data-trt-plan-supply]' ).forEach( function ( el ) {
+				el.textContent = supplyLabel ? supplyLabel.textContent.trim() : '';
+			} );
+			render();
+			cfg.scrollIntoView( { behavior: 'smooth', block: 'start' } );
+		} );
+	} );
+
 	var ownLabsCheckbox = document.getElementById( 'pdp-own-labs' );
 	if ( ownLabsCheckbox ) {
 		ownLabsCheckbox.addEventListener( 'change', function () {
@@ -195,6 +235,9 @@
 			if ( state.ownLabs ) {
 				params += '&own_labs=1';
 			}
+			if ( monthlyBilling && state.strength ) {
+				params += '&trt_strength=' + encodeURIComponent( state.strength );
+			}
 
 			window.location.href = window.location.pathname + '?' + params;
 		} );
@@ -207,7 +250,10 @@
 			state.primary   = primaryKeys[0];
 			state.secondary = secondaryKeys.length ? secondaryKeys[0] : null;
 			state.ownLabs   = false;
+			state.strength  = '200 mg/ml vial';
 			if ( ownLabsCheckbox ) ownLabsCheckbox.checked = false;
+			var defaultStrength = document.querySelector( '.trt-pdp__strength-btn[data-trt-strength="200 mg/ml vial"]' );
+			if ( defaultStrength ) defaultStrength.click();
 			render();
 		}
 	} );
