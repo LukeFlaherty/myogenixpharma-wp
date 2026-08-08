@@ -639,7 +639,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
 			[],
-			'1.9.9'
+			'1.10.1'
 		);
 	}
 
@@ -679,7 +679,7 @@ add_action( 'wp_enqueue_scripts', function() {
 				'myogenix-sexual-health-pdp',
 				get_stylesheet_directory_uri() . '/assets/js/sexual-health-pdp.js',
 				[],
-				'1.3.0',
+				'1.3.1',
 				true
 			);
 		}

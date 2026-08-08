@@ -97,11 +97,11 @@
 			var displayFeeLabel = ( state.ownLabs && flatFeeLabelOwnLabs ) ? flatFeeLabelOwnLabs : flatFeeLabel;
 			if ( displayFeePrice > 0 ) {
 				el.innerHTML =
-					'<span class="pdp-cfg__summary-label">Checkout Details</span>' +
-					'<div class="pdp-cfg__summary-month-price">' + fmt( displayFeePrice ) + '</div>' +
+					'<span class="pdp-cfg__summary-label">Plan review first</span>' +
+					'<div class="pdp-cfg__summary-month-price">Personalized after provider review.</div>' +
 					'<p class="pdp-cfg__summary-sub">' + displayFeeLabel + '</p>' +
 					'<div class="pdp-cfg__summary-total">' +
-						'<span>Total billed today</span>' +
+						'<span>Total today</span>' +
 						'<strong class="pdp-cfg__summary-total-price">' + fmt( displayFeePrice ) + '</strong>' +
 					'</div>';
 				return;

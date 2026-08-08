@@ -526,12 +526,19 @@ if ( $is_weight_loss ) :
 		return esc_url( $base . implode( '/', array_map( 'rawurlencode', $parts ) ) );
 	};
 
-	$steps = [
-		[ 'num' => '01', 'img' => 'PDP Sections/form.png',         'title' => 'Questionnaire',                  'desc' => 'Answer a few questions and share your medical details' ],
-		[ 'num' => '02', 'img' => 'PDP Sections/consultation.png', 'title' => 'Review and Approved by provider',  'desc' => 'Discuss your goals and receive expert recommendations' ],
-		[ 'num' => '03', 'img' => 'PDP Sections/box.png',          'title' => 'Receive medication',               'desc' => 'Medication and supplies shipped straight to your door' ],
-		[ 'num' => '04', 'img' => 'PDP Sections/calendar.png',     'title' => 'Monthly Monitoring',               'desc' => 'Stay on track with regular free check-ins to ensure progress' ],
-	];
+	$steps = $slug === 'testosterone'
+		? [
+			[ 'num' => '1', 'img' => 'grunge-redesign/laptop-check.svg', 'title' => 'Quick Online Intake',   'desc' => 'Complete your confidential medical questionnaire in minutes.' ],
+			[ 'num' => '2', 'img' => 'grunge-redesign/doctor.svg',       'title' => 'Provider Review',       'desc' => 'A licensed provider reviews your health history and goals.' ],
+			[ 'num' => '3', 'img' => 'grunge-redesign/rx.svg',           'title' => 'Personalized Plan',     'desc' => 'Your protocol is reviewed for the selected dose and supply.' ],
+			[ 'num' => '4', 'img' => 'grunge-redesign/box.svg',          'title' => 'Shipped to Your Door',  'desc' => 'Discreet, temperature-aware shipping direct to you.' ],
+		]
+		: [
+			[ 'num' => '01', 'img' => 'PDP Sections/form.png',         'title' => 'Questionnaire',                  'desc' => 'Answer a few questions and share your medical details' ],
+			[ 'num' => '02', 'img' => 'PDP Sections/consultation.png', 'title' => 'Review and Approved by provider',  'desc' => 'Discuss your goals and receive expert recommendations' ],
+			[ 'num' => '03', 'img' => 'PDP Sections/box.png',          'title' => 'Receive medication',               'desc' => 'Medication and supplies shipped straight to your door' ],
+			[ 'num' => '04', 'img' => 'PDP Sections/calendar.png',     'title' => 'Monthly Monitoring',               'desc' => 'Stay on track with regular free check-ins to ensure progress' ],
+		];
 
 ?>
 
@@ -736,19 +743,16 @@ if ( $is_weight_loss ) :
 		],
 		'testosterone' => [
 			'name'            => 'Testosterone Cypionate',
-			'badge'           => 'Hormone Therapy',
+			'badge'           => 'Provider-reviewed men\'s health',
 			'desc'            => 'Testosterone Cypionate is a long-acting injectable testosterone used to treat hypogonadism (low T). It supports energy levels, muscle mass, libido, mood, and overall wellbeing.',
 			'includes'        => [
-				'Testosterone Cypionate injectable &middot; multi-dose vial',
-				'Syringes &amp; needles',
-				'Alcohol prep pads',
-				'Future Bloodwork',
-				'Ongoing Doctor Consults',
-				'Free Shipping',
-				'Dosing protocol card',
+				'Safe, effective, supported',
+				'Prescription required',
+				'Reviewed by licensed provider',
+				'Shipped to your door',
 			],
 			'primary_attr'    => 'pa_subscription-plan',
-			'primary_label'   => 'Subscription Plan',
+			'primary_label'   => '2. Quantity',
 			'secondary_attr'  => null,
 			'secondary_label' => null,
 			'fixed_attrs'     => [],
@@ -854,12 +858,19 @@ if ( $is_weight_loss ) :
 		return esc_url( $base . implode( '/', array_map( 'rawurlencode', $parts ) ) );
 	};
 
-	$steps = [
-		[ 'num' => '01', 'img' => 'PDP Sections/form.png',         'title' => 'Questionnaire',                  'desc' => 'Answer a few questions and share your medical details' ],
-		[ 'num' => '02', 'img' => 'PDP Sections/consultation.png', 'title' => 'Review and Approved by provider',  'desc' => 'Discuss your goals and receive expert recommendations' ],
-		[ 'num' => '03', 'img' => 'PDP Sections/box.png',          'title' => 'Receive medication',               'desc' => 'Medication and supplies shipped straight to your door' ],
-		[ 'num' => '04', 'img' => 'PDP Sections/calendar.png',     'title' => 'Monthly Monitoring',               'desc' => 'Stay on track with regular free check-ins to ensure progress' ],
-	];
+	$steps = $slug === 'testosterone'
+		? [
+			[ 'num' => '1', 'img' => 'grunge-redesign/laptop-check.svg', 'title' => 'Quick Online Intake',  'desc' => 'Complete your confidential medical questionnaire in minutes.' ],
+			[ 'num' => '2', 'img' => 'grunge-redesign/doctor.svg',       'title' => 'Provider Review',      'desc' => 'A licensed provider reviews your health history and goals.' ],
+			[ 'num' => '3', 'img' => 'grunge-redesign/rx.svg',           'title' => 'Personalized Plan',    'desc' => 'Your protocol is reviewed for the selected dose and supply.' ],
+			[ 'num' => '4', 'img' => 'grunge-redesign/box.svg',          'title' => 'Shipped to Your Door', 'desc' => 'Discreet, temperature-aware shipping direct to you.' ],
+		]
+		: [
+			[ 'num' => '01', 'img' => 'PDP Sections/form.png',         'title' => 'Questionnaire',                  'desc' => 'Answer a few questions and share your medical details' ],
+			[ 'num' => '02', 'img' => 'PDP Sections/consultation.png', 'title' => 'Review and Approved by provider',  'desc' => 'Discuss your goals and receive expert recommendations' ],
+			[ 'num' => '03', 'img' => 'PDP Sections/box.png',          'title' => 'Receive medication',               'desc' => 'Medication and supplies shipped straight to your door' ],
+			[ 'num' => '04', 'img' => 'PDP Sections/calendar.png',     'title' => 'Monthly Monitoring',               'desc' => 'Stay on track with regular free check-ins to ensure progress' ],
+		];
 
 	// ─── TRT state gating — 48 states per Myogenix service policy ───────────────
 	// Alaska (AK) and Mississippi (MS) excluded. Update this list as coverage changes.
@@ -888,16 +899,31 @@ if ( $is_weight_loss ) :
 
 ?>
 
-<div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'myogenix-pdp sexual-health-pdp', $product ); ?>>
+<div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'myogenix-pdp sexual-health-pdp' . ( $slug === 'testosterone' ? ' trt-grunge-pdp' : '' ), $product ); ?>>
 
 	<!-- Product Hero -->
 	<section class="pdp-hero" id="buy">
+		<?php if ( $slug === 'testosterone' ) : ?>
+		<div class="trt-pdp__hero-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/hero bg.png' ); ?>')" aria-hidden="true"></div>
+		<?php endif; ?>
 		<div class="pdp-hero__inner">
 
 			<div class="pdp-hero__left">
 				<span class="pdp-hero__badge"><?php echo $shcfg['badge']; ?></span>
+				<?php if ( $slug === 'testosterone' ) : ?>
+				<h1 class="pdp-hero__title">
+					<span class="grunge-word grunge-word--red">Testosterone</span>
+					<span class="grunge-word grunge-word--white">TRT Therapy</span>
+				</h1>
+				<p class="pdp-hero__desc">Provider-managed TRT <span>Testosterone Cypionate</span></p>
+				<div class="trt-pdp__hero-actions">
+					<a class="grunge-btn grunge-btn--red" href="#build-plan">Continue to evaluation <span aria-hidden="true">-&gt;</span></a>
+					<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <span aria-hidden="true">-&gt;</span></a>
+				</div>
+				<?php else : ?>
 				<h1 class="pdp-hero__title"><?php echo esc_html( $shcfg['name'] ); ?></h1>
 				<p class="pdp-hero__desc"><?php echo esc_html( $shcfg['desc'] ); ?></p>
+				<?php endif; ?>
 				<ul class="pdp-hero__bullets">
 					<li>Compounded &middot; FDA-registered facility</li>
 					<li>Provider-reviewed &middot; Prescription required</li>
@@ -937,7 +963,7 @@ if ( $is_weight_loss ) :
 				</div>
 			</div>
 
-			<div class="pdp-hero__right">
+			<div class="pdp-hero__right" id="build-plan">
 
 				<!-- Hidden WC form — keeps variation hooks alive for plugins -->
 				<div class="pdp-hero__wc-hidden" aria-hidden="true" inert>
@@ -968,8 +994,8 @@ if ( $is_weight_loss ) :
 
 					<?php if ( $slug === 'testosterone' ) : ?>
 					<!-- TRT: state eligibility gate -->
-					<p class="pdp-cfg__section-label">
-						Your State
+					<p class="pdp-cfg__section-label trt-pdp__eligibility-label">
+						Eligibility
 						<span class="trt-state__required">Required</span>
 					</p>
 					<div class="trt-state__picker" id="trt-state-picker">
@@ -1001,6 +1027,20 @@ if ( $is_weight_loss ) :
 						<a href="mailto:support@myogenixpharma.com" class="trt-state__unavailable-link">
 							Contact us about future availability
 						</a>
+					</div>
+					<?php endif; ?>
+
+					<?php if ( $slug === 'testosterone' ) : ?>
+					<div class="trt-pdp__static-row trt-pdp__static-row--strength" aria-label="Vial strength">
+						<p class="pdp-cfg__section-label">1. Vial Strength</p>
+						<div class="pdp-cfg__supply-row">
+							<button class="pdp-cfg__supply pdp-cfg__supply--active" type="button" aria-pressed="true">
+								<strong>200 mg/ml vial</strong>
+							</button>
+							<button class="pdp-cfg__supply" type="button" aria-pressed="false">
+								<strong>400 mg/ml vial</strong>
+							</button>
+						</div>
 					</div>
 					<?php endif; ?>
 
@@ -1043,6 +1083,17 @@ if ( $is_weight_loss ) :
 					</div>
 					<?php endif; ?>
 
+					<?php if ( $slug === 'testosterone' ) : ?>
+					<div class="trt-pdp__static-row trt-pdp__static-row--schedule" aria-label="Ship schedule">
+						<p class="pdp-cfg__section-label">3. Ship Schedule</p>
+						<div class="pdp-cfg__supply-row">
+							<button class="pdp-cfg__supply" type="button" aria-pressed="true">
+								<strong>One-time order</strong>
+							</button>
+						</div>
+					</div>
+					<?php endif; ?>
+
 					<!-- What's included -->
 					<div class="peptide-cfg__includes">
 						<p class="peptide-cfg__includes-title">What's included</p>
@@ -1077,13 +1128,75 @@ if ( $is_weight_loss ) :
 		</div>
 	</section>
 
+	<?php if ( $slug === 'testosterone' ) : ?>
+	<section class="trt-pdp__trust-strip" aria-label="Care features">
+		<div class="trt-pdp__trust-strip-inner">
+			<?php
+			$trt_trust = [
+				[ 'img' => 'grunge-redesign/doctor.svg',       'label' => 'Physician-Guided Care' ],
+				[ 'img' => 'grunge-redesign/laptop-check.svg', 'label' => 'Online Intake' ],
+				[ 'img' => 'grunge-redesign/rx.svg',           'label' => 'Personalized Dosing' ],
+				[ 'img' => 'grunge-redesign/box.svg',          'label' => 'Shipped to Your Door' ],
+				[ 'img' => 'grunge-redesign/headphones.svg',   'label' => 'Concierge Support' ],
+			];
+			foreach ( $trt_trust as $item ) :
+			?>
+			<div class="trt-pdp__trust-cell">
+				<img src="<?php echo $img_url( $item['img'] ); ?>" alt="" loading="lazy" width="36" height="36">
+				<span><?php echo esc_html( $item['label'] ); ?></span>
+			</div>
+			<?php endforeach; ?>
+		</div>
+	</section>
+
+	<section class="trt-pdp__plans" aria-label="Choose your starting point">
+		<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/grunge black section bg blank.png' ); ?>')" aria-hidden="true"></div>
+		<div class="trt-pdp__plans-inner">
+			<div class="trt-pdp__plans-copy">
+				<p class="grunge-kicker">Choose your starting point</p>
+				<h2><span class="grunge-word grunge-word--white">200 mg/ml vial</span><span class="grunge-word grunge-word--red">1 vial</span></h2>
+				<p>Testosterone cypionate is an injectable testosterone ester used for provider-managed testosterone replacement therapy in patients with clinically low levels.</p>
+			</div>
+			<div class="trt-pdp__plan-grid">
+				<?php
+				$trt_plan_cards = [
+					[ 'title' => '1 Vial',  'supply' => '~30 day supply', 'qty' => '1 vial' ],
+					[ 'title' => '2 Vials', 'supply' => '~60 day supply', 'qty' => '2 vials', 'popular' => true ],
+					[ 'title' => '3 Vials', 'supply' => '~90 day supply', 'qty' => '3 vials' ],
+				];
+				foreach ( $trt_plan_cards as $plan ) :
+				?>
+				<article class="trt-pdp__plan-card">
+					<?php if ( ! empty( $plan['popular'] ) ) : ?><span class="trt-pdp__popular">Popular</span><?php endif; ?>
+					<h3><?php echo esc_html( $plan['title'] ); ?></h3>
+					<p><?php echo esc_html( $plan['supply'] ); ?></p>
+					<ul>
+						<li>Energy</li>
+						<li>Libido</li>
+						<li>Muscle mass &amp; mood support for low-T patients</li>
+					</ul>
+					<dl>
+						<div><dt>Strength</dt><dd>200 mg/ml vial</dd></div>
+						<div><dt>Supply</dt><dd><?php echo esc_html( $plan['qty'] ); ?></dd></div>
+					</dl>
+					<a class="trt-pdp__select" href="#build-plan">Select Plan</a>
+				</article>
+				<?php endforeach; ?>
+			</div>
+		</div>
+	</section>
+	<?php endif; ?>
+
 	<!-- How It Works Section -->
 	<section class="home-how" aria-label="How it works">
+		<?php if ( $slug === 'testosterone' ) : ?>
+		<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/grunge black section bg blank.png' ); ?>')" aria-hidden="true"></div>
+		<?php endif; ?>
 		<div class="hp-inner">
 			<div class="home-how__header">
-				<p class="home-how__overline">Process</p>
-				<h2 class="home-how__heading">How it works</h2>
-				<p class="home-how__desc">From your first order to your ongoing program — here's what to expect at every step.</p>
+				<p class="home-how__overline"><?php echo $slug === 'testosterone' ? 'How it works' : 'Process'; ?></p>
+				<h2 class="home-how__heading"><?php echo $slug === 'testosterone' ? 'Getting started is simple' : 'How it works'; ?></h2>
+				<p class="home-how__desc"><?php echo $slug === 'testosterone' ? 'From your intake to provider review, each step is built for clear, guided care.' : 'From your first order to your ongoing program — here\'s what to expect at every step.'; ?></p>
 			</div>
 			<div class="home-how__steps">
 				<?php foreach ( $steps as $step ) : ?>
@@ -1103,7 +1216,54 @@ if ( $is_weight_loss ) :
 	</section>
 
 	<!-- Common Questions -->
+	<?php if ( $slug === 'testosterone' ) : ?>
+	<section class="myo-faq" id="faq">
+		<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/grunge black section bg blank.png' ); ?>')" aria-hidden="true"></div>
+		<div class="myo-faq__wrap">
+			<div class="myo-faq__header">
+				<span class="myo-faq__eyebrow">Support</span>
+				<h2 class="myo-faq__title">
+					<span class="grunge-word grunge-word--white">Fast answers.</span>
+					<span class="grunge-word grunge-word--red">Guided support.</span>
+				</h2>
+				<p class="myo-faq__desc">We are here to guide you through every step and answer questions before, during, and after your treatment.</p>
+			</div>
+			<div class="myo-faq__list">
+				<?php
+				$trt_faqs = [
+					[ 'q' => 'How is my dose selected?', 'a' => 'You choose a starting configuration, then a licensed provider reviews whether it is appropriate for your health history and goals.' ],
+					[ 'q' => 'Can I change my quantity?', 'a' => 'Yes. You can select a different supply before checkout. Future protocol changes should be guided by your provider.' ],
+					[ 'q' => 'What happens after provider review?', 'a' => 'If approved, your medication is prepared and shipped. If the provider needs more information, the care team will follow up.' ],
+				];
+				foreach ( $trt_faqs as $idx => $item ) :
+					$panel_id   = 'trt-pdp-faq-' . $idx;
+					$is_first   = ( $idx === 0 );
+					$expanded   = $is_first ? 'true' : 'false';
+					$open_class = $is_first ? ' is-open' : '';
+				?>
+				<div class="myo-faq__item">
+					<button class="myo-faq__btn" type="button" aria-expanded="<?php echo esc_attr( $expanded ); ?>" aria-controls="<?php echo esc_attr( $panel_id ); ?>">
+						<span class="myo-faq__q"><?php echo esc_html( $item['q'] ); ?></span>
+						<span class="myo-faq__icon" aria-hidden="true">+</span>
+					</button>
+					<div class="myo-faq__panel<?php echo esc_attr( $open_class ); ?>" id="<?php echo esc_attr( $panel_id ); ?>">
+						<div class="myo-faq__panel-inner">
+							<p><?php echo esc_html( $item['a'] ); ?></p>
+						</div>
+					</div>
+				</div>
+				<?php endforeach; ?>
+				<div class="myo-faq__cta">
+					<a href="#build-plan" class="myo-faq__cta-btn">Continue to evaluation</a>
+					<a href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>" class="myo-faq__cta-btn myo-faq__cta-btn--dark">Ask a question</a>
+				</div>
+				<p class="trt-pdp__faq-disclaimer">Prescription required if approved. Plan review by licensed provider.</p>
+			</div>
+		</div>
+	</section>
+	<?php else : ?>
 	<?php myogenix_render_product_faq( $product->get_id() ); ?>
+	<?php endif; ?>
 
 	<!-- Explore More Treatment Lines -->
 	<section class="myogenix-pdp__explore">
