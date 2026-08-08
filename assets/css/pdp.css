@@ -2670,6 +2670,11 @@ body.single-product .grunge-product-pdp .pdp-hero__right {
 	align-items: start;
 }
 
+.grunge-product-pdp .pdp-cfg__builder {
+	grid-column: 1;
+	min-width: 0;
+}
+
 .grunge-product-pdp .pdp-cfg::before {
 	content: "Build your plan";
 	grid-column: 1 / -1;
@@ -2733,7 +2738,18 @@ body.single-product .grunge-product-pdp .pdp-hero__right {
 .grunge-product-pdp .pdp-cfg__supply,
 .grunge-product-pdp .pdp-cfg__dose,
 .grunge-product-pdp .trt-state__trigger {
+	min-width: 0;
+	max-width: 100%;
 	border-radius: 0 !important;
+}
+
+.grunge-product-pdp .pdp-cfg__pkg strong,
+.grunge-product-pdp .pdp-cfg__pkg span,
+.grunge-product-pdp .pdp-cfg__supply strong,
+.grunge-product-pdp .pdp-cfg__supply span:not(.pdp-cfg__popular-tag) {
+	max-width: 100%;
+	overflow-wrap: anywhere;
+	white-space: normal;
 }
 
 .grunge-product-pdp .home-how,
@@ -2831,6 +2847,7 @@ body.single-product .grunge-product-pdp .pdp-hero__right {
 	}
 
 	.grunge-product-pdp .pdp-cfg,
+	.grunge-product-pdp .pdp-cfg__builder,
 	.grunge-product-pdp .trt-pdp__plans-inner,
 	.grunge-product-pdp .home-how .hp-inner,
 	.grunge-product-pdp .myo-faq__wrap {
@@ -2840,7 +2857,8 @@ body.single-product .grunge-product-pdp .pdp-hero__right {
 	.grunge-product-pdp .pdp-cfg__summary,
 	.grunge-product-pdp .peptide-cfg__includes,
 	.grunge-product-pdp .pdp-cfg__cta,
-	.grunge-product-pdp .pdp-cfg__disclaimer {
+	.grunge-product-pdp .pdp-cfg__disclaimer,
+	.grunge-product-pdp .pdp-cfg__builder {
 		grid-column: 1;
 		grid-row: auto;
 	}
@@ -2910,6 +2928,12 @@ body.single-product .grunge-product-pdp .pdp-hero__right {
 	.grunge-product-pdp .pdp-cfg__pkg-row,
 	.grunge-product-pdp .pdp-cfg__doses-wrap {
 		grid-template-columns: 1fr;
+	}
+
+	.grunge-product-pdp .pdp-cfg__pkg,
+	.grunge-product-pdp .pdp-cfg__supply {
+		padding-right: 10px;
+		padding-left: 10px;
 	}
 
 	body.single-product .grunge-product-pdp .pdp-hero__right,

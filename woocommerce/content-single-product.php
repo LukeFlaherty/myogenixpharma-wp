@@ -310,6 +310,7 @@ if ( $is_weight_loss ) :
 					data-continuation-price="<?php echo esc_attr( $continuation_price ); ?>"
 					data-continuation-dose-slug="<?php echo esc_attr( $pkg_dose_slugs['continuation'] ?? '' ); ?>"
 				>
+					<div class="pdp-cfg__builder">
 					<!-- Package Type -->
 					<p class="pdp-cfg__section-label">Choose Your Package</p>
 					<div class="pdp-cfg__pkg-row">
@@ -348,6 +349,7 @@ if ( $is_weight_loss ) :
 					<!-- Dose Selector -->
 					<p class="pdp-cfg__section-label" id="pdp-dose-label">Month 1 Dose</p>
 					<div id="pdp-dose" class="pdp-cfg__doses-wrap"></div>
+					</div>
 
 					<!-- Order Summary -->
 					<div id="pdp-summary" class="pdp-cfg__summary"></div>
@@ -666,6 +668,7 @@ if ( $is_weight_loss ) :
 					data-supply-map="<?php echo esc_attr( wp_json_encode( $supply_map ) ); ?>"
 					data-supply-attr="<?php echo esc_attr( $supply_meta_key ); ?>"
 				>
+					<div class="pdp-cfg__builder">
 					<p class="pdp-cfg__section-label">Supply</p>
 					<div class="pdp-cfg__supply-row">
 						<?php
@@ -682,7 +685,8 @@ if ( $is_weight_loss ) :
 						<?php
 						$is_first = false;
 						endforeach;
-						?>
+							?>
+					</div>
 					</div>
 
 					<div class="peptide-cfg__includes">
@@ -1106,6 +1110,7 @@ if ( $is_weight_loss ) :
 					data-flat-fee-label-own-labs="<?php echo esc_attr( $shcfg['flat_fee_label_own_labs'] ); ?>"
 					<?php endif; ?>
 				>
+					<div class="pdp-cfg__builder">
 					<?php if ( $slug === 'testosterone' ) : ?>
 					<div class="trt-pdp__static-row trt-pdp__static-row--strength" aria-label="Vial strength">
 						<p class="pdp-cfg__section-label">1. Vial Strength</p>
@@ -1210,6 +1215,16 @@ if ( $is_weight_loss ) :
 					</div>
 					<?php endif; ?>
 
+					<?php if ( $slug === 'testosterone' ) : ?>
+					<!-- TRT: own-labs discount toggle -->
+					<label class="pdp-cfg__own-labs" for="pdp-own-labs">
+						<input type="checkbox" id="pdp-own-labs" class="pdp-cfg__own-labs-checkbox" />
+						<span class="pdp-cfg__own-labs-text">I already have my own recent labs &mdash; save $100</span>
+					</label>
+					<p class="pdp-cfg__own-labs-note">You'll confirm this during your intake after checkout.</p>
+					<?php endif; ?>
+					</div>
+
 					<!-- What's included -->
 					<div class="peptide-cfg__includes">
 						<p class="peptide-cfg__includes-title">What's included</p>
@@ -1222,15 +1237,6 @@ if ( $is_weight_loss ) :
 							<?php endforeach; ?>
 						</ul>
 					</div>
-
-					<?php if ( $slug === 'testosterone' ) : ?>
-					<!-- TRT: own-labs discount toggle -->
-					<label class="pdp-cfg__own-labs" for="pdp-own-labs">
-						<input type="checkbox" id="pdp-own-labs" class="pdp-cfg__own-labs-checkbox" />
-						<span class="pdp-cfg__own-labs-text">I already have my own recent labs &mdash; save $100</span>
-					</label>
-					<p class="pdp-cfg__own-labs-note">You'll confirm this during your intake after checkout.</p>
-					<?php endif; ?>
 
 					<div id="sh-summary" class="pdp-cfg__summary"></div>
 
