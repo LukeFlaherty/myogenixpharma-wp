@@ -1,12 +1,43 @@
 # Myogenix Redesign Workflow
 
-Last updated: 2026-08-07
+Last updated: 2026-08-08
 
 ## Goal
 
 Port the approved redesign from the Next.js frontend clone into the live WordPress/WooCommerce child theme at production quality.
 
 This is a production WordPress.com Business site. Staging is intentionally out of scope because it is not caught up with production ordering functionality. Work goes directly through `main`, then live QA happens on the production URL after deploy.
+
+## Local PHP / WordPress Tooling
+
+Installed through Homebrew on 2026-08-08:
+
+- PHP CLI: `/opt/homebrew/bin/php` (`php` formula, currently PHP 8.5.x)
+- WordPress-friendly PHP CLI: `/opt/homebrew/opt/php@8.4/bin/php` (`php@8.4`, keg-only)
+- WP-CLI: `/opt/homebrew/bin/wp`
+
+Use PHP linting before committing WordPress template changes:
+
+```bash
+php -l functions.php
+php -l woocommerce/content-single-product.php
+php -l front-page.php
+php -l page-program-category.php
+php -l template-parts/site-header.php
+php -l template-parts/site-footer.php
+```
+
+For WP-CLI commands, prefer PHP 8.4 by prefixing PATH so WP-CLI does not run under the bleeding-edge Homebrew `php` formula:
+
+```bash
+PATH="/opt/homebrew/opt/php@8.4/bin:/opt/homebrew/opt/php@8.4/sbin:$PATH" wp --info
+```
+
+Notes:
+
+- No PHP-FPM or background service is needed for linting or WP-CLI inspection.
+- This local checkout does not currently include a usable `wp-config.php`/database connection, so WP-CLI may not be able to inspect posts/products unless a complete local WordPress runtime is added later.
+- `php -l` remains useful even without a local database because it catches syntax errors in PHP templates before code is pushed to production.
 
 ## Source Design References
 
