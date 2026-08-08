@@ -4774,3 +4774,213 @@ body.single-product .trt-grunge-pdp .pdp-hero__right {
 		line-height: 1.35 !important;
 	}
 }
+
+/* PDP Build Your Plan third-pass refinements */
+body.single-product .grunge-product-pdp .pdp-hero,
+body.single-product .grunge-product-pdp .home-how,
+body.single-product .grunge-product-pdp .myo-faq,
+body.single-product .grunge-product-pdp .myogenix-pdp__explore,
+body.single-product .grunge-product-pdp .trt-pdp__plans,
+body.single-product .grunge-product-pdp .trt-pdp__trust-strip,
+body.single-product .grunge-product-pdp .pdp-build,
+body.single-product .trt-grunge-pdp .pdp-hero,
+body.single-product .trt-grunge-pdp .home-how,
+body.single-product .trt-grunge-pdp .myo-faq,
+body.single-product .trt-grunge-pdp .myogenix-pdp__explore,
+body.single-product .trt-grunge-pdp .trt-pdp__plans,
+body.single-product .trt-grunge-pdp .trt-pdp__trust-strip,
+body.single-product .trt-grunge-pdp .pdp-build {
+	width: 100vw !important;
+	max-width: 100vw !important;
+	margin-right: calc(50% - 50vw) !important;
+	margin-left: calc(50% - 50vw) !important;
+	left: auto !important;
+	transform: none !important;
+}
+
+body.single-product .grunge-product-pdp,
+body.single-product .trt-grunge-pdp,
+body.single-product .grunge-product-pdp > section,
+body.single-product .trt-grunge-pdp > section {
+	box-sizing: border-box;
+}
+
+.grunge-product-pdp .pdp-cfg,
+.trt-grunge-pdp .pdp-cfg {
+	align-items: start !important;
+	grid-auto-flow: row !important;
+}
+
+.grunge-product-pdp .pdp-cfg__side,
+.trt-grunge-pdp .pdp-cfg__side {
+	display: flex;
+	grid-column: 2 !important;
+	grid-row: 2 !important;
+	flex-direction: column;
+	gap: 14px;
+	min-width: 0;
+}
+
+.grunge-product-pdp .pdp-cfg__side .pdp-cfg__summary,
+.trt-grunge-pdp .pdp-cfg__side .pdp-cfg__summary,
+.grunge-product-pdp .pdp-cfg__side .peptide-cfg__includes,
+.trt-grunge-pdp .pdp-cfg__side .peptide-cfg__includes,
+.grunge-product-pdp .pdp-cfg__side .pdp-cfg__cta,
+.trt-grunge-pdp .pdp-cfg__side .pdp-cfg__cta,
+.grunge-product-pdp .pdp-cfg__side .pdp-cfg__disclaimer,
+.trt-grunge-pdp .pdp-cfg__side .pdp-cfg__disclaimer {
+	grid-column: auto !important;
+	grid-row: auto !important;
+	width: 100%;
+	margin: 0 !important;
+}
+
+.grunge-product-pdp .peptide-cfg__includes--inline,
+.trt-grunge-pdp .peptide-cfg__includes--inline {
+	grid-column: 1 !important;
+	grid-row: auto !important;
+	align-self: start;
+}
+
+.grunge-product-pdp .pdp-cfg::before,
+.trt-grunge-pdp .pdp-cfg::before {
+	font-size: clamp(2.48rem, 4.16vw, 4.28rem) !important;
+}
+
+.grunge-product-pdp .pdp-cfg__summary-label,
+.trt-grunge-pdp .pdp-cfg__summary-label {
+	font-size: clamp(0.98rem, 1.26vw, 1.33rem) !important;
+}
+
+.grunge-product-pdp .peptide-cfg__includes-item,
+.trt-grunge-pdp .peptide-cfg__includes-item {
+	font-size: clamp(1.08rem, 1.24vw, 1.44rem) !important;
+	line-height: 1.24 !important;
+}
+
+.grunge-product-pdp .peptide-cfg__includes-icon,
+.trt-grunge-pdp .peptide-cfg__includes-icon {
+	width: 48px !important;
+	height: 48px !important;
+	min-width: 48px !important;
+}
+
+.grunge-product-pdp .peptide-cfg__includes-icon svg,
+.trt-grunge-pdp .peptide-cfg__includes-icon svg {
+	width: 48px !important;
+	height: 48px !important;
+}
+
+.peptide-pdp .pdp-cfg__supply,
+.sexual-health-pdp .pdp-cfg__supply {
+	align-items: center !important;
+	justify-content: center !important;
+	text-align: center !important;
+}
+
+.peptide-pdp .pdp-cfg__supply strong,
+.sexual-health-pdp .pdp-cfg__supply strong {
+	font-size: 1.33rem !important;
+	line-height: 1.12 !important;
+	text-align: center !important;
+}
+
+.grunge-product-pdp .myo-faq,
+.trt-grunge-pdp .myo-faq {
+	background-image: url("../images/grunge-redesign/thin section bg.png") !important;
+	background-position: center !important;
+	background-size: cover !important;
+}
+
+@media (max-width: 600px) {
+	.grunge-product-pdp .pdp-cfg__side,
+	.trt-grunge-pdp .pdp-cfg__side {
+		display: contents;
+	}
+
+	.grunge-product-pdp .pdp-cfg__builder,
+	.trt-grunge-pdp .pdp-cfg__builder {
+		order: 1;
+	}
+
+	.grunge-product-pdp .pdp-cfg__summary,
+	.trt-grunge-pdp .pdp-cfg__summary {
+		order: 2;
+	}
+
+	.grunge-product-pdp .pdp-cfg__cta,
+	.trt-grunge-pdp .pdp-cfg__cta {
+		order: 3;
+	}
+
+	.grunge-product-pdp .peptide-cfg__includes,
+	.trt-grunge-pdp .peptide-cfg__includes {
+		order: 4;
+	}
+
+	.grunge-product-pdp .pdp-cfg__disclaimer,
+	.trt-grunge-pdp .pdp-cfg__disclaimer {
+		order: 5;
+	}
+
+	.grunge-product-pdp .pdp-cfg::before,
+	.trt-grunge-pdp .pdp-cfg::before {
+		font-size: clamp(2.24rem, 11.2vw, 3.28rem) !important;
+	}
+
+	.grunge-product-pdp .pdp-cfg__dose-card-header,
+	.trt-grunge-pdp .pdp-cfg__dose-card-header {
+		flex-direction: row !important;
+		align-items: center !important;
+		justify-content: space-between !important;
+	}
+
+	.grunge-product-pdp .pdp-cfg__dose-badge,
+	.trt-grunge-pdp .pdp-cfg__dose-badge {
+		order: 0;
+	}
+
+	.grunge-product-pdp .peptide-cfg__includes-item,
+	.trt-grunge-pdp .peptide-cfg__includes-item {
+		font-size: clamp(0.96rem, 4.48vw, 1.24rem) !important;
+	}
+
+	.grunge-product-pdp .home-how__heading,
+	.trt-grunge-pdp .home-how__heading {
+		font-size: clamp(4.2rem, 17vw, 4.8rem) !important;
+	}
+
+	.grunge-product-pdp .trt-pdp__plans-inner,
+	.trt-grunge-pdp .trt-pdp__plans-inner {
+		gap: 22px !important;
+	}
+
+	.grunge-product-pdp .trt-pdp__plans-copy,
+	.trt-grunge-pdp .trt-pdp__plans-copy {
+		margin-bottom: 0 !important;
+	}
+
+	.grunge-product-pdp .trt-pdp__plan-grid,
+	.trt-grunge-pdp .trt-pdp__plan-grid {
+		gap: 16px !important;
+		margin-top: 0 !important;
+	}
+
+	.grunge-product-pdp .trt-pdp__plan-card p,
+	.trt-grunge-pdp .trt-pdp__plan-card p {
+		font-size: 1.3rem !important;
+	}
+
+	.grunge-product-pdp .trt-pdp__plan-card li,
+	.trt-grunge-pdp .trt-pdp__plan-card li {
+		font-size: 1.36rem !important;
+		line-height: 1.28 !important;
+	}
+
+	.grunge-product-pdp .trt-pdp__plan-card dt,
+	.grunge-product-pdp .trt-pdp__plan-card dd,
+	.trt-grunge-pdp .trt-pdp__plan-card dt,
+	.trt-grunge-pdp .trt-pdp__plan-card dd {
+		font-size: 1rem !important;
+	}
+}

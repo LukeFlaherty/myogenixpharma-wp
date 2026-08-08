@@ -364,6 +364,13 @@ if ( $is_weight_loss ) :
 					<div id="pdp-dose" class="pdp-cfg__doses-wrap"></div>
 					</div>
 
+					<div class="pdp-cfg__side">
+					<!-- Order Summary -->
+					<div id="pdp-summary" class="pdp-cfg__summary"></div>
+
+					<!-- CTA -->
+					<button id="pdp-cta" class="pdp-cfg__cta">Go to Checkout</button>
+
 					<div class="peptide-cfg__includes">
 						<p class="peptide-cfg__includes-title">What's included</p>
 						<ul class="peptide-cfg__includes-list">
@@ -374,14 +381,10 @@ if ( $is_weight_loss ) :
 						</ul>
 					</div>
 
-					<!-- Order Summary -->
-					<div id="pdp-summary" class="pdp-cfg__summary"></div>
-
-					<!-- CTA -->
-					<button id="pdp-cta" class="pdp-cfg__cta">Go to Checkout</button>
 					<p id="pdp-disclaimer" class="pdp-cfg__disclaimer">
 						This is a one-time purchase. Your order will be reviewed by a licensed provider before processing.
 					</p>
+					</div>
 				</div>
 
 				</div>
@@ -757,12 +760,14 @@ if ( $is_weight_loss ) :
 						</ul>
 					</div>
 
+					<div class="pdp-cfg__side">
 					<div id="peptide-summary" class="pdp-cfg__summary"></div>
 
 					<button id="pdp-cta" class="pdp-cfg__cta">Go to Checkout</button>
 					<p id="pdp-disclaimer" class="pdp-cfg__disclaimer">
 						One-time purchase. Order reviewed by a licensed provider before processing.
 					</p>
+					</div>
 
 				</div>
 				</div>
@@ -1289,7 +1294,8 @@ if ( $is_weight_loss ) :
 							$sh_config_option_count = 3;
 						}
 						?>
-						<div class="peptide-cfg__includes<?php echo $sh_config_option_count < 2 ? ' peptide-cfg__includes--inline' : ''; ?>">
+						<?php if ( $sh_config_option_count < 2 ) : ?>
+						<div class="peptide-cfg__includes peptide-cfg__includes--inline">
 						<p class="peptide-cfg__includes-title">What's included</p>
 						<ul class="peptide-cfg__includes-list">
 							<?php foreach ( $shcfg['includes'] as $include_item ) : ?>
@@ -1300,13 +1306,29 @@ if ( $is_weight_loss ) :
 							<?php endforeach; ?>
 						</ul>
 					</div>
+					<?php endif; ?>
 
+					<div class="pdp-cfg__side">
 					<div id="sh-summary" class="pdp-cfg__summary"></div>
 
 					<button id="pdp-cta" class="pdp-cfg__cta"><?php echo esc_html( $shcfg['cta_label'] ); ?></button>
+					<?php if ( $sh_config_option_count >= 2 ) : ?>
+						<div class="peptide-cfg__includes">
+						<p class="peptide-cfg__includes-title">What's included</p>
+						<ul class="peptide-cfg__includes-list">
+							<?php foreach ( $shcfg['includes'] as $include_item ) : ?>
+							<li class="peptide-cfg__includes-item">
+								<span class="peptide-cfg__includes-icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+								<?php echo $include_item; ?>
+							</li>
+							<?php endforeach; ?>
+						</ul>
+					</div>
+					<?php endif; ?>
 					<p id="pdp-disclaimer" class="pdp-cfg__disclaimer">
 						<?php echo esc_html( $shcfg['disclaimer'] ); ?>
 					</p>
+					</div>
 
 				</div>
 				</div>
@@ -1440,7 +1462,7 @@ if ( $is_weight_loss ) :
 	<!-- Common Questions -->
 	<?php if ( $slug === 'testosterone' ) : ?>
 	<section class="myo-faq" id="faq">
-		<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/section bg 5.png' ); ?>')" aria-hidden="true"></div>
+		<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/thin section bg.png' ); ?>')" aria-hidden="true"></div>
 		<div class="myo-faq__wrap">
 			<div class="myo-faq__header">
 				<span class="myo-faq__eyebrow">Support</span>
