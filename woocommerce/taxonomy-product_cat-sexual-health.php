@@ -167,7 +167,7 @@ $faqs = [
 					</div>
 					<?php endif; ?>
 					<a href="<?php echo esc_url( $prod_url ); ?>" class="pdp-cfg__cta">
-						Configure Your Program &rarr;
+						Configure Your Program <?php echo myogenix_grunge_arrow_svg(); ?>
 					</a>
 					<p class="pdp-cfg__disclaimer">Provider-reviewed before processing. Prescription required.</p>
 				</div>
@@ -231,7 +231,7 @@ $faqs = [
 				<?php endforeach; ?>
 			</div>
 			<div class="myo-faq__cta">
-				<a href="#" class="myo-faq__cta-btn" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Choose your medication &rarr;</a>
+				<a href="#" class="myo-faq__cta-btn" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Choose your medication <?php echo myogenix_grunge_arrow_svg(); ?></a>
 			</div>
 		</div>
 	</section>

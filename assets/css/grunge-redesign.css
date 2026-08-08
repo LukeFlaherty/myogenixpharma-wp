@@ -144,7 +144,6 @@ body.single-product header.home-nav + * {
 .grunge-btn::after,
 .grunge-text-link::after,
 .grunge-program-card span::after,
-.grunge-category-product-card__body em::after,
 .pdp-cfg__cta::after,
 .pdp-hero__compare::after,
 .trt-state__unavailable-link::after,
@@ -159,6 +158,26 @@ body.single-product header.home-nav + * {
   margin-left: 8px;
   background: url("../images/grunge-redesign/cta-arrow.svg") center / contain no-repeat;
   vertical-align: -2px;
+}
+
+.grunge-arrow-icon {
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
+  margin-left: 8px;
+  stroke: currentColor;
+}
+
+.grunge-arrow-icon,
+.grunge-btn .grunge-arrow-icon,
+.grunge-category-product-card__body em .grunge-arrow-icon {
+  display: inline-block;
+}
+
+.grunge-btn:has(.grunge-arrow-icon)::after,
+.pdp-cfg__cta:has(.grunge-arrow-icon)::after,
+.myo-faq__cta-btn:has(.grunge-arrow-icon)::after {
+  display: none;
 }
 
 .grunge-btn--red {
@@ -1839,6 +1858,16 @@ body.single-product .myogenix-pdp__explore::before {
   inset: 0;
   opacity: 0.55;
   background: url("../images/grunge-redesign/grunge black section bg blank.png") center / cover no-repeat;
+}
+
+body.single-product {
+  overflow-x: clip;
+}
+
+@supports not (overflow: clip) {
+  body.single-product {
+    overflow-x: hidden;
+  }
 }
 
 body.single-product .hp-inner,

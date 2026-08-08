@@ -195,7 +195,7 @@ $faqs = [
 					</div>
 					<?php endif; ?>
 					<a href="<?php echo esc_url( $prod_url ); ?>" class="pdp-cfg__cta">
-						<?php echo esc_html( $cfg['cta_label'] ); ?> &rarr;
+						<?php echo esc_html( $cfg['cta_label'] ); ?> <?php echo myogenix_grunge_arrow_svg(); ?>
 					</a>
 					<p class="pdp-cfg__disclaimer">Provider-reviewed before processing. Prescription required.</p>
 				</div>
@@ -259,7 +259,7 @@ $faqs = [
 				<?php endforeach; ?>
 			</div>
 			<div class="myo-faq__cta">
-				<a href="<?php echo esc_url( home_url( '/product-category/mens-health/' ) ); ?>" class="myo-faq__cta-btn">Explore men's health treatments &rarr;</a>
+				<a href="<?php echo esc_url( home_url( '/product-category/mens-health/' ) ); ?>" class="myo-faq__cta-btn">Explore men's health treatments <?php echo myogenix_grunge_arrow_svg(); ?></a>
 			</div>
 		</div>
 	</section>

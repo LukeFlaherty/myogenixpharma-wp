@@ -31,7 +31,7 @@ add_action( 'wp_enqueue_scripts', function() {
 		'myogenix-grunge-redesign',
 		get_stylesheet_directory_uri() . '/assets/css/grunge-redesign.css',
 		[ 'myogenix-home', 'myogenix-grunge-fonts' ],
-		'0.1.4'
+		'0.1.5'
 	);
 	wp_enqueue_script(
 		'myogenix-home',
@@ -46,7 +46,7 @@ add_action( 'wp_enqueue_scripts', function() {
 // frontend bundle there produces a missing elementorFrontendConfig console error.
 add_action( 'wp_enqueue_scripts', function() {
 	$program_slugs = [ 'weight-management', 'mens-health', 'sexual-health', 'wellness', 'womens-health' ];
-	$product_category_slugs = [ 'weight-loss', 'mens-health', 'sexual-health', 'peptides-longevity', 'womens-health' ];
+	$product_category_slugs = [ 'weight-loss', 'mens-health', 'sexual-health', 'peptides-longevity', 'womens-health', 'uncategorized' ];
 	$is_coded_grunge_page = is_front_page() || is_page( $program_slugs ) || is_singular( 'product' ) || is_page( 'retatrutide' );
 	if ( function_exists( 'is_product_category' ) && is_product_category( $product_category_slugs ) ) {
 		$is_coded_grunge_page = true;
@@ -61,10 +61,12 @@ add_action( 'wp_enqueue_scripts', function() {
 // pages still have Elementor page-template metadata, so force the PHP template
 // for the redesign slugs instead of relying on the database-assigned template.
 add_filter( 'template_include', function( $template ) {
-	if ( ! is_page() ) return $template;
-
 	$program_slugs = [ 'weight-management', 'mens-health', 'sexual-health', 'wellness', 'womens-health' ];
-	if ( ! is_page( $program_slugs ) ) return $template;
+	$product_category_slugs = [ 'weight-loss', 'mens-health', 'sexual-health', 'peptides-longevity', 'womens-health', 'uncategorized' ];
+	$is_program_page = is_page( $program_slugs );
+	$is_program_category = function_exists( 'is_product_category' ) && is_product_category( $product_category_slugs );
+
+	if ( ! $is_program_page && ! $is_program_category ) return $template;
 
 	$program_template = locate_template( 'page-program-category.php' );
 	return $program_template ?: $template;
@@ -191,6 +193,10 @@ function myogenix_dose_display( $slug ) {
 		if ( $term ) return $term->name;
 	}
 	return $slug;
+}
+
+function myogenix_grunge_arrow_svg() {
+	return '<svg class="grunge-arrow-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="m13 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 }
 
 // Dose escalation — capture per-month doses from add-to-cart URL and attach to cart item
@@ -628,18 +634,15 @@ add_action( 'wp_enqueue_scripts', function() {
 // Enqueue PDP styles and scripts on single product pages, category pages, and retatrutide page
 add_action( 'wp_enqueue_scripts', function() {
 	$is_pdp    = is_singular( 'product' );
-	$is_wm_cat = is_tax( 'product_cat', 'weight-loss' );
-	$is_mh_cat = is_tax( 'product_cat', 'mens-health' );
-	$is_sh_cat = is_tax( 'product_cat', 'sexual-health' );
-	$is_pl_cat = is_tax( 'product_cat', 'peptides-longevity' );
+	$is_product_cat = function_exists( 'is_product_category' ) && is_product_category( [ 'weight-loss', 'mens-health', 'sexual-health', 'peptides-longevity', 'womens-health', 'uncategorized' ] );
 	$is_rtd    = is_page( 'retatrutide' );
 
-	if ( $is_pdp || $is_wm_cat || $is_mh_cat || $is_sh_cat || $is_pl_cat || $is_rtd ) {
+	if ( $is_pdp || $is_product_cat || $is_rtd ) {
 		wp_enqueue_style(
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
 			[],
-			'1.10.4'
+			'1.10.5'
 		);
 	}
 

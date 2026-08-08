@@ -214,7 +214,7 @@ $faqs = [
 				<?php endforeach; ?>
 			</div>
 			<div class="myo-faq__cta">
-				<a href="#" class="myo-faq__cta-btn" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Browse peptides &rarr;</a>
+				<a href="#" class="myo-faq__cta-btn" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Browse peptides <?php echo myogenix_grunge_arrow_svg(); ?></a>
 			</div>
 		</div>
 	</section>

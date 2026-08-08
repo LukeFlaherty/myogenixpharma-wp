@@ -86,7 +86,7 @@ get_header();
 				<p class="trt-cta-block__sub">Labs, physician consultation, and medication — all in one streamlined process. No insurance needed.</p>
 			</div>
 			<div class="trt-cta-block__action">
-				<a href="<?php echo $trt_url; ?>" class="trt-cta-block__btn">Start Now &rarr;</a>
+				<a href="<?php echo $trt_url; ?>" class="trt-cta-block__btn">Start Now <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				<p class="trt-cta-block__price">From <strong>$567</strong> / 3 months &middot; Consultation included</p>
 			</div>
 		</div>
@@ -149,7 +149,7 @@ get_header();
 				<p class="trt-cta-block__sub">Our board-certified providers follow every required guideline — and make the process as simple as possible for you.</p>
 			</div>
 			<div class="trt-cta-block__action">
-				<a href="<?php echo $trt_url; ?>" class="trt-cta-block__btn">Start Now &rarr;</a>
+				<a href="<?php echo $trt_url; ?>" class="trt-cta-block__btn">Start Now <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				<p class="trt-cta-block__price">From <strong>$567</strong> / 3 months</p>
 			</div>
 		</div>
@@ -191,7 +191,7 @@ get_header();
 				<p class="trt-cta-block__sub">Board-certified physicians. CLIA-accredited labs. Medication shipped discreetly to your door.</p>
 			</div>
 			<div class="trt-cta-block__action">
-				<a href="<?php echo $trt_url; ?>" class="trt-cta-block__btn">Get Started &rarr;</a>
+				<a href="<?php echo $trt_url; ?>" class="trt-cta-block__btn">Get Started <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				<p class="trt-cta-block__price">From <strong>$567</strong> / 3 months &middot; Consultation included</p>
 			</div>
 		</div>
@@ -233,7 +233,7 @@ get_header();
 				<li>Medication shipped directly to your door</li>
 				<li>90-day reassessments to keep your treatment optimized</li>
 			</ul>
-			<a href="<?php echo $trt_url; ?>" class="trt-simple-cta__btn">Start Now &rarr;</a>
+			<a href="<?php echo $trt_url; ?>" class="trt-simple-cta__btn">Start Now <?php echo myogenix_grunge_arrow_svg(); ?></a>
 			<span class="trt-simple-cta__price">From $567 / 3 months &middot; Doctor consultation included</span>
 		</div>
 
@@ -260,7 +260,7 @@ get_header();
 				<p class="trt-cta-block__sub">Join thousands of men who have reclaimed their energy, strength, and quality of life with physician-supervised TRT.</p>
 			</div>
 			<div class="trt-cta-block__action">
-				<a href="<?php echo $trt_url; ?>" class="trt-cta-block__btn">Get Started &rarr;</a>
+				<a href="<?php echo $trt_url; ?>" class="trt-cta-block__btn">Get Started <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				<p class="trt-cta-block__price">From <strong>$567</strong> / 3 months &middot; Consultation included</p>
 			</div>
 		</div>

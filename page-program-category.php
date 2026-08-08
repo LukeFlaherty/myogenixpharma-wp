@@ -19,6 +19,7 @@ if ( function_exists( 'is_product_category' ) && is_product_category() ) {
 		'sexual-health'        => 'sexual-health',
 		'peptides-longevity'   => 'wellness',
 		'womens-health'        => 'womens-health',
+		'uncategorized'        => 'uncategorized',
 	];
 	if ( $term && ! empty( $term->slug ) && isset( $term_slug_map[ $term->slug ] ) ) {
 		$current_slug = $term_slug_map[ $term->slug ];
@@ -117,6 +118,17 @@ $programs = [
 		'hero_cta'      => home_url( '/reach-a-concierge/' ),
 		'products'      => [],
 	],
+	'uncategorized' => [
+		'eyebrow'       => 'Concierge support',
+		'title'         => 'Treatment Options',
+		'accent'        => 'Treatment',
+		'subtitle'      => 'Provider-guided care, routed by a real support team.',
+		'body'          => 'Online intake, provider review, personalized options, and concierge support for the right next step.',
+		'option_label'  => 'treatment',
+		'hero_image'    => 'pharma support staff tp bg.png',
+		'hero_cta'      => home_url( '/reach-a-concierge/' ),
+		'products'      => [],
+	],
 ];
 
 $program = $programs[ $current_slug ] ?? $programs['weight-management'];
@@ -200,8 +212,8 @@ get_header();
 				<p class="grunge-category-hero__subtitle"><?php echo esc_html( $program['subtitle'] ); ?></p>
 				<p class="grunge-category-hero__body"><?php echo esc_html( $program['body'] ); ?></p>
 				<div class="grunge-hero__actions">
-					<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( $program['hero_cta'] ); ?>">Continue to evaluation <span aria-hidden="true">-&gt;</span></a>
-					<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <span aria-hidden="true">-&gt;</span></a>
+					<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( $program['hero_cta'] ); ?>">Continue to evaluation <?php echo myogenix_grunge_arrow_svg(); ?></a>
+					<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				</div>
 			</div>
 			<div class="grunge-category-hero__media">
@@ -244,7 +256,7 @@ get_header();
 						<h3><?php echo esc_html( $product['name'] ); ?></h3>
 						<span>Starting at</span>
 						<strong><?php echo esc_html( $product['price'] ); ?><small><?php echo esc_html( $product['unit'] ); ?></small></strong>
-						<em>Start Now <span aria-hidden="true">-&gt;</span></em>
+						<em>Start Now <?php echo myogenix_grunge_arrow_svg(); ?></em>
 					</div>
 				</a>
 				<?php endforeach; ?>
@@ -252,7 +264,7 @@ get_header();
 			<?php else : ?>
 			<div class="grunge-category-empty">
 				<p>Product options are coming soon. Our concierge team can help route you to the right next step.</p>
-				<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <span aria-hidden="true">-&gt;</span></a>
+				<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 			</div>
 			<?php endif; ?>
 		</div>
@@ -284,8 +296,8 @@ get_header();
 			<img src="<?php echo $myo_asset( 'red and white logo.svg' ); ?>" alt="MyoGenix Pharma" width="176" height="54" loading="lazy">
 			<h2>Ready to start? <span class="grunge-text-red">We are here to help.</span></h2>
 			<div class="grunge-final-cta__actions">
-				<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( $program['hero_cta'] ); ?>">Continue to evaluation <span aria-hidden="true">-&gt;</span></a>
-				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <span aria-hidden="true">-&gt;</span></a>
+				<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( $program['hero_cta'] ); ?>">Continue to evaluation <?php echo myogenix_grunge_arrow_svg(); ?></a>
+				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 			</div>
 		</div>
 	</section>

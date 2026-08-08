@@ -1440,13 +1440,38 @@ body.single-product #main.site-main {
 }
 
 .myogenix-pdp__explore .home-categories__grid {
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
 	margin-top: 40px;
 	max-width: none;
+	min-width: 0;
 }
 
 .myogenix-pdp__explore .hp-catbox {
 	background: #f9f9f9;
 	border-color: #f0f0f0;
+	min-width: 0;
+	max-width: 100%;
+	overflow: hidden;
+}
+
+.myogenix-pdp__explore .hp-catbox__scroll-wrap,
+.myogenix-pdp__explore .hp-catbox__scroll {
+	min-width: 0;
+	max-width: 100%;
+}
+
+.myogenix-pdp__explore .hp-catbox__scroll-wrap {
+	overflow: hidden;
+}
+
+.myogenix-pdp__explore .hp-catbox__scroll {
+	width: 100%;
+	overflow-x: auto;
+	overscroll-behavior-inline: contain;
+}
+
+.myogenix-pdp__explore .hp-card {
+	max-width: min(176px, calc(100vw - 56px));
 }
 
 /* ==========================================================================
@@ -1987,6 +2012,11 @@ body.single-product .trt-grunge-pdp .pdp-hero__right {
 	background: rgba(0, 0, 0, 0.45) !important;
 	color: #fff !important;
 	box-shadow: none !important;
+}
+
+.trt-pdp__eligibility {
+	grid-column: 1;
+	margin-top: 4px;
 }
 
 .trt-grunge-pdp .pdp-cfg__supply--active,
@@ -2540,7 +2570,10 @@ body.single-product .trt-grunge-pdp .pdp-hero__right {
 	}
 
 	.trt-grunge-pdp .pdp-hero__title {
-		font-size: 2.75rem;
+		font-size: 2.48rem;
+		max-width: 340px;
+		margin-right: auto;
+		margin-left: auto;
 	}
 
 	.trt-pdp__plans-copy h2,

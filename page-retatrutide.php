@@ -37,7 +37,7 @@ if ( ! $authenticated ) {
 					Incorrect access code. Please try again.
 				</p>
 				<?php endif; ?>
-				<button class="rtd-gate__btn" type="submit">Continue &rarr;</button>
+				<button class="rtd-gate__btn" type="submit">Continue <?php echo myogenix_grunge_arrow_svg(); ?></button>
 			</form>
 
 			<p class="rtd-gate__footer">Not a referred patient? Contact your healthcare provider to receive access.</p>
@@ -335,7 +335,7 @@ do_action( 'woocommerce_before_single_product' );
 					</div>
 
 					<!-- ── CTA (always visible) ── -->
-					<button id="pdp-cta" class="pdp-cfg__cta">Go to Checkout &rarr;</button>
+					<button id="pdp-cta" class="pdp-cfg__cta">Go to Checkout <?php echo myogenix_grunge_arrow_svg(); ?></button>
 					<p id="pdp-disclaimer" class="pdp-cfg__disclaimer">
 						One-time purchase. Order reviewed by a licensed provider before processing.
 					</p>
@@ -455,7 +455,7 @@ do_action( 'woocommerce_before_single_product' );
 			</div>
 
 			<div class="myo-faq__cta">
-				<a href="#buy" class="myo-faq__cta-btn">Configure your program &rarr;</a>
+				<a href="#buy" class="myo-faq__cta-btn">Configure your program <?php echo myogenix_grunge_arrow_svg(); ?></a>
 			</div>
 
 		</div>

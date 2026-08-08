@@ -177,8 +177,8 @@ get_header();
 				</h1>
 				<p class="grunge-hero__lead">Concierge telehealth for TRT <span>Performance care, guided by humans.</span></p>
 				<div class="grunge-hero__actions">
-					<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">Start your evaluation <span aria-hidden="true">-&gt;</span></a>
-					<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <span aria-hidden="true">-&gt;</span></a>
+					<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">Start your evaluation <?php echo myogenix_grunge_arrow_svg(); ?></a>
+					<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				</div>
 			</div>
 			<div class="grunge-hero__media">
@@ -236,7 +236,7 @@ get_header();
 					<li>Doorstep delivery</li>
 					<li>Human concierge support</li>
 				</ul>
-				<a class="grunge-btn grunge-btn--red grunge-inline-cta" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">Start TRT <span aria-hidden="true">-&gt;</span></a>
+				<a class="grunge-btn grunge-btn--red grunge-inline-cta" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">Start TRT <?php echo myogenix_grunge_arrow_svg(); ?></a>
 			</div>
 		</div>
 	</section>
@@ -253,7 +253,7 @@ get_header();
 				<li><?php echo esc_html( $symptom ); ?></li>
 				<?php endforeach; ?>
 			</ul>
-			<a class="grunge-btn grunge-btn--red grunge-inline-cta" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">See if TRT is right for you <span aria-hidden="true">-&gt;</span></a>
+			<a class="grunge-btn grunge-btn--red grunge-inline-cta" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">See if TRT is right for you <?php echo myogenix_grunge_arrow_svg(); ?></a>
 		</div>
 	</section>
 
@@ -283,7 +283,7 @@ get_header();
 						<p><span>Your care team</span><small>Real people</small></p>
 					</div>
 				</div>
-				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <span aria-hidden="true">-&gt;</span></a>
+				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 			</div>
 		</div>
 	</section>
@@ -312,7 +312,7 @@ get_header();
 			<div class="myo-faq__header grunge-section__header">
 				<span class="myo-faq__eyebrow grunge-kicker">FAQ</span>
 				<h2 class="myo-faq__title">Your questions. <span class="grunge-text-red">Answered.</span></h2>
-				<p class="myo-faq__desc"><a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <span aria-hidden="true">-&gt;</span></a></p>
+				<p class="myo-faq__desc"><a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a></p>
 			</div>
 			<div class="myo-faq__list">
 				<?php foreach ( $faqs as $i => $faq ) :
@@ -341,8 +341,8 @@ get_header();
 			<img src="<?php echo $myo_asset( 'red and white logo.svg' ); ?>" alt="" width="176" height="54" loading="lazy">
 			<h2>Concierge care <span class="grunge-text-red">is live</span></h2>
 			<div class="grunge-final-cta__actions">
-				<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">Start your evaluation <span aria-hidden="true">-&gt;</span></a>
-				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <span aria-hidden="true">-&gt;</span></a>
+				<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">Start your evaluation <?php echo myogenix_grunge_arrow_svg(); ?></a>
+				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 			</div>
 		</div>
 	</section>

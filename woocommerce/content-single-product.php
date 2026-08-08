@@ -756,7 +756,7 @@ if ( $is_weight_loss ) :
 			'secondary_attr'  => null,
 			'secondary_label' => null,
 			'fixed_attrs'     => [],
-			'cta_label'       => 'Schedule Bloodwork',
+			'cta_label'       => 'Continue to Evaluation',
 			'disclaimer'      => 'Order reviewed by a licensed provider before processing.',
 			'flat_fee_price'  => 165,
 			'flat_fee_label'  => 'Male Hormone Panel & Initial Doctor Consult',
@@ -917,8 +917,8 @@ if ( $is_weight_loss ) :
 				</h1>
 				<p class="pdp-hero__desc">Provider-managed TRT <span>Testosterone Cypionate</span></p>
 				<div class="trt-pdp__hero-actions">
-					<a class="grunge-btn grunge-btn--red" href="#build-plan">Continue to evaluation <span aria-hidden="true">-&gt;</span></a>
-					<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <span aria-hidden="true">-&gt;</span></a>
+					<a class="grunge-btn grunge-btn--red" href="#build-plan">Continue to evaluation <?php echo myogenix_grunge_arrow_svg(); ?></a>
+					<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				</div>
 				<?php else : ?>
 				<h1 class="pdp-hero__title"><?php echo esc_html( $shcfg['name'] ); ?></h1>
@@ -991,45 +991,6 @@ if ( $is_weight_loss ) :
 					data-flat-fee-label-own-labs="<?php echo esc_attr( $shcfg['flat_fee_label_own_labs'] ); ?>"
 					<?php endif; ?>
 				>
-
-					<?php if ( $slug === 'testosterone' ) : ?>
-					<!-- TRT: state eligibility gate -->
-					<p class="pdp-cfg__section-label trt-pdp__eligibility-label">
-						Eligibility
-						<span class="trt-state__required">Required</span>
-					</p>
-					<div class="trt-state__picker" id="trt-state-picker">
-						<button class="trt-state__trigger" id="trt-state-trigger" type="button"
-							aria-haspopup="listbox" aria-expanded="false" aria-label="Select your state">
-							<span id="trt-state-display" class="trt-state__trigger-text trt-state__trigger-text--placeholder">Select your state&hellip;</span>
-							<span class="trt-state__chevron" aria-hidden="true">
-								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-							</span>
-						</button>
-						<ul class="trt-state__options" id="trt-state-options" role="listbox" aria-label="Select your state">
-							<?php foreach ( $all_us_states as $code => $name ) : ?>
-							<li class="trt-state__option" role="option" data-value="<?php echo esc_attr( $code ); ?>" aria-selected="false"><?php echo esc_html( $name ); ?></li>
-							<?php endforeach; ?>
-						</ul>
-					</div>
-					<input type="hidden" id="trt-state-value" value="">
-					<p id="trt-state-status" class="trt-state__status"></p>
-					<div id="trt-state-error" class="trt-state__unavailable" style="display:none;">
-						<div class="trt-state__unavailable-header">
-							<div class="trt-state__unavailable-icon" aria-hidden="true">
-								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-							</div>
-							<p class="trt-state__unavailable-title">Not available in your state</p>
-						</div>
-						<p class="trt-state__unavailable-desc">
-							We currently offer TRT services in 48 states. We&rsquo;re not yet licensed to prescribe in your area, but we&rsquo;re actively expanding coverage.
-						</p>
-						<a href="mailto:support@myogenixpharma.com" class="trt-state__unavailable-link">
-							Contact us about future availability
-						</a>
-					</div>
-					<?php endif; ?>
-
 					<?php if ( $slug === 'testosterone' ) : ?>
 					<div class="trt-pdp__static-row trt-pdp__static-row--strength" aria-label="Vial strength">
 						<p class="pdp-cfg__section-label">1. Vial Strength</p>
@@ -1090,6 +1051,46 @@ if ( $is_weight_loss ) :
 							<button class="pdp-cfg__supply" type="button" aria-pressed="true">
 								<strong>One-time order</strong>
 							</button>
+						</div>
+					</div>
+					<?php endif; ?>
+
+					<?php if ( $slug === 'testosterone' ) : ?>
+					<!-- TRT: state eligibility gate -->
+					<div class="trt-pdp__eligibility">
+						<p class="pdp-cfg__section-label trt-pdp__eligibility-label">
+							Eligibility
+							<span class="trt-state__required">Required</span>
+						</p>
+						<div class="trt-state__picker" id="trt-state-picker">
+							<button class="trt-state__trigger" id="trt-state-trigger" type="button"
+								aria-haspopup="listbox" aria-expanded="false" aria-label="Select your state">
+								<span id="trt-state-display" class="trt-state__trigger-text trt-state__trigger-text--placeholder">Select your state&hellip;</span>
+								<span class="trt-state__chevron" aria-hidden="true">
+									<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+								</span>
+							</button>
+							<ul class="trt-state__options" id="trt-state-options" role="listbox" aria-label="Select your state">
+								<?php foreach ( $all_us_states as $code => $name ) : ?>
+								<li class="trt-state__option" role="option" data-value="<?php echo esc_attr( $code ); ?>" aria-selected="false"><?php echo esc_html( $name ); ?></li>
+								<?php endforeach; ?>
+							</ul>
+						</div>
+						<input type="hidden" id="trt-state-value" value="">
+						<p id="trt-state-status" class="trt-state__status"></p>
+						<div id="trt-state-error" class="trt-state__unavailable" style="display:none;">
+							<div class="trt-state__unavailable-header">
+								<div class="trt-state__unavailable-icon" aria-hidden="true">
+									<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+								</div>
+								<p class="trt-state__unavailable-title">Not available in your state</p>
+							</div>
+							<p class="trt-state__unavailable-desc">
+								We currently offer TRT services in 48 states. We&rsquo;re not yet licensed to prescribe in your area, but we&rsquo;re actively expanding coverage.
+							</p>
+							<a href="mailto:support@myogenixpharma.com" class="trt-state__unavailable-link">
+								Contact us about future availability
+							</a>
 						</div>
 					</div>
 					<?php endif; ?>
