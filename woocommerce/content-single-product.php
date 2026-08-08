@@ -224,7 +224,7 @@ if ( $is_weight_loss ) :
 
 ?>
 
-<div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'myogenix-pdp', $product ); ?>>
+<div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'myogenix-pdp grunge-product-pdp', $product ); ?>>
 
 	<!-- Product Hero -->
 	<section class="pdp-hero" id="buy">
@@ -359,6 +359,65 @@ if ( $is_weight_loss ) :
 					</p>
 				</div>
 
+			</div>
+		</div>
+	</section>
+
+	<section class="trt-pdp__trust-strip" aria-label="Care features">
+		<div class="trt-pdp__trust-strip-inner">
+			<?php
+			$pdp_trust = [
+				[ 'img' => 'grunge-redesign/doctor.svg',       'label' => 'Physician-Guided Care' ],
+				[ 'img' => 'grunge-redesign/laptop-check.svg', 'label' => 'Online Intake' ],
+				[ 'img' => 'grunge-redesign/rx.svg',           'label' => 'Personalized Dosing' ],
+				[ 'img' => 'grunge-redesign/box.svg',          'label' => 'Shipped to Your Door' ],
+				[ 'img' => 'grunge-redesign/headphones.svg',   'label' => 'Concierge Support' ],
+			];
+			foreach ( $pdp_trust as $item ) :
+			?>
+			<div class="trt-pdp__trust-cell">
+				<img src="<?php echo $img_url( $item['img'] ); ?>" alt="" loading="lazy" width="36" height="36">
+				<span><?php echo esc_html( $item['label'] ); ?></span>
+			</div>
+			<?php endforeach; ?>
+		</div>
+	</section>
+
+	<section class="trt-pdp__plans" aria-label="Choose your starting point">
+		<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/grunge black section bg blank.png' ); ?>')" aria-hidden="true"></div>
+		<div class="trt-pdp__plans-inner">
+			<div class="trt-pdp__plans-copy">
+				<p class="grunge-kicker">Choose your starting point</p>
+				<h2><span class="grunge-word grunge-word--white"><?php echo esc_html( $h['title'] ); ?></span><span class="grunge-word grunge-word--red"><?php echo esc_html( $dose_labels[ $first_dose ] ?? $first_dose ); ?></span></h2>
+				<p><?php echo esc_html( $h['desc'] ); ?></p>
+			</div>
+			<div class="trt-pdp__plan-grid">
+				<?php
+				$wm_plan_cards = [
+					[ 'title' => '1 Month',  'supply' => 'starter supply', 'price' => $sp[0], 'meta' => '1 vial' ],
+					[ 'title' => '2 Months', 'supply' => 'expanded supply', 'price' => $sp[1], 'meta' => '2 vials', 'popular' => true ],
+					[ 'title' => '3 Months', 'supply' => 'best value', 'price' => $sp[2], 'meta' => '3 vials' ],
+				];
+				foreach ( $wm_plan_cards as $plan ) :
+				?>
+				<article class="trt-pdp__plan-card">
+					<?php if ( ! empty( $plan['popular'] ) ) : ?><span class="trt-pdp__popular">Popular</span><?php endif; ?>
+					<h3><?php echo esc_html( $plan['title'] ); ?></h3>
+					<p><?php echo esc_html( $plan['supply'] ); ?></p>
+					<ul>
+						<li>Provider-reviewed</li>
+						<li>Personalized dosing</li>
+						<li>Once-weekly injections</li>
+						<li>Concierge support</li>
+					</ul>
+					<dl>
+						<div><dt>Starting dose</dt><dd><?php echo esc_html( $dose_labels[ $first_dose ] ?? $first_dose ); ?></dd></div>
+						<div><dt>Supply</dt><dd><?php echo esc_html( $plan['meta'] ); ?></dd></div>
+						<div><dt>Price</dt><dd><?php echo $plan['price'] ? '$' . esc_html( number_format( $plan['price'], 0 ) ) : 'Custom'; ?></dd></div>
+					</dl>
+					<a class="trt-pdp__select" href="#buy">Select Plan</a>
+				</article>
+				<?php endforeach; ?>
 			</div>
 		</div>
 	</section>
@@ -542,7 +601,7 @@ if ( $is_weight_loss ) :
 
 ?>
 
-<div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'myogenix-pdp peptide-pdp', $product ); ?>>
+<div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'myogenix-pdp grunge-product-pdp peptide-pdp', $product ); ?>>
 
 	<!-- Product Hero -->
 	<section class="pdp-hero" id="buy">
@@ -656,6 +715,62 @@ if ( $is_weight_loss ) :
 					</p>
 
 				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="trt-pdp__trust-strip" aria-label="Care features">
+		<div class="trt-pdp__trust-strip-inner">
+			<?php
+			$pdp_trust = [
+				[ 'img' => 'grunge-redesign/doctor.svg',       'label' => 'Physician-Guided Care' ],
+				[ 'img' => 'grunge-redesign/laptop-check.svg', 'label' => 'Online Intake' ],
+				[ 'img' => 'grunge-redesign/rx.svg',           'label' => 'Personalized Dosing' ],
+				[ 'img' => 'grunge-redesign/box.svg',          'label' => 'Shipped to Your Door' ],
+				[ 'img' => 'grunge-redesign/headphones.svg',   'label' => 'Concierge Support' ],
+			];
+			foreach ( $pdp_trust as $item ) :
+			?>
+			<div class="trt-pdp__trust-cell">
+				<img src="<?php echo $img_url( $item['img'] ); ?>" alt="" loading="lazy" width="36" height="36">
+				<span><?php echo esc_html( $item['label'] ); ?></span>
+			</div>
+			<?php endforeach; ?>
+		</div>
+	</section>
+
+	<section class="trt-pdp__plans" aria-label="Choose your starting point">
+		<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/grunge black section bg blank.png' ); ?>')" aria-hidden="true"></div>
+		<div class="trt-pdp__plans-inner">
+			<div class="trt-pdp__plans-copy">
+				<p class="grunge-kicker">Choose your starting point</p>
+				<h2><span class="grunge-word grunge-word--white"><?php echo esc_html( $pcfg['name'] ); ?></span><span class="grunge-word grunge-word--red"><?php echo esc_html( $single_supply_price ? '$' . number_format( $single_supply_price, 0 ) : 'Program' ); ?></span></h2>
+				<p><?php echo esc_html( $pcfg['desc'] ); ?></p>
+			</div>
+			<div class="trt-pdp__plan-grid">
+				<?php
+				$plan_index = 0;
+				foreach ( $supply_map as $s_entry ) :
+					$plan_index++;
+				?>
+				<article class="trt-pdp__plan-card">
+					<?php if ( $plan_index === 2 && count( $supply_map ) > 1 ) : ?><span class="trt-pdp__popular">Popular</span><?php endif; ?>
+					<h3><?php echo esc_html( $s_entry['label'] ); ?></h3>
+					<p><?php echo esc_html( '~' . ( 30 * (int) $s_entry['qty'] ) . ' day supply' ); ?></p>
+					<ul>
+						<li>Provider-reviewed</li>
+						<li>Syringes and needles</li>
+						<li>Dosing protocol card</li>
+						<li>Concierge support</li>
+					</ul>
+					<dl>
+						<div><dt>Formula</dt><dd><?php echo esc_html( $pcfg['spec'] ); ?></dd></div>
+						<div><dt>Supply</dt><dd><?php echo esc_html( $s_entry['label'] ); ?></dd></div>
+						<div><dt>Price</dt><dd><?php echo '$' . esc_html( number_format( (float) $s_entry['price'], 0 ) ); ?></dd></div>
+					</dl>
+					<a class="trt-pdp__select" href="#buy">Select Plan</a>
+				</article>
+				<?php endforeach; ?>
 			</div>
 		</div>
 	</section>
@@ -899,7 +1014,7 @@ if ( $is_weight_loss ) :
 
 ?>
 
-<div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'myogenix-pdp sexual-health-pdp' . ( $slug === 'testosterone' ? ' trt-grunge-pdp' : '' ), $product ); ?>>
+<div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'myogenix-pdp grunge-product-pdp sexual-health-pdp' . ( $slug === 'testosterone' ? ' trt-grunge-pdp' : '' ), $product ); ?>>
 
 	<!-- Product Hero -->
 	<section class="pdp-hero" id="buy">
@@ -1129,7 +1244,6 @@ if ( $is_weight_loss ) :
 		</div>
 	</section>
 
-	<?php if ( $slug === 'testosterone' ) : ?>
 	<section class="trt-pdp__trust-strip" aria-label="Care features">
 		<div class="trt-pdp__trust-strip-inner">
 			<?php
@@ -1155,17 +1269,23 @@ if ( $is_weight_loss ) :
 		<div class="trt-pdp__plans-inner">
 			<div class="trt-pdp__plans-copy">
 				<p class="grunge-kicker">Choose your starting point</p>
+				<?php if ( $slug === 'testosterone' ) : ?>
 				<h2><span class="grunge-word grunge-word--white">200 mg/ml vial</span><span class="grunge-word grunge-word--red">1 vial</span></h2>
 				<p>Testosterone cypionate is an injectable testosterone ester used for provider-managed testosterone replacement therapy in patients with clinically low levels.</p>
+				<?php else : ?>
+				<h2><span class="grunge-word grunge-word--white"><?php echo esc_html( $shcfg['name'] ); ?></span><span class="grunge-word grunge-word--red"><?php echo esc_html( $shcfg['primary_label'] ); ?></span></h2>
+				<p><?php echo esc_html( $shcfg['desc'] ); ?></p>
+				<?php endif; ?>
 			</div>
 			<div class="trt-pdp__plan-grid">
 				<?php
-				$trt_plan_cards = [
-					[ 'title' => '1 Vial',  'supply' => '~30 day supply', 'qty' => '1 vial' ],
-					[ 'title' => '2 Vials', 'supply' => '~60 day supply', 'qty' => '2 vials', 'popular' => true ],
-					[ 'title' => '3 Vials', 'supply' => '~90 day supply', 'qty' => '3 vials' ],
-				];
-				foreach ( $trt_plan_cards as $plan ) :
+				if ( $slug === 'testosterone' ) :
+					$trt_plan_cards = [
+						[ 'title' => '1 Vial',  'supply' => '~30 day supply', 'qty' => '1 vial' ],
+						[ 'title' => '2 Vials', 'supply' => '~60 day supply', 'qty' => '2 vials', 'popular' => true ],
+						[ 'title' => '3 Vials', 'supply' => '~90 day supply', 'qty' => '3 vials' ],
+					];
+					foreach ( $trt_plan_cards as $plan ) :
 				?>
 				<article class="trt-pdp__plan-card">
 					<?php if ( ! empty( $plan['popular'] ) ) : ?><span class="trt-pdp__popular">Popular</span><?php endif; ?>
@@ -1182,11 +1302,43 @@ if ( $is_weight_loss ) :
 					</dl>
 					<a class="trt-pdp__select" href="#build-plan">Select Plan</a>
 				</article>
-				<?php endforeach; ?>
+				<?php
+					endforeach;
+				else :
+					$plan_index = 0;
+					foreach ( $primary_keys as $p_slug ) :
+						$plan_index++;
+						$entry = $secondary_attr_key && ! empty( $secondary_keys )
+							? ( $variation_matrix[ $p_slug ][ $secondary_keys[0] ] ?? null )
+							: ( $variation_matrix[ $p_slug ] ?? null );
+						if ( ! $entry ) continue;
+				?>
+				<article class="trt-pdp__plan-card">
+					<?php if ( $plan_index === 2 && count( $primary_keys ) > 1 ) : ?><span class="trt-pdp__popular">Popular</span><?php endif; ?>
+					<h3><?php echo esc_html( $primary_labels[ $p_slug ] ?? $p_slug ); ?></h3>
+					<p><?php echo esc_html( $shcfg['badge'] ); ?></p>
+					<ul>
+						<li>Provider-reviewed</li>
+						<li>Prescription required</li>
+						<li>Discreet shipping</li>
+						<li>Concierge support</li>
+					</ul>
+					<dl>
+						<div><dt>Option</dt><dd><?php echo esc_html( $primary_labels[ $p_slug ] ?? $p_slug ); ?></dd></div>
+						<?php if ( $secondary_attr_key && ! empty( $secondary_keys ) ) : ?>
+						<div><dt>Supply</dt><dd><?php echo esc_html( $secondary_labels[ $secondary_keys[0] ] ?? $secondary_keys[0] ); ?></dd></div>
+						<?php endif; ?>
+						<div><dt>Price</dt><dd><?php echo '$' . esc_html( number_format( (float) $entry['price'], 0 ) ); ?></dd></div>
+					</dl>
+					<a class="trt-pdp__select" href="#build-plan">Select Plan</a>
+				</article>
+				<?php
+					endforeach;
+				endif;
+				?>
 			</div>
 		</div>
 	</section>
-	<?php endif; ?>
 
 	<!-- How It Works Section -->
 	<section class="home-how" aria-label="How it works">
