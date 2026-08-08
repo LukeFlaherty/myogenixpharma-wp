@@ -4984,3 +4984,36 @@ body.single-product .trt-grunge-pdp > section {
 		font-size: 1rem !important;
 	}
 }
+
+/* WordPress content wrappers leave a 72px gutter on PDPs; pin redesigned sections to the viewport. */
+body.single-product .grunge-product-pdp,
+body.single-product .trt-grunge-pdp {
+	width: 100vw !important;
+	max-width: 100vw !important;
+	margin-right: 0 !important;
+	margin-left: 0 !important;
+	padding-right: 0 !important;
+	padding-left: 0 !important;
+}
+
+body.single-product .grunge-product-pdp .pdp-hero,
+body.single-product .grunge-product-pdp .home-how,
+body.single-product .grunge-product-pdp .myo-faq,
+body.single-product .grunge-product-pdp .myogenix-pdp__explore,
+body.single-product .grunge-product-pdp .trt-pdp__plans,
+body.single-product .grunge-product-pdp .trt-pdp__trust-strip,
+body.single-product .grunge-product-pdp .pdp-build,
+body.single-product .trt-grunge-pdp .pdp-hero,
+body.single-product .trt-grunge-pdp .home-how,
+body.single-product .trt-grunge-pdp .myo-faq,
+body.single-product .trt-grunge-pdp .myogenix-pdp__explore,
+body.single-product .trt-grunge-pdp .trt-pdp__plans,
+body.single-product .trt-grunge-pdp .trt-pdp__trust-strip,
+body.single-product .trt-grunge-pdp .pdp-build {
+	width: 100vw !important;
+	max-width: 100vw !important;
+	margin-right: 0 !important;
+	margin-left: 0 !important;
+	left: auto !important;
+	transform: none !important;
+}
