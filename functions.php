@@ -642,7 +642,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
 			[],
-			'1.10.8'
+				'1.10.9'
 		);
 	}
 
@@ -655,7 +655,7 @@ add_action( 'wp_enqueue_scripts', function() {
 				'myogenix-pdp',
 				get_stylesheet_directory_uri() . '/assets/js/pdp.js',
 				[],
-				'1.5.2',
+					'1.5.3',
 				true
 			);
 		}
@@ -671,7 +671,7 @@ add_action( 'wp_enqueue_scripts', function() {
 				'myogenix-peptide-pdp',
 				get_stylesheet_directory_uri() . '/assets/js/peptide-pdp.js',
 				[],
-				'1.4.2',
+					'1.4.3',
 				true
 			);
 		}
@@ -682,7 +682,7 @@ add_action( 'wp_enqueue_scripts', function() {
 				'myogenix-sexual-health-pdp',
 				get_stylesheet_directory_uri() . '/assets/js/sexual-health-pdp.js',
 				[],
-				'1.3.1',
+					'1.3.2',
 				true
 			);
 		}
@@ -988,13 +988,17 @@ function myogenix_render_product_faq( $product_id ) {
 	$faqs = array_values( array_filter( $faqs, fn( $f ) => ! empty( $f['q'] ) ) );
 	if ( empty( $faqs ) ) return;
 	?>
-	<section class="myo-faq">
-		<div class="myo-faq__wrap">
-			<div class="myo-faq__header">
-				<span class="myo-faq__eyebrow">FAQ</span>
-				<h2 class="myo-faq__title">Common questions</h2>
-				<p class="myo-faq__desc">Everything you need to know about the program, ordering, and what to expect before and after you start.</p>
-			</div>
+		<section class="myo-faq">
+			<div class="trt-pdp__section-bg" aria-hidden="true"></div>
+			<div class="myo-faq__wrap">
+				<div class="myo-faq__header">
+					<span class="myo-faq__eyebrow">Support</span>
+					<h2 class="myo-faq__title">
+						<span class="grunge-word grunge-word--white">Fast answers.</span>
+						<span class="grunge-word grunge-word--red">Guided support.</span>
+					</h2>
+					<p class="myo-faq__desc">We are here to guide you through every step and answer questions before, during, and after your treatment.</p>
+				</div>
 			<div class="myo-faq__list">
 				<?php foreach ( $faqs as $idx => $item ) :
 					$panel_id   = 'pdp-faq-' . intval( $product_id ) . '-' . $idx;
@@ -1014,12 +1018,14 @@ function myogenix_render_product_faq( $product_id ) {
 					</div>
 				</div>
 				<?php endforeach; ?>
+				</div>
+				<div class="myo-faq__cta">
+					<a href="#buy" class="myo-faq__cta-btn">Continue to evaluation</a>
+					<a href="<?= esc_url( home_url( '/reach-a-concierge/' ) ) ?>" class="myo-faq__cta-btn myo-faq__cta-btn--dark">Ask a question</a>
+				</div>
+				<p class="trt-pdp__faq-disclaimer">Prescription required if approved. Plan review by licensed provider.</p>
 			</div>
-			<div class="myo-faq__cta">
-				<a href="#buy" class="myo-faq__cta-btn">Get started</a>
-			</div>
-		</div>
-	</section>
+		</section>
 	<?php
 }
 

@@ -195,40 +195,40 @@ if ( $is_weight_loss ) :
 		return esc_url( $base . implode( '/', array_map( 'rawurlencode', $parts ) ) );
 	};
 
-	$steps = [
-		[
-			'num'   => '01',
-			'img'   => 'PDP Sections/form.png',
-			'title' => 'Questionnaire',
-			'desc'  => 'Answer a few questions and share your medical details',
-		],
-		[
-			'num'   => '02',
-			'img'   => 'PDP Sections/consultation.png',
-			'title' => 'Review and Approved by provider',
-			'desc'  => 'Discuss your goals and receive expert recommendations',
-		],
-		[
-			'num'   => '03',
-			'img'   => 'PDP Sections/box.png',
-			'title' => 'Receive medication',
-			'desc'  => 'Medication and supplies shipped straight to your door',
-		],
-		[
-			'num'   => '04',
-			'img'   => 'PDP Sections/calendar.png',
-			'title' => 'Monthly Monitoring',
-			'desc'  => 'Stay on track with regular free check-ins to ensure progress',
-		],
-	];
+		$steps = [
+			[
+				'num'   => '1',
+				'img'   => 'grunge-redesign/laptop-check.svg',
+				'title' => 'Quick Online Intake',
+				'desc'  => 'Complete your confidential medical questionnaire in minutes.',
+			],
+			[
+				'num'   => '2',
+				'img'   => 'grunge-redesign/doctor.svg',
+				'title' => 'Provider Review',
+				'desc'  => 'A licensed provider reviews your health history and goals.',
+			],
+			[
+				'num'   => '3',
+				'img'   => 'grunge-redesign/rx.svg',
+				'title' => 'Personalized Plan',
+				'desc'  => 'Your protocol is reviewed for the selected dose and supply.',
+			],
+			[
+				'num'   => '4',
+				'img'   => 'grunge-redesign/box.svg',
+				'title' => 'Shipped to Your Door',
+				'desc'  => 'Discreet, temperature-aware shipping direct to you.',
+			],
+		];
 
 ?>
 
 <div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'myogenix-pdp grunge-product-pdp', $product ); ?>>
 
 	<!-- Product Hero -->
-	<section class="pdp-hero" id="buy">
-		<div class="pdp-hero__inner">
+		<section class="pdp-hero">
+			<div class="pdp-hero__inner">
 
 			<!-- Left: product info + image -->
 			<div class="pdp-hero__left">
@@ -281,8 +281,14 @@ if ( $is_weight_loss ) :
 				</a>
 			</div>
 
-			<!-- Right: configurator + hidden WC form -->
-			<div class="pdp-hero__right">
+			</div>
+		</section>
+
+		<section class="pdp-build" id="buy" aria-label="Build your plan">
+			<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/grunge black section bg blank.png' ); ?>')" aria-hidden="true"></div>
+			<div class="pdp-build__inner">
+				<!-- Configurator + hidden WC form -->
+				<div class="pdp-hero__right">
 
 				<!-- Hidden WC form — keeps variation JS alive for any plugin hooks -->
 				<div class="pdp-hero__wc-hidden" aria-hidden="true" inert>
@@ -361,9 +367,9 @@ if ( $is_weight_loss ) :
 					</p>
 				</div>
 
+				</div>
 			</div>
-		</div>
-	</section>
+		</section>
 
 	<section class="trt-pdp__trust-strip" aria-label="Care features">
 		<div class="trt-pdp__trust-strip-inner">
@@ -428,9 +434,9 @@ if ( $is_weight_loss ) :
 	<section class="home-how" aria-label="How it works">
 		<div class="hp-inner">
 			<div class="home-how__header">
-				<p class="home-how__overline">Process</p>
-				<h2 class="home-how__heading">How it works</h2>
-				<p class="home-how__desc">From your first order to your ongoing program — here's what to expect at every step.</p>
+					<p class="home-how__overline">How it works</p>
+					<h2 class="home-how__heading">Getting started is simple</h2>
+					<p class="home-how__desc">From your intake to provider review, each step is built for clear, guided care.</p>
 			</div>
 			<div class="home-how__steps">
 				<?php foreach ( $steps as $step ) : ?>
@@ -587,18 +593,11 @@ if ( $is_weight_loss ) :
 		return esc_url( $base . implode( '/', array_map( 'rawurlencode', $parts ) ) );
 	};
 
-	$steps = $slug === 'testosterone'
-		? [
-			[ 'num' => '1', 'img' => 'grunge-redesign/laptop-check.svg', 'title' => 'Quick Online Intake',   'desc' => 'Complete your confidential medical questionnaire in minutes.' ],
-			[ 'num' => '2', 'img' => 'grunge-redesign/doctor.svg',       'title' => 'Provider Review',       'desc' => 'A licensed provider reviews your health history and goals.' ],
-			[ 'num' => '3', 'img' => 'grunge-redesign/rx.svg',           'title' => 'Personalized Plan',     'desc' => 'Your protocol is reviewed for the selected dose and supply.' ],
-			[ 'num' => '4', 'img' => 'grunge-redesign/box.svg',          'title' => 'Shipped to Your Door',  'desc' => 'Discreet, temperature-aware shipping direct to you.' ],
-		]
-		: [
-			[ 'num' => '01', 'img' => 'PDP Sections/form.png',         'title' => 'Questionnaire',                  'desc' => 'Answer a few questions and share your medical details' ],
-			[ 'num' => '02', 'img' => 'PDP Sections/consultation.png', 'title' => 'Review and Approved by provider',  'desc' => 'Discuss your goals and receive expert recommendations' ],
-			[ 'num' => '03', 'img' => 'PDP Sections/box.png',          'title' => 'Receive medication',               'desc' => 'Medication and supplies shipped straight to your door' ],
-			[ 'num' => '04', 'img' => 'PDP Sections/calendar.png',     'title' => 'Monthly Monitoring',               'desc' => 'Stay on track with regular free check-ins to ensure progress' ],
+		$steps = [
+			[ 'num' => '1', 'img' => 'grunge-redesign/laptop-check.svg', 'title' => 'Quick Online Intake',  'desc' => 'Complete your confidential medical questionnaire in minutes.' ],
+			[ 'num' => '2', 'img' => 'grunge-redesign/doctor.svg',       'title' => 'Provider Review',      'desc' => 'A licensed provider reviews your health history and goals.' ],
+			[ 'num' => '3', 'img' => 'grunge-redesign/rx.svg',           'title' => 'Personalized Plan',    'desc' => 'Your protocol is reviewed for the selected dose and supply.' ],
+			[ 'num' => '4', 'img' => 'grunge-redesign/box.svg',          'title' => 'Shipped to Your Door', 'desc' => 'Discreet, temperature-aware shipping direct to you.' ],
 		];
 
 ?>
@@ -606,8 +605,8 @@ if ( $is_weight_loss ) :
 <div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'myogenix-pdp grunge-product-pdp peptide-pdp', $product ); ?>>
 
 	<!-- Product Hero -->
-	<section class="pdp-hero" id="buy">
-		<div class="pdp-hero__inner">
+		<section class="pdp-hero">
+			<div class="pdp-hero__inner">
 
 			<div class="pdp-hero__left">
 				<span class="pdp-hero__badge"><?php echo $pcfg['badge']; ?></span>
@@ -652,7 +651,13 @@ if ( $is_weight_loss ) :
 				</div>
 			</div>
 
-			<div class="pdp-hero__right">
+			</div>
+		</section>
+
+		<section class="pdp-build" id="buy" aria-label="Build your plan">
+			<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/grunge black section bg blank.png' ); ?>')" aria-hidden="true"></div>
+			<div class="pdp-build__inner">
+				<div class="pdp-hero__right">
 
 				<!-- Hidden WC form — keeps variation hooks alive for plugins -->
 				<div class="pdp-hero__wc-hidden" aria-hidden="true" inert>
@@ -719,9 +724,9 @@ if ( $is_weight_loss ) :
 					</p>
 
 				</div>
+				</div>
 			</div>
-		</div>
-	</section>
+		</section>
 
 	<section class="trt-pdp__trust-strip" aria-label="Care features">
 		<div class="trt-pdp__trust-strip-inner">
@@ -783,9 +788,9 @@ if ( $is_weight_loss ) :
 	<section class="home-how" aria-label="How it works">
 		<div class="hp-inner">
 			<div class="home-how__header">
-				<p class="home-how__overline">Process</p>
-				<h2 class="home-how__heading">How it works</h2>
-				<p class="home-how__desc">From your first order to your ongoing program — here's what to expect at every step.</p>
+					<p class="home-how__overline">How it works</p>
+					<h2 class="home-how__heading">Getting started is simple</h2>
+					<p class="home-how__desc">From your intake to provider review, each step is built for clear, guided care.</p>
 			</div>
 			<div class="home-how__steps">
 				<?php foreach ( $steps as $step ) : ?>
@@ -977,18 +982,11 @@ if ( $is_weight_loss ) :
 		return esc_url( $base . implode( '/', array_map( 'rawurlencode', $parts ) ) );
 	};
 
-	$steps = $slug === 'testosterone'
-		? [
+		$steps = [
 			[ 'num' => '1', 'img' => 'grunge-redesign/laptop-check.svg', 'title' => 'Quick Online Intake',  'desc' => 'Complete your confidential medical questionnaire in minutes.' ],
 			[ 'num' => '2', 'img' => 'grunge-redesign/doctor.svg',       'title' => 'Provider Review',      'desc' => 'A licensed provider reviews your health history and goals.' ],
 			[ 'num' => '3', 'img' => 'grunge-redesign/rx.svg',           'title' => 'Personalized Plan',    'desc' => 'Your protocol is reviewed for the selected dose and supply.' ],
 			[ 'num' => '4', 'img' => 'grunge-redesign/box.svg',          'title' => 'Shipped to Your Door', 'desc' => 'Discreet, temperature-aware shipping direct to you.' ],
-		]
-		: [
-			[ 'num' => '01', 'img' => 'PDP Sections/form.png',         'title' => 'Questionnaire',                  'desc' => 'Answer a few questions and share your medical details' ],
-			[ 'num' => '02', 'img' => 'PDP Sections/consultation.png', 'title' => 'Review and Approved by provider',  'desc' => 'Discuss your goals and receive expert recommendations' ],
-			[ 'num' => '03', 'img' => 'PDP Sections/box.png',          'title' => 'Receive medication',               'desc' => 'Medication and supplies shipped straight to your door' ],
-			[ 'num' => '04', 'img' => 'PDP Sections/calendar.png',     'title' => 'Monthly Monitoring',               'desc' => 'Stay on track with regular free check-ins to ensure progress' ],
 		];
 
 	// ─── TRT state gating — 48 states per Myogenix service policy ───────────────
@@ -1021,7 +1019,7 @@ if ( $is_weight_loss ) :
 <div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'myogenix-pdp grunge-product-pdp sexual-health-pdp' . ( $slug === 'testosterone' ? ' trt-grunge-pdp' : '' ), $product ); ?>>
 
 	<!-- Product Hero -->
-	<section class="pdp-hero" id="buy">
+		<section class="pdp-hero">
 		<?php if ( $slug === 'testosterone' ) : ?>
 		<div class="trt-pdp__hero-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/hero bg.png' ); ?>')" aria-hidden="true"></div>
 		<?php endif; ?>
@@ -1082,7 +1080,13 @@ if ( $is_weight_loss ) :
 				</div>
 			</div>
 
-			<div class="pdp-hero__right" id="build-plan">
+			</div>
+		</section>
+
+		<section class="pdp-build" id="<?php echo $slug === 'testosterone' ? 'build-plan' : 'buy'; ?>" aria-label="Build your plan">
+			<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/grunge black section bg blank.png' ); ?>')" aria-hidden="true"></div>
+			<div class="pdp-build__inner">
+				<div class="pdp-hero__right">
 
 				<!-- Hidden WC form — keeps variation hooks alive for plugins -->
 				<div class="pdp-hero__wc-hidden" aria-hidden="true" inert>
@@ -1246,9 +1250,9 @@ if ( $is_weight_loss ) :
 					</p>
 
 				</div>
+				</div>
 			</div>
-		</div>
-	</section>
+		</section>
 
 	<section class="trt-pdp__trust-strip" aria-label="Care features">
 		<div class="trt-pdp__trust-strip-inner">
@@ -1353,9 +1357,9 @@ if ( $is_weight_loss ) :
 		<?php endif; ?>
 		<div class="hp-inner">
 			<div class="home-how__header">
-				<p class="home-how__overline"><?php echo $slug === 'testosterone' ? 'How it works' : 'Process'; ?></p>
-				<h2 class="home-how__heading"><?php echo $slug === 'testosterone' ? 'Getting started is simple' : 'How it works'; ?></h2>
-				<p class="home-how__desc"><?php echo $slug === 'testosterone' ? 'From your intake to provider review, each step is built for clear, guided care.' : 'From your first order to your ongoing program — here\'s what to expect at every step.'; ?></p>
+					<p class="home-how__overline">How it works</p>
+					<h2 class="home-how__heading">Getting started is simple</h2>
+					<p class="home-how__desc">From your intake to provider review, each step is built for clear, guided care.</p>
 			</div>
 			<div class="home-how__steps">
 				<?php foreach ( $steps as $step ) : ?>
