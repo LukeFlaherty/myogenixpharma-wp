@@ -292,7 +292,7 @@ if ( $is_weight_loss ) :
 		</section>
 
 		<section class="pdp-build" id="buy" aria-label="Build your plan">
-			<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/grunge black section bg blank.png' ); ?>')" aria-hidden="true"></div>
+			<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/bg-genetic-wire.webp' ); ?>')" aria-hidden="true"></div>
 			<div class="pdp-build__inner">
 				<!-- Configurator + hidden WC form -->
 				<div class="pdp-hero__right">
@@ -409,7 +409,7 @@ if ( $is_weight_loss ) :
 	</section>
 
 	<section class="trt-pdp__plans" aria-label="Choose your starting point">
-		<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/grunge black section bg blank.png' ); ?>')" aria-hidden="true"></div>
+		<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/section bg 4.png' ); ?>')" aria-hidden="true"></div>
 		<div class="trt-pdp__plans-inner">
 			<div class="trt-pdp__plans-copy">
 				<p class="grunge-kicker">Choose your starting point</p>
@@ -696,7 +696,7 @@ if ( $is_weight_loss ) :
 		</section>
 
 		<section class="pdp-build" id="buy" aria-label="Build your plan">
-			<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/grunge black section bg blank.png' ); ?>')" aria-hidden="true"></div>
+			<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/bg-genetic-wire.webp' ); ?>')" aria-hidden="true"></div>
 			<div class="pdp-build__inner">
 				<div class="pdp-hero__right">
 
@@ -790,7 +790,7 @@ if ( $is_weight_loss ) :
 	</section>
 
 	<section class="trt-pdp__plans" aria-label="Choose your starting point">
-		<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/grunge black section bg blank.png' ); ?>')" aria-hidden="true"></div>
+		<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/section bg 4.png' ); ?>')" aria-hidden="true"></div>
 		<div class="trt-pdp__plans-inner">
 			<div class="trt-pdp__plans-copy">
 				<p class="grunge-kicker">Choose your starting point</p>
@@ -1137,7 +1137,7 @@ if ( $is_weight_loss ) :
 		</section>
 
 		<section class="pdp-build" id="<?php echo $slug === 'testosterone' ? 'build-plan' : 'buy'; ?>" aria-label="Build your plan">
-			<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/grunge black section bg blank.png' ); ?>')" aria-hidden="true"></div>
+			<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/bg-genetic-wire.webp' ); ?>')" aria-hidden="true"></div>
 			<div class="pdp-build__inner">
 				<div class="pdp-hero__right">
 
@@ -1334,7 +1334,7 @@ if ( $is_weight_loss ) :
 	</section>
 
 	<section class="trt-pdp__plans" aria-label="Choose your starting point">
-		<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/grunge black section bg blank.png' ); ?>')" aria-hidden="true"></div>
+		<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/section bg 4.png' ); ?>')" aria-hidden="true"></div>
 		<div class="trt-pdp__plans-inner">
 			<div class="trt-pdp__plans-copy">
 				<p class="grunge-kicker">Choose your starting point</p>
@@ -1412,7 +1412,7 @@ if ( $is_weight_loss ) :
 	<!-- How It Works Section -->
 	<section class="home-how" aria-label="How it works">
 		<?php if ( $slug === 'testosterone' ) : ?>
-		<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/grunge black section bg blank.png' ); ?>')" aria-hidden="true"></div>
+		<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/section bg 2.png' ); ?>')" aria-hidden="true"></div>
 		<?php endif; ?>
 		<div class="hp-inner">
 			<div class="home-how__header">
@@ -1440,7 +1440,7 @@ if ( $is_weight_loss ) :
 	<!-- Common Questions -->
 	<?php if ( $slug === 'testosterone' ) : ?>
 	<section class="myo-faq" id="faq">
-		<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/grunge black section bg blank.png' ); ?>')" aria-hidden="true"></div>
+		<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/section bg 5.png' ); ?>')" aria-hidden="true"></div>
 		<div class="myo-faq__wrap">
 			<div class="myo-faq__header">
 				<span class="myo-faq__eyebrow">Support</span>

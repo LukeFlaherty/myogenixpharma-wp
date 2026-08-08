@@ -4451,3 +4451,326 @@ body.single-product .trt-grunge-pdp .pdp-hero__right {
 		padding-left: 18px !important;
 	}
 }
+
+/* PDP Build Your Plan second-pass refinements */
+body.single-product,
+body.single-product .grunge-product-pdp,
+body.single-product .trt-grunge-pdp {
+	max-width: 100vw;
+	overflow-x: clip;
+}
+
+body.single-product .grunge-product-pdp .pdp-build,
+body.single-product .trt-grunge-pdp .pdp-build {
+	background-position: center right !important;
+	background-size: cover !important;
+}
+
+body.single-product .grunge-product-pdp .pdp-build .trt-pdp__section-bg,
+body.single-product .trt-grunge-pdp .pdp-build .trt-pdp__section-bg {
+	background-position: center right !important;
+	background-size: cover !important;
+}
+
+body.single-product .grunge-product-pdp .pdp-build__inner,
+body.single-product .trt-grunge-pdp .pdp-build__inner,
+body.single-product .grunge-product-pdp .pdp-hero__right,
+body.single-product .trt-grunge-pdp .pdp-hero__right {
+	max-width: min(1152px, calc(100vw - 32px)) !important;
+}
+
+.grunge-product-pdp .pdp-cfg__builder,
+.trt-grunge-pdp .pdp-cfg__builder,
+.grunge-product-pdp .trt-pdp__static-row,
+.trt-grunge-pdp .trt-pdp__static-row,
+.grunge-product-pdp .trt-pdp__eligibility,
+.trt-grunge-pdp .trt-pdp__eligibility {
+	display: grid !important;
+	grid-template-columns: 1fr !important;
+	gap: 12px !important;
+}
+
+.grunge-product-pdp .pdp-cfg__section-label,
+.trt-grunge-pdp .pdp-cfg__section-label,
+.grunge-product-pdp .pdp-cfg__pkg-row,
+.trt-grunge-pdp .pdp-cfg__pkg-row,
+.grunge-product-pdp .pdp-cfg__supply-row,
+.trt-grunge-pdp .pdp-cfg__supply-row,
+.grunge-product-pdp .pdp-cfg__doses-wrap,
+.trt-grunge-pdp .pdp-cfg__doses-wrap,
+.grunge-product-pdp .trt-state__picker,
+.trt-grunge-pdp .trt-state__picker,
+.grunge-product-pdp .trt-state__status,
+.trt-grunge-pdp .trt-state__status,
+.grunge-product-pdp .trt-state__unavailable,
+.trt-grunge-pdp .trt-state__unavailable,
+.grunge-product-pdp .pdp-cfg__own-labs,
+.trt-grunge-pdp .pdp-cfg__own-labs,
+.grunge-product-pdp .pdp-cfg__own-labs-note,
+.trt-grunge-pdp .pdp-cfg__own-labs-note {
+	grid-column: 1 !important;
+}
+
+.grunge-product-pdp .pdp-cfg::before,
+.trt-grunge-pdp .pdp-cfg::before,
+.grunge-product-pdp .pdp-cfg__section-label,
+.trt-grunge-pdp .pdp-cfg__section-label {
+	background-image: url("../images/grunge-redesign/concrete-texture.jpg"), linear-gradient(135deg, #ffffff 0 52%, #dc2626 52% 100%);
+	background-position: center;
+	background-size: 220px auto, 100% 100%;
+	color: transparent !important;
+	-webkit-background-clip: text;
+	background-clip: text;
+	font-family: var(--myo-font-grunge, "Oswald", sans-serif) !important;
+	font-weight: 900 !important;
+	letter-spacing: 0 !important;
+	line-height: 0.92 !important;
+	text-transform: uppercase !important;
+}
+
+.grunge-product-pdp .pdp-cfg::before,
+.trt-grunge-pdp .pdp-cfg::before {
+	font-size: clamp(3.1rem, 5.2vw, 5.35rem) !important;
+	margin-bottom: 22px !important;
+}
+
+.grunge-product-pdp .pdp-cfg__section-label,
+.trt-grunge-pdp .pdp-cfg__section-label {
+	font-size: clamp(1.55rem, 2.05vw, 2.15rem) !important;
+	margin-top: 18px !important;
+	margin-bottom: 0 !important;
+}
+
+.grunge-product-pdp .pdp-cfg__section-label:first-child,
+.trt-grunge-pdp .pdp-cfg__section-label:first-child,
+.grunge-product-pdp .trt-pdp__static-row:first-child .pdp-cfg__section-label,
+.trt-grunge-pdp .trt-pdp__static-row:first-child .pdp-cfg__section-label {
+	margin-top: 0 !important;
+}
+
+.grunge-product-pdp .pdp-cfg__pkg,
+.grunge-product-pdp .pdp-cfg__supply,
+.trt-grunge-pdp .pdp-cfg__pkg,
+.trt-grunge-pdp .pdp-cfg__supply {
+	box-shadow: none !important;
+	transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.grunge-product-pdp .pdp-cfg__pkg--active,
+.grunge-product-pdp .pdp-cfg__supply--active,
+.trt-grunge-pdp .pdp-cfg__pkg--active,
+.trt-grunge-pdp .pdp-cfg__supply--active,
+.grunge-product-pdp .pdp-cfg__pkg:hover,
+.grunge-product-pdp .pdp-cfg__supply:hover,
+.trt-grunge-pdp .pdp-cfg__pkg:hover,
+.trt-grunge-pdp .pdp-cfg__supply:hover {
+	border-color: #dc2626 !important;
+	background: #dc2626 !important;
+	color: #fff !important;
+	box-shadow: none !important;
+	text-shadow: none !important;
+}
+
+.grunge-product-pdp .pdp-cfg__pkg--active *,
+.grunge-product-pdp .pdp-cfg__supply--active *,
+.trt-grunge-pdp .pdp-cfg__pkg--active *,
+.trt-grunge-pdp .pdp-cfg__supply--active *,
+.grunge-product-pdp .pdp-cfg__pkg:hover *,
+.grunge-product-pdp .pdp-cfg__supply:hover *,
+.trt-grunge-pdp .pdp-cfg__pkg:hover *,
+.trt-grunge-pdp .pdp-cfg__supply:hover * {
+	color: #fff !important;
+}
+
+.grunge-product-pdp .pdp-cfg__supply:hover .pdp-cfg__popular-tag,
+.grunge-product-pdp .pdp-cfg__supply--active .pdp-cfg__popular-tag,
+.trt-grunge-pdp .pdp-cfg__supply:hover .pdp-cfg__popular-tag,
+.trt-grunge-pdp .pdp-cfg__supply--active .pdp-cfg__popular-tag {
+	border-color: rgba(255, 255, 255, 0.7) !important;
+	background: #dc2626 !important;
+	color: #fff !important;
+}
+
+.grunge-product-pdp .pdp-cfg__dose-card-header,
+.trt-grunge-pdp .pdp-cfg__dose-card-header {
+	display: flex !important;
+	flex-direction: column !important;
+	align-items: flex-start !important;
+	gap: 8px !important;
+}
+
+.grunge-product-pdp .pdp-cfg__dose-badge,
+.trt-grunge-pdp .pdp-cfg__dose-badge {
+	align-self: flex-start;
+	order: -1;
+}
+
+.grunge-product-pdp .pdp-cfg__summary::before,
+.trt-grunge-pdp .pdp-cfg__summary::before {
+	content: none !important;
+	display: none !important;
+}
+
+.grunge-product-pdp .pdp-cfg__summary-label,
+.trt-grunge-pdp .pdp-cfg__summary-label {
+	font-size: clamp(1.4rem, 1.8vw, 1.9rem) !important;
+	letter-spacing: 0.06em !important;
+	line-height: 1.05 !important;
+}
+
+.grunge-product-pdp .pdp-cfg__summary-line,
+.trt-grunge-pdp .pdp-cfg__summary-line,
+.grunge-product-pdp .pdp-cfg__summary-total,
+.trt-grunge-pdp .pdp-cfg__summary-total {
+	display: flex !important;
+	flex-direction: column !important;
+	align-items: flex-start !important;
+	gap: 4px !important;
+}
+
+.grunge-product-pdp .pdp-cfg__summary-weekly,
+.trt-grunge-pdp .pdp-cfg__summary-weekly,
+.grunge-product-pdp .pdp-cfg__summary-sub,
+.trt-grunge-pdp .pdp-cfg__summary-sub {
+	white-space: normal !important;
+}
+
+.grunge-product-pdp .peptide-cfg__includes,
+.trt-grunge-pdp .peptide-cfg__includes {
+	padding: 26px !important;
+}
+
+.grunge-product-pdp .peptide-cfg__includes-title,
+.trt-grunge-pdp .peptide-cfg__includes-title {
+	font-size: clamp(1.45rem, 1.75vw, 1.8rem) !important;
+	letter-spacing: 0.07em !important;
+	line-height: 1.05 !important;
+}
+
+.grunge-product-pdp .peptide-cfg__includes-list,
+.trt-grunge-pdp .peptide-cfg__includes-list {
+	gap: 18px !important;
+}
+
+.grunge-product-pdp .peptide-cfg__includes-item,
+.trt-grunge-pdp .peptide-cfg__includes-item {
+	align-items: flex-start !important;
+	font-size: clamp(1.35rem, 1.55vw, 1.8rem) !important;
+	font-weight: 800 !important;
+	line-height: 1.2 !important;
+}
+
+.grunge-product-pdp .peptide-cfg__includes-icon,
+.trt-grunge-pdp .peptide-cfg__includes-icon {
+	width: 28px !important;
+	height: 28px !important;
+	min-width: 28px !important;
+	margin-top: 1px;
+}
+
+.grunge-product-pdp .peptide-cfg__includes-icon svg,
+.trt-grunge-pdp .peptide-cfg__includes-icon svg {
+	width: 28px !important;
+	height: 28px !important;
+}
+
+.grunge-product-pdp .pdp-cfg__disclaimer,
+.trt-grunge-pdp .pdp-cfg__disclaimer {
+	font-size: 0.53rem !important;
+	line-height: 1.45 !important;
+}
+
+.grunge-product-pdp .myo-faq__item,
+.trt-grunge-pdp .myo-faq__item {
+	border-bottom: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+
+.grunge-product-pdp .myo-faq__item:last-child,
+.trt-grunge-pdp .myo-faq__item:last-child {
+	border-bottom: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+
+.grunge-product-pdp .home-how,
+.trt-grunge-pdp .home-how {
+	background-image: url("../images/grunge-redesign/section bg 2.png") !important;
+	background-position: center !important;
+	background-size: cover !important;
+}
+
+.grunge-product-pdp .myo-faq,
+.trt-grunge-pdp .myo-faq {
+	background-image: url("../images/grunge-redesign/section bg 5.png") !important;
+	background-position: center !important;
+	background-size: cover !important;
+}
+
+.grunge-product-pdp .hp-step__title,
+.trt-grunge-pdp .hp-step__title {
+	font-size: clamp(1.05rem, 1.2vw, 1.28rem) !important;
+}
+
+.grunge-product-pdp .hp-step__desc,
+.trt-grunge-pdp .hp-step__desc {
+	font-size: clamp(0.74rem, 0.85vw, 0.9rem) !important;
+}
+
+@media (max-width: 600px) {
+	body.single-product .grunge-product-pdp .pdp-build__inner,
+	body.single-product .trt-grunge-pdp .pdp-build__inner,
+	body.single-product .grunge-product-pdp .pdp-hero__right,
+	body.single-product .trt-grunge-pdp .pdp-hero__right {
+		max-width: calc(100vw - 24px) !important;
+	}
+
+	.grunge-product-pdp .pdp-cfg::before,
+	.trt-grunge-pdp .pdp-cfg::before {
+		font-size: clamp(2.8rem, 14vw, 4.1rem) !important;
+	}
+
+	.grunge-product-pdp .pdp-cfg__section-label,
+	.trt-grunge-pdp .pdp-cfg__section-label {
+		font-size: clamp(1.42rem, 7.4vw, 2rem) !important;
+	}
+
+	.grunge-product-pdp .peptide-cfg__includes,
+	.trt-grunge-pdp .peptide-cfg__includes {
+		padding: 22px !important;
+	}
+
+	.grunge-product-pdp .peptide-cfg__includes-item,
+	.trt-grunge-pdp .peptide-cfg__includes-item {
+		font-size: clamp(1.2rem, 5.6vw, 1.55rem) !important;
+	}
+
+	.grunge-product-pdp .home-how .hp-inner,
+	.trt-grunge-pdp .home-how .hp-inner {
+		gap: 20px !important;
+		padding-top: 64px !important;
+	}
+
+	.grunge-product-pdp .home-how__header,
+	.trt-grunge-pdp .home-how__header {
+		margin-bottom: 0 !important;
+	}
+
+	.grunge-product-pdp .home-how__steps,
+	.trt-grunge-pdp .home-how__steps {
+		margin-top: 0 !important;
+	}
+
+	.grunge-product-pdp .hp-step,
+	.trt-grunge-pdp .hp-step {
+		padding-top: 24px !important;
+	}
+
+	.grunge-product-pdp .hp-step__title,
+	.trt-grunge-pdp .hp-step__title {
+		font-size: 1.74rem !important;
+	}
+
+	.grunge-product-pdp .hp-step__desc,
+	.trt-grunge-pdp .hp-step__desc {
+		font-size: 0.98rem !important;
+		line-height: 1.35 !important;
+	}
+}
