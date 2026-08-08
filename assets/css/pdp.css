@@ -2715,6 +2715,17 @@ body.single-product .grunge-product-pdp .pdp-hero__right {
 .grunge-product-pdp .peptide-cfg__includes {
 	grid-row: 3;
 	margin: 0;
+	border: 1px solid rgba(255, 255, 255, 0.16) !important;
+	border-radius: 0 !important;
+	background:
+		repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.028) 0 1px, transparent 1px 8px),
+		rgba(6, 6, 6, 0.88) !important;
+	padding: 18px !important;
+	color: #d4d4d8 !important;
+}
+
+.grunge-product-pdp .peptide-cfg__includes-title {
+	color: var(--myo-red, #dc2626) !important;
 }
 
 .grunge-product-pdp .pdp-cfg__cta {
@@ -2748,8 +2759,16 @@ body.single-product .grunge-product-pdp .pdp-hero__right {
 .grunge-product-pdp .pdp-cfg__supply strong,
 .grunge-product-pdp .pdp-cfg__supply span:not(.pdp-cfg__popular-tag) {
 	max-width: 100%;
+	color: #d4d4d8 !important;
 	overflow-wrap: anywhere;
 	white-space: normal;
+}
+
+.grunge-product-pdp .pdp-cfg__pkg--active strong,
+.grunge-product-pdp .pdp-cfg__pkg--active span,
+.grunge-product-pdp .pdp-cfg__supply--active strong,
+.grunge-product-pdp .pdp-cfg__supply--active span:not(.pdp-cfg__popular-tag) {
+	color: #fff !important;
 }
 
 .grunge-product-pdp .home-how,
