@@ -70,7 +70,7 @@ $programs = [
 		'subtitle'      => 'Physician-guided care, built around your goals.',
 		'body'          => 'Online intake, provider review, personalized treatment options, and concierge support.',
 		'option_label'  => 'weight loss',
-		'hero_image'    => 'weight-loss-category-vials.webp',
+		'hero_image'    => 'tirz-sema-category-vials.webp',
 		'hero_cta'      => home_url( '/product/compound-tirzepatide/' ),
 		'products'      => [ 'tirzepatide', 'semaglutide' ],
 	],
