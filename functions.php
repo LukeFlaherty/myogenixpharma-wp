@@ -184,6 +184,77 @@ add_action( 'pre_get_posts', function ( $query ) {
 	$query->set( 'post__not_in', $excluded );
 } );
 
+// Retatrutide is currently not offered for purchase. Treat the product like a
+// customer-facing draft in theme-owned commerce paths until it is re-enabled.
+function myogenix_retatrutide_product_ids(): array {
+	return [ 4537 ];
+}
+
+function myogenix_is_retatrutide_product( $product_or_id ): bool {
+	$product_id = is_object( $product_or_id ) && method_exists( $product_or_id, 'get_id' )
+		? (int) $product_or_id->get_id()
+		: (int) $product_or_id;
+
+	if ( ! $product_id ) return false;
+
+	$parent_id = is_object( $product_or_id ) && method_exists( $product_or_id, 'get_parent_id' )
+		? (int) $product_or_id->get_parent_id()
+		: (int) wp_get_post_parent_id( $product_id );
+	$lookup_id = $parent_id ?: $product_id;
+
+	if ( in_array( $lookup_id, myogenix_retatrutide_product_ids(), true ) ) return true;
+
+	return 'compound-retatrutide' === get_post_field( 'post_name', $lookup_id );
+}
+
+add_filter( 'woocommerce_is_purchasable', function( $purchasable, $product ) {
+	return myogenix_is_retatrutide_product( $product ) ? false : $purchasable;
+}, 20, 2 );
+
+add_filter( 'woocommerce_variation_is_purchasable', function( $purchasable, $variation ) {
+	return myogenix_is_retatrutide_product( $variation ) ? false : $purchasable;
+}, 20, 2 );
+
+add_filter( 'woocommerce_product_is_visible', function( $visible, $product_id ) {
+	return myogenix_is_retatrutide_product( $product_id ) ? false : $visible;
+}, 20, 2 );
+
+add_filter( 'woocommerce_add_to_cart_validation', function( $passed, $product_id, $quantity, $variation_id = 0 ) {
+	if ( myogenix_is_retatrutide_product( $variation_id ?: $product_id ) ) {
+		wc_add_notice( 'Retatrutide is not currently available for purchase.', 'error' );
+		return false;
+	}
+	return $passed;
+}, 20, 4 );
+
+add_action( 'template_redirect', function() {
+	if ( ( function_exists( 'is_product' ) && is_product() && myogenix_is_retatrutide_product( get_queried_object_id() ) )
+		|| is_page( 'retatrutide' ) ) {
+		wp_safe_redirect( home_url( '/product-category/weight-loss/' ), 302 );
+		exit;
+	}
+}, 5 );
+
+add_action( 'pre_get_posts', function( $query ) {
+	if ( is_admin() || ! $query->is_main_query() ) return;
+	if ( ! $query->is_post_type_archive( 'product' ) && ! $query->is_tax( 'product_cat' ) && ! $query->is_search() ) return;
+
+	$excluded = (array) $query->get( 'post__not_in' );
+	$query->set( 'post__not_in', array_values( array_unique( array_merge( $excluded, myogenix_retatrutide_product_ids() ) ) ) );
+} );
+
+add_action( 'woocommerce_before_calculate_totals', function( $cart ) {
+	if ( is_admin() && ! defined( 'DOING_AJAX' ) ) return;
+	if ( ! $cart || ! method_exists( $cart, 'get_cart' ) ) return;
+
+	foreach ( $cart->get_cart() as $cart_item_key => $cart_item ) {
+		if ( myogenix_is_retatrutide_product( $cart_item['variation_id'] ?? $cart_item['product_id'] ?? 0 ) ) {
+			$cart->remove_cart_item( $cart_item_key );
+			wc_add_notice( 'Retatrutide is no longer available for purchase and was removed from your cart.', 'notice' );
+		}
+	}
+}, 1 );
+
 
 // Convert a dose term slug (e.g. "10-mg") to its display name (e.g. "10 mg").
 // Checks pa_individual-dose first (production), then pa_dosage (staging).

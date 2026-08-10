@@ -72,7 +72,7 @@ $programs = [
 		'option_label'  => 'weight loss',
 		'hero_image'    => 'weight-loss-category-vials.webp',
 		'hero_cta'      => home_url( '/product/compound-tirzepatide/' ),
-		'products'      => [ 'tirzepatide', 'semaglutide', 'retatrutide' ],
+		'products'      => [ 'tirzepatide', 'semaglutide' ],
 	],
 	'mens-health' => [
 		'eyebrow'       => 'Hormone optimization',
