@@ -245,9 +245,10 @@ get_header();
 		<div class="grunge-symptoms__image" style="background-image:url('<?php echo $myo_asset( 'section bg 2.png' ); ?>')" aria-hidden="true"></div>
 		<div class="grunge-symptoms__shade" aria-hidden="true"></div>
 		<div class="grunge-container grunge-symptoms__content">
-			<img class="grunge-symptoms__person" src="<?php echo $myo_asset( 'guy-sad.webp' ); ?>" alt="" width="360" height="420" loading="lazy">
-			<p class="grunge-kicker">Low T signals</p>
-			<h2>Common <span class="grunge-text-red">symptoms</span> of low T</h2>
+			<div class="grunge-symptoms__intro">
+				<img class="grunge-symptoms__person" src="<?php echo $myo_asset( 'guy-sad.webp' ); ?>" alt="" width="360" height="420" loading="lazy">
+				<h2>Common <span class="grunge-text-red">symptoms</span> of low T</h2>
+			</div>
 			<ul class="grunge-symptom-grid grunge-check-list">
 				<?php foreach ( $symptoms as $symptom ) : ?>
 				<li><?php echo esc_html( $symptom ); ?></li>
@@ -339,7 +340,7 @@ get_header();
 		<div class="grunge-final-cta__texture" style="background-image:url('<?php echo $myo_asset( 'thin section bg.png' ); ?>')" aria-hidden="true"></div>
 		<div class="grunge-final-cta__inner">
 			<img src="<?php echo $myo_asset( 'red and white logo.svg' ); ?>" alt="" width="176" height="54" loading="lazy">
-			<h2>Concierge care <span class="grunge-text-red">is live</span></h2>
+			<h2><span class="grunge-final-cta__line">Concierge care</span> <span class="grunge-text-red">is live</span></h2>
 			<div class="grunge-final-cta__actions">
 				<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">Start your evaluation <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
