@@ -42,6 +42,8 @@ $product_ids = [
 	'glutathione'  => 1868,
 	'tesamorelin'  => 2803,
 	'cjc'          => 2619,
+	'klow'         => 2819,
+	'wolverine'    => 2606,
 ];
 
 $product_meta = [
@@ -60,6 +62,8 @@ $product_meta = [
 	'glutathione'  => [ 'name' => 'Glutathione',  'tagline' => 'Antioxidant and renewal support', 'unit' => '/vial' ],
 	'tesamorelin'  => [ 'name' => 'Tesamorelin / Ipamorelin', 'tagline' => 'GH optimization support', 'unit' => '/vial' ],
 	'cjc'          => [ 'name' => 'CJC-1295 / Ipamorelin', 'tagline' => 'Recovery and performance support', 'unit' => '/vial' ],
+	'klow'         => [ 'name' => 'KLOW',         'tagline' => 'Metabolic support', 'unit' => '/vial' ],
+	'wolverine'    => [ 'name' => 'Wolverine',    'tagline' => 'Elite tissue recovery', 'unit' => '/vial' ],
 ];
 
 $programs = [
@@ -105,7 +109,7 @@ $programs = [
 		'option_label'  => 'peptide',
 		'hero_image'    => 'peptides-category-vials.webp',
 		'hero_cta'      => home_url( '/product/bpc/' ),
-		'products'      => [ 'bpc', 'motsc', 'epithalon', 'nad', 'sermorelin', 'glutathione', 'tesamorelin', 'cjc' ],
+		'products'      => [ 'bpc', 'motsc', 'epithalon', 'nad', 'sermorelin', 'glutathione', 'tesamorelin', 'cjc', 'klow', 'wolverine' ],
 	],
 	'womens-health' => [
 		'eyebrow'       => 'Personalized care',
