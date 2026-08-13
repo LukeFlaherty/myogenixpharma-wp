@@ -15,14 +15,28 @@ $_nav_cart_url    = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : h
 $_nav_cart_count  = ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0;
 $_nav_path        = isset( $_SERVER['REQUEST_URI'] ) ? strtok( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), '?' ) : '/';
 
-$_nav_links = [
+$_nav_all_links = [
 	[ 'label' => 'Weight Management', 'url' => home_url( '/weight-management/' ), 'match' => [ '/weight-management/', '/product-category/weight-loss/' ] ],
+	[ 'label' => 'Mens Health',       'url' => home_url( '/mens-health/' ),       'match' => [ '/mens-health/', '/product-category/mens-health/' ] ],
 	[ 'label' => 'Peptides',          'url' => home_url( '/wellness/' ),          'match' => [ '/wellness/', '/product-category/peptides-longevity/' ] ],
 	[ 'label' => 'Sexual Health',     'url' => home_url( '/sexual-health/' ),     'match' => [ '/sexual-health/', '/product-category/sexual-health/' ] ],
 ];
 
-$_mobile_links = array_merge( $_nav_links, [
-	[ 'label' => 'Mens Health', 'url' => home_url( '/mens-health/' ), 'match' => [ '/mens-health/', '/product-category/mens-health/' ] ],
+$_nav_current_index = null;
+foreach ( $_nav_all_links as $_idx => $_link ) {
+	if ( in_array( $_nav_path, $_link['match'], true ) ) {
+		$_nav_current_index = $_idx;
+		break;
+	}
+}
+$_nav_links = array_values( array_filter(
+	$_nav_all_links,
+	fn( $_link, $_idx ) => $_idx !== $_nav_current_index,
+	ARRAY_FILTER_USE_BOTH
+) );
+$_nav_links = array_slice( $_nav_links, 0, 3 );
+
+$_mobile_links = array_merge( $_nav_all_links, [
 	[ 'label' => 'How it works', 'url' => home_url( '/#how-it-works' ), 'match' => [] ],
 	[ 'label' => 'FAQ', 'url' => home_url( '/#faq' ), 'match' => [] ],
 ] );

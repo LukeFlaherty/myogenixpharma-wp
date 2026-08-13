@@ -31,7 +31,7 @@ add_action( 'wp_enqueue_scripts', function() {
 		'myogenix-grunge-redesign',
 		get_stylesheet_directory_uri() . '/assets/css/grunge-redesign.css',
 		[ 'myogenix-home', 'myogenix-grunge-fonts' ],
-		'0.2.0'
+		'0.2.3'
 	);
 	wp_enqueue_script(
 		'myogenix-home',
@@ -40,7 +40,50 @@ add_action( 'wp_enqueue_scripts', function() {
 		'1.6.0',
 		true
 	);
+	wp_enqueue_script(
+		'myogenix-grunge-popup',
+		get_stylesheet_directory_uri() . '/assets/js/grunge-popup.js',
+		[],
+		'1.0.1',
+		true
+	);
 } );
+
+add_action( 'wp_footer', function() {
+	if ( is_admin() ) return;
+	?>
+	<div class="myo-purchase-popup" id="myo-purchase-popup" hidden>
+		<div class="myo-purchase-popup__backdrop" data-myo-popup-close></div>
+		<div class="myo-purchase-popup__dialog" role="dialog" aria-modal="true" aria-labelledby="myo-purchase-popup-title">
+			<button class="myo-purchase-popup__close" type="button" aria-label="Close" data-myo-popup-close>&times;</button>
+			<p class="grunge-kicker">Need help choosing?</p>
+			<h2 id="myo-purchase-popup-title">Get help with your purchase</h2>
+			<p>Tell us where to reach you and a MyoGenix team member can help guide you through which products may fit and what the process looks like.</p>
+			<form class="myo-purchase-popup__form" id="myo-purchase-popup-form">
+				<label>
+					<span>Email</span>
+					<input id="myo-purchase-popup-email" type="email" autocomplete="email" placeholder="you@example.com">
+				</label>
+				<label>
+					<span>Phone</span>
+					<input id="myo-purchase-popup-phone" type="tel" autocomplete="tel" placeholder="(555) 555-5555">
+				</label>
+				<label>
+					<span>What can we help with?</span>
+					<textarea id="myo-purchase-popup-message" rows="3">Help me understand which products are right for me and how the process works.</textarea>
+				</label>
+				<p class="myo-purchase-popup__error" id="myo-purchase-popup-error" hidden></p>
+				<button class="grunge-btn grunge-btn--red myo-purchase-popup__submit" id="myo-purchase-popup-submit" type="submit">Contact me <?php echo myogenix_grunge_arrow_svg(); ?></button>
+				<a class="myo-purchase-popup__email" href="mailto:customersupport@myogenixpharma.com">customersupport@myogenixpharma.com</a>
+			</form>
+			<div class="myo-purchase-popup__success" id="myo-purchase-popup-success" hidden>
+				<strong>We got it.</strong>
+				<span>A team member will reach out to help you choose the right next step.</span>
+			</div>
+		</div>
+	</div>
+	<?php
+}, 30 );
 
 // The coded front page does not use Elementor widgets. Leaving Elementor's
 // frontend bundle there produces a missing elementorFrontendConfig console error.
@@ -287,6 +330,11 @@ add_filter( 'woocommerce_add_cart_item_data', function ( $cart_item_data, $produ
 	}
 	return $cart_item_data;
 }, 10, 2 );
+
+add_filter( 'woocommerce_add_to_cart_redirect', function( $url ) {
+	if ( empty( $_REQUEST['myogenix_checkout_redirect'] ) ) return $url;
+	return function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : home_url( '/checkout/' );
+} );
 
 // Display dose schedule in cart and checkout review with weekly breakdown.
 // Uses separate entries so WC Blocks checkout renders each as its own row.
@@ -753,7 +801,7 @@ add_action( 'wp_enqueue_scripts', function() {
 				'myogenix-sexual-health-pdp',
 				get_stylesheet_directory_uri() . '/assets/js/sexual-health-pdp.js',
 				[],
-					'1.3.3',
+					'1.3.7',
 				true
 			);
 		}
@@ -1091,7 +1139,7 @@ function myogenix_render_product_faq( $product_id ) {
 				<?php endforeach; ?>
 				</div>
 				<div class="myo-faq__cta">
-					<a href="#buy" class="myo-faq__cta-btn">Continue to evaluation</a>
+					<a href="#buy" class="myo-faq__cta-btn">Choose options</a>
 					<a href="<?= esc_url( home_url( '/reach-a-concierge/' ) ) ?>" class="myo-faq__cta-btn myo-faq__cta-btn--dark">Ask a question</a>
 				</div>
 				<p class="trt-pdp__faq-disclaimer">Prescription required if approved. Plan review by licensed provider.</p>

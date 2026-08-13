@@ -20,6 +20,7 @@
 	var primaryLabels   = JSON.parse( cfg.getAttribute( 'data-primary-labels' )   || '{}' );
 	var secondaryLabels = JSON.parse( cfg.getAttribute( 'data-secondary-labels' ) || '{}' );
 	var productId       = cfg.getAttribute( 'data-product-id' ) || '';
+	var checkoutUrl     = cfg.getAttribute( 'data-checkout-url' ) || '';
 	var monthlyBilling  = cfg.getAttribute( 'data-monthly-billing' ) === '1';
 	var flatFeePrice    = parseFloat( cfg.getAttribute( 'data-flat-fee-price' ) || '0' );
 	var flatFeeLabel    = cfg.getAttribute( 'data-flat-fee-label' ) || '';
@@ -99,9 +100,8 @@
 			if ( displayFeePrice > 0 ) {
 				el.innerHTML =
 					'<span class="pdp-cfg__summary-label">Plan review first</span>' +
-					'<div class="pdp-cfg__summary-month-price">Personalized after provider review.</div>' +
+					'<div class="pdp-cfg__summary-month-price">TRT evaluation</div>' +
 					'<p class="pdp-cfg__summary-sub">' + displayFeeLabel + '</p>' +
-					'<div class="pdp-cfg__summary-line"><span>Vial strength</span><strong>' + state.strength + '</strong></div>' +
 					'<div class="pdp-cfg__summary-total">' +
 						'<span>Total today</span>' +
 						'<strong class="pdp-cfg__summary-total-price">' + fmt( displayFeePrice ) + '</strong>' +
@@ -214,9 +214,22 @@
 		} );
 	}
 
+	document.querySelectorAll( '.trt-pdp__lab-option' ).forEach( function ( btn ) {
+		btn.addEventListener( 'click', function () {
+			state.ownLabs = btn.getAttribute( 'data-trt-own-labs' ) === '1';
+			document.querySelectorAll( '.trt-pdp__lab-option' ).forEach( function ( option ) {
+				var active = option === btn;
+				option.classList.toggle( 'pdp-cfg__supply--active', active );
+				option.setAttribute( 'aria-pressed', active ? 'true' : 'false' );
+			} );
+			render();
+		} );
+	} );
+
 	var cta = document.getElementById( 'pdp-cta' );
 	if ( cta ) {
-		cta.addEventListener( 'click', function () {
+		cta.addEventListener( 'click', function ( e ) {
+			e.preventDefault();
 			var entry = getEntry();
 			if ( ! entry || ! entry.id ) return;
 
@@ -238,6 +251,22 @@
 			if ( monthlyBilling && state.strength ) {
 				params += '&trt_strength=' + encodeURIComponent( state.strength );
 			}
+			if ( monthlyBilling ) {
+				params += '&myogenix_checkout_redirect=1';
+			}
+
+			if ( monthlyBilling && checkoutUrl ) {
+				cta.disabled = true;
+				cta.textContent = 'Loading...';
+				fetch( window.location.pathname + '?' + params, { credentials: 'same-origin' } )
+					.then( function () {
+						window.location.href = checkoutUrl;
+					} )
+					.catch( function () {
+						window.location.href = window.location.pathname + '?' + params;
+					} );
+				return;
+			}
 
 			window.location.href = window.location.pathname + '?' + params;
 		} );
@@ -252,6 +281,11 @@
 			state.ownLabs   = false;
 			state.strength  = '200 mg/ml vial';
 			if ( ownLabsCheckbox ) ownLabsCheckbox.checked = false;
+			document.querySelectorAll( '.trt-pdp__lab-option' ).forEach( function ( option ) {
+				var active = option.getAttribute( 'data-trt-own-labs' ) === '0';
+				option.classList.toggle( 'pdp-cfg__supply--active', active );
+				option.setAttribute( 'aria-pressed', active ? 'true' : 'false' );
+			} );
 			var defaultStrength = document.querySelector( '.trt-pdp__strength-btn[data-trt-strength="200 mg/ml vial"]' );
 			if ( defaultStrength ) defaultStrength.click();
 			render();

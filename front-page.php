@@ -36,7 +36,7 @@ $product_meta = [
 	'nad'          => [ 'name' => 'NAD+', 'line' => 'Cellular energy support', 'unit' => '/vial' ],
 	'sermorelin'   => [ 'name' => 'Sermorelin', 'line' => 'GH optimization support', 'unit' => '/vial' ],
 	'glutathione'  => [ 'name' => 'Glutathione', 'line' => 'Antioxidant and renewal support', 'unit' => '/vial' ],
-	'tadalafil'    => [ 'name' => 'Tadalafil', 'line' => 'Daily ED support', 'unit' => '/tablet' ],
+	'tadalafil'    => [ 'name' => 'Tadalafil', 'line' => 'Daily ED support', 'unit' => '/tablet', 'tablets_supply' => 90 ],
 	'sildenafil'   => [ 'name' => 'Sildenafil', 'line' => 'Fast-acting ED treatment', 'unit' => '/mo' ],
 ];
 
@@ -58,6 +58,9 @@ foreach ( $product_ids as $key => $id ) {
 		}
 	}
 
+	if ( ! empty( $product_meta[ $key ]['tablets_supply'] ) ) {
+		$raw_price = $raw_price / max( 1, (int) $product_meta[ $key ]['tablets_supply'] );
+	}
 	$decimals = ( isset( $product_meta[ $key ]['unit'] ) && '/tablet' === $product_meta[ $key ]['unit'] ) ? 2 : 0;
 	$products[ $key ] = [
 		'name'  => $product_meta[ $key ]['name'],
@@ -71,18 +74,17 @@ foreach ( $product_ids as $key => $id ) {
 
 $care_features = [
 	[ 'label' => 'Physician-guided care', 'icon' => 'doctor.svg' ],
-	[ 'label' => 'Lab testing with Quest', 'icon' => 'vial.svg' ],
+	[ 'label' => 'Online evaluation', 'icon' => 'laptop-check.svg' ],
 	[ 'label' => 'Personalized treatment plans', 'icon' => 'rx.svg' ],
 	[ 'label' => 'Medication shipped to your door', 'icon' => 'box.svg' ],
 	[ 'label' => 'Dedicated concierge support', 'icon' => 'headphones.svg' ],
 ];
 
 $steps = [
-	[ 'number' => '1', 'title' => 'Quick online intake', 'body' => 'Complete your medical questionnaire in minutes.' ],
-	[ 'number' => '2', 'title' => 'Quest lab testing', 'body' => 'Get diagnostic labs at a trusted local Quest.' ],
-	[ 'number' => '3', 'title' => 'Physician review', 'body' => 'A licensed provider reviews your results and health history.' ],
-	[ 'number' => '4', 'title' => 'Personalized plan', 'body' => 'Your dose is built for your goals, symptoms, and markers.' ],
-	[ 'number' => '5', 'title' => 'Shipped to your door', 'body' => 'Medication arrives discreetly with ongoing concierge care.' ],
+	[ 'number' => '1', 'title' => 'Choose a treatment line', 'body' => 'Explore the program or medication that fits your goals.' ],
+	[ 'number' => '2', 'title' => 'Complete your online intake', 'body' => 'Share your health history so a provider can review next steps.' ],
+	[ 'number' => '3', 'title' => 'Provider review', 'body' => 'A licensed provider reviews your order before treatment moves forward.' ],
+	[ 'number' => '4', 'title' => 'Discreet fulfillment', 'body' => 'If approved, your medication is prepared and shipped to your door.' ],
 ];
 
 $programs = [
@@ -112,7 +114,7 @@ $programs = [
 	],
 ];
 
-$featured_keys = [ 'testosterone', 'tirzepatide', 'semaglutide', 'bpc', 'nad', 'tadalafil' ];
+$featured_keys = [ 'tirzepatide', 'semaglutide', 'tadalafil', 'sildenafil', 'bpc', 'nad' ];
 
 $symptoms = [
 	'Low energy',
@@ -128,18 +130,18 @@ $symptoms = [
 $trust_items = [
 	[ 'title' => 'Built for athletes', 'body' => 'Performance roots. Clinical standards.', 'icon' => 'muscle-icon.webp' ],
 	[ 'title' => 'Physician-guided care', 'body' => 'Licensed medical oversight.', 'icon' => 'hospital-staff.webp' ],
-	[ 'title' => 'Quest diagnostics', 'body' => 'Industry-leading lab partner.', 'icon' => 'quest-logo-new.webp' ],
+	[ 'title' => 'Discreet delivery', 'body' => 'Care shipped directly to your door.', 'icon' => 'box.svg' ],
 	[ 'title' => 'Concierge follow-up', 'body' => 'Real support. Always here.', 'icon' => 'headphones.svg' ],
 ];
 
 $faqs = [
 	[
 		'q' => 'How do I start?',
-		'a' => 'Start with the online evaluation. We collect your goals, medical history, and the details a provider needs to determine next steps.',
+		'a' => 'Start by choosing the treatment line or medication you want to learn more about. Each product page explains the next step before checkout.',
 	],
 	[
 		'q' => 'Do I need labs?',
-		'a' => 'For TRT, labs are part of the care path. We use diagnostics to help guide eligibility, treatment planning, and follow-up.',
+		'a' => 'Some programs require labs before treatment can be approved. The product page will explain what is required for that medication.',
 	],
 	[
 		'q' => 'Who reviews my results?',
@@ -175,9 +177,9 @@ get_header();
 					<span class="grunge-word grunge-word--red">MyoGenix</span>
 					<span class="grunge-word grunge-word--white">Pharma</span>
 				</h1>
-				<p class="grunge-hero__lead">Concierge telehealth for TRT <span>Performance care, guided by humans.</span></p>
+				<p class="grunge-hero__lead">Concierge telehealth for performance and wellness <span>Care guided by real humans.</span></p>
 				<div class="grunge-hero__actions">
-					<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">Start your evaluation <?php echo myogenix_grunge_arrow_svg(); ?></a>
+					<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/weight-management/' ) ); ?>">Explore treatments <?php echo myogenix_grunge_arrow_svg(); ?></a>
 					<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				</div>
 			</div>
@@ -226,17 +228,17 @@ get_header();
 				<img src="<?php echo $myo_asset( 'mgrx-phone-care-journey.webp' ); ?>" alt="MyoGenix care journey" width="620" height="620" loading="lazy">
 			</div>
 			<div class="grunge-performance__copy">
-				<p class="grunge-kicker">TRT care path</p>
-				<h2>Concierge telehealth <span class="grunge-text-red">for TRT</span></h2>
-				<p><span class="grunge-text-red">Physician-guided</span> treatment. Human support.</p>
+				<p class="grunge-kicker">Treatment lines</p>
+				<h2>Medication options <span class="grunge-text-red">built around goals</span></h2>
+				<p><span class="grunge-text-red">Provider-reviewed</span> care across weight management, men's health, peptides, and sexual health.</p>
 				<ul class="grunge-check-list">
-					<li>Online enrollment</li>
-					<li>Licensed providers</li>
-					<li>Personalized dosing</li>
-					<li>Doorstep delivery</li>
-					<li>Human concierge support</li>
+					<li>GLP-1 weight-management options</li>
+					<li>TRT, HCG, and hormone support</li>
+					<li>Recovery and longevity peptides</li>
+					<li>Discreet sexual health medications</li>
+					<li>Human concierge support before you choose</li>
 				</ul>
-				<a class="grunge-btn grunge-btn--red grunge-inline-cta" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">Start TRT <?php echo myogenix_grunge_arrow_svg(); ?></a>
+				<a class="grunge-btn grunge-btn--red grunge-inline-cta" href="<?php echo esc_url( home_url( '/weight-management/' ) ); ?>">Explore programs <?php echo myogenix_grunge_arrow_svg(); ?></a>
 			</div>
 		</div>
 	</section>
@@ -247,14 +249,19 @@ get_header();
 		<div class="grunge-container grunge-symptoms__content">
 			<div class="grunge-symptoms__intro">
 				<img class="grunge-symptoms__person" src="<?php echo $myo_asset( 'guy-sad.webp' ); ?>" alt="" width="360" height="420" loading="lazy">
-				<h2>Common <span class="grunge-text-red">symptoms</span> of low T</h2>
+				<h2>Support for <span class="grunge-text-red">real goals</span></h2>
 			</div>
 			<ul class="grunge-symptom-grid grunge-check-list">
-				<?php foreach ( $symptoms as $symptom ) : ?>
-				<li><?php echo esc_html( $symptom ); ?></li>
-				<?php endforeach; ?>
+				<li>Weight management</li>
+				<li>Metabolic support</li>
+				<li>Hormone optimization</li>
+				<li>Sexual performance</li>
+				<li>Recovery support</li>
+				<li>Longevity-focused care</li>
+				<li>Energy and consistency</li>
+				<li>Private, provider-guided treatment</li>
 			</ul>
-			<a class="grunge-btn grunge-btn--red grunge-inline-cta" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">See if TRT is right for you <?php echo myogenix_grunge_arrow_svg(); ?></a>
+			<a class="grunge-btn grunge-btn--red grunge-inline-cta" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Get product guidance <?php echo myogenix_grunge_arrow_svg(); ?></a>
 		</div>
 	</section>
 
@@ -342,7 +349,7 @@ get_header();
 			<img src="<?php echo $myo_asset( 'red and white logo.svg' ); ?>" alt="" width="176" height="54" loading="lazy">
 			<h2><span class="grunge-final-cta__line">Concierge care</span> <span class="grunge-text-red">is live</span></h2>
 			<div class="grunge-final-cta__actions">
-				<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">Start your evaluation <?php echo myogenix_grunge_arrow_svg(); ?></a>
+				<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/weight-management/' ) ); ?>">Explore treatments <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 			</div>
 		</div>
