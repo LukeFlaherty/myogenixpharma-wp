@@ -4,7 +4,7 @@
  * "rdx-hero" alongside the rdx-nav component; nothing here is shared with
  * the rest of the live site.
  *
- * "Start Evaluation" placeholder-links to the current page pending a real
+ * The primary CTA placeholder-links to the current page pending a real
  * evaluation flow, same as the navbar CTA — see site-header-redesign.php.
  */
 defined( 'ABSPATH' ) || exit;
@@ -50,7 +50,7 @@ $_rdx_hero_fg_url  = myogenix_rdx_asset_url( 'hero-foreground.png', $_rdx_hero_i
 
 			<div class="rdx-hero__ctas">
 				<a href="<?php echo esc_url( $_rdx_hero_cta_url ); ?>" class="rdx-nav__cta rdx-nav__cta--primary rdx-hero__cta">
-					Start Evaluation
+					Learn More
 					<?php echo $_rdx_hero_arrow; ?>
 				</a>
 				<a href="<?php echo esc_url( $_rdx_hero_ask_url ); ?>" class="rdx-nav__cta rdx-nav__cta--secondary rdx-hero__cta">Ask a Question</a>

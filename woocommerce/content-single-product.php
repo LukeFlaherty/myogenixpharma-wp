@@ -1313,7 +1313,7 @@ if ( $is_weight_loss ) :
 							<p class="trt-state__unavailable-desc">
 								We currently offer TRT services in 48 states. We&rsquo;re not yet licensed to prescribe in your area, but we&rsquo;re actively expanding coverage.
 							</p>
-							<a href="mailto:support@myogenixpharma.com" class="trt-state__unavailable-link">
+							<a href="mailto:customersupport@myogenixpharma.com" class="trt-state__unavailable-link">
 								Contact us about future availability
 							</a>
 						</div>

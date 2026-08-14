@@ -672,11 +672,12 @@ add_action( 'woocommerce_cart_calculate_fees', function ( $cart ) {
 
 	$consultation_fee_amount = 0;
 	foreach ( $cart->get_fees() as $fee ) {
-		if ( 'Consultation Fee' === $fee->name ) {
+		$fee_name = strtolower( wp_strip_all_tags( html_entity_decode( (string) $fee->name, ENT_QUOTES, 'UTF-8' ) ) );
+		if ( str_contains( $fee_name, 'consultation' ) || str_contains( $fee_name, 'blood work' ) || str_contains( $fee_name, 'bloodwork' ) ) {
 			$consultation_fee_amount += $fee->amount;
 		}
 	}
-	$discount = min( 100, $consultation_fee_amount ); // $100 off, matches "save $100" PDP copy
+	$discount = min( 100, $consultation_fee_amount ); // $100 off: $165 without labs vs $65 with labs.
 	if ( $discount <= 0 ) return;
 
 	$cart->add_fee( 'Own Labs Discount', -$discount, true );
