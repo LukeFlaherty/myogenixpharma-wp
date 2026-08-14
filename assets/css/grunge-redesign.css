@@ -93,7 +93,6 @@ body.single-product header.home-nav + * {
   background-blend-mode: soft-light, multiply, normal;
   background-size: 100% 100%, 520px 350px, auto;
   background-position: center;
-  background-repeat: no-repeat;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -190,7 +189,6 @@ body.single-product header.home-nav + * {
     linear-gradient(rgba(220, 38, 38, 0.9), rgba(220, 38, 38, 0.9)),
     url("../images/grunge-redesign/concrete-texture.jpg");
   background-size: auto, 420px 280px;
-  background-repeat: no-repeat;
   background-blend-mode: normal, multiply;
   color: #fff;
   box-shadow: 0 0 24px rgba(220, 38, 38, 0.35);
@@ -870,7 +868,6 @@ body.single-product header.home-nav + * {
   background-blend-mode: soft-light, multiply, normal;
   background-size: 100% 100%, 520px 350px, auto;
   background-position: center;
-  background-repeat: no-repeat;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -890,7 +887,6 @@ body.single-product header.home-nav + * {
   background-blend-mode: soft-light, multiply, normal;
   background-size: 100% 100%, 520px 350px, auto;
   background-position: center;
-  background-repeat: no-repeat;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1563,34 +1559,6 @@ body.single-product header.home-nav + * {
   filter: drop-shadow(0 30px 55px rgba(0, 0, 0, 0.75));
 }
 
-.grunge-category-hero__media > img {
-  position: relative;
-  z-index: 1;
-}
-
-.grunge-category-hero__collage {
-  position: absolute;
-  right: clamp(4px, 4vw, 48px);
-  bottom: 22px;
-  z-index: 2;
-  display: grid;
-  grid-template-columns: repeat(2, 92px);
-  gap: 10px;
-  padding: 12px;
-  border: 1px solid rgba(220, 38, 38, 0.5);
-  background: rgba(0, 0, 0, 0.56);
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(8px);
-}
-
-.grunge-category-hero__collage img {
-  width: 92px;
-  height: 92px;
-  margin: 0;
-  object-fit: contain;
-  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.65));
-}
-
 .grunge-category-product-grid {
   position: relative;
   z-index: 2;
@@ -1962,81 +1930,12 @@ body.single-product .myogenix-pdp__explore .hp-catbox {
   backdrop-filter: blur(8px);
 }
 
-body.single-product .hp-step__body {
-  padding-left: clamp(14px, 2vw, 22px);
-  padding-right: clamp(14px, 2vw, 22px);
-}
-
-body.single-product .myo-faq__cta {
-  align-items: stretch;
-}
-
-body.single-product .myo-faq__cta-btn {
-  justify-content: center;
-  text-align: center;
-  white-space: normal;
-}
-
 body.single-product .pdp-hero__wc-hidden {
   display: none !important;
 }
 
 body.single-product .pdp-cfg {
   padding: 18px;
-}
-
-body.single-product .trt-pdp__requirements,
-body.single-product .trt-pdp__lab-options {
-  margin-bottom: 20px;
-}
-
-body.single-product .trt-pdp__requirement-grid {
-  display: grid;
-  gap: 10px;
-}
-
-body.single-product .trt-pdp__requirement-card {
-  padding: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.055);
-}
-
-body.single-product .trt-pdp__requirement-card strong,
-body.single-product .trt-pdp__requirement-card span,
-body.single-product .trt-pdp__lab-option span,
-body.single-product .trt-pdp__lab-option small {
-  display: block;
-}
-
-body.single-product .trt-pdp__requirement-card strong,
-body.single-product .trt-pdp__lab-option span {
-  color: #fff;
-  font-family: var(--myo-font-display);
-  font-size: 1.18rem;
-  font-weight: 400;
-  letter-spacing: 0.04em;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-body.single-product .trt-pdp__requirement-card span,
-body.single-product .trt-pdp__lab-option small {
-  margin-top: 7px;
-  color: var(--myo-zinc-400);
-  font-size: 0.78rem;
-  font-weight: 700;
-  line-height: 1.45;
-}
-
-body.single-product .trt-pdp__lab-option {
-  min-height: 132px;
-  align-content: start;
-  justify-items: start;
-  text-align: left;
-}
-
-body.single-product .trt-pdp__lab-option strong {
-  font-size: 1.32rem;
 }
 
 body.single-product .pdp-cfg__section-label,
@@ -2456,41 +2355,6 @@ body.single-product .myogenix-pdp__cq-heading {
 
   body.single-product .pdp-cfg__pkg-row {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 640px) and (max-width: 1023px) {
-  .grunge-final-cta__inner {
-    grid-template-columns: 1fr;
-    max-width: 680px;
-  }
-
-  .grunge-final-cta__actions {
-    flex-direction: column;
-    width: min(100%, 380px);
-  }
-
-  .grunge-final-cta h2 .grunge-text-red,
-  .grunge-final-cta__line {
-    white-space: normal;
-  }
-
-  body.single-product .myo-faq__cta {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 767px) {
-  .grunge-category-hero__collage {
-    right: 50%;
-    bottom: 8px;
-    grid-template-columns: repeat(4, 64px);
-    transform: translateX(50%);
-  }
-
-  .grunge-category-hero__collage img {
-    width: 64px;
-    height: 64px;
   }
 }
 

@@ -50,9 +50,9 @@ $product_meta = [
 	'tirzepatide'  => [ 'name' => 'Tirzepatide',  'tagline' => 'Dual-action GLP-1 therapy', 'unit' => '/mo' ],
 	'semaglutide'  => [ 'name' => 'Semaglutide',  'tagline' => 'Proven GLP-1 therapy', 'unit' => '/mo' ],
 	'retatrutide'  => [ 'name' => 'Retatrutide',  'tagline' => 'Triple-action weight support', 'unit' => '/mo', 'url' => home_url( '/retatrutide/' ) ],
-	'testosterone' => [ 'name' => 'Testosterone Therapy', 'tagline' => 'TRT evaluation and care', 'unit' => '', 'price_label' => 'From $65 today', 'price_prefix' => 'Evaluation' ],
+	'testosterone' => [ 'name' => 'Testosterone', 'tagline' => 'Hormone optimization', 'unit' => '/mo' ],
 	'hcg'          => [ 'name' => 'HCG',          'tagline' => 'Natural testosterone support', 'unit' => '' ],
-	'tadalafil'    => [ 'name' => 'Tadalafil',    'tagline' => 'Daily ED support', 'unit' => '/tablet', 'tablets_supply' => 90 ],
+	'tadalafil'    => [ 'name' => 'Tadalafil',    'tagline' => 'Daily ED support', 'unit' => '/tablet' ],
 	'sildenafil'   => [ 'name' => 'Sildenafil',   'tagline' => 'Fast-acting ED treatment', 'unit' => '/mo' ],
 	'bpc'          => [ 'name' => 'BPC-157',      'tagline' => 'Recovery and repair support', 'unit' => '/vial' ],
 	'motsc'        => [ 'name' => 'MOTSc',        'tagline' => 'Mitochondrial performance', 'unit' => '/vial' ],
@@ -85,10 +85,9 @@ $programs = [
 		'subtitle'      => 'Provider-managed TRT, built around your labs and goals.',
 		'body'          => 'Online intake, provider review, personalized treatment options, and concierge support.',
 		'option_label'  => "men's health",
-		'hero_image'    => 'trt-category-image.webp',
+		'hero_image'    => 'mgrx-hero-team.webp',
 		'hero_cta'      => home_url( '/product/testosterone/' ),
 		'products'      => [ 'testosterone', 'hcg', 'tadalafil', 'sildenafil' ],
-		'collage'       => [ 'testosterone', 'hcg', 'tadalafil', 'sildenafil' ],
 	],
 	'sexual-health' => [
 		'eyebrow'       => 'Discreet provider review',
@@ -100,7 +99,6 @@ $programs = [
 		'hero_image'    => 'sexual-health-products.webp',
 		'hero_cta'      => home_url( '/product/compound-oral-tadalafil/' ),
 		'products'      => [ 'tadalafil', 'sildenafil' ],
-		'collage'       => [ 'tadalafil', 'sildenafil' ],
 	],
 	'wellness' => [
 		'eyebrow'       => 'Compounded peptides',
@@ -170,19 +168,14 @@ $get_product = function( $key ) use ( $product_ids, $product_meta ) {
 		}
 	}
 
-	$meta = $product_meta[ $key ] ?? [];
-	if ( ! empty( $meta['tablets_supply'] ) ) {
-		$raw_price = $raw_price / max( 1, (int) $meta['tablets_supply'] );
-	}
-	$decimals    = ( ( $meta['unit'] ?? '' ) === '/tablet' ) ? 2 : 0;
-	$price_label = $meta['price_label'] ?? ( '$' . number_format( max( 0, $raw_price ), $decimals ) );
+	$meta     = $product_meta[ $key ] ?? [];
+	$decimals = ( ( $meta['unit'] ?? '' ) === '/tablet' ) ? 2 : 0;
 
 	return [
 		'name'    => $meta['name'] ?? $product->get_name(),
 		'tagline' => $meta['tagline'] ?? '',
 		'unit'    => $meta['unit'] ?? '',
-		'price'   => $price_label,
-		'price_prefix' => $meta['price_prefix'] ?? 'Starting at',
+		'price'   => '$' . number_format( max( 0, $raw_price ), $decimals ),
 		'url'     => $meta['url'] ?? $product->get_permalink(),
 		'image'   => get_the_post_thumbnail_url( $id, 'large' ) ?: get_the_post_thumbnail_url( $id, 'full' ) ?: '',
 	];
@@ -223,22 +216,12 @@ get_header();
 				<p class="grunge-category-hero__subtitle"><?php echo esc_html( $program['subtitle'] ); ?></p>
 				<p class="grunge-category-hero__body"><?php echo esc_html( $program['body'] ); ?></p>
 				<div class="grunge-hero__actions">
-					<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( $program['hero_cta'] ); ?>">Learn about this treatment <?php echo myogenix_grunge_arrow_svg(); ?></a>
+					<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( $program['hero_cta'] ); ?>">Continue to evaluation <?php echo myogenix_grunge_arrow_svg(); ?></a>
 					<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				</div>
 			</div>
 			<div class="grunge-category-hero__media">
 				<img src="<?php echo $myo_asset( $program['hero_image'] ); ?>" alt="" width="620" height="520">
-				<?php if ( ! empty( $program['collage'] ) ) : ?>
-				<div class="grunge-category-hero__collage" aria-hidden="true">
-					<?php foreach ( $program['collage'] as $collage_key ) :
-						$collage_product = $get_product( $collage_key );
-						if ( ! $collage_product || empty( $collage_product['image'] ) ) continue;
-					?>
-					<img src="<?php echo esc_url( $collage_product['image'] ); ?>" alt="" width="160" height="160" loading="lazy">
-					<?php endforeach; ?>
-				</div>
-				<?php endif; ?>
 			</div>
 		</div>
 	</section>
@@ -275,9 +258,9 @@ get_header();
 					<div class="grunge-category-product-card__body">
 						<p><?php echo esc_html( $product['tagline'] ); ?></p>
 						<h3><?php echo esc_html( $product['name'] ); ?></h3>
-						<span><?php echo esc_html( $product['price_prefix'] ); ?></span>
+						<span>Starting at</span>
 						<strong><?php echo esc_html( $product['price'] ); ?><small><?php echo esc_html( $product['unit'] ); ?></small></strong>
-						<em>Learn More <?php echo myogenix_grunge_arrow_svg(); ?></em>
+						<em>Start Now <?php echo myogenix_grunge_arrow_svg(); ?></em>
 					</div>
 				</a>
 				<?php endforeach; ?>
@@ -317,7 +300,7 @@ get_header();
 			<img src="<?php echo $myo_asset( 'red and white logo.svg' ); ?>" alt="MyoGenix Pharma" width="176" height="54" loading="lazy">
 			<h2>Ready to start? <span class="grunge-text-red">We are here to help.</span></h2>
 			<div class="grunge-final-cta__actions">
-				<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( $program['hero_cta'] ); ?>">Learn about this treatment <?php echo myogenix_grunge_arrow_svg(); ?></a>
+				<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( $program['hero_cta'] ); ?>">Continue to evaluation <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 			</div>
 		</div>

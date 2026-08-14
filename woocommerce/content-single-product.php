@@ -242,7 +242,7 @@ if ( $is_weight_loss ) :
 				<h1 class="pdp-hero__title"><?php echo esc_html( $h['title'] ); ?></h1>
 				<p class="pdp-hero__desc"><?php echo esc_html( $h['hero_line'] ); ?> <span><?php echo esc_html( $h['hero_accent'] ); ?></span></p>
 				<div class="trt-pdp__hero-actions">
-					<a class="grunge-btn grunge-btn--red" href="#buy">Choose options <?php echo myogenix_grunge_arrow_svg(); ?></a>
+					<a class="grunge-btn grunge-btn--red" href="#buy">Continue to evaluation <?php echo myogenix_grunge_arrow_svg(); ?></a>
 					<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				</div>
 				<ul class="pdp-hero__bullets">
@@ -369,7 +369,7 @@ if ( $is_weight_loss ) :
 					<div id="pdp-summary" class="pdp-cfg__summary"></div>
 
 					<!-- CTA -->
-					<button id="pdp-cta" class="pdp-cfg__cta" type="button">Go to Checkout</button>
+					<button id="pdp-cta" class="pdp-cfg__cta">Go to Checkout</button>
 
 					<div class="peptide-cfg__includes">
 						<p class="peptide-cfg__includes-title">What's included</p>
@@ -653,7 +653,7 @@ if ( $is_weight_loss ) :
 				<h1 class="pdp-hero__title"><?php echo esc_html( $pcfg['name'] ); ?></h1>
 				<p class="pdp-hero__desc"><?php echo esc_html( $pcfg['hero_line'] ); ?> <span><?php echo esc_html( $pcfg['hero_accent'] ); ?></span></p>
 				<div class="trt-pdp__hero-actions">
-					<a class="grunge-btn grunge-btn--red" href="#buy">Choose options <?php echo myogenix_grunge_arrow_svg(); ?></a>
+					<a class="grunge-btn grunge-btn--red" href="#buy">Continue to evaluation <?php echo myogenix_grunge_arrow_svg(); ?></a>
 					<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				</div>
 				<ul class="pdp-hero__bullets">
@@ -763,7 +763,7 @@ if ( $is_weight_loss ) :
 					<div class="pdp-cfg__side">
 					<div id="peptide-summary" class="pdp-cfg__summary"></div>
 
-					<button id="pdp-cta" class="pdp-cfg__cta" type="button">Go to Checkout</button>
+					<button id="pdp-cta" class="pdp-cfg__cta">Go to Checkout</button>
 					<p id="pdp-disclaimer" class="pdp-cfg__disclaimer">
 						One-time purchase. Order reviewed by a licensed provider before processing.
 					</p>
@@ -916,31 +916,28 @@ if ( $is_weight_loss ) :
 			'flat_fee_label'  => '',
 		],
 		'testosterone' => [
-			'name'            => 'Testosterone Therapy',
+			'name'            => 'Testosterone Cypionate',
 			'badge'           => 'Provider-reviewed men\'s health',
 			'desc'            => 'Testosterone Cypionate is a long-acting injectable testosterone used to treat hypogonadism (low T). It supports energy levels, muscle mass, libido, mood, and overall wellbeing.',
 			'hero_line'       => 'Provider-managed TRT',
-			'hero_accent'     => 'Testosterone therapy',
+			'hero_accent'     => 'Testosterone Cypionate',
 			'includes'        => [
-				'Testosterone cypionate',
-				'Labwork',
-				'Doctor consultations',
-				'Syringes',
-				'Alcohol swabs',
-				'Estrogen support if necessary',
+				'Safe, effective, supported',
+				'Prescription required',
+				'Reviewed by licensed provider',
 				'Shipped to your door',
 			],
 			'primary_attr'    => 'pa_subscription-plan',
-			'primary_label'   => 'TRT evaluation',
+			'primary_label'   => '2. Quantity',
 			'secondary_attr'  => null,
 			'secondary_label' => null,
 			'fixed_attrs'     => [],
-			'cta_label'       => 'Continue to Checkout',
+			'cta_label'       => 'Continue to Evaluation',
 			'disclaimer'      => 'Order reviewed by a licensed provider before processing.',
 			'flat_fee_price'  => 165,
-			'flat_fee_label'  => 'Schedule bloodwork after payment',
+			'flat_fee_label'  => 'Male Hormone Panel & Initial Doctor Consult',
 			'flat_fee_price_own_labs' => 65,
-			'flat_fee_label_own_labs' => 'Schedule doctor consult and upload labs after payment',
+			'flat_fee_label_own_labs' => 'Initial Doctor Consult (labs provided by you)',
 		],
 		'hcg' => [
 			'name'            => 'HCG',
@@ -1061,20 +1058,12 @@ if ( $is_weight_loss ) :
 		return esc_url( $base . implode( '/', array_map( 'rawurlencode', $parts ) ) );
 	};
 
-			$steps = [
-				[ 'num' => '1', 'img' => 'grunge-redesign/laptop-check.svg', 'title' => 'Quick Online Intake',  'desc' => 'Complete your confidential medical questionnaire in minutes.' ],
-				[ 'num' => '2', 'img' => 'grunge-redesign/doctor.svg',       'title' => 'Provider Review',      'desc' => 'A licensed provider reviews your health history and goals.' ],
-				[ 'num' => '3', 'img' => 'grunge-redesign/rx.svg',           'title' => 'Personalized Plan',    'desc' => 'Your protocol is reviewed for the selected dose and supply.' ],
-				[ 'num' => '4', 'img' => 'grunge-redesign/box.svg',          'title' => 'Shipped to Your Door', 'desc' => 'Discreet, temperature-aware shipping direct to you.' ],
-			];
-	if ( 'testosterone' === $slug ) {
 		$steps = [
-			[ 'num' => '1', 'img' => 'grunge-redesign/laptop-check.svg', 'title' => 'Checkout', 'desc' => 'Choose whether you have recent labs or need MyoGenix to schedule bloodwork.' ],
-			[ 'num' => '2', 'img' => 'grunge-redesign/doctor.svg', 'title' => 'Medical Questionnaire', 'desc' => 'Complete the medical questionnaire after payment so your provider has the right context.' ],
-			[ 'num' => '3', 'img' => 'grunge-redesign/quest-logo-new.webp', 'title' => 'Quest Instructions', 'desc' => 'If you need labs, you receive instructions to create your Quest appointment at a nearby location.' ],
-			[ 'num' => '4', 'img' => 'grunge-redesign/box.svg', 'title' => 'Provider Review', 'desc' => 'Your provider reviews intake and lab results before any treatment is approved and shipped.' ],
+			[ 'num' => '1', 'img' => 'grunge-redesign/laptop-check.svg', 'title' => 'Quick Online Intake',  'desc' => 'Complete your confidential medical questionnaire in minutes.' ],
+			[ 'num' => '2', 'img' => 'grunge-redesign/doctor.svg',       'title' => 'Provider Review',      'desc' => 'A licensed provider reviews your health history and goals.' ],
+			[ 'num' => '3', 'img' => 'grunge-redesign/rx.svg',           'title' => 'Personalized Plan',    'desc' => 'Your protocol is reviewed for the selected dose and supply.' ],
+			[ 'num' => '4', 'img' => 'grunge-redesign/box.svg',          'title' => 'Shipped to Your Door', 'desc' => 'Discreet, temperature-aware shipping direct to you.' ],
 		];
-	}
 
 	// ─── TRT state gating — 48 states per Myogenix service policy ───────────────
 	// Alaska (AK) and Mississippi (MS) excluded. Update this list as coverage changes.
@@ -1117,18 +1106,18 @@ if ( $is_weight_loss ) :
 				<?php if ( $slug === 'testosterone' ) : ?>
 				<h1 class="pdp-hero__title">
 					<span class="grunge-word grunge-word--red">Testosterone</span>
-					<span class="grunge-word grunge-word--white">Therapy</span>
+					<span class="grunge-word grunge-word--white">TRT Therapy</span>
 				</h1>
 				<p class="pdp-hero__desc">Provider-managed TRT <span>Testosterone Cypionate</span></p>
 				<div class="trt-pdp__hero-actions">
-					<a class="grunge-btn grunge-btn--red" href="#build-plan">Check availability <?php echo myogenix_grunge_arrow_svg(); ?></a>
+					<a class="grunge-btn grunge-btn--red" href="#build-plan">Continue to evaluation <?php echo myogenix_grunge_arrow_svg(); ?></a>
 					<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				</div>
 					<?php else : ?>
 					<h1 class="pdp-hero__title"><?php echo esc_html( $shcfg['name'] ); ?></h1>
 					<p class="pdp-hero__desc"><?php echo esc_html( $shcfg['hero_line'] ); ?> <span><?php echo esc_html( $shcfg['hero_accent'] ); ?></span></p>
 					<div class="trt-pdp__hero-actions">
-						<a class="grunge-btn grunge-btn--red" href="#buy">Choose options <?php echo myogenix_grunge_arrow_svg(); ?></a>
+						<a class="grunge-btn grunge-btn--red" href="#buy">Continue to evaluation <?php echo myogenix_grunge_arrow_svg(); ?></a>
 						<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 					</div>
 					<?php endif; ?>
@@ -1189,9 +1178,8 @@ if ( $is_weight_loss ) :
 
 				<!-- Sexual health configurator -->
 				<div id="pdp-cfg" class="pdp-cfg"
-						data-product-id="<?php echo esc_attr( $product->get_id() ); ?>"
-						data-checkout-url="<?php echo esc_url( function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : home_url( '/checkout/' ) ); ?>"
-						data-variation-matrix="<?php echo esc_attr( wp_json_encode( $variation_matrix ) ); ?>"
+					data-product-id="<?php echo esc_attr( $product->get_id() ); ?>"
+					data-variation-matrix="<?php echo esc_attr( wp_json_encode( $variation_matrix ) ); ?>"
 					data-primary-attr="<?php echo esc_attr( $primary_attr_key ); ?>"
 					data-secondary-attr="<?php echo esc_attr( $secondary_attr_key ?? '' ); ?>"
 					data-fixed-attrs="<?php echo esc_attr( wp_json_encode( $shcfg['fixed_attrs'] ) ); ?>"
@@ -1205,59 +1193,41 @@ if ( $is_weight_loss ) :
 					data-flat-fee-price-own-labs="<?php echo esc_attr( $shcfg['flat_fee_price_own_labs'] ); ?>"
 					data-flat-fee-label-own-labs="<?php echo esc_attr( $shcfg['flat_fee_label_own_labs'] ); ?>"
 					<?php endif; ?>
-					>
-						<div class="pdp-cfg__builder">
-						<?php if ( $slug === 'testosterone' ) : ?>
-						<div class="trt-pdp__requirements" aria-label="What's required to get started">
-							<p class="pdp-cfg__section-label">What's required to get started</p>
-							<div class="trt-pdp__requirement-grid">
-								<div class="trt-pdp__requirement-card">
-									<strong>State eligibility</strong>
-									<span>Confirm TRT is available where you live.</span>
-								</div>
-								<div class="trt-pdp__requirement-card">
-									<strong>Labs</strong>
-									<span>Use recent labs or schedule bloodwork after payment.</span>
-								</div>
-							</div>
-						</div>
-
-						<div class="trt-pdp__lab-options" aria-label="Choose lab path">
-							<p class="pdp-cfg__section-label">Labs</p>
-							<div class="pdp-cfg__supply-row trt-pdp__lab-option-row">
-								<button class="pdp-cfg__supply pdp-cfg__supply--active trt-pdp__lab-option" type="button" aria-pressed="true" data-trt-own-labs="0">
-									<strong>Without labs</strong>
-									<span>$165 today</span>
-									<small>Schedule bloodwork</small>
-								</button>
-								<button class="pdp-cfg__supply trt-pdp__lab-option" type="button" aria-pressed="false" data-trt-own-labs="1">
-									<strong>With labs</strong>
-									<span>$65 today</span>
-									<small>Schedule doctor consult + upload labs after payment</small>
-								</button>
-							</div>
-						</div>
-						<?php else : ?>
-
-						<!-- Primary selector (dosage or plan) -->
-						<p class="pdp-cfg__section-label"><?php echo esc_html( $shcfg['primary_label'] ); ?></p>
+				>
+					<div class="pdp-cfg__builder">
+					<?php if ( $slug === 'testosterone' ) : ?>
+					<div class="trt-pdp__static-row trt-pdp__static-row--strength" aria-label="Vial strength">
+						<p class="pdp-cfg__section-label">1. Vial Strength</p>
 						<div class="pdp-cfg__supply-row">
-							<?php
-							$is_first = true;
-							foreach ( $primary_keys as $p_slug ) :
-							?>
-							<button class="pdp-cfg__supply sh-pdp__primary-btn<?php echo $is_first ? ' pdp-cfg__supply--active' : ''; ?>"
-								data-primary="<?php echo esc_attr( $p_slug ); ?>">
-								<strong><?php echo esc_html( $primary_labels[ $p_slug ] ?? $p_slug ); ?></strong>
-							</button>
-							<?php
-							$is_first = false;
-							endforeach;
-							?>
+								<button class="pdp-cfg__supply pdp-cfg__supply--active trt-pdp__strength-btn" type="button" aria-pressed="true" data-trt-strength="200 mg/ml vial">
+									<strong>200 mg/ml vial</strong>
+								</button>
+								<button class="pdp-cfg__supply trt-pdp__strength-btn" type="button" aria-pressed="false" data-trt-strength="400 mg/ml vial">
+									<strong>400 mg/ml vial</strong>
+								</button>
 						</div>
+					</div>
+					<?php endif; ?>
 
-						<?php if ( $secondary_attr_key && ! empty( $secondary_keys ) ) : ?>
-						<!-- Secondary selector (tablets / supply length) -->
+					<!-- Primary selector (dosage or plan) -->
+					<p class="pdp-cfg__section-label"><?php echo esc_html( $shcfg['primary_label'] ); ?></p>
+					<div class="pdp-cfg__supply-row">
+						<?php
+						$is_first = true;
+						foreach ( $primary_keys as $p_slug ) :
+						?>
+						<button class="pdp-cfg__supply sh-pdp__primary-btn<?php echo $is_first ? ' pdp-cfg__supply--active' : ''; ?>"
+							data-primary="<?php echo esc_attr( $p_slug ); ?>">
+							<strong><?php echo esc_html( $primary_labels[ $p_slug ] ?? $p_slug ); ?></strong>
+						</button>
+						<?php
+						$is_first = false;
+						endforeach;
+						?>
+					</div>
+
+					<?php if ( $secondary_attr_key && ! empty( $secondary_keys ) ) : ?>
+					<!-- Secondary selector (tablets / supply length) -->
 					<p class="pdp-cfg__section-label"><?php echo esc_html( $shcfg['secondary_label'] ); ?></p>
 					<div class="pdp-cfg__supply-row">
 						<?php
@@ -1275,12 +1245,21 @@ if ( $is_weight_loss ) :
 						$is_first = false;
 						endforeach;
 						?>
+					</div>
+					<?php endif; ?>
+
+					<?php if ( $slug === 'testosterone' ) : ?>
+					<div class="trt-pdp__static-row trt-pdp__static-row--schedule" aria-label="Ship schedule">
+						<p class="pdp-cfg__section-label">3. Ship Schedule</p>
+						<div class="pdp-cfg__supply-row">
+							<button class="pdp-cfg__supply" type="button" aria-pressed="true">
+								<strong>One-time order</strong>
+							</button>
 						</div>
-						<?php endif; ?>
+					</div>
+					<?php endif; ?>
 
-						<?php endif; ?>
-
-						<?php if ( $slug === 'testosterone' ) : ?>
+					<?php if ( $slug === 'testosterone' ) : ?>
 					<!-- TRT: state eligibility gate -->
 					<div class="trt-pdp__eligibility">
 						<p class="pdp-cfg__section-label trt-pdp__eligibility-label">
@@ -1313,14 +1292,22 @@ if ( $is_weight_loss ) :
 							<p class="trt-state__unavailable-desc">
 								We currently offer TRT services in 48 states. We&rsquo;re not yet licensed to prescribe in your area, but we&rsquo;re actively expanding coverage.
 							</p>
-							<a href="mailto:customersupport@myogenixpharma.com" class="trt-state__unavailable-link">
+							<a href="mailto:support@myogenixpharma.com" class="trt-state__unavailable-link">
 								Contact us about future availability
 							</a>
 						</div>
 					</div>
 					<?php endif; ?>
 
-						</div>
+					<?php if ( $slug === 'testosterone' ) : ?>
+					<!-- TRT: own-labs discount toggle -->
+					<label class="pdp-cfg__own-labs" for="pdp-own-labs">
+						<input type="checkbox" id="pdp-own-labs" class="pdp-cfg__own-labs-checkbox" />
+						<span class="pdp-cfg__own-labs-text">I already have my own recent labs &mdash; save $100</span>
+					</label>
+					<p class="pdp-cfg__own-labs-note">You'll confirm this during your intake after checkout.</p>
+					<?php endif; ?>
+					</div>
 
 					<!-- What's included -->
 						<?php
@@ -1346,7 +1333,7 @@ if ( $is_weight_loss ) :
 					<div class="pdp-cfg__side">
 					<div id="sh-summary" class="pdp-cfg__summary"></div>
 
-					<button id="pdp-cta" class="pdp-cfg__cta" type="button"><?php echo esc_html( $shcfg['cta_label'] ); ?></button>
+					<button id="pdp-cta" class="pdp-cfg__cta"><?php echo esc_html( $shcfg['cta_label'] ); ?></button>
 					<?php if ( $sh_config_option_count >= 2 ) : ?>
 						<div class="peptide-cfg__includes">
 						<p class="peptide-cfg__includes-title">What's included</p>
@@ -1390,16 +1377,15 @@ if ( $is_weight_loss ) :
 		</div>
 	</section>
 
-	<section class="trt-pdp__plans" aria-label="<?php echo $slug === 'testosterone' ? 'TRT requirements and inclusions' : 'Choose your starting point'; ?>">
+	<section class="trt-pdp__plans" aria-label="Choose your starting point">
 		<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/section bg 4.png' ); ?>')" aria-hidden="true"></div>
 		<div class="trt-pdp__plans-inner">
 			<div class="trt-pdp__plans-copy">
-				<?php if ( $slug === 'testosterone' ) : ?>
-				<p class="grunge-kicker">TRT care path</p>
-				<h2><span class="grunge-word grunge-word--white">What TRT</span><span class="grunge-word grunge-word--red">includes</span></h2>
-				<p>Your evaluation starts with state eligibility and labs. If approved, your provider-managed TRT program is fulfilled with the medication and supplies needed to begin treatment.</p>
-				<?php else : ?>
 				<p class="grunge-kicker">Choose your starting point</p>
+				<?php if ( $slug === 'testosterone' ) : ?>
+					<h2><span class="grunge-word grunge-word--white" data-trt-plan-strength>200 mg/ml vial</span><span class="grunge-word grunge-word--red" data-trt-plan-supply>1 vial</span></h2>
+				<p>Testosterone cypionate is an injectable testosterone ester used for provider-managed testosterone replacement therapy in patients with clinically low levels.</p>
+				<?php else : ?>
 				<h2><span class="grunge-word grunge-word--white"><?php echo esc_html( $shcfg['name'] ); ?></span><span class="grunge-word grunge-word--red"><?php echo esc_html( $shcfg['primary_label'] ); ?></span></h2>
 				<p><?php echo esc_html( $shcfg['desc'] ); ?></p>
 				<?php endif; ?>
@@ -1407,30 +1393,28 @@ if ( $is_weight_loss ) :
 			<div class="trt-pdp__plan-grid">
 				<?php
 				if ( $slug === 'testosterone' ) :
-					$trt_info_cards = [
-						[
-							'title' => 'Required to start',
-							'body'  => 'Confirm eligibility, then complete the lab path that matches your situation.',
-							'items' => [ 'State eligibility', 'Recent labs or scheduled bloodwork', 'Medical questionnaire after payment' ],
-						],
-						[
-							'title' => 'Included if approved',
-							'body'  => 'Your care path covers medication, clinical guidance, and supplies.',
-							'items' => [ 'Testosterone cypionate', 'Labwork', 'Doctor consultations', 'Syringes', 'Alcohol swabs', 'Estrogen support if necessary', 'Shipped to your door' ],
-						],
-					];
-					foreach ( $trt_info_cards as $plan ) :
+						$trt_plan_cards = [
+							[ 'title' => '1 Vial',  'supply' => '~30 day supply', 'qty' => '1 vial', 'primary' => $primary_keys[0] ?? '' ],
+							[ 'title' => '2 Vials', 'supply' => '~60 day supply', 'qty' => '2 vials', 'primary' => $primary_keys[1] ?? '', 'popular' => true ],
+							[ 'title' => '3 Vials', 'supply' => '~90 day supply', 'qty' => '3 vials', 'primary' => $primary_keys[2] ?? '' ],
+						];
+					foreach ( $trt_plan_cards as $plan ) :
 				?>
 				<article class="trt-pdp__plan-card">
+					<?php if ( ! empty( $plan['popular'] ) ) : ?><span class="trt-pdp__popular">Popular</span><?php endif; ?>
 					<h3><?php echo esc_html( $plan['title'] ); ?></h3>
-					<p><?php echo esc_html( $plan['body'] ); ?></p>
+					<p><?php echo esc_html( $plan['supply'] ); ?></p>
 					<ul>
-						<?php foreach ( $plan['items'] as $item ) : ?>
-						<li><?php echo esc_html( $item ); ?></li>
-						<?php endforeach; ?>
+						<li>Energy</li>
+						<li>Libido</li>
+						<li>Muscle mass &amp; mood support for low-T patients</li>
 					</ul>
-					<a class="trt-pdp__select" href="#build-plan">Check availability</a>
-				</article>
+					<dl>
+							<div><dt>Strength</dt><dd data-trt-card-strength>200 mg/ml vial</dd></div>
+							<div><dt>Supply</dt><dd><?php echo esc_html( $plan['qty'] ); ?></dd></div>
+						</dl>
+						<a class="trt-pdp__select" href="#build-plan" data-pdp-primary="<?php echo esc_attr( $plan['primary'] ); ?>">Select Plan</a>
+					</article>
 				<?php
 					endforeach;
 				else :
@@ -1478,10 +1462,7 @@ if ( $is_weight_loss ) :
 			<div class="home-how__header">
 					<p class="home-how__overline">How it works</p>
 						<h2 class="home-how__heading"><span class="grunge-word grunge-word--white">Getting started</span><span class="grunge-word grunge-word--red">is simple</span></h2>
-					<p class="home-how__desc"><?php echo $slug === 'testosterone' ? 'TRT starts with checkout, questionnaire, labs, and provider review before medication is approved.' : 'From your intake to provider review, each step is built for clear, guided care.'; ?></p>
-					<?php if ( $slug === 'testosterone' ) : ?>
-					<a class="grunge-btn grunge-btn--dark trt-pdp__quest-link" href="<?php echo esc_url( home_url( '/how-quest-process-works/' ) ); ?>">How the Quest process works <?php echo myogenix_grunge_arrow_svg(); ?></a>
-					<?php endif; ?>
+					<p class="home-how__desc">From your intake to provider review, each step is built for clear, guided care.</p>
 			</div>
 			<div class="home-how__steps">
 				<?php foreach ( $steps as $step ) : ?>
@@ -1516,12 +1497,9 @@ if ( $is_weight_loss ) :
 			<div class="myo-faq__list">
 				<?php
 				$trt_faqs = [
-					[ 'q' => 'What do I pay for today?', 'a' => 'If you need bloodwork, today covers the lab path and initial doctor consult. If you already have recent labs, today covers the initial doctor consult and you upload labs after payment.' ],
-					[ 'q' => 'What happens after I checkout?', 'a' => 'You complete the medical questionnaire. If you need labs, you receive Quest instructions and schedule your appointment before provider review.' ],
-					[ 'q' => 'Do I pay anything at Quest?', 'a' => 'No. Your lab path is handled through MyoGenix, and Quest receives the information needed for your appointment.' ],
-					[ 'q' => 'How do I schedule Quest bloodwork?', 'a' => 'After checkout and questionnaire completion, you use the Quest instructions to enter your information, search by ZIP code, choose a location, and select an available date and time.' ],
-					[ 'q' => 'When is medication shipped?', 'a' => 'Medication ships only if a licensed provider approves treatment after reviewing your questionnaire and lab results.' ],
-					[ 'q' => 'What is included if approved?', 'a' => 'TRT includes testosterone cypionate, labwork, doctor consultations, syringes, alcohol swabs, estrogen support if necessary, and shipping to your door.' ],
+					[ 'q' => 'How is my dose selected?', 'a' => 'You choose a starting configuration, then a licensed provider reviews whether it is appropriate for your health history and goals.' ],
+					[ 'q' => 'Can I change my quantity?', 'a' => 'Yes. You can select a different supply before checkout. Future protocol changes should be guided by your provider.' ],
+					[ 'q' => 'What happens after provider review?', 'a' => 'If approved, your medication is prepared and shipped. If the provider needs more information, the care team will follow up.' ],
 				];
 				foreach ( $trt_faqs as $idx => $item ) :
 					$panel_id   = 'trt-pdp-faq-' . $idx;
@@ -1542,7 +1520,7 @@ if ( $is_weight_loss ) :
 				</div>
 				<?php endforeach; ?>
 				<div class="myo-faq__cta">
-					<a href="#build-plan" class="myo-faq__cta-btn">Check availability</a>
+					<a href="#build-plan" class="myo-faq__cta-btn">Continue to evaluation</a>
 					<a href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>" class="myo-faq__cta-btn myo-faq__cta-btn--dark">Ask a question</a>
 				</div>
 				<p class="trt-pdp__faq-disclaimer">Prescription required if approved. Plan review by licensed provider.</p>

@@ -6,7 +6,7 @@
  * stylesheet/script (home-redesign.css / home-redesign.js) so nothing here
  * can affect the rest of the live site while the redesign is in progress.
  *
- * "Treatments," "Our Approach," "About Us," and the primary CTA have
+ * "Treatments," "Our Approach," "About Us," and "Start Your Evaluation" have
  * no dedicated pages yet — they placeholder-link to the current page until
  * those are built later in the page-by-page redesign.
  */
@@ -52,7 +52,7 @@ $_rdx_links = [
 
 		<div class="rdx-nav__actions">
 			<a href="<?php echo esc_url( $_rdx_placeholder_url ); ?>" class="rdx-nav__cta rdx-nav__cta--primary">
-				Learn More
+				Start Evaluation
 				<?php echo $_rdx_arrow_svg; ?>
 			</a>
 			<a href="<?php echo esc_url( $_rdx_ask_url ); ?>" class="rdx-nav__cta rdx-nav__cta--secondary">Ask a Question</a>
@@ -100,7 +100,7 @@ $_rdx_links = [
 	</ul>
 	<div class="rdx-nav__drawer-actions">
 		<a href="<?php echo esc_url( $_rdx_placeholder_url ); ?>" class="rdx-nav__cta rdx-nav__cta--primary">
-			Learn More
+			Start Evaluation
 			<?php echo $_rdx_arrow_svg; ?>
 		</a>
 		<a href="<?php echo esc_url( $_rdx_ask_url ); ?>" class="rdx-nav__cta rdx-nav__cta--secondary">Ask a Question</a>

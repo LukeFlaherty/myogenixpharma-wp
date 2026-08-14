@@ -31,7 +31,7 @@ add_action( 'wp_enqueue_scripts', function() {
 		'myogenix-grunge-redesign',
 		get_stylesheet_directory_uri() . '/assets/css/grunge-redesign.css',
 		[ 'myogenix-home', 'myogenix-grunge-fonts' ],
-		'0.2.3'
+		'0.2.4'
 	);
 	wp_enqueue_script(
 		'myogenix-home',
@@ -330,11 +330,6 @@ add_filter( 'woocommerce_add_cart_item_data', function ( $cart_item_data, $produ
 	}
 	return $cart_item_data;
 }, 10, 2 );
-
-add_filter( 'woocommerce_add_to_cart_redirect', function( $url ) {
-	if ( empty( $_REQUEST['myogenix_checkout_redirect'] ) ) return $url;
-	return function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : home_url( '/checkout/' );
-} );
 
 // Display dose schedule in cart and checkout review with weekly breakdown.
 // Uses separate entries so WC Blocks checkout renders each as its own row.
@@ -672,12 +667,11 @@ add_action( 'woocommerce_cart_calculate_fees', function ( $cart ) {
 
 	$consultation_fee_amount = 0;
 	foreach ( $cart->get_fees() as $fee ) {
-		$fee_name = strtolower( wp_strip_all_tags( html_entity_decode( (string) $fee->name, ENT_QUOTES, 'UTF-8' ) ) );
-		if ( str_contains( $fee_name, 'consultation' ) || str_contains( $fee_name, 'blood work' ) || str_contains( $fee_name, 'bloodwork' ) ) {
+		if ( 'Consultation Fee' === $fee->name ) {
 			$consultation_fee_amount += $fee->amount;
 		}
 	}
-	$discount = min( 100, $consultation_fee_amount ); // $100 off: $165 without labs vs $65 with labs.
+	$discount = min( 100, $consultation_fee_amount ); // $100 off, matches "save $100" PDP copy
 	if ( $discount <= 0 ) return;
 
 	$cart->add_fee( 'Own Labs Discount', -$discount, true );
@@ -802,7 +796,7 @@ add_action( 'wp_enqueue_scripts', function() {
 				'myogenix-sexual-health-pdp',
 				get_stylesheet_directory_uri() . '/assets/js/sexual-health-pdp.js',
 				[],
-					'1.3.7',
+					'1.3.3',
 				true
 			);
 		}
@@ -1140,7 +1134,7 @@ function myogenix_render_product_faq( $product_id ) {
 				<?php endforeach; ?>
 				</div>
 				<div class="myo-faq__cta">
-					<a href="#buy" class="myo-faq__cta-btn">Choose options</a>
+					<a href="#buy" class="myo-faq__cta-btn">Continue to evaluation</a>
 					<a href="<?= esc_url( home_url( '/reach-a-concierge/' ) ) ?>" class="myo-faq__cta-btn myo-faq__cta-btn--dark">Ask a question</a>
 				</div>
 				<p class="trt-pdp__faq-disclaimer">Prescription required if approved. Plan review by licensed provider.</p>
