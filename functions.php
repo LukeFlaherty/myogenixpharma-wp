@@ -31,7 +31,7 @@ add_action( 'wp_enqueue_scripts', function() {
 		'myogenix-grunge-redesign',
 		get_stylesheet_directory_uri() . '/assets/css/grunge-redesign.css',
 		[ 'myogenix-home', 'myogenix-grunge-fonts' ],
-		'0.2.5'
+		'0.2.6'
 	);
 	wp_enqueue_script(
 		'myogenix-home',
@@ -127,15 +127,21 @@ function myogenix_get_lowest_product_price( $product, string $unit = '' ): ?floa
 
 add_filter( 'template_include', function( $template ) {
 	$request_path = isset( $_SERVER['REQUEST_URI'] ) ? strtok( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), '?' ) : '';
-	if ( '/quest-faqs/' !== $request_path && '/quest-faqs' !== $request_path ) return $template;
+	$route_templates = [
+		'/quest-faqs/'        => 'page-how-quest-process-works.php',
+		'/quest-faqs'         => 'page-how-quest-process-works.php',
+		'/select-medication/' => 'page-select-medication.php',
+		'/select-medication'  => 'page-select-medication.php',
+	];
+	if ( empty( $route_templates[ $request_path ] ) ) return $template;
 
 	global $wp_query;
 	if ( $wp_query ) {
 		$wp_query->is_404 = false;
 	}
 	status_header( 200 );
-	$quest_template = locate_template( 'page-how-quest-process-works.php' );
-	return $quest_template ?: $template;
+	$route_template = locate_template( $route_templates[ $request_path ] );
+	return $route_template ?: $template;
 }, 20 );
 
 add_action( 'wp_footer', function() {
@@ -178,7 +184,7 @@ add_action( 'wp_footer', function() {
 // The coded front page does not use Elementor widgets. Leaving Elementor's
 // frontend bundle there produces a missing elementorFrontendConfig console error.
 add_action( 'wp_enqueue_scripts', function() {
-	$program_slugs = [ 'weight-management', 'mens-health', 'sexual-health', 'wellness', 'womens-health' ];
+	$program_slugs = [ 'weight-management', 'mens-health', 'sexual-health', 'wellness', 'womens-health', 'select-medication' ];
 	$product_category_slugs = [ 'weight-loss', 'mens-health', 'sexual-health', 'peptides-longevity', 'womens-health', 'uncategorized' ];
 	$is_coded_grunge_page = is_front_page() || is_page( $program_slugs ) || is_singular( 'product' ) || is_page( 'retatrutide' );
 	if ( function_exists( 'is_product_category' ) && is_product_category( $product_category_slugs ) ) {

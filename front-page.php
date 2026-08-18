@@ -247,17 +247,56 @@ get_header();
 				<img src="<?php echo $myo_asset( 'mgrx-phone-care-journey.webp' ); ?>" alt="MyoGenix care journey" width="620" height="620" loading="lazy">
 			</div>
 			<div class="grunge-performance__copy">
-				<p class="grunge-kicker">Weight management</p>
-				<h2>Metabolic care <span class="grunge-text-red">without the waiting room</span></h2>
-				<p><span class="grunge-text-red">Provider-reviewed</span> GLP-1 options with concierge support.</p>
+				<p class="grunge-kicker">TRT care path</p>
+				<h2>Concierge telehealth <span class="grunge-text-red">for TRT</span></h2>
+				<p><span class="grunge-text-red">Physician-guided</span> treatment. Human support.</p>
 				<ul class="grunge-check-list">
-					<li>Semaglutide and tirzepatide options</li>
+					<li>Online enrollment</li>
 					<li>Licensed providers</li>
-					<li>Personalized dosing path</li>
+					<li>Personalized dosing</li>
 					<li>Doorstep delivery</li>
 					<li>Human concierge support</li>
 				</ul>
-				<a class="grunge-btn grunge-btn--red grunge-inline-cta" href="<?php echo esc_url( home_url( '/weight-management/' ) ); ?>">Select Medication <?php echo myogenix_grunge_arrow_svg(); ?></a>
+				<a class="grunge-btn grunge-btn--red grunge-inline-cta" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">Start TRT <?php echo myogenix_grunge_arrow_svg(); ?></a>
+			</div>
+		</div>
+	</section>
+
+	<section class="grunge-section grunge-weight-compare">
+		<div class="grunge-section__texture" style="background-image:url('<?php echo $myo_asset( 'section bg 5.png' ); ?>')" aria-hidden="true"></div>
+		<div class="grunge-container">
+			<div class="grunge-section__header grunge-section__header--split">
+				<div>
+					<p class="grunge-kicker">Weight management</p>
+					<h2>Compare your <span class="grunge-text-red">GLP-1 options</span></h2>
+				</div>
+				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/weight-management/' ) ); ?>">View weight loss <?php echo myogenix_grunge_arrow_svg(); ?></a>
+			</div>
+			<div class="grunge-compare-grid">
+				<?php
+				$compare_cards = [
+					[ 'key' => 'semaglutide', 'best' => 'Established GLP-1 support', 'points' => [ 'Once-weekly injection', 'Appetite and craving support', 'Lower starting price path' ] ],
+					[ 'key' => 'tirzepatide', 'best' => 'Dual-action metabolic care', 'points' => [ 'GIP + GLP-1 activity', 'Once-weekly injection', 'Often selected for stronger support' ] ],
+				];
+				foreach ( $compare_cards as $card ) :
+					if ( empty( $products[ $card['key'] ] ) ) continue;
+					$item = $products[ $card['key'] ];
+				?>
+				<a class="grunge-compare-card" href="<?php echo esc_url( $item['url'] ); ?>">
+					<img src="<?php echo esc_url( $item['image'] ); ?>" alt="<?php echo esc_attr( $item['name'] ); ?>" width="260" height="260" loading="lazy">
+					<div>
+						<p><?php echo esc_html( $card['best'] ); ?></p>
+						<h3><?php echo esc_html( $item['name'] ); ?></h3>
+						<strong><?php echo esc_html( $item['price'] ); ?><span><?php echo esc_html( $item['unit'] ); ?></span></strong>
+						<ul>
+							<?php foreach ( $card['points'] as $point ) : ?>
+							<li><?php echo esc_html( $point ); ?></li>
+							<?php endforeach; ?>
+						</ul>
+						<em>Select <?php echo esc_html( $item['name'] ); ?> <?php echo myogenix_grunge_arrow_svg(); ?></em>
+					</div>
+				</a>
+				<?php endforeach; ?>
 			</div>
 		</div>
 	</section>
