@@ -150,7 +150,6 @@ body.single-product header.home-nav + * {
 .grunge-text-link::after,
 .grunge-program-card span::after,
 .grunge-select-card__body em::after,
-.grunge-compare-card em::after,
 .pdp-cfg__cta::after,
 .pdp-hero__compare::after,
 .trt-state__unavailable-link::after,
@@ -1083,12 +1082,13 @@ body.single-product header.home-nav + * {
   display: flex;
   gap: 10px;
   align-items: center;
-  color: var(--myo-zinc-200);
+  color: #fff;
   font-family: var(--myo-font-display);
   font-size: 1.28rem;
   letter-spacing: 0.055em;
   line-height: 1;
   text-transform: uppercase;
+  -webkit-text-fill-color: currentColor;
 }
 
 .grunge-check-list li::before {
@@ -2612,6 +2612,67 @@ body.single-product .myogenix-pdp__cq-heading {
     position: relative;
     z-index: 2;
     max-width: min(72vw, 320px);
+  }
+
+  .grunge-weight-compare .grunge-section__header {
+    gap: 14px;
+  }
+
+  .grunge-compare-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .grunge-compare-card {
+    gap: 10px;
+    min-width: 0;
+    padding: 10px;
+  }
+
+  .grunge-compare-card img {
+    height: 118px;
+    max-width: 100%;
+  }
+
+  .grunge-compare-card p {
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    line-height: 1.05;
+  }
+
+  .grunge-compare-card h3 {
+    margin-top: 7px;
+    font-size: clamp(1.45rem, 8.1vw, 2rem);
+    line-height: 0.86;
+    overflow-wrap: anywhere;
+  }
+
+  .grunge-compare-card strong {
+    margin-top: 8px;
+    font-size: 1.4rem;
+  }
+
+  .grunge-compare-card ul {
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .grunge-compare-card li {
+    gap: 6px;
+    font-size: 0.72rem;
+    line-height: 1.25;
+  }
+
+  .grunge-compare-card li::before {
+    width: 12px;
+    height: 12px;
+  }
+
+  .grunge-compare-card em {
+    margin-top: 12px;
+    font-size: 0.92rem;
+    letter-spacing: 0.04em;
+    line-height: 1.05;
   }
 
   .grunge-symptoms__content {
