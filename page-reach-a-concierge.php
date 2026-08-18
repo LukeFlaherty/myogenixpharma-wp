@@ -27,6 +27,7 @@ get_header();
 
 <div class="rac-page">
 	<div class="rac-page__grid" aria-hidden="true"></div>
+	<div class="rac-page__texture" aria-hidden="true"></div>
 
 	<!-- ═══════════════════════════════════════════════════
 	     HERO
@@ -35,10 +36,10 @@ get_header();
 		<div class="rac-hero__content">
 			<div class="rac-hero__pill">
 				<span class="rac-hero__pill-dot" aria-hidden="true"></span>
-				<span class="rac-hero__pill-text">Get 1-on-1 Guidance</span>
+				<span class="rac-hero__pill-text">Concierge Support</span>
 			</div>
-			<h1 class="rac-hero__headline">Get More Info</h1>
-			<p class="rac-hero__sub">Tell us what you're interested in below. A member of our care team will personally review your request and reach out to you directly.</p>
+			<h1 class="rac-hero__headline">Ask A Question</h1>
+			<p class="rac-hero__sub">Tell us what you want help with. A member of our care team will personally review your request and reach out directly.</p>
 		</div>
 	</section>
 
@@ -69,7 +70,7 @@ get_header();
 				<label class="rac-label rac-label--message" for="rac-message">Additional message</label>
 				<textarea id="rac-message" name="message" class="rac-input rac-textarea" rows="4" placeholder="Anything else we should know?"></textarea>
 
-				<button type="submit" id="rac-submit" class="rac-submit">Contact Me</button>
+				<button type="submit" id="rac-submit" class="rac-submit">Submit Question</button>
 				<div id="rac-error" class="rac-error" role="alert"></div>
 			</div>
 		</form>

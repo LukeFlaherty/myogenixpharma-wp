@@ -224,6 +224,13 @@ body.single-product header.home-nav + * {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   margin-block-start: 0 !important;
+  transform: translateY(0);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+  will-change: transform;
+}
+
+.home-nav.grunge-nav.home-nav--hidden {
+  transform: translateY(-112%);
 }
 
 .admin-bar .home-nav.grunge-nav {
@@ -1454,6 +1461,10 @@ body.single-product header.home-nav + * {
   z-index: 2;
   width: min(100% - 32px, 960px);
   margin: 0 auto;
+}
+
+body.home .myo-faq__wrap.grunge-faq__wrap {
+  width: min(100% - 48px, 960px);
 }
 
 .myo-faq__header.grunge-section__header {
@@ -2997,13 +3008,20 @@ body.single-product .myogenix-pdp__cq-heading {
 @media (max-width: 480px) {
   .grunge-container,
   .grunge-hero__inner,
-  .myo-faq__wrap.grunge-faq__wrap,
   .grunge-final-cta__inner {
     width: min(100% - 24px, 1152px);
   }
 
+  .myo-faq__wrap.grunge-faq__wrap {
+    width: min(100% - 32px, 960px);
+  }
+
+  body.home .myo-faq__wrap.grunge-faq__wrap {
+    width: min(100% - 40px, 960px);
+  }
+
   .grunge-hero__title {
-    font-size: clamp(3.25rem, 13.9vw, 4.6rem);
+    font-size: clamp(3.9rem, 16.7vw, 5.52rem);
   }
 
   .grunge-care-strip__inner {

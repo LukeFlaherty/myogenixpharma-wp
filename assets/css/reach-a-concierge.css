@@ -331,3 +331,305 @@ body.page-template-page-reach-a-concierge header.home-nav + * {
 	font-size: 15px;
 	color: #666;
 }
+
+/* ── Grunge redesign skin ───────────────────────────────── */
+.rac-page {
+	--rac-red: #dc2626;
+	--rac-red-dark: #991b1b;
+	--rac-zinc-100: #f4f4f5;
+	--rac-zinc-300: #d4d4d8;
+	--rac-zinc-400: #a1a1aa;
+	--rac-display: "Bebas Neue", "Oswald", Impact, sans-serif;
+	--rac-body: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	isolation: isolate;
+	min-height: 100vh;
+	overflow: hidden;
+	background: #000 !important;
+	color: #fff;
+	font-family: var(--rac-body);
+}
+
+.rac-page::before,
+.rac-page::after,
+.rac-page__texture {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	content: "";
+}
+
+.rac-page::before {
+	background:
+		linear-gradient(180deg, rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.92) 48%, #000 100%),
+		url("../images/grunge-redesign/hero%20bg.png") center top / cover no-repeat;
+	opacity: 0.8;
+}
+
+.rac-page::after {
+	background:
+		radial-gradient(circle at 18% 10%, rgba(220, 38, 38, 0.32), transparent 28%),
+		linear-gradient(90deg, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.64) 46%, rgba(0, 0, 0, 0.9));
+}
+
+.rac-page__texture {
+	background: url("../images/grunge-redesign/concrete-texture.jpg") center / cover repeat;
+	mix-blend-mode: screen;
+	opacity: 0.14;
+}
+
+.rac-page__grid {
+	display: none;
+}
+
+.rac-hero {
+	padding: 72px 20px 20px;
+}
+
+.rac-hero__content {
+	z-index: 2;
+	gap: 14px;
+	max-width: 760px;
+}
+
+.rac-hero__pill {
+	border: 1px solid rgba(220, 38, 38, 0.7);
+	border-radius: 0;
+	background: rgba(0, 0, 0, 0.68);
+	box-shadow: 0 0 28px rgba(220, 38, 38, 0.22);
+	padding: 8px 13px;
+}
+
+.rac-hero__pill-dot {
+	background: var(--rac-red);
+	box-shadow: 0 0 16px rgba(220, 38, 38, 0.7);
+}
+
+.rac-hero__pill-text {
+	color: var(--rac-zinc-100);
+	font-family: var(--rac-display);
+	font-size: 1.22rem;
+	font-weight: 400;
+	letter-spacing: 0.08em;
+	line-height: 1;
+	text-transform: uppercase;
+}
+
+.rac-hero__headline {
+	max-width: 720px;
+	color: #fff;
+	font-family: var(--rac-display);
+	font-size: clamp(4rem, 17vw, 7.4rem);
+	font-weight: 400;
+	letter-spacing: 0;
+	line-height: 0.84;
+	text-transform: uppercase;
+	text-shadow: 0 2px 22px rgba(0, 0, 0, 0.95);
+}
+
+.rac-hero__sub {
+	max-width: 600px;
+	color: var(--rac-zinc-300);
+	font-size: clamp(0.98rem, 3.8vw, 1.1rem);
+	font-weight: 600;
+	line-height: 1.55;
+	text-shadow: 0 2px 16px rgba(0, 0, 0, 0.92);
+}
+
+.rac-card {
+	z-index: 2;
+	max-width: 760px;
+	padding: 18px 20px 84px;
+}
+
+.rac-card form,
+.rac-success {
+	border: 2px solid rgba(185, 28, 28, 0.72);
+	background:
+		linear-gradient(180deg, rgba(10, 10, 10, 0.9), rgba(0, 0, 0, 0.88)),
+		url("../images/grunge-redesign/thin%20section%20bg.png") center / cover no-repeat;
+	box-shadow: 0 28px 70px rgba(0, 0, 0, 0.64), inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+	padding: 22px;
+}
+
+.rac-field {
+	max-width: none;
+}
+
+.rac-label {
+	color: var(--rac-zinc-100);
+	font-family: var(--rac-display);
+	font-size: 1.28rem;
+	font-weight: 400;
+	letter-spacing: 0.055em;
+	line-height: 1;
+	text-transform: uppercase;
+}
+
+.rac-label__optional {
+	color: var(--rac-zinc-400);
+	font-family: var(--rac-body);
+	font-size: 0.76rem;
+	font-weight: 600;
+	letter-spacing: 0;
+	text-transform: none;
+}
+
+.rac-input {
+	border: 1px solid rgba(255, 255, 255, 0.18);
+	border-radius: 0;
+	background: rgba(255, 255, 255, 0.06);
+	color: #fff;
+	font-weight: 600;
+}
+
+.rac-input::placeholder {
+	color: rgba(255, 255, 255, 0.45);
+}
+
+.rac-input:focus {
+	border-color: rgba(220, 38, 38, 0.9);
+	box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.22);
+}
+
+.rac-products {
+	gap: 10px;
+	margin: 8px 0 16px;
+}
+
+.rac-product-card.rac-product-card {
+	border: 1px solid rgba(255, 255, 255, 0.16) !important;
+	border-radius: 0;
+	background:
+		linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025)),
+		rgba(0, 0, 0, 0.72) !important;
+	color: #fff !important;
+	min-height: 150px;
+	overflow: hidden;
+}
+
+.rac-product-card.rac-product-card::after {
+	position: absolute;
+	inset: auto 0 0;
+	height: 3px;
+	background: var(--rac-red);
+	content: "";
+	opacity: 0;
+	transition: opacity 0.15s;
+}
+
+.rac-product-card.rac-product-card:hover,
+.rac-product-card.rac-product-card:focus-visible,
+.rac-product-card.rac-product-card[aria-pressed="true"] {
+	border-color: rgba(220, 38, 38, 0.95) !important;
+	background:
+		linear-gradient(180deg, rgba(220, 38, 38, 0.16), rgba(0, 0, 0, 0.76)),
+		rgba(0, 0, 0, 0.86) !important;
+	box-shadow: 0 0 30px rgba(220, 38, 38, 0.18);
+	color: #fff !important;
+}
+
+.rac-product-card.rac-product-card[aria-pressed="true"]::after {
+	opacity: 1;
+}
+
+.rac-product-card__img-wrap {
+	height: 96px;
+	aspect-ratio: auto;
+}
+
+.rac-product-card__name {
+	color: #fff;
+	font-family: var(--rac-display);
+	font-size: 1.32rem;
+	font-weight: 400;
+	letter-spacing: 0.045em;
+	line-height: 0.96;
+	text-transform: uppercase;
+}
+
+.rac-product-card__check {
+	top: 7px;
+	right: 7px;
+	border-radius: 0;
+	background: var(--rac-red);
+	color: #fff;
+}
+
+#rac-submit.rac-submit.rac-submit {
+	border: 2px solid rgba(255, 255, 255, 0.14) !important;
+	border-radius: 0 !important;
+	background: var(--rac-red) !important;
+	box-shadow: 0 0 24px rgba(220, 38, 38, 0.28) !important;
+	color: #fff !important;
+	font-family: var(--rac-display) !important;
+	font-size: 1.55rem !important;
+	font-weight: 400 !important;
+	letter-spacing: 0.055em !important;
+	line-height: 1 !important;
+	text-transform: uppercase !important;
+}
+
+#rac-submit.rac-submit.rac-submit:hover,
+#rac-submit.rac-submit.rac-submit:focus {
+	background: #ef4444 !important;
+}
+
+.rac-error {
+	color: #fecaca;
+	font-weight: 700;
+}
+
+.rac-success {
+	color: #fff;
+}
+
+.rac-success__check {
+	color: var(--rac-red);
+}
+
+.rac-success h2 {
+	color: #fff;
+	font-family: var(--rac-display);
+	font-size: clamp(2.5rem, 9vw, 4rem);
+	font-weight: 400;
+	letter-spacing: 0.04em;
+	line-height: 0.9;
+	text-transform: uppercase;
+}
+
+.rac-success p {
+	color: var(--rac-zinc-300);
+	font-weight: 600;
+}
+
+@media (max-width: 640px) {
+	.rac-hero {
+		padding-top: 54px;
+	}
+
+	.rac-card {
+		padding-left: 18px;
+		padding-right: 18px;
+	}
+
+	.rac-card form,
+	.rac-success {
+		padding: 18px;
+	}
+
+	.rac-products {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		overflow: visible;
+	}
+
+	.rac-product-card.rac-product-card {
+		flex: none;
+		min-height: 136px;
+	}
+
+	.rac-product-card__img-wrap {
+		height: 78px;
+	}
+}

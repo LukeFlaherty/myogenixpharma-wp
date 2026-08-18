@@ -31,13 +31,13 @@ add_action( 'wp_enqueue_scripts', function() {
 		'myogenix-grunge-redesign',
 		get_stylesheet_directory_uri() . '/assets/css/grunge-redesign.css',
 		[ 'myogenix-home', 'myogenix-grunge-fonts' ],
-		'0.3.0'
+		'0.3.1'
 	);
 	wp_enqueue_script(
 		'myogenix-home',
 		get_stylesheet_directory_uri() . '/assets/js/home.js',
 		[],
-		'1.6.0',
+		'1.6.1',
 		true
 	);
 	wp_enqueue_script(
@@ -265,13 +265,13 @@ add_action( 'wp_enqueue_scripts', function() {
 		'myogenix-reach-a-concierge',
 		get_stylesheet_directory_uri() . '/assets/css/reach-a-concierge.css',
 		[],
-		'1.6.0'
+		'1.7.0'
 	);
 	wp_enqueue_script(
 		'myogenix-reach-a-concierge',
 		get_stylesheet_directory_uri() . '/assets/js/reach-a-concierge.js',
 		[],
-		'1.6.0',
+		'1.7.0',
 		true
 	);
 } );

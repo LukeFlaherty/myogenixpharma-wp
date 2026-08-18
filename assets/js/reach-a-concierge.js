@@ -2,6 +2,7 @@
 	'use strict';
 
 	var WEBHOOK_URL = 'https://services.leadconnectorhq.com/hooks/CTnsDDgYzrLg4A5wA7Q3/webhook-trigger/67a479f9-e823-4253-b8b7-b6fc1bf5f6ab';
+	var SUBMIT_TEXT = 'Submit Question';
 
 	document.addEventListener('DOMContentLoaded', function () {
 		var form        = document.getElementById('rac-form');
@@ -71,7 +72,7 @@
 				document.getElementById('rac-success').style.display = 'block';
 			}).catch(function () {
 				btn.disabled = false;
-				btn.textContent = 'Contact Me';
+				btn.textContent = SUBMIT_TEXT;
 				errEl.textContent = 'Something went wrong. Please try again.';
 				errEl.style.display = 'block';
 			});
