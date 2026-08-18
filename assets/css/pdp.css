@@ -5123,6 +5123,22 @@ body.single-product .trt-grunge-pdp .pdp-build {
 	box-shadow: none !important;
 }
 
+.grunge-product-pdp .pdp-hero__trust-grid,
+.trt-grunge-pdp .pdp-hero__trust-grid,
+body.single-product .pdp-hero__trust-grid {
+	gap: 0 !important;
+	background: transparent !important;
+	border: 0 !important;
+	box-shadow: none !important;
+}
+
+.grunge-product-pdp .pdp-hero__trust-item,
+.trt-grunge-pdp .pdp-hero__trust-item,
+body.single-product .pdp-hero__trust-item {
+	border: 0 !important;
+	box-shadow: none !important;
+}
+
 @media (max-width: 600px) {
 	.grunge-product-pdp .home-how__steps,
 	.trt-grunge-pdp .home-how__steps {

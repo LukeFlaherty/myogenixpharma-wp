@@ -114,12 +114,10 @@ get_header();
 		<div class="grunge-category-hero__shade" aria-hidden="true"></div>
 		<div class="grunge-category-hero__inner">
 			<div class="grunge-category-hero__copy">
-				<p class="grunge-kicker">Medication directory</p>
 				<h1 class="grunge-category-hero__title">
 					<span class="grunge-word grunge-word--white">Search</span>
 					<span class="grunge-word grunge-word--red">Medications</span>
 				</h1>
-				<p class="grunge-category-hero__subtitle">Find the treatment option that fits your goal.</p>
 				<p class="grunge-category-hero__body">Search by medication, category, or treatment line, then select a product to review the details.</p>
 			</div>
 			<div class="grunge-category-hero__media">

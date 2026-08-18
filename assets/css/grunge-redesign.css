@@ -783,8 +783,7 @@ body.single-product header.home-nav + * {
   gap: 12px;
   padding: 20px 12px;
   text-align: center;
-  border-right: 1px solid rgba(127, 29, 29, 0.8);
-  border-bottom: 1px solid rgba(127, 29, 29, 0.8);
+  border: 0;
 }
 
 .grunge-care img {
@@ -1889,6 +1888,10 @@ body.single-product header.home-nav + * {
   color: #fff;
 }
 
+.grunge-medications-page .grunge-category-hero__title {
+  font-size: clamp(3.55rem, 15.3vw, 6.1rem);
+}
+
 .grunge-med-search {
   position: relative;
   z-index: 2;
@@ -1898,11 +1901,12 @@ body.single-product header.home-nav + * {
 }
 
 .grunge-med-search label {
-  color: var(--myo-red);
-  font-family: var(--myo-font-display);
-  font-size: 1.2rem;
-  letter-spacing: 0.1em;
-  line-height: 1;
+  color: #fff;
+  font-family: var(--myo-font-grunge);
+  font-size: clamp(2.4rem, 9vw, 4.1rem);
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 0.88;
   text-transform: uppercase;
 }
 
@@ -2204,10 +2208,10 @@ body.single-product .pdp-hero__image-card img {
 body.single-product .pdp-hero__trust-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1px;
+  gap: 0;
   width: min(100%, 520px);
   margin-top: 22px;
-  background: rgba(127, 29, 29, 0.75);
+  background: transparent;
 }
 
 body.single-product .pdp-hero__trust-item {
