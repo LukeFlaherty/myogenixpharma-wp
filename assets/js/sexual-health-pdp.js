@@ -153,6 +153,81 @@
 		renderSummary();
 	}
 
+	function setOwnLabs( ownLabs ) {
+		state.ownLabs = ownLabs;
+		if ( ownLabsCheckbox ) ownLabsCheckbox.checked = ownLabs;
+		document.querySelectorAll( '[data-trt-own-labs]' ).forEach( function ( option ) {
+			var active = option.getAttribute( 'data-trt-own-labs' ) === ( ownLabs ? '1' : '0' );
+			option.classList.toggle( 'trt-pdp__labs-option--active', active );
+			option.setAttribute( 'aria-pressed', active ? 'true' : 'false' );
+		} );
+		render();
+	}
+
+	function scrollToTrtStateGate() {
+		var stateValue = document.getElementById( 'trt-state-value' );
+		var stateError = document.getElementById( 'trt-state-error' );
+		var stateStatus = document.getElementById( 'trt-state-status' );
+		var stateTrigger = document.getElementById( 'trt-state-trigger' );
+		var target = stateError && stateError.style.display !== 'none' ? stateError : ( stateTrigger || cfg );
+
+		if ( stateStatus && stateValue && ! stateValue.value ) {
+			stateStatus.textContent = 'Select an eligible state to continue.';
+			stateStatus.className = 'trt-state__status trt-state__status--error';
+		}
+
+		if ( target && target.scrollIntoView ) {
+			target.scrollIntoView( { behavior: 'smooth', block: 'center' } );
+		}
+		if ( stateTrigger && stateTrigger.focus ) stateTrigger.focus( { preventScroll: true } );
+	}
+
+	function trtStateIsEligible() {
+		if ( ! monthlyBilling ) return true;
+		var stateValue = document.getElementById( 'trt-state-value' );
+		var selectedState = stateValue ? stateValue.value : '';
+		var allowedStates = [];
+		try {
+			allowedStates = JSON.parse( cfg.getAttribute( 'data-trt-allowed-states' ) || '[]' );
+		} catch ( e ) {}
+		return !! selectedState && allowedStates.indexOf( selectedState ) !== -1;
+	}
+
+	function buildCheckoutUrl() {
+		var entry = getEntry();
+		if ( ! entry || ! entry.id ) return '';
+
+		var params = 'add-to-cart=' + encodeURIComponent( productId ) +
+		             '&variation_id=' + encodeURIComponent( String( entry.id ) ) +
+		             '&' + encodeURIComponent( primaryAttr ) + '=' + encodeURIComponent( state.primary );
+
+		if ( hasSecondary && state.secondary ) {
+			params += '&' + encodeURIComponent( secondaryAttr ) + '=' + encodeURIComponent( state.secondary );
+		}
+
+		Object.keys( fixedAttrs ).forEach( function ( k ) {
+			params += '&' + encodeURIComponent( k ) + '=' + encodeURIComponent( fixedAttrs[ k ] );
+		} );
+
+		if ( state.ownLabs ) {
+			params += '&own_labs=1';
+		}
+		if ( monthlyBilling && state.strength ) {
+			params += '&trt_strength=' + encodeURIComponent( state.strength );
+		}
+
+		return monthlyBilling && checkoutUrl ? checkoutUrl + '?' + params : window.location.pathname + '?' + params;
+	}
+
+	function goToCheckout() {
+		if ( monthlyBilling && ! trtStateIsEligible() ) {
+			scrollToTrtStateGate();
+			return;
+		}
+		var url = buildCheckoutUrl();
+		if ( url ) window.location.href = url;
+	}
+
 	// ── Events ────────────────────────────────────────────────────────────────
 
 	document.querySelectorAll( '.sh-pdp__primary-btn' ).forEach( function ( btn ) {
@@ -218,14 +293,7 @@
 	document.querySelectorAll( '[data-trt-own-labs]' ).forEach( function ( btn ) {
 		btn.addEventListener( 'click', function ( e ) {
 			var ownLabs = btn.getAttribute( 'data-trt-own-labs' ) === '1';
-			state.ownLabs = ownLabs;
-			if ( ownLabsCheckbox ) ownLabsCheckbox.checked = ownLabs;
-			document.querySelectorAll( '[data-trt-own-labs]' ).forEach( function ( option ) {
-				var active = option.getAttribute( 'data-trt-own-labs' ) === ( ownLabs ? '1' : '0' );
-				option.classList.toggle( 'trt-pdp__labs-option--active', active );
-				option.setAttribute( 'aria-pressed', active ? 'true' : 'false' );
-			} );
-			render();
+			setOwnLabs( ownLabs );
 			if ( btn.classList.contains( 'trt-pdp__select' ) ) {
 				e.preventDefault();
 				cfg.scrollIntoView( { behavior: 'smooth', block: 'start' } );
@@ -236,31 +304,18 @@
 	var cta = document.getElementById( 'pdp-cta' );
 	if ( cta ) {
 		cta.addEventListener( 'click', function () {
-			var entry = getEntry();
-			if ( ! entry || ! entry.id ) return;
-
-			var params = 'add-to-cart=' + encodeURIComponent( productId ) +
-			             '&variation_id=' + encodeURIComponent( String( entry.id ) ) +
-			             '&' + encodeURIComponent( primaryAttr ) + '=' + encodeURIComponent( state.primary );
-
-			if ( hasSecondary && state.secondary ) {
-				params += '&' + encodeURIComponent( secondaryAttr ) + '=' + encodeURIComponent( state.secondary );
-			}
-
-			Object.keys( fixedAttrs ).forEach( function ( k ) {
-				params += '&' + encodeURIComponent( k ) + '=' + encodeURIComponent( fixedAttrs[ k ] );
-			} );
-
-			if ( state.ownLabs ) {
-				params += '&own_labs=1';
-			}
-			if ( monthlyBilling && state.strength ) {
-				params += '&trt_strength=' + encodeURIComponent( state.strength );
-			}
-
-			window.location.href = monthlyBilling && checkoutUrl ? checkoutUrl + '?' + params : window.location.pathname + '?' + params;
+			goToCheckout();
 		} );
 	}
+
+	document.querySelectorAll( '[data-trt-direct-checkout]' ).forEach( function ( link ) {
+		link.addEventListener( 'click', function ( e ) {
+			if ( ! monthlyBilling ) return;
+			e.preventDefault();
+			setOwnLabs( link.getAttribute( 'data-trt-own-labs' ) === '1' );
+			goToCheckout();
+		} );
+	} );
 
 	// ── Back-button cache reset ───────────────────────────────────────────────
 

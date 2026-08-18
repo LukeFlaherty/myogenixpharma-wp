@@ -1071,10 +1071,10 @@ if ( $is_weight_loss ) :
 	};
 
 		$steps = $slug === 'testosterone' ? [
-			[ 'num' => '1', 'img' => 'grunge-redesign/laptop-check.svg', 'title' => 'Checkout',              'desc' => 'Choose whether you need bloodwork or already have recent labs, then complete checkout.' ],
-			[ 'num' => '2', 'img' => 'grunge-redesign/vial.svg',         'title' => 'Questionnaire & labs',  'desc' => 'Complete the medical questionnaire. If bloodwork is needed, you receive Quest scheduling instructions by email.' ],
-			[ 'num' => '3', 'img' => 'grunge-redesign/doctor.svg',       'title' => 'Provider review',       'desc' => 'Your provider reviews your questionnaire and lab information before treatment is approved.' ],
-			[ 'num' => '4', 'img' => 'grunge-redesign/box.svg',          'title' => 'TRT shipped',           'desc' => 'If approved, your TRT supplies are prepared and shipped to your door.' ],
+			[ 'num' => '1', 'img' => 'grunge-redesign/laptop-check.svg', 'title' => 'Checkout',              'desc' => 'Pick labs status and complete checkout.' ],
+			[ 'num' => '2', 'img' => 'grunge-redesign/vial.svg',         'title' => 'Questionnaire & labs',  'desc' => 'Complete intake and schedule labs if needed.' ],
+			[ 'num' => '3', 'img' => 'grunge-redesign/doctor.svg',       'title' => 'Provider review',       'desc' => 'A provider reviews your intake and labs.' ],
+			[ 'num' => '4', 'img' => 'grunge-redesign/box.svg',          'title' => 'TRT shipped',           'desc' => 'If approved, supplies ship to your door.' ],
 		] : [
 			[ 'num' => '1', 'img' => 'grunge-redesign/laptop-check.svg', 'title' => 'Quick Online Intake',  'desc' => 'Complete your confidential medical questionnaire in minutes.' ],
 			[ 'num' => '2', 'img' => 'grunge-redesign/doctor.svg',       'title' => 'Provider Review',      'desc' => 'A licensed provider reviews your health history and goals.' ],
@@ -1127,7 +1127,7 @@ if ( $is_weight_loss ) :
 				</h1>
 				<p class="pdp-hero__desc">Provider-managed TRT <span>Testosterone Cypionate</span></p>
 				<div class="trt-pdp__hero-actions">
-					<a class="grunge-btn grunge-btn--red" href="#build-plan">Continue to Checkout <?php echo myogenix_grunge_arrow_svg(); ?></a>
+					<a class="grunge-btn grunge-btn--red" href="#build-plan" data-trt-direct-checkout data-trt-own-labs="0">Continue to Checkout <?php echo myogenix_grunge_arrow_svg(); ?></a>
 					<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				</div>
 					<?php else : ?>
@@ -1310,12 +1310,12 @@ if ( $is_weight_loss ) :
 						<p class="pdp-cfg__section-label">Labs</p>
 						<div class="trt-pdp__labs-grid" role="group" aria-label="TRT lab option">
 							<button class="trt-pdp__labs-option trt-pdp__labs-option--active" type="button" data-trt-own-labs="0" aria-pressed="true">
-								<strong>Without labs <span>$165</span></strong>
-								<em>Schedule Bloodwork</em>
+								<strong>W/o labs <span>$165</span></strong>
+								<em>Schedule bloodwork</em>
 							</button>
 							<button class="trt-pdp__labs-option" type="button" data-trt-own-labs="1" aria-pressed="false">
-								<strong>With labs <span>$65</span></strong>
-								<em>Schedule Doctor Consult + Upload Labs after payment</em>
+								<strong>W/ labs <span>$65</span></strong>
+								<em>Upload labs after payment</em>
 							</button>
 						</div>
 						<input type="checkbox" id="pdp-own-labs" class="pdp-cfg__own-labs-checkbox" hidden />
@@ -1428,8 +1428,8 @@ if ( $is_weight_loss ) :
 				<?php
 				if ( $slug === 'testosterone' ) :
 						$trt_plan_cards = [
-							[ 'title' => 'Without labs', 'price' => '$165', 'supply' => 'Schedule Bloodwork', 'own_labs' => '0', 'popular' => true, 'items' => [ 'Medical questionnaire after checkout', 'Quest instructions by email', 'Schedule a nearby Quest appointment', 'Nothing to pay at Quest' ] ],
-							[ 'title' => 'With labs', 'price' => '$65', 'supply' => 'Schedule Doctor Consult + Upload Labs after payment', 'own_labs' => '1', 'items' => [ 'Medical questionnaire after checkout', 'Upload recent labwork', 'Provider reviews labs and intake', 'Consult path without new Quest bloodwork' ] ],
+							[ 'title' => 'W/o labs', 'price' => '$165', 'supply' => 'Schedule bloodwork', 'own_labs' => '0', 'popular' => true, 'items' => [ 'Quest scheduling after checkout', 'Nothing to pay at Quest' ] ],
+							[ 'title' => 'W/ labs', 'price' => '$65', 'supply' => 'Upload labs', 'own_labs' => '1', 'items' => [ 'Upload labs after payment', 'Doctor consult next' ] ],
 						];
 					foreach ( $trt_plan_cards as $plan ) :
 				?>
@@ -1553,13 +1553,13 @@ if ( $is_weight_loss ) :
 					</div>
 				</div>
 				<?php endforeach; ?>
-				<div class="myo-faq__cta">
-					<a href="#build-plan" class="myo-faq__cta-btn">Continue to checkout</a>
-					<a href="<?php echo esc_url( home_url( '/quest-faqs/' ) ); ?>" class="myo-faq__cta-btn myo-faq__cta-btn--dark">Quest FAQs</a>
-					<a href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>" class="myo-faq__cta-btn myo-faq__cta-btn--dark">Ask a question</a>
-				</div>
-				<p class="trt-pdp__faq-disclaimer">Prescription required if approved. Plan review by licensed provider.</p>
 			</div>
+			<div class="myo-faq__cta">
+				<a href="#build-plan" class="myo-faq__cta-btn" data-trt-direct-checkout data-trt-own-labs="0">Continue to checkout</a>
+				<a href="<?php echo esc_url( home_url( '/quest-faqs/' ) ); ?>" class="myo-faq__cta-btn myo-faq__cta-btn--dark">Quest FAQs</a>
+				<a href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>" class="myo-faq__cta-btn myo-faq__cta-btn--dark">Ask a question</a>
+			</div>
+			<p class="trt-pdp__faq-disclaimer">Prescription required if approved. Plan review by licensed provider.</p>
 		</div>
 	</section>
 	<?php else : ?>

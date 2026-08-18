@@ -5174,3 +5174,118 @@ body.single-product .pdp-hero__trust-item {
 		line-height: 1.3 !important;
 	}
 }
+
+/* TRT refinement pass: direct checkout, compact lab paths, and FAQ layout. */
+.trt-grunge-pdp .trt-pdp__plan-grid {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	align-items: stretch;
+}
+
+.trt-grunge-pdp .trt-pdp__plan-card {
+	display: grid;
+	align-content: start;
+	gap: 12px;
+}
+
+.trt-grunge-pdp .trt-pdp__plan-card ul {
+	margin: 0;
+}
+
+.trt-grunge-pdp .trt-pdp__plan-card dl {
+	margin-top: 0;
+}
+
+.trt-grunge-pdp .myo-faq__wrap {
+	align-items: start;
+}
+
+.trt-grunge-pdp .myo-faq__header {
+	margin-bottom: 0 !important;
+}
+
+.trt-grunge-pdp .myo-faq__desc {
+	margin-bottom: 0 !important;
+}
+
+.trt-grunge-pdp .myo-faq__cta {
+	grid-column: 1 / -1 !important;
+	display: grid !important;
+	grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+	gap: 12px !important;
+	width: 100%;
+}
+
+.trt-grunge-pdp .trt-pdp__faq-disclaimer {
+	grid-column: 1 / -1 !important;
+}
+
+@media (max-width: 600px) {
+	.trt-grunge-pdp .trt-pdp__labs-grid,
+	.trt-grunge-pdp .trt-pdp__plan-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+		gap: 8px !important;
+	}
+
+	.trt-grunge-pdp .trt-pdp__labs-option,
+	.trt-grunge-pdp .trt-pdp__plan-card {
+		min-height: 0 !important;
+		padding: 10px !important;
+	}
+
+	.trt-grunge-pdp .trt-pdp__labs-option strong,
+	.trt-grunge-pdp .trt-pdp__plan-card h3 {
+		font-size: clamp(1.16rem, 5.7vw, 1.48rem) !important;
+		line-height: 0.95 !important;
+	}
+
+	.trt-grunge-pdp .trt-pdp__labs-option strong span {
+		float: none;
+		display: block;
+		margin-top: 4px;
+	}
+
+	.trt-grunge-pdp .trt-pdp__labs-option em,
+	.trt-grunge-pdp .trt-pdp__plan-card p,
+	.trt-grunge-pdp .trt-pdp__plan-card li,
+	.trt-grunge-pdp .trt-pdp__plan-card dt,
+	.trt-grunge-pdp .trt-pdp__plan-card dd {
+		font-size: 0.78rem !important;
+		line-height: 1.2 !important;
+	}
+
+	.trt-grunge-pdp .trt-pdp__plan-card ul {
+		display: none !important;
+	}
+
+	.trt-grunge-pdp .trt-pdp__plan-card dl {
+		gap: 6px !important;
+	}
+
+	.trt-grunge-pdp .trt-pdp__select {
+		min-height: 36px !important;
+		padding: 9px 8px !important;
+		font-size: 1.02rem !important;
+	}
+
+	.trt-grunge-pdp .myo-faq {
+		padding-top: 40px !important;
+	}
+
+	.trt-grunge-pdp .myo-faq__wrap {
+		gap: 12px !important;
+	}
+
+	.trt-grunge-pdp .myo-faq__header {
+		display: grid;
+		gap: 10px;
+	}
+
+	.trt-grunge-pdp .myo-faq__desc {
+		margin-top: 0 !important;
+		line-height: 1.4 !important;
+	}
+
+	.trt-grunge-pdp .myo-faq__cta {
+		grid-template-columns: minmax(0, 1fr) !important;
+	}
+}
