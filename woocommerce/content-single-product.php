@@ -930,10 +930,10 @@ if ( $is_weight_loss ) :
 			'includes'        => [
 				'Testosterone cypionate',
 				'Labwork',
-				'Dr. consultations',
+				'Dr. Consultations',
 				'Syringes',
 				'Alcohol swabs',
-				'Estrogen support if necessary',
+				'Estrogen support (if necessary)',
 				'Shipped to your door',
 			],
 			'primary_attr'    => 'pa_subscription-plan',
@@ -1072,7 +1072,7 @@ if ( $is_weight_loss ) :
 
 		$steps = $slug === 'testosterone' ? [
 			[ 'num' => '1', 'img' => 'grunge-redesign/laptop-check.svg', 'title' => 'Checkout',              'desc' => 'Pick labs status and complete checkout.' ],
-			[ 'num' => '2', 'img' => 'grunge-redesign/vial.svg',         'title' => 'Questionnaire & labs',  'desc' => 'Complete intake and schedule labs if needed.' ],
+			[ 'num' => '2', 'img' => 'grunge-redesign/vial.svg',         'title' => 'Intake & Labs',         'desc' => 'Complete intake and schedule labs if needed.' ],
 			[ 'num' => '3', 'img' => 'grunge-redesign/doctor.svg',       'title' => 'Provider review',       'desc' => 'A provider reviews your intake and labs.' ],
 			[ 'num' => '4', 'img' => 'grunge-redesign/box.svg',          'title' => 'TRT shipped',           'desc' => 'If approved, supplies ship to your door.' ],
 		] : [
@@ -1310,11 +1310,11 @@ if ( $is_weight_loss ) :
 						<p class="pdp-cfg__section-label">Labs</p>
 						<div class="trt-pdp__labs-grid" role="group" aria-label="TRT lab option">
 							<button class="trt-pdp__labs-option trt-pdp__labs-option--active" type="button" data-trt-own-labs="0" aria-pressed="true">
-								<strong>W/o labs <span>$165</span></strong>
+								<strong>W/O LABS <span>$165</span></strong>
 								<em>Schedule bloodwork</em>
 							</button>
 							<button class="trt-pdp__labs-option" type="button" data-trt-own-labs="1" aria-pressed="false">
-								<strong>W/ labs <span>$65</span></strong>
+								<strong>W/LABS <span>$65</span></strong>
 								<em>Upload labs after payment</em>
 							</button>
 						</div>
@@ -1428,8 +1428,8 @@ if ( $is_weight_loss ) :
 				<?php
 				if ( $slug === 'testosterone' ) :
 						$trt_plan_cards = [
-							[ 'title' => 'W/o labs', 'price' => '$165', 'supply' => 'Schedule bloodwork', 'own_labs' => '0', 'popular' => true, 'items' => [ 'Quest scheduling after checkout', 'Nothing to pay at Quest' ] ],
-							[ 'title' => 'W/ labs', 'price' => '$65', 'supply' => 'Upload labs', 'own_labs' => '1', 'items' => [ 'Upload labs after payment', 'Doctor consult next' ] ],
+							[ 'title' => 'Without labs', 'price' => '$165', 'supply' => 'Schedule bloodwork', 'own_labs' => '0', 'popular' => true, 'items' => [ 'Quest scheduling after checkout', 'Nothing to pay at Quest' ] ],
+							[ 'title' => 'With labs', 'price' => '$65', 'supply' => 'Upload labs', 'own_labs' => '1', 'items' => [ 'Upload labs after payment', 'Doctor consult next' ] ],
 						];
 					foreach ( $trt_plan_cards as $plan ) :
 				?>
@@ -1446,7 +1446,7 @@ if ( $is_weight_loss ) :
 						<div><dt>Due today</dt><dd><?php echo esc_html( $plan['price'] ); ?></dd></div>
 						<div><dt>Next step</dt><dd><?php echo esc_html( $plan['supply'] ); ?></dd></div>
 					</dl>
-					<a class="trt-pdp__select" href="#build-plan" data-trt-own-labs="<?php echo esc_attr( $plan['own_labs'] ); ?>">Select Option</a>
+					<a class="trt-pdp__select" href="#build-plan" data-trt-own-labs="<?php echo esc_attr( $plan['own_labs'] ); ?>">Select</a>
 					</article>
 				<?php
 					endforeach;
