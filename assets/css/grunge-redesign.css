@@ -1548,13 +1548,14 @@ body.myogenix-home-page .myo-faq__wrap.grunge-faq__wrap {
 
 body.home .myo-faq.grunge-faq .myo-faq__btn.myo-faq__btn,
 body.myogenix-home-page .myo-faq.grunge-faq .myo-faq__btn.myo-faq__btn {
-  padding-left: 48px !important;
-  padding-right: 48px !important;
+  padding-left: 28px !important;
+  padding-right: 28px !important;
 }
 
 body.home .myo-faq.grunge-faq .myo-faq__panel-inner.myo-faq__panel-inner,
 body.myogenix-home-page .myo-faq.grunge-faq .myo-faq__panel-inner.myo-faq__panel-inner {
-  padding: 16px 48px 28px !important;
+  padding-right: 28px !important;
+  padding-left: 28px !important;
 }
 
 .myo-faq__panel-inner p {
@@ -3037,6 +3038,14 @@ body.single-product .myogenix-pdp__cq-heading {
   body.home .myo-faq__wrap.grunge-faq__wrap,
   body.myogenix-home-page .myo-faq__wrap.grunge-faq__wrap {
     width: min(100% - 40px, 960px);
+  }
+
+  body.home .myo-faq.grunge-faq .myo-faq__btn.myo-faq__btn,
+  body.myogenix-home-page .myo-faq.grunge-faq .myo-faq__btn.myo-faq__btn,
+  body.home .myo-faq.grunge-faq .myo-faq__panel-inner.myo-faq__panel-inner,
+  body.myogenix-home-page .myo-faq.grunge-faq .myo-faq__panel-inner.myo-faq__panel-inner {
+    padding-right: 18px !important;
+    padding-left: 18px !important;
   }
 
   .grunge-hero__title {
