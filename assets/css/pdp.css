@@ -4332,6 +4332,103 @@ body.single-product .trt-grunge-pdp .pdp-hero__right {
 	padding-left: 28px !important;
 }
 
+.trt-grunge-pdp .trt-pdp__requirements,
+.trt-grunge-pdp .trt-pdp__labs-choice {
+	grid-column: 1;
+}
+
+.trt-pdp__requirement-grid,
+.trt-pdp__labs-grid {
+	display: grid;
+	gap: 10px;
+}
+
+.trt-pdp__requirement-grid div,
+.trt-pdp__labs-option {
+	display: grid;
+	gap: 6px;
+	min-height: 76px;
+	padding: 14px;
+	border: 1px solid rgba(255, 255, 255, 0.18);
+	background: rgba(0, 0, 0, 0.48);
+	color: #fff;
+	text-align: left;
+}
+
+.trt-pdp__requirement-grid strong,
+.trt-pdp__labs-option strong {
+	color: #fff;
+	font-family: var(--myo-font-display, "Bebas Neue", sans-serif);
+	font-size: 1.34rem;
+	font-weight: 400;
+	letter-spacing: 0.04em;
+	line-height: 1;
+	text-transform: uppercase;
+}
+
+.trt-pdp__requirement-grid span,
+.trt-pdp__labs-option em {
+	color: #d4d4d8;
+	font-size: 0.84rem;
+	font-style: normal;
+	font-weight: 700;
+	line-height: 1.45;
+}
+
+.trt-pdp__labs-option {
+	cursor: pointer;
+}
+
+.trt-pdp__labs-option strong span {
+	float: right;
+	color: var(--myo-red, #dc2626);
+}
+
+.trt-pdp__labs-option--active,
+.trt-pdp__labs-option:hover {
+	border-color: var(--myo-red, #dc2626);
+	background: rgba(220, 38, 38, 0.16);
+}
+
+.trt-grunge-pdp .pdp-cfg__builder > .pdp-cfg__section-label,
+.trt-grunge-pdp .pdp-cfg__builder > .pdp-cfg__supply-row,
+.trt-grunge-pdp .trt-pdp__static-row--strength,
+.trt-grunge-pdp .trt-pdp__static-row--schedule {
+	display: none;
+}
+
+.trt-grunge-pdp .home-how .hp-step__body {
+	padding-left: 18px;
+	padding-right: 18px;
+}
+
+.trt-grunge-pdp .myo-faq__cta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+.trt-grunge-pdp .myo-faq__cta-btn {
+	flex: 1 1 180px;
+	text-align: center;
+}
+
+.trt-pdp__symptoms {
+	position: relative;
+	overflow: hidden;
+	border-top: 1px solid rgba(185, 28, 28, 0.72);
+	background: #000;
+	color: #fff;
+}
+
+.trt-pdp__symptom-list {
+	position: relative;
+	z-index: 2;
+	width: min(100%, 620px);
+	margin: 0;
+	align-self: center;
+}
+
 @media (max-width: 600px) {
 	body.single-product .grunge-product-pdp .pdp-hero__inner,
 	body.single-product .trt-grunge-pdp .pdp-hero__inner {

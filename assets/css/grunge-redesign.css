@@ -93,6 +93,7 @@ body.single-product header.home-nav + * {
   background-blend-mode: soft-light, multiply, normal;
   background-size: 100% 100%, 520px 350px, auto;
   background-position: center;
+  background-repeat: no-repeat;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -549,6 +550,12 @@ body.single-product header.home-nav + * {
   cursor: pointer;
 }
 
+.myo-purchase-popup__logo {
+  width: 168px;
+  height: auto;
+  margin: 0 0 18px;
+}
+
 .myo-purchase-popup h2 {
   margin: 12px 0 10px;
   color: #fff;
@@ -868,6 +875,7 @@ body.single-product header.home-nav + * {
   background-blend-mode: soft-light, multiply, normal;
   background-size: 100% 100%, 520px 350px, auto;
   background-position: center;
+  background-repeat: no-repeat;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -887,6 +895,7 @@ body.single-product header.home-nav + * {
   background-blend-mode: soft-light, multiply, normal;
   background-size: 100% 100%, 520px 350px, auto;
   background-position: center;
+  background-repeat: no-repeat;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -970,6 +979,7 @@ body.single-product header.home-nav + * {
   background-blend-mode: soft-light, multiply, normal;
   background-size: 100% 100%, 360px 240px, auto;
   background-position: center;
+  background-repeat: no-repeat;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1462,6 +1472,8 @@ body.single-product header.home-nav + * {
   flex-direction: column;
   gap: 12px;
   width: min(100%, 360px);
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 /* Program category pages */
@@ -1557,6 +1569,39 @@ body.single-product header.home-nav + * {
   margin: 0 auto;
   object-fit: contain;
   filter: drop-shadow(0 30px 55px rgba(0, 0, 0, 0.75));
+}
+
+.grunge-bottle-collage {
+  position: relative;
+  min-height: 360px;
+  width: min(100%, 640px);
+  margin: 0 auto;
+}
+
+.grunge-bottle-collage img {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: min(48vw, 300px);
+  max-width: none;
+  transform: translateX(-50%);
+}
+
+.grunge-bottle-collage img:nth-child(1) {
+  z-index: 3;
+  transform: translateX(-50%) scale(1.04);
+}
+
+.grunge-bottle-collage img:nth-child(2) {
+  z-index: 2;
+  transform: translateX(-88%) rotate(-7deg) scale(0.84);
+  opacity: 0.92;
+}
+
+.grunge-bottle-collage img:nth-child(3) {
+  z-index: 1;
+  transform: translateX(-12%) rotate(7deg) scale(0.84);
+  opacity: 0.92;
 }
 
 .grunge-category-product-grid {
@@ -2180,7 +2225,12 @@ body.single-product .myogenix-pdp__cq-heading {
   }
 
   .grunge-final-cta__inner {
-    grid-template-columns: 176px minmax(0, 1fr) auto;
+    grid-template-columns: 150px minmax(0, 1fr) minmax(0, auto);
+    column-gap: 20px;
+  }
+
+  .grunge-final-cta img {
+    width: 150px;
   }
 }
 
@@ -2253,6 +2303,12 @@ body.single-product .myogenix-pdp__cq-heading {
     width: min(56vw, 680px);
   }
 
+  .grunge-category-hero__media .grunge-bottle-collage img {
+    position: absolute;
+    bottom: 0;
+    width: min(25vw, 330px);
+  }
+
   .grunge-section {
     padding: 72px 0;
   }
@@ -2321,14 +2377,14 @@ body.single-product .myogenix-pdp__cq-heading {
     display: grid;
     justify-items: center;
     text-align: center;
-    font-size: clamp(2.8rem, 4.2vw, 3.75rem);
+    font-size: clamp(2.2rem, 3.2vw, 3.2rem);
     line-height: 0.86;
   }
 
   .grunge-final-cta h2 .grunge-text-red {
     display: block;
     font-size: 1.24em;
-    white-space: nowrap;
+    white-space: normal;
   }
 
   body.single-product .pdp-hero__inner {

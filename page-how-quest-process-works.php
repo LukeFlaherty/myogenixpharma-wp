@@ -5,9 +5,7 @@
 defined( 'ABSPATH' ) || exit;
 
 $myo_asset = function( $path ) {
-	$base  = get_stylesheet_directory_uri() . '/assets/images/grunge-redesign/';
-	$parts = explode( '/', $path );
-	return esc_url( $base . implode( '/', array_map( 'rawurlencode', $parts ) ) );
+	return function_exists( 'myogenix_grunge_asset_url' ) ? myogenix_grunge_asset_url( $path ) : '';
 };
 
 add_filter( 'body_class', function( $classes ) {
@@ -23,15 +21,15 @@ $steps = [
 	],
 	[
 		'title' => 'Quest instructions arrive',
-		'body'  => 'If you need bloodwork, you receive instructions for Quest after the questionnaire is complete. There is nothing to pay at Quest.',
+		'body'  => 'If you need bloodwork, you receive Quest instructions by email after the questionnaire is complete. MyoGenix sends the required order information, and there is nothing to pay at Quest.',
 	],
 	[
 		'title' => 'Create or sign in to Quest',
-		'body'  => 'Use the Quest link to add your information, then enter your ZIP code to see nearby Quest locations.',
+		'body'  => 'Click the Quest link, create or sign in to your Quest account, add your personal information, then enter your ZIP code to see nearby Quest locations.',
 	],
 	[
 		'title' => 'Choose your appointment',
-		'body'  => 'Select a location, date, and available time. Quest sends an automated confirmation text with the appointment details.',
+		'body'  => 'Select a location, then choose from the available calendar dates and times. Quest sends an automated confirmation text with your appointment date and time.',
 	],
 	[
 		'title' => 'Provider review',

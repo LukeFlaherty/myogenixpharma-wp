@@ -31,7 +31,7 @@ add_action( 'wp_enqueue_scripts', function() {
 		'myogenix-grunge-redesign',
 		get_stylesheet_directory_uri() . '/assets/css/grunge-redesign.css',
 		[ 'myogenix-home', 'myogenix-grunge-fonts' ],
-		'0.2.4'
+		'0.2.5'
 	);
 	wp_enqueue_script(
 		'myogenix-home',
@@ -44,10 +44,99 @@ add_action( 'wp_enqueue_scripts', function() {
 		'myogenix-grunge-popup',
 		get_stylesheet_directory_uri() . '/assets/js/grunge-popup.js',
 		[],
-		'1.0.1',
+		'1.0.2',
 		true
 	);
 } );
+
+function myogenix_grunge_asset_url( string $path ): string {
+	$base  = get_stylesheet_directory_uri() . '/assets/images/grunge-redesign/';
+	$parts = explode( '/', $path );
+	return esc_url( $base . implode( '/', array_map( 'rawurlencode', $parts ) ) );
+}
+
+function myogenix_grunge_bottle_map(): array {
+	return [
+		'compound-semaglutide' => 'semaglutide-square-v2 Background Removed Background Removed.png',
+		'compound-tirzepatide' => 'tirzepatide-square-v2 Background Removed Background Removed.png',
+		'compound-retatrutide' => 'retatrutide-square-v2 Background Removed Background Removed.png',
+		'testosterone' => 'testosterone-square-v2 Background Removed Background Removed.png',
+		'compound-oral-tadalafil' => 'tadalafil tablets.webp',
+		'compound-sildenafil' => 'sildenafil tablets.webp',
+		'bpc' => 'bpc-157-square-v2 Background Removed Background Removed.png',
+		'motsc' => 'mots-c-square-v2 Background Removed Background Removed.png',
+		'epithalon' => 'epithalon-square-v2 Background Removed Background Removed.png',
+		'compound-injectable-nad' => 'nad-plus-square-v2 Background Removed Background Removed.png',
+		'compound-injectable-sermorelin' => 'sermorelin-square-v2 Background Removed Background Removed.png',
+		'compound-injectable-glutathione' => 'glutathione-square-v2 Background Removed Background Removed.png',
+		'tesamorelin-ipamorelin' => 'tesamorelin-square-v2 Background Removed Background Removed.png',
+		'cjc1295-ipamorelin' => 'cjc-1295-square-v2 Background Removed Background Removed.png',
+		'klow-stack-bpc157-10mg-ghk-cu-50mg-tb50010mg-kpv-10mg' => 'klow-square-v2 Background Removed Background Removed.png',
+		'2606' => 'wolverine-square-v2 Background Removed Background Removed.png',
+	];
+}
+
+function myogenix_grunge_bottle_url( $product_or_slug ): string {
+	$slug = is_object( $product_or_slug ) && method_exists( $product_or_slug, 'get_slug' )
+		? $product_or_slug->get_slug()
+		: (string) $product_or_slug;
+	$file = myogenix_grunge_bottle_map()[ $slug ] ?? '';
+	if ( ! $file ) return '';
+	return myogenix_grunge_asset_url( 'bottles-v2/' . $file );
+}
+
+function myogenix_get_lowest_product_price( $product, string $unit = '' ): ?float {
+	if ( ! $product || ! is_object( $product ) ) return null;
+
+	if ( method_exists( $product, 'get_slug' ) && 'testosterone' === $product->get_slug() ) {
+		return 65.0;
+	}
+
+	$prices = [];
+	if ( $product->is_type( 'variable' ) || $product->is_type( 'variable-subscription' ) ) {
+		foreach ( $product->get_children() as $vid ) {
+			$variation = wc_get_product( $vid );
+			if ( ! $variation || 'publish' !== get_post_status( $vid ) ) continue;
+			$price = (float) $variation->get_price();
+			if ( $price <= 0 ) continue;
+
+			if ( '/tablet' === $unit ) {
+				$tablets = 0;
+				foreach ( [ 'attribute_pa_tablets', 'attribute_pa_tablet-count' ] as $key ) {
+					$tablets = max( $tablets, (int) preg_replace( '/\D+/', '', (string) get_post_meta( $vid, $key, true ) ) );
+				}
+				if ( ! $tablets ) $tablets = 90;
+				$price = $price / $tablets;
+			} elseif ( $variation->is_type( 'subscription_variation' ) && class_exists( 'WC_Subscriptions_Product' ) ) {
+				$interval = (int) WC_Subscriptions_Product::get_interval( $vid );
+				if ( $interval > 1 && 'month' === WC_Subscriptions_Product::get_period( $vid ) ) {
+					$price = $price / $interval;
+				}
+			}
+
+			$prices[] = $price;
+		}
+	} else {
+		$price = (float) $product->get_price();
+		if ( $price > 0 ) $prices[] = $price;
+	}
+
+	if ( empty( $prices ) ) return null;
+	return min( $prices );
+}
+
+add_filter( 'template_include', function( $template ) {
+	$request_path = isset( $_SERVER['REQUEST_URI'] ) ? strtok( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), '?' ) : '';
+	if ( '/quest-faqs/' !== $request_path && '/quest-faqs' !== $request_path ) return $template;
+
+	global $wp_query;
+	if ( $wp_query ) {
+		$wp_query->is_404 = false;
+	}
+	status_header( 200 );
+	$quest_template = locate_template( 'page-how-quest-process-works.php' );
+	return $quest_template ?: $template;
+}, 20 );
 
 add_action( 'wp_footer', function() {
 	if ( is_admin() ) return;
@@ -56,6 +145,7 @@ add_action( 'wp_footer', function() {
 		<div class="myo-purchase-popup__backdrop" data-myo-popup-close></div>
 		<div class="myo-purchase-popup__dialog" role="dialog" aria-modal="true" aria-labelledby="myo-purchase-popup-title">
 			<button class="myo-purchase-popup__close" type="button" aria-label="Close" data-myo-popup-close>&times;</button>
+			<img class="myo-purchase-popup__logo" src="<?php echo myogenix_grunge_asset_url( 'red and white logo.svg' ); ?>" alt="MyoGenix Pharma" width="168" height="50" loading="lazy">
 			<p class="grunge-kicker">Need help choosing?</p>
 			<h2 id="myo-purchase-popup-title">Get help with your purchase</h2>
 			<p>Tell us where to reach you and a MyoGenix team member can help guide you through which products may fit and what the process looks like.</p>
@@ -756,7 +846,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
 			[],
-				'1.10.15'
+				'1.10.16'
 		);
 	}
 
@@ -796,7 +886,7 @@ add_action( 'wp_enqueue_scripts', function() {
 				'myogenix-sexual-health-pdp',
 				get_stylesheet_directory_uri() . '/assets/js/sexual-health-pdp.js',
 				[],
-					'1.3.3',
+					'1.3.4',
 				true
 			);
 		}
@@ -1134,7 +1224,7 @@ function myogenix_render_product_faq( $product_id ) {
 				<?php endforeach; ?>
 				</div>
 				<div class="myo-faq__cta">
-					<a href="#buy" class="myo-faq__cta-btn">Continue to evaluation</a>
+					<a href="#buy" class="myo-faq__cta-btn">Select Medication</a>
 					<a href="<?= esc_url( home_url( '/reach-a-concierge/' ) ) ?>" class="myo-faq__cta-btn myo-faq__cta-btn--dark">Ask a question</a>
 				</div>
 				<p class="trt-pdp__faq-disclaimer">Prescription required if approved. Plan review by licensed provider.</p>

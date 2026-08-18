@@ -25,6 +25,7 @@
 	var flatFeeLabel    = cfg.getAttribute( 'data-flat-fee-label' ) || '';
 	var flatFeePriceOwnLabs = parseFloat( cfg.getAttribute( 'data-flat-fee-price-own-labs' ) || '0' );
 	var flatFeeLabelOwnLabs = cfg.getAttribute( 'data-flat-fee-label-own-labs' ) || '';
+	var checkoutUrl = cfg.getAttribute( 'data-checkout-url' ) || '';
 
 	var primaryKeys   = Object.keys( matrix );
 	var hasSecondary  = !! secondaryAttr;
@@ -214,6 +215,24 @@
 		} );
 	}
 
+	document.querySelectorAll( '[data-trt-own-labs]' ).forEach( function ( btn ) {
+		btn.addEventListener( 'click', function ( e ) {
+			var ownLabs = btn.getAttribute( 'data-trt-own-labs' ) === '1';
+			state.ownLabs = ownLabs;
+			if ( ownLabsCheckbox ) ownLabsCheckbox.checked = ownLabs;
+			document.querySelectorAll( '[data-trt-own-labs]' ).forEach( function ( option ) {
+				var active = option.getAttribute( 'data-trt-own-labs' ) === ( ownLabs ? '1' : '0' );
+				option.classList.toggle( 'trt-pdp__labs-option--active', active );
+				option.setAttribute( 'aria-pressed', active ? 'true' : 'false' );
+			} );
+			render();
+			if ( btn.classList.contains( 'trt-pdp__select' ) ) {
+				e.preventDefault();
+				cfg.scrollIntoView( { behavior: 'smooth', block: 'start' } );
+			}
+		} );
+	} );
+
 	var cta = document.getElementById( 'pdp-cta' );
 	if ( cta ) {
 		cta.addEventListener( 'click', function () {
@@ -239,7 +258,7 @@
 				params += '&trt_strength=' + encodeURIComponent( state.strength );
 			}
 
-			window.location.href = window.location.pathname + '?' + params;
+			window.location.href = monthlyBilling && checkoutUrl ? checkoutUrl + '?' + params : window.location.pathname + '?' + params;
 		} );
 	}
 

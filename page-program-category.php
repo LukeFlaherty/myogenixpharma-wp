@@ -5,9 +5,7 @@
 defined( 'ABSPATH' ) || exit;
 
 $myo_asset = function( $path ) {
-	$base  = get_stylesheet_directory_uri() . '/assets/images/grunge-redesign/';
-	$parts = explode( '/', $path );
-	return esc_url( $base . implode( '/', array_map( 'rawurlencode', $parts ) ) );
+	return function_exists( 'myogenix_grunge_asset_url' ) ? myogenix_grunge_asset_url( $path ) : '';
 };
 
 $current_slug = get_post_field( 'post_name', get_queried_object_id() );
@@ -50,10 +48,10 @@ $product_meta = [
 	'tirzepatide'  => [ 'name' => 'Tirzepatide',  'tagline' => 'Dual-action GLP-1 therapy', 'unit' => '/mo' ],
 	'semaglutide'  => [ 'name' => 'Semaglutide',  'tagline' => 'Proven GLP-1 therapy', 'unit' => '/mo' ],
 	'retatrutide'  => [ 'name' => 'Retatrutide',  'tagline' => 'Triple-action weight support', 'unit' => '/mo', 'url' => home_url( '/retatrutide/' ) ],
-	'testosterone' => [ 'name' => 'Testosterone', 'tagline' => 'Hormone optimization', 'unit' => '/mo' ],
+	'testosterone' => [ 'name' => 'Testosterone', 'tagline' => 'Hormone optimization', 'unit' => '' ],
 	'hcg'          => [ 'name' => 'HCG',          'tagline' => 'Natural testosterone support', 'unit' => '' ],
 	'tadalafil'    => [ 'name' => 'Tadalafil',    'tagline' => 'Daily ED support', 'unit' => '/tablet' ],
-	'sildenafil'   => [ 'name' => 'Sildenafil',   'tagline' => 'Fast-acting ED treatment', 'unit' => '/mo' ],
+	'sildenafil'   => [ 'name' => 'Sildenafil',   'tagline' => 'Fast-acting ED treatment', 'unit' => '/tablet' ],
 	'bpc'          => [ 'name' => 'BPC-157',      'tagline' => 'Recovery and repair support', 'unit' => '/vial' ],
 	'motsc'        => [ 'name' => 'MOTSc',        'tagline' => 'Mitochondrial performance', 'unit' => '/vial' ],
 	'epithalon'    => [ 'name' => 'Epithalon',    'tagline' => 'Longevity peptide', 'unit' => '/vial' ],
@@ -86,8 +84,9 @@ $programs = [
 		'body'          => 'Online intake, provider review, personalized treatment options, and concierge support.',
 		'option_label'  => "men's health",
 		'hero_image'    => 'mgrx-hero-team.webp',
-		'hero_cta'      => home_url( '/product/testosterone/' ),
+		'hero_cta'      => home_url( '/product-category/mens-health/' ),
 		'products'      => [ 'testosterone', 'hcg', 'tadalafil', 'sildenafil' ],
+		'hero_bottles'  => [ 'testosterone', 'tadalafil', 'sildenafil' ],
 	],
 	'sexual-health' => [
 		'eyebrow'       => 'Discreet provider review',
@@ -157,19 +156,14 @@ $get_product = function( $key ) use ( $product_ids, $product_meta ) {
 	$product = ( $id && function_exists( 'wc_get_product' ) ) ? wc_get_product( $id ) : null;
 	if ( ! $product ) return null;
 
-	$raw_price = (float) $product->get_price();
-	if ( $product->is_type( 'variable-subscription' ) && class_exists( 'WC_Subscriptions_Product' ) ) {
-		$min_var_id = $product->get_meta( '_min_price_variation_id' );
-		if ( $min_var_id ) {
-			$interval = (int) WC_Subscriptions_Product::get_interval( $min_var_id );
-			if ( $interval > 1 && 'month' === WC_Subscriptions_Product::get_period( $min_var_id ) ) {
-				$raw_price = $raw_price / $interval;
-			}
-		}
-	}
-
 	$meta     = $product_meta[ $key ] ?? [];
 	$decimals = ( ( $meta['unit'] ?? '' ) === '/tablet' ) ? 2 : 0;
+	$image    = function_exists( 'myogenix_grunge_bottle_url' ) ? myogenix_grunge_bottle_url( $product ) : '';
+	if ( ! $image ) return null;
+	$raw_price = function_exists( 'myogenix_get_lowest_product_price' )
+		? myogenix_get_lowest_product_price( $product, $meta['unit'] ?? '' )
+		: (float) $product->get_price();
+	if ( null === $raw_price ) return null;
 
 	return [
 		'name'    => $meta['name'] ?? $product->get_name(),
@@ -177,7 +171,7 @@ $get_product = function( $key ) use ( $product_ids, $product_meta ) {
 		'unit'    => $meta['unit'] ?? '',
 		'price'   => '$' . number_format( max( 0, $raw_price ), $decimals ),
 		'url'     => $meta['url'] ?? $product->get_permalink(),
-		'image'   => get_the_post_thumbnail_url( $id, 'large' ) ?: get_the_post_thumbnail_url( $id, 'full' ) ?: '',
+		'image'   => $image,
 	];
 };
 
@@ -216,12 +210,24 @@ get_header();
 				<p class="grunge-category-hero__subtitle"><?php echo esc_html( $program['subtitle'] ); ?></p>
 				<p class="grunge-category-hero__body"><?php echo esc_html( $program['body'] ); ?></p>
 				<div class="grunge-hero__actions">
-					<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( $program['hero_cta'] ); ?>">Continue to evaluation <?php echo myogenix_grunge_arrow_svg(); ?></a>
+					<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( $program['hero_cta'] ); ?>">Select Medication <?php echo myogenix_grunge_arrow_svg(); ?></a>
 					<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				</div>
 			</div>
 			<div class="grunge-category-hero__media">
+				<?php if ( ! empty( $program['hero_bottles'] ) ) : ?>
+				<div class="grunge-bottle-collage" aria-hidden="true">
+					<?php foreach ( $program['hero_bottles'] as $bottle_key ) :
+						$bottle_product = ! empty( $product_ids[ $bottle_key ] ) && function_exists( 'wc_get_product' ) ? wc_get_product( $product_ids[ $bottle_key ] ) : null;
+						$bottle_url     = $bottle_product && function_exists( 'myogenix_grunge_bottle_url' ) ? myogenix_grunge_bottle_url( $bottle_product ) : '';
+						if ( ! $bottle_url ) continue;
+					?>
+					<img src="<?php echo esc_url( $bottle_url ); ?>" alt="" width="320" height="420" loading="eager">
+					<?php endforeach; ?>
+				</div>
+				<?php else : ?>
 				<img src="<?php echo $myo_asset( $program['hero_image'] ); ?>" alt="" width="620" height="520">
+				<?php endif; ?>
 			</div>
 		</div>
 	</section>
@@ -260,7 +266,7 @@ get_header();
 						<h3><?php echo esc_html( $product['name'] ); ?></h3>
 						<span>Starting at</span>
 						<strong><?php echo esc_html( $product['price'] ); ?><small><?php echo esc_html( $product['unit'] ); ?></small></strong>
-						<em>Start Now <?php echo myogenix_grunge_arrow_svg(); ?></em>
+						<em>Select Medication <?php echo myogenix_grunge_arrow_svg(); ?></em>
 					</div>
 				</a>
 				<?php endforeach; ?>
@@ -300,7 +306,7 @@ get_header();
 			<img src="<?php echo $myo_asset( 'red and white logo.svg' ); ?>" alt="MyoGenix Pharma" width="176" height="54" loading="lazy">
 			<h2>Ready to start? <span class="grunge-text-red">We are here to help.</span></h2>
 			<div class="grunge-final-cta__actions">
-				<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( $program['hero_cta'] ); ?>">Continue to evaluation <?php echo myogenix_grunge_arrow_svg(); ?></a>
+				<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( $program['hero_cta'] ); ?>">Select Medication <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 			</div>
 		</div>

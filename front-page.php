@@ -5,9 +5,7 @@
 defined( 'ABSPATH' ) || exit;
 
 $myo_asset = function( $path ) {
-	$base  = get_stylesheet_directory_uri() . '/assets/images/grunge-redesign/';
-	$parts = explode( '/', $path );
-	return esc_url( $base . implode( '/', array_map( 'rawurlencode', $parts ) ) );
+	return function_exists( 'myogenix_grunge_asset_url' ) ? myogenix_grunge_asset_url( $path ) : '';
 };
 
 $product_ids = [
@@ -26,7 +24,7 @@ $product_ids = [
 ];
 
 $product_meta = [
-	'testosterone' => [ 'name' => 'Testosterone', 'line' => 'Hormone optimization', 'unit' => '/mo' ],
+	'testosterone' => [ 'name' => 'Testosterone', 'line' => 'Hormone optimization', 'unit' => '' ],
 	'hcg'          => [ 'name' => 'HCG', 'line' => 'Natural testosterone support', 'unit' => '' ],
 	'tirzepatide'  => [ 'name' => 'Tirzepatide', 'line' => 'Dual-action GLP-1 protocol', 'unit' => '/mo' ],
 	'semaglutide'  => [ 'name' => 'Semaglutide', 'line' => 'Provider-guided GLP-1 care', 'unit' => '/mo' ],
@@ -37,7 +35,7 @@ $product_meta = [
 	'sermorelin'   => [ 'name' => 'Sermorelin', 'line' => 'GH optimization support', 'unit' => '/vial' ],
 	'glutathione'  => [ 'name' => 'Glutathione', 'line' => 'Antioxidant and renewal support', 'unit' => '/vial' ],
 	'tadalafil'    => [ 'name' => 'Tadalafil', 'line' => 'Daily ED support', 'unit' => '/tablet' ],
-	'sildenafil'   => [ 'name' => 'Sildenafil', 'line' => 'Fast-acting ED treatment', 'unit' => '/mo' ],
+	'sildenafil'   => [ 'name' => 'Sildenafil', 'line' => 'Fast-acting ED treatment', 'unit' => '/tablet' ],
 ];
 
 $products = [];
@@ -47,25 +45,20 @@ foreach ( $product_ids as $key => $id ) {
 		continue;
 	}
 
-	$raw_price = (float) $product->get_price();
-	if ( $product->is_type( 'variable-subscription' ) && class_exists( 'WC_Subscriptions_Product' ) ) {
-		$min_var_id = $product->get_meta( '_min_price_variation_id' );
-		if ( $min_var_id ) {
-			$interval = (int) WC_Subscriptions_Product::get_interval( $min_var_id );
-			if ( $interval > 1 && 'month' === WC_Subscriptions_Product::get_period( $min_var_id ) ) {
-				$raw_price = $raw_price / $interval;
-			}
-		}
-	}
-
 	$decimals = ( isset( $product_meta[ $key ]['unit'] ) && '/tablet' === $product_meta[ $key ]['unit'] ) ? 2 : 0;
+	$raw_price = function_exists( 'myogenix_get_lowest_product_price' )
+		? myogenix_get_lowest_product_price( $product, $product_meta[ $key ]['unit'] )
+		: (float) $product->get_price();
+	$image_url = function_exists( 'myogenix_grunge_bottle_url' ) ? myogenix_grunge_bottle_url( $product ) : '';
+	if ( null === $raw_price || ! $image_url ) continue;
+
 	$products[ $key ] = [
 		'name'  => $product_meta[ $key ]['name'],
 		'line'  => $product_meta[ $key ]['line'],
 		'unit'  => $product_meta[ $key ]['unit'],
 		'price' => '$' . number_format( max( 0, $raw_price ), $decimals ),
 		'url'   => $product->get_permalink(),
-		'image' => get_the_post_thumbnail_url( $id, 'large' ) ?: get_the_post_thumbnail_url( $id, 'full' ) ?: '',
+		'image' => $image_url,
 	];
 }
 
@@ -112,7 +105,7 @@ $programs = [
 	],
 ];
 
-$featured_keys = [ 'testosterone', 'tirzepatide', 'semaglutide', 'bpc', 'nad', 'tadalafil' ];
+$featured_keys = [ 'tirzepatide', 'semaglutide', 'tadalafil', 'sildenafil', 'bpc', 'nad' ];
 
 $symptoms = [
 	'Low energy',
@@ -177,7 +170,7 @@ get_header();
 				</h1>
 				<p class="grunge-hero__lead">Concierge telehealth for TRT <span>Performance care, guided by humans.</span></p>
 				<div class="grunge-hero__actions">
-					<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">Start your evaluation <?php echo myogenix_grunge_arrow_svg(); ?></a>
+					<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/product-category/mens-health/' ) ); ?>">Select Medication <?php echo myogenix_grunge_arrow_svg(); ?></a>
 					<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				</div>
 			</div>
@@ -196,6 +189,34 @@ get_header();
 				<p><?php echo esc_html( $feature['label'] ); ?></p>
 			</div>
 			<?php endforeach; ?>
+		</div>
+	</section>
+
+	<section class="grunge-section grunge-products">
+		<div class="grunge-section__texture" style="background-image:url('<?php echo $myo_asset( 'red-dots-grid-background.webp' ); ?>')" aria-hidden="true"></div>
+		<div class="grunge-container">
+			<div class="grunge-section__header grunge-section__header--split">
+				<div>
+					<p class="grunge-kicker">Treatment options</p>
+					<h2>Select the <span class="grunge-text-red">medication path</span></h2>
+				</div>
+				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/shop/' ) ); ?>">View all <?php echo myogenix_grunge_arrow_svg(); ?></a>
+			</div>
+			<div class="grunge-product-grid">
+				<?php foreach ( $featured_keys as $key ) :
+					if ( empty( $products[ $key ] ) ) continue;
+					$item = $products[ $key ];
+				?>
+				<a class="grunge-product-card" href="<?php echo esc_url( $item['url'] ); ?>">
+					<img src="<?php echo esc_url( $item['image'] ); ?>" alt="<?php echo esc_attr( $item['name'] ); ?>" width="180" height="180" loading="lazy">
+					<div>
+						<p><?php echo esc_html( $item['line'] ); ?></p>
+						<h3><?php echo esc_html( $item['name'] ); ?></h3>
+						<strong><?php echo esc_html( $item['price'] ); ?><span><?php echo esc_html( $item['unit'] ); ?></span></strong>
+					</div>
+				</a>
+				<?php endforeach; ?>
+			</div>
 		</div>
 	</section>
 
@@ -226,35 +247,35 @@ get_header();
 				<img src="<?php echo $myo_asset( 'mgrx-phone-care-journey.webp' ); ?>" alt="MyoGenix care journey" width="620" height="620" loading="lazy">
 			</div>
 			<div class="grunge-performance__copy">
-				<p class="grunge-kicker">TRT care path</p>
-				<h2>Concierge telehealth <span class="grunge-text-red">for TRT</span></h2>
-				<p><span class="grunge-text-red">Physician-guided</span> treatment. Human support.</p>
+				<p class="grunge-kicker">Weight management</p>
+				<h2>Metabolic care <span class="grunge-text-red">without the waiting room</span></h2>
+				<p><span class="grunge-text-red">Provider-reviewed</span> GLP-1 options with concierge support.</p>
 				<ul class="grunge-check-list">
-					<li>Online enrollment</li>
+					<li>Semaglutide and tirzepatide options</li>
 					<li>Licensed providers</li>
-					<li>Personalized dosing</li>
+					<li>Personalized dosing path</li>
 					<li>Doorstep delivery</li>
 					<li>Human concierge support</li>
 				</ul>
-				<a class="grunge-btn grunge-btn--red grunge-inline-cta" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">Start TRT <?php echo myogenix_grunge_arrow_svg(); ?></a>
+				<a class="grunge-btn grunge-btn--red grunge-inline-cta" href="<?php echo esc_url( home_url( '/weight-management/' ) ); ?>">Select Medication <?php echo myogenix_grunge_arrow_svg(); ?></a>
 			</div>
 		</div>
 	</section>
 
 	<section class="grunge-symptoms">
-		<div class="grunge-symptoms__image" style="background-image:url('<?php echo $myo_asset( 'section bg 2.png' ); ?>')" aria-hidden="true"></div>
+		<div class="grunge-symptoms__image" style="background-image:url('<?php echo $myo_asset( 'section bg 4.png' ); ?>')" aria-hidden="true"></div>
 		<div class="grunge-symptoms__shade" aria-hidden="true"></div>
 		<div class="grunge-container grunge-symptoms__content">
 			<div class="grunge-symptoms__intro">
-				<img class="grunge-symptoms__person" src="<?php echo $myo_asset( 'guy-sad.webp' ); ?>" alt="" width="360" height="420" loading="lazy">
-				<h2>Common <span class="grunge-text-red">symptoms</span> of low T</h2>
+				<img class="grunge-symptoms__person" src="<?php echo $myo_asset( 'peptides-category-vials.webp' ); ?>" alt="" width="360" height="420" loading="lazy">
+				<h2>Peptides for <span class="grunge-text-red">recovery and longevity</span></h2>
 			</div>
 			<ul class="grunge-symptom-grid grunge-check-list">
-				<?php foreach ( $symptoms as $symptom ) : ?>
+				<?php foreach ( [ 'BPC-157', 'NAD+', 'Sermorelin', 'Glutathione', 'CJC-1295', 'MOTSc', 'Epithalon', 'Wolverine' ] as $symptom ) : ?>
 				<li><?php echo esc_html( $symptom ); ?></li>
 				<?php endforeach; ?>
 			</ul>
-			<a class="grunge-btn grunge-btn--red grunge-inline-cta" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">See if TRT is right for you <?php echo myogenix_grunge_arrow_svg(); ?></a>
+			<a class="grunge-btn grunge-btn--red grunge-inline-cta" href="<?php echo esc_url( home_url( '/wellness/' ) ); ?>">Select Medication <?php echo myogenix_grunge_arrow_svg(); ?></a>
 		</div>
 	</section>
 
@@ -342,7 +363,7 @@ get_header();
 			<img src="<?php echo $myo_asset( 'red and white logo.svg' ); ?>" alt="" width="176" height="54" loading="lazy">
 			<h2><span class="grunge-final-cta__line">Concierge care</span> <span class="grunge-text-red">is live</span></h2>
 			<div class="grunge-final-cta__actions">
-				<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">Start your evaluation <?php echo myogenix_grunge_arrow_svg(); ?></a>
+				<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/product-category/mens-health/' ) ); ?>">Select Medication <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 			</div>
 		</div>
