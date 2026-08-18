@@ -5617,6 +5617,23 @@ body.single-product .trt-grunge-pdp .pdp-hero__right {
 	text-align: left !important;
 }
 
+.trt-grunge-pdp .pdp-cfg__summary-label {
+	order: 1;
+}
+
+.trt-grunge-pdp .pdp-cfg__summary-total {
+	order: 2;
+}
+
+.trt-grunge-pdp .pdp-cfg__summary-month-price {
+	order: 3;
+}
+
+.trt-grunge-pdp .pdp-cfg__summary-sub,
+.trt-grunge-pdp .pdp-cfg__summary-line {
+	order: 4;
+}
+
 .trt-grunge-pdp .pdp-cfg__summary-total {
 	align-items: start !important;
 	justify-content: start !important;

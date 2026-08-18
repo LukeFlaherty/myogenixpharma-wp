@@ -2,7 +2,7 @@
  * Sexual health PDP configurator.
  * Handles 1D (dosage only) and 2D (dosage × tablets) variable products.
  * Reads config from data-* attributes on #pdp-cfg.
- * @version 1.3.7
+ * @version 1.3.8
  */
 ( function () {
 	'use strict';
