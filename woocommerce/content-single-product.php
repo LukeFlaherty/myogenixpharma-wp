@@ -1311,11 +1311,11 @@ if ( $is_weight_loss ) :
 						<div class="trt-pdp__labs-grid" role="group" aria-label="TRT lab option">
 							<button class="trt-pdp__labs-option trt-pdp__labs-option--active" type="button" data-trt-own-labs="0" aria-pressed="true">
 								<strong>W/O LABS <span>$165</span></strong>
-								<em>Schedule bloodwork</em>
+								<em>Schedule Bloodwork</em>
 							</button>
 							<button class="trt-pdp__labs-option" type="button" data-trt-own-labs="1" aria-pressed="false">
 								<strong>W/LABS <span>$65</span></strong>
-								<em>Upload labs after payment</em>
+								<em>Upload Labs</em>
 							</button>
 						</div>
 						<input type="checkbox" id="pdp-own-labs" class="pdp-cfg__own-labs-checkbox" hidden />

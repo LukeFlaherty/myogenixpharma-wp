@@ -5834,3 +5834,120 @@ body.single-product .trt-grunge-pdp .pdp-hero__right {
 		font-size: 1.7rem !important;
 	}
 }
+
+/* TRT final checkout polish. */
+.trt-grunge-pdp .trt-pdp__requirement-grid {
+	display: none !important;
+}
+
+.trt-grunge-pdp .pdp-cfg__summary-month-price {
+	display: none !important;
+}
+
+.trt-grunge-pdp .pdp-cfg__summary-month-price::before {
+	content: none !important;
+	display: none !important;
+}
+
+.trt-grunge-pdp .pdp-cfg__side .peptide-cfg__includes {
+	gap: 14px !important;
+	padding: 18px !important;
+}
+
+.trt-grunge-pdp .pdp-cfg__side .peptide-cfg__includes-title {
+	font-size: 2.24rem !important;
+	line-height: 0.95 !important;
+}
+
+.trt-grunge-pdp .pdp-cfg__side .peptide-cfg__includes-list {
+	grid-template-columns: minmax(0, 1fr) !important;
+	gap: 11px !important;
+}
+
+.trt-grunge-pdp .pdp-cfg__side .peptide-cfg__includes-item {
+	gap: 12px !important;
+	font-size: 1.08rem !important;
+	line-height: 1.22 !important;
+}
+
+.trt-grunge-pdp .pdp-cfg__side .peptide-cfg__includes-icon,
+.trt-grunge-pdp .pdp-cfg__side .peptide-cfg__includes-icon svg {
+	width: 24px !important;
+	height: 24px !important;
+	min-width: 24px !important;
+}
+
+.trt-grunge-pdp .trt-pdp__plan-card:has(.trt-pdp__popular) h3 {
+	margin-top: 28px !important;
+}
+
+.trt-grunge-pdp .trt-pdp__plan-card dt {
+	font-size: 1.21rem !important;
+}
+
+.trt-grunge-pdp .trt-pdp__plan-card dd {
+	font-size: 1.86rem !important;
+	text-align: left !important;
+}
+
+.trt-grunge-pdp .trt-pdp__select {
+	background-image: none !important;
+}
+
+.trt-grunge-pdp .trt-pdp__select::after {
+	content: "" !important;
+	width: 28px !important;
+	height: 23px !important;
+	background: url("../images/grunge-redesign/cta-arrow.svg") center / contain no-repeat !important;
+	font-size: 0 !important;
+}
+
+.trt-grunge-pdp .trt-pdp__select svg,
+.trt-grunge-pdp .trt-pdp__select img {
+	display: none !important;
+}
+
+@media (max-width: 600px) {
+	.trt-grunge-pdp .trt-pdp__labs-option em {
+		font-size: 0.59rem !important;
+		line-height: 1.12 !important;
+	}
+
+	.trt-grunge-pdp .pdp-cfg__side .peptide-cfg__includes {
+		gap: 12px !important;
+		padding: 14px !important;
+	}
+
+	.trt-grunge-pdp .pdp-cfg__side .peptide-cfg__includes-title {
+		font-size: 2rem !important;
+	}
+
+	.trt-grunge-pdp .pdp-cfg__side .peptide-cfg__includes-list {
+		grid-template-columns: minmax(0, 1fr) !important;
+		gap: 10px !important;
+	}
+
+	.trt-grunge-pdp .pdp-cfg__side .peptide-cfg__includes-item {
+		font-size: 1rem !important;
+	}
+
+	.trt-grunge-pdp .pdp-cfg__side .peptide-cfg__includes-icon,
+	.trt-grunge-pdp .pdp-cfg__side .peptide-cfg__includes-icon svg {
+		width: 22px !important;
+		height: 22px !important;
+		min-width: 22px !important;
+	}
+
+	.trt-grunge-pdp .trt-pdp__plan-card:has(.trt-pdp__popular) h3 {
+		margin-top: 24px !important;
+	}
+
+	.trt-grunge-pdp .trt-pdp__plan-card dt {
+		font-size: 0.94rem !important;
+	}
+
+	.trt-grunge-pdp .trt-pdp__plan-card dd {
+		font-size: 1.46rem !important;
+		text-align: left !important;
+	}
+}
