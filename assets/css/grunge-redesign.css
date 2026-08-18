@@ -1007,6 +1007,10 @@ body.single-product header.home-nav + * {
   background: rgba(127, 29, 29, 0.8);
 }
 
+.grunge-product-grid {
+  background: transparent;
+}
+
 .grunge-program-card,
 .grunge-product-card,
 .grunge-trust-card {
@@ -1051,6 +1055,8 @@ body.single-product header.home-nav + * {
 }
 
 .grunge-performance__grid {
+  position: relative;
+  z-index: 2;
   display: grid;
   gap: 26px;
   align-items: center;
@@ -1231,8 +1237,8 @@ body.single-product header.home-nav + * {
 }
 
 .grunge-compare-card img {
-  width: min(100%, 260px);
-  height: 230px;
+  width: min(100%, 312px);
+  height: 276px;
   margin: 0 auto;
   object-fit: contain;
   filter: drop-shadow(0 24px 38px rgba(0, 0, 0, 0.7));
@@ -2339,6 +2345,12 @@ body.single-product .myogenix-pdp__cq-heading {
     width: auto;
   }
 
+  .grunge-product-grid > .grunge-product-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc(50% - 0.5px);
+  }
+
   body.single-product .pdp-cfg__supply-row,
   body.single-product .pdp-cfg__doses-wrap {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2525,6 +2537,15 @@ body.single-product .myogenix-pdp__cq-heading {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .grunge-product-grid > .grunge-product-card:last-child:nth-child(odd) {
+    grid-column: auto;
+    width: 100%;
+  }
+
+  .grunge-product-grid > .grunge-product-card:last-child:nth-child(3n + 1) {
+    grid-column: 2;
+  }
+
   .grunge-category-product-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -2585,6 +2606,16 @@ body.single-product .myogenix-pdp__cq-heading {
 }
 
 @media (max-width: 767px) {
+  .grunge-performance .grunge-programs__bg {
+    opacity: 0.2;
+  }
+
+  .grunge-performance::after {
+    background:
+      radial-gradient(circle at 82% 16%, rgba(220, 38, 38, 0.14), transparent 30%),
+      linear-gradient(90deg, rgba(0, 0, 0, 0.94), rgba(0, 0, 0, 0.78) 62%, rgba(0, 0, 0, 0.38));
+  }
+
   .grunge-performance__grid {
     min-height: 560px;
     align-items: center;
@@ -2610,8 +2641,37 @@ body.single-product .myogenix-pdp__cq-heading {
 
   .grunge-performance__copy {
     position: relative;
-    z-index: 2;
+    z-index: 4;
     max-width: min(72vw, 320px);
+    color: #fff;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.95);
+  }
+
+  .grunge-performance__copy .grunge-kicker,
+  .grunge-performance__copy h2,
+  .grunge-performance__copy h2 .grunge-text-red,
+  .grunge-performance__copy p,
+  .grunge-performance__copy p .grunge-text-red,
+  .grunge-performance__copy .grunge-check-list li {
+    background: none;
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    -webkit-text-fill-color: currentColor;
+  }
+
+  .grunge-performance__copy .grunge-kicker {
+    color: var(--myo-red);
+  }
+
+  .grunge-performance__copy h2,
+  .grunge-performance__copy p,
+  .grunge-performance__copy .grunge-check-list li {
+    color: #fff;
+  }
+
+  .grunge-performance__copy h2 .grunge-text-red,
+  .grunge-performance__copy p .grunge-text-red {
+    color: var(--myo-red);
   }
 
   .grunge-weight-compare .grunge-section__header {
@@ -2630,7 +2690,7 @@ body.single-product .myogenix-pdp__cq-heading {
   }
 
   .grunge-compare-card img {
-    height: 118px;
+    height: 142px;
     max-width: 100%;
   }
 

@@ -275,8 +275,8 @@ get_header();
 			<div class="grunge-compare-grid">
 				<?php
 				$compare_cards = [
-					[ 'key' => 'semaglutide', 'best' => 'Established GLP-1 support', 'points' => [ 'Once-weekly injection', 'Appetite and craving support', 'Lower starting price path' ] ],
-					[ 'key' => 'tirzepatide', 'best' => 'Dual-action metabolic care', 'points' => [ 'GIP + GLP-1 activity', 'Once-weekly injection', 'Often selected for stronger support' ] ],
+					[ 'key' => 'semaglutide', 'best' => 'Established GLP-1 support', 'points' => [ 'Once-weekly injection', 'Lower your appetite', 'Lower starting price' ] ],
+					[ 'key' => 'tirzepatide', 'best' => 'Dual-action metabolic care', 'points' => [ 'GIP + GLP-1 activity', 'Once-weekly injection', 'Stronger effects' ] ],
 				];
 				foreach ( $compare_cards as $card ) :
 					if ( empty( $products[ $card['key'] ] ) ) continue;
