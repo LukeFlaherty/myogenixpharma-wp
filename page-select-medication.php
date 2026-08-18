@@ -14,6 +14,14 @@ add_filter( 'body_class', function( $classes ) {
 	return $classes;
 } );
 
+add_filter( 'pre_get_document_title', function() {
+	return 'Select Medication - Myogenix Pharma';
+} );
+
+add_filter( 'rank_math/frontend/title', function() {
+	return 'Select Medication - Myogenix Pharma';
+} );
+
 $categories = [
 	[
 		'title' => 'Weight Management',
