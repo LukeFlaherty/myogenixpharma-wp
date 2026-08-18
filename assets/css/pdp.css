@@ -5951,3 +5951,69 @@ body.single-product .trt-grunge-pdp .pdp-hero__right {
 		text-align: left !important;
 	}
 }
+
+/* TRT selector polish: labels, lab cards, and include spacing. */
+.trt-grunge-pdp .trt-pdp__eligibility {
+	gap: 14px !important;
+}
+
+.trt-grunge-pdp .trt-pdp__eligibility-label,
+.trt-grunge-pdp .trt-pdp__labs-choice > .pdp-cfg__section-label {
+	font-size: clamp(1.64rem, 2.4vw, 1.96rem) !important;
+	line-height: 1 !important;
+}
+
+.trt-grunge-pdp .trt-pdp__labs-option {
+	align-content: start !important;
+	gap: 10px !important;
+}
+
+.trt-grunge-pdp .trt-pdp__labs-option strong {
+	display: grid !important;
+	gap: 6px !important;
+	font-size: clamp(1.05rem, 1.65vw, 1.34rem) !important;
+	line-height: 1 !important;
+}
+
+.trt-grunge-pdp .trt-pdp__labs-option strong span {
+	display: block !important;
+	float: none !important;
+	margin-top: 0 !important;
+}
+
+.trt-grunge-pdp .pdp-cfg__side .peptide-cfg__includes {
+	gap: 8px !important;
+}
+
+.trt-grunge-pdp .pdp-cfg__side .peptide-cfg__includes-title {
+	margin-bottom: 0 !important;
+}
+
+@media (max-width: 600px) {
+	.trt-grunge-pdp .trt-pdp__eligibility {
+		gap: 10px !important;
+	}
+
+	.trt-grunge-pdp .trt-pdp__eligibility-label,
+	.trt-grunge-pdp .trt-pdp__labs-choice > .pdp-cfg__section-label {
+		font-size: 1.44rem !important;
+	}
+
+	.trt-grunge-pdp .trt-pdp__labs-option {
+		gap: 5px !important;
+	}
+
+	.trt-grunge-pdp .trt-pdp__labs-option strong {
+		font-size: clamp(0.88rem, 4.15vw, 1.06rem) !important;
+		line-height: 1 !important;
+	}
+
+	.trt-grunge-pdp .trt-pdp__labs-option em {
+		font-size: 0.71rem !important;
+		line-height: 1.12 !important;
+	}
+
+	.trt-grunge-pdp .pdp-cfg__side .peptide-cfg__includes {
+		gap: 7px !important;
+	}
+}

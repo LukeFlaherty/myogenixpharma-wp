@@ -1310,11 +1310,11 @@ if ( $is_weight_loss ) :
 						<p class="pdp-cfg__section-label">Labs</p>
 						<div class="trt-pdp__labs-grid" role="group" aria-label="TRT lab option">
 							<button class="trt-pdp__labs-option trt-pdp__labs-option--active" type="button" data-trt-own-labs="0" aria-pressed="true">
-								<strong>W/O LABS <span>$165</span></strong>
+								<strong>Without Labs <span>$165</span></strong>
 								<em>Schedule Bloodwork</em>
 							</button>
 							<button class="trt-pdp__labs-option" type="button" data-trt-own-labs="1" aria-pressed="false">
-								<strong>W/LABS <span>$65</span></strong>
+								<strong>With Labs <span>$65</span></strong>
 								<em>Upload Labs</em>
 							</button>
 						</div>
@@ -1402,7 +1402,7 @@ if ( $is_weight_loss ) :
 				<p>Symptoms and labs are reviewed together before a provider determines whether TRT is clinically appropriate.</p>
 			</div>
 			<ul class="grunge-symptom-grid grunge-check-list trt-pdp__symptom-list">
-				<?php foreach ( [ 'Low energy', 'Brain fog', 'Loss of strength', 'Increased body fat', 'Low libido', 'Poor recovery', 'Mood changes', 'Poor sleep' ] as $symptom ) : ?>
+				<?php foreach ( [ 'Low energy', 'Brain fog', 'Low Strength', 'High Body Fat', 'Low libido', 'Poor recovery', 'Mood changes', 'Poor sleep' ] as $symptom ) : ?>
 				<li><?php echo esc_html( $symptom ); ?></li>
 				<?php endforeach; ?>
 			</ul>

@@ -862,7 +862,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
 			[],
-				'1.10.23'
+				'1.10.24'
 		);
 	}
 
