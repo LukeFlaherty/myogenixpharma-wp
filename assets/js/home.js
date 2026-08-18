@@ -22,6 +22,9 @@
     var ticking = false;
     var threshold = 96;
     var minDelta = 6;
+    var setNavHeight = function () {
+      document.documentElement.style.setProperty('--myo-nav-height', header.offsetHeight + 'px');
+    };
 
     var updateHeader = function () {
       var currentScrollY = window.scrollY || 0;
@@ -44,6 +47,8 @@
         ticking = true;
       }
     }, { passive: true });
+    window.addEventListener('resize', setNavHeight);
+    setNavHeight();
   }
 
   // ── FAQ accordion (site-wide: home page, category pages, and any PDP that

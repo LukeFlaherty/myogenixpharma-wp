@@ -4,6 +4,11 @@
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
+body.page-template-page-reach-a-concierge,
+body.page-template-page-reach-a-concierge .wp-site-blocks {
+	background: #000 !important;
+}
+
 /* Checkerboard grid texture behind the entire page, not just the hero. */
 .rac-page__grid {
 	position: absolute;
@@ -23,6 +28,10 @@
    uses by virtue of carrying the .home body class. */
 body.page-template-page-reach-a-concierge header.home-nav + * {
 	margin-block-start: 0 !important;
+}
+
+body.page-template-page-reach-a-concierge header.home-nav.grunge-nav {
+	margin-top: 0 !important;
 }
 
 /* ── Hero (mirrors .home-hero) ─────────────────────────── */
