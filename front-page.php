@@ -200,7 +200,7 @@ get_header();
 					<p class="grunge-kicker">Treatment options</p>
 					<h2>Select the <span class="grunge-text-red">medication path</span></h2>
 				</div>
-				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/shop/' ) ); ?>">View all <?php echo myogenix_grunge_arrow_svg(); ?></a>
+				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/medications/' ) ); ?>">View all <?php echo myogenix_grunge_arrow_svg(); ?></a>
 			</div>
 			<div class="grunge-product-grid">
 				<?php foreach ( $featured_keys as $key ) :

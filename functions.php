@@ -31,7 +31,7 @@ add_action( 'wp_enqueue_scripts', function() {
 		'myogenix-grunge-redesign',
 		get_stylesheet_directory_uri() . '/assets/css/grunge-redesign.css',
 		[ 'myogenix-home', 'myogenix-grunge-fonts' ],
-		'0.2.8'
+		'0.2.9'
 	);
 	wp_enqueue_script(
 		'myogenix-home',
@@ -130,6 +130,8 @@ add_filter( 'template_include', function( $template ) {
 	$route_templates = [
 		'/quest-faqs/'        => 'page-how-quest-process-works.php',
 		'/quest-faqs'         => 'page-how-quest-process-works.php',
+		'/medications/'       => 'page-medications.php',
+		'/medications'        => 'page-medications.php',
 		'/select-medication/' => 'page-select-medication.php',
 		'/select-medication'  => 'page-select-medication.php',
 	];
@@ -143,6 +145,14 @@ add_filter( 'template_include', function( $template ) {
 	$route_template = locate_template( $route_templates[ $request_path ] );
 	return $route_template ?: $template;
 }, 20 );
+
+add_action( 'template_redirect', function() {
+	if ( is_admin() ) return;
+	$request_path = isset( $_SERVER['REQUEST_URI'] ) ? strtok( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), '?' ) : '';
+	if ( '/shop/' !== $request_path && '/shop' !== $request_path ) return;
+	wp_safe_redirect( home_url( '/medications/' ), 301 );
+	exit;
+}, 1 );
 
 add_action( 'wp_footer', function() {
 	if ( is_admin() ) return;
@@ -184,7 +194,7 @@ add_action( 'wp_footer', function() {
 // The coded front page does not use Elementor widgets. Leaving Elementor's
 // frontend bundle there produces a missing elementorFrontendConfig console error.
 add_action( 'wp_enqueue_scripts', function() {
-	$program_slugs = [ 'weight-management', 'mens-health', 'sexual-health', 'wellness', 'womens-health', 'select-medication' ];
+	$program_slugs = [ 'weight-management', 'mens-health', 'sexual-health', 'wellness', 'womens-health', 'medications', 'select-medication' ];
 	$product_category_slugs = [ 'weight-loss', 'mens-health', 'sexual-health', 'peptides-longevity', 'womens-health', 'uncategorized' ];
 	$is_coded_grunge_page = is_front_page() || is_page( $program_slugs ) || is_singular( 'product' ) || is_page( 'retatrutide' );
 	if ( function_exists( 'is_product_category' ) && is_product_category( $product_category_slugs ) ) {
@@ -852,7 +862,7 @@ add_action( 'wp_enqueue_scripts', function() {
 			'myogenix-pdp',
 			get_stylesheet_directory_uri() . '/assets/css/pdp.css',
 			[],
-				'1.10.16'
+				'1.10.17'
 		);
 	}
 

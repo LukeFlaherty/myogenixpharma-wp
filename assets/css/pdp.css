@@ -5114,3 +5114,47 @@ body.single-product .trt-grunge-pdp .pdp-build {
 	left: auto !important;
 	transform: none !important;
 }
+
+.grunge-product-pdp .peptide-cfg__includes,
+.trt-grunge-pdp .peptide-cfg__includes,
+.grunge-product-pdp .peptide-cfg__includes-icon,
+.trt-grunge-pdp .peptide-cfg__includes-icon {
+	border: 0 !important;
+	box-shadow: none !important;
+}
+
+@media (max-width: 600px) {
+	.grunge-product-pdp .home-how__steps,
+	.trt-grunge-pdp .home-how__steps {
+		grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+		gap: 8px !important;
+	}
+
+	.grunge-product-pdp .hp-step,
+	.trt-grunge-pdp .hp-step {
+		min-width: 0;
+		padding: 16px 10px !important;
+	}
+
+	.grunge-product-pdp .hp-step__img-wrap,
+	.trt-grunge-pdp .hp-step__img-wrap {
+		min-height: 74px !important;
+	}
+
+	.grunge-product-pdp .hp-step__img,
+	.trt-grunge-pdp .hp-step__img {
+		width: 58px !important;
+		height: 58px !important;
+	}
+
+	.grunge-product-pdp .hp-step__title,
+	.trt-grunge-pdp .hp-step__title {
+		font-size: clamp(1.2rem, 6vw, 1.55rem) !important;
+	}
+
+	.grunge-product-pdp .hp-step__desc,
+	.trt-grunge-pdp .hp-step__desc {
+		font-size: clamp(0.82rem, 3.6vw, 1rem) !important;
+		line-height: 1.3 !important;
+	}
+}
