@@ -2,7 +2,7 @@
  * Sexual health PDP configurator.
  * Handles 1D (dosage only) and 2D (dosage × tablets) variable products.
  * Reads config from data-* attributes on #pdp-cfg.
- * @version 1.3.0
+ * @version 1.3.6
  */
 ( function () {
 	'use strict';
@@ -99,12 +99,12 @@
 			var displayFeeLabel = ( state.ownLabs && flatFeeLabelOwnLabs ) ? flatFeeLabelOwnLabs : flatFeeLabel;
 			if ( displayFeePrice > 0 ) {
 				el.innerHTML =
-					'<span class="pdp-cfg__summary-label">Plan review first</span>' +
-					'<div class="pdp-cfg__summary-month-price">Personalized after provider review.</div>' +
+					'<span class="pdp-cfg__summary-label">Due today</span>' +
+					'<div class="pdp-cfg__summary-month-price">Provider review after checkout.</div>' +
 					'<p class="pdp-cfg__summary-sub">' + displayFeeLabel + '</p>' +
 					'<div class="pdp-cfg__summary-line"><span>Vial strength</span><strong>' + state.strength + '</strong></div>' +
 					'<div class="pdp-cfg__summary-total">' +
-						'<span>Total today</span>' +
+						'<span>Checkout total</span>' +
 						'<strong class="pdp-cfg__summary-total-price">' + fmt( displayFeePrice ) + '</strong>' +
 					'</div>';
 				return;

@@ -1180,7 +1180,7 @@ if ( $is_weight_loss ) :
 			</div>
 		</section>
 
-		<section class="pdp-build" id="<?php echo $slug === 'testosterone' ? 'build-plan' : 'buy'; ?>" aria-label="Build your plan">
+		<section class="pdp-build" id="<?php echo $slug === 'testosterone' ? 'build-plan' : 'buy'; ?>" aria-label="<?php echo $slug === 'testosterone' ? 'TRT checkout essentials' : 'Build your plan'; ?>">
 			<div class="trt-pdp__section-bg" style="background-image:url('<?php echo $img_url( 'grunge-redesign/bg-genetic-wire.webp' ); ?>')" aria-hidden="true"></div>
 			<div class="pdp-build__inner">
 				<div class="pdp-hero__right">
@@ -1217,8 +1217,8 @@ if ( $is_weight_loss ) :
 					<div class="trt-pdp__requirements">
 						<p class="pdp-cfg__section-label">What's required to get started</p>
 						<div class="trt-pdp__requirement-grid">
-							<div><strong>State eligibility</strong><span>Confirm TRT is available where you live.</span></div>
-							<div><strong>Labs</strong><span>Use recent labs or schedule bloodwork after checkout.</span></div>
+							<div><strong>State eligibility</strong><span>Auto-detected; change if needed.</span></div>
+							<div><strong>Labs</strong><span>Choose bloodwork or upload recent labs.</span></div>
 						</div>
 					</div>
 					<?php endif; ?>
@@ -1319,7 +1319,7 @@ if ( $is_weight_loss ) :
 							</button>
 						</div>
 						<input type="checkbox" id="pdp-own-labs" class="pdp-cfg__own-labs-checkbox" hidden />
-						<p class="pdp-cfg__own-labs-note">You'll confirm lab details during your intake after checkout.</p>
+						<p class="pdp-cfg__own-labs-note">Lab details come after checkout.</p>
 					</div>
 					<?php endif; ?>
 					</div>

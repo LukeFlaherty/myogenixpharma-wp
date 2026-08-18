@@ -5289,3 +5289,289 @@ body.single-product .pdp-hero__trust-item {
 		grid-template-columns: minmax(0, 1fr) !important;
 	}
 }
+
+/* TRT checkout essentials: compact path distinct from the standard medication builder. */
+body.single-product .trt-grunge-pdp .pdp-build__inner {
+	width: min(100% - 32px, 980px) !important;
+	padding-top: 28px !important;
+	padding-bottom: 28px !important;
+}
+
+body.single-product .trt-grunge-pdp .pdp-hero__right {
+	box-sizing: border-box !important;
+	width: 100% !important;
+	max-width: 980px !important;
+	padding: 20px !important;
+	overflow: visible !important;
+}
+
+.trt-grunge-pdp .pdp-cfg,
+.trt-grunge-pdp .pdp-cfg *,
+.trt-grunge-pdp .pdp-cfg *::before,
+.trt-grunge-pdp .pdp-cfg *::after {
+	box-sizing: border-box !important;
+	min-width: 0;
+}
+
+.trt-grunge-pdp .pdp-cfg {
+	display: grid !important;
+	grid-template-columns: minmax(0, 1fr) minmax(260px, 320px) !important;
+	gap: 16px 20px !important;
+	width: 100% !important;
+	max-width: 100% !important;
+}
+
+.trt-grunge-pdp .pdp-cfg::before {
+	content: "TRT checkout" !important;
+	margin: 0 !important;
+	font-size: clamp(2.15rem, 4.4vw, 3.45rem) !important;
+	line-height: 0.9 !important;
+}
+
+.trt-grunge-pdp .pdp-cfg__builder {
+	display: grid !important;
+	grid-template-columns: minmax(0, 1fr) !important;
+	gap: 14px !important;
+	grid-column: 1 !important;
+	grid-row: 2 !important;
+	width: 100% !important;
+	max-width: 100% !important;
+}
+
+.trt-grunge-pdp .pdp-cfg__side {
+	display: flex !important;
+	grid-column: 2 !important;
+	grid-row: 2 !important;
+	flex-direction: column !important;
+	gap: 12px !important;
+	width: 100% !important;
+	max-width: 100% !important;
+}
+
+.trt-grunge-pdp .trt-pdp__requirements,
+.trt-grunge-pdp .trt-pdp__eligibility,
+.trt-grunge-pdp .trt-pdp__labs-choice {
+	display: grid !important;
+	gap: 8px !important;
+	width: 100% !important;
+	max-width: 100% !important;
+}
+
+.trt-grunge-pdp .pdp-cfg__section-label {
+	margin: 0 !important;
+	font-size: clamp(0.82rem, 1.2vw, 0.98rem) !important;
+	line-height: 1.15 !important;
+}
+
+.trt-grunge-pdp .trt-pdp__requirement-grid,
+.trt-grunge-pdp .trt-pdp__labs-grid {
+	display: grid !important;
+	grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+	gap: 10px !important;
+	width: 100% !important;
+	max-width: 100% !important;
+}
+
+.trt-grunge-pdp .trt-pdp__requirement-grid div,
+.trt-grunge-pdp .trt-pdp__labs-option {
+	width: 100% !important;
+	max-width: 100% !important;
+	min-height: 0 !important;
+	padding: 12px !important;
+	gap: 7px !important;
+}
+
+.trt-grunge-pdp .trt-state__picker,
+.trt-grunge-pdp .trt-state__trigger,
+.trt-grunge-pdp .trt-state__options,
+.trt-grunge-pdp .trt-state__status,
+.trt-grunge-pdp .trt-state__unavailable,
+.trt-grunge-pdp .pdp-cfg__own-labs-note {
+	width: 100% !important;
+	max-width: 100% !important;
+}
+
+.trt-grunge-pdp .trt-state__trigger {
+	min-height: 48px !important;
+	padding: 11px 12px !important;
+}
+
+.trt-grunge-pdp .trt-state__status {
+	margin: 2px 0 0 !important;
+	min-height: 0 !important;
+	font-size: 0.78rem !important;
+	line-height: 1.3 !important;
+}
+
+.trt-grunge-pdp .pdp-cfg__own-labs-note {
+	margin: 0 !important;
+	font-size: 0.78rem !important;
+	line-height: 1.3 !important;
+}
+
+.trt-grunge-pdp .pdp-cfg__summary,
+.trt-grunge-pdp .peptide-cfg__includes,
+.trt-grunge-pdp .pdp-cfg__disclaimer {
+	width: 100% !important;
+	max-width: 100% !important;
+}
+
+@media (max-width: 600px) {
+	body.single-product .trt-grunge-pdp .pdp-build__inner {
+		width: min(100% - 24px, 430px) !important;
+		padding-top: 16px !important;
+		padding-bottom: 16px !important;
+	}
+
+	body.single-product .trt-grunge-pdp .pdp-hero__right {
+		padding: 12px !important;
+		overflow: hidden !important;
+	}
+
+	.trt-grunge-pdp .pdp-cfg {
+		display: flex !important;
+		flex-direction: column !important;
+		gap: 8px !important;
+	}
+
+	.trt-grunge-pdp .pdp-cfg::before {
+		font-size: clamp(1.8rem, 8vw, 2.28rem) !important;
+	}
+
+	.trt-grunge-pdp .pdp-cfg__builder {
+		order: 1 !important;
+		gap: 8px !important;
+	}
+
+	.trt-grunge-pdp .pdp-cfg__side {
+		display: flex !important;
+		order: 2 !important;
+		gap: 8px !important;
+	}
+
+	.trt-grunge-pdp .trt-pdp__requirements,
+	.trt-grunge-pdp .trt-pdp__eligibility,
+	.trt-grunge-pdp .trt-pdp__labs-choice {
+		gap: 5px !important;
+	}
+
+	.trt-grunge-pdp .trt-pdp__requirement-grid {
+		display: none !important;
+	}
+
+	.trt-grunge-pdp .pdp-cfg__section-label {
+		font-size: 0.72rem !important;
+		line-height: 1.1 !important;
+		letter-spacing: 0.09em !important;
+	}
+
+	.trt-grunge-pdp .trt-state__required {
+		padding: 3px 5px !important;
+		font-size: 0.56rem !important;
+		line-height: 1 !important;
+	}
+
+	.trt-grunge-pdp .trt-state__trigger {
+		min-height: 40px !important;
+		padding: 8px 9px !important;
+	}
+
+	.trt-grunge-pdp .trt-state__trigger-text {
+		font-size: 0.88rem !important;
+		line-height: 1.15 !important;
+	}
+
+	.trt-grunge-pdp .trt-state__status {
+		font-size: 0.68rem !important;
+		line-height: 1.2 !important;
+	}
+
+	.trt-grunge-pdp .trt-state__unavailable {
+		padding: 9px !important;
+	}
+
+	.trt-grunge-pdp .trt-state__unavailable-desc,
+	.trt-grunge-pdp .trt-state__unavailable-link {
+		font-size: 0.72rem !important;
+		line-height: 1.25 !important;
+	}
+
+	.trt-grunge-pdp .trt-pdp__labs-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+		gap: 7px !important;
+	}
+
+	.trt-grunge-pdp .trt-pdp__labs-option {
+		min-height: 54px !important;
+		padding: 8px !important;
+		gap: 4px !important;
+	}
+
+	.trt-grunge-pdp .trt-pdp__labs-option strong {
+		display: grid !important;
+		gap: 2px !important;
+		font-size: clamp(0.95rem, 4.9vw, 1.22rem) !important;
+		line-height: 0.95 !important;
+	}
+
+	.trt-grunge-pdp .trt-pdp__labs-option strong span {
+		display: block !important;
+		margin-top: 0 !important;
+	}
+
+	.trt-grunge-pdp .trt-pdp__labs-option em {
+		font-size: 0.66rem !important;
+		line-height: 1.12 !important;
+	}
+
+	.trt-grunge-pdp .pdp-cfg__own-labs-note {
+		display: none !important;
+	}
+
+	.trt-grunge-pdp .pdp-cfg__summary {
+		display: grid !important;
+		gap: 4px !important;
+		padding: 9px !important;
+	}
+
+	.trt-grunge-pdp .pdp-cfg__summary::before,
+	.trt-grunge-pdp .pdp-cfg__summary-month-price,
+	.trt-grunge-pdp .pdp-cfg__summary-line,
+	.trt-grunge-pdp .pdp-cfg__summary-sub,
+	.trt-grunge-pdp .peptide-cfg__includes,
+	.trt-grunge-pdp .pdp-cfg__disclaimer {
+		display: none !important;
+	}
+
+	.trt-grunge-pdp .pdp-cfg__summary-label {
+		font-size: 0.72rem !important;
+		line-height: 1 !important;
+	}
+
+	.trt-grunge-pdp .pdp-cfg__summary-total {
+		display: flex !important;
+		align-items: center !important;
+		justify-content: space-between !important;
+		gap: 8px !important;
+		margin: 0 !important;
+		padding: 0 !important;
+		border-top: 0 !important;
+	}
+
+	.trt-grunge-pdp .pdp-cfg__summary-total span {
+		font-size: 0.72rem !important;
+		line-height: 1.1 !important;
+	}
+
+	.trt-grunge-pdp .pdp-cfg__summary-total-price {
+		font-size: 1.28rem !important;
+		line-height: 0.95 !important;
+	}
+
+	.trt-grunge-pdp .pdp-cfg__cta {
+		min-height: 42px !important;
+		padding: 10px 12px !important;
+		font-size: 1.08rem !important;
+		line-height: 1 !important;
+	}
+}
