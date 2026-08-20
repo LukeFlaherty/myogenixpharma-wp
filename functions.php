@@ -3,6 +3,8 @@
  * Myogenix Theme functions
  */
 
+require_once get_stylesheet_directory() . '/inc/product-reviews.php';
+
 // Enqueue parent theme styles
 add_action( 'wp_enqueue_scripts', function() {
 	wp_enqueue_style(
@@ -134,6 +136,8 @@ add_filter( 'template_include', function( $template ) {
 		'/medications'        => 'page-medications.php',
 		'/select-medication/' => 'page-select-medication.php',
 		'/select-medication'  => 'page-select-medication.php',
+		'/reviews/'           => 'page-reviews.php',
+		'/reviews'            => 'page-reviews.php',
 	];
 	if ( empty( $route_templates[ $request_path ] ) ) return $template;
 
@@ -1248,6 +1252,26 @@ function myogenix_render_product_faq( $product_id ) {
 		</section>
 	<?php
 }
+
+// ─── Reviews page styles/scripts ───────────────────────────────────────────
+add_action( 'wp_enqueue_scripts', function() {
+	$request_path = isset( $_SERVER['REQUEST_URI'] ) ? strtok( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), '?' ) : '';
+	$is_reviews_page = is_page( 'reviews' ) || in_array( $request_path, [ '/reviews', '/reviews/' ], true );
+	if ( ! $is_reviews_page ) return;
+	wp_enqueue_style(
+		'myogenix-reviews',
+		get_stylesheet_directory_uri() . '/assets/css/reviews.css',
+		[ 'myogenix-grunge-redesign' ],
+		'1.0.0'
+	);
+	wp_enqueue_script(
+		'myogenix-reviews',
+		get_stylesheet_directory_uri() . '/assets/js/reviews.js',
+		[],
+		'1.0.0',
+		true
+	);
+} );
 
 // ─── TRT checkout notice styles ──────────────────────────────────────────────
 add_action( 'wp_enqueue_scripts', function() {
