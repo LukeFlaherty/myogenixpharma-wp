@@ -1264,13 +1264,13 @@ add_action( 'wp_enqueue_scripts', function() {
 		'myogenix-reviews',
 		get_stylesheet_directory_uri() . '/assets/css/reviews.css',
 		[ 'myogenix-grunge-redesign' ],
-		'1.1.0'
+		'1.2.0'
 	);
 	wp_enqueue_script(
 		'myogenix-reviews',
 		get_stylesheet_directory_uri() . '/assets/js/reviews.js',
 		[],
-		'1.1.0',
+		'1.2.0',
 		true
 	);
 } );

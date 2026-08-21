@@ -53,7 +53,6 @@ if ( function_exists( 'wc_get_products' ) ) {
 			'name'  => $product->get_name(),
 			'url'   => $product->get_permalink(),
 			'image' => $image,
-			'price' => $product->get_price_html(),
 		];
 	}
 }
@@ -74,11 +73,7 @@ get_header();
 				<p class="grunge-reviews__hero-body">Real feedback from Myogenix Pharma customers. Bought something from us? We'd love to hear about your experience.</p>
 				<button type="button" class="grunge-btn grunge-btn--red" id="myo-review-cta">Leave a Review <?php echo function_exists( 'myogenix_grunge_arrow_svg' ) ? myogenix_grunge_arrow_svg() : ''; ?></button>
 			</div>
-		</div>
-	</section>
 
-	<section class="grunge-section grunge-reviews__leave-section">
-		<div class="grunge-container grunge-reviews__leave-container">
 			<form id="myo-review-form" class="myo-review-form" hidden novalidate>
 				<h2 class="myo-review-form__title">Leave a Review</h2>
 
@@ -149,7 +144,8 @@ get_header();
 		<div class="grunge-container">
 			<div class="grunge-section__header">
 				<p class="grunge-kicker">What customers are saying</p>
-				<h2>Verified <span class="grunge-text-red">customer reviews</span></h2>
+				<h2>Read Our <span class="grunge-text-red">Reviews</span></h2>
+				<p>Real customer feedback from approved Myogenix Pharma product reviews.</p>
 			</div>
 			<div class="myo-review-grid">
 				<?php foreach ( $reviews as $review ) : ?>
@@ -181,12 +177,13 @@ get_header();
 			</div>
 		</div>
 	</section>
-	<?php else : ?>
+	<?php endif; ?>
+
 	<section class="grunge-section grunge-reviews__products-section">
 		<div class="grunge-section__texture" style="background-image:url('<?php echo $myo_asset( 'red-dots-grid-background.webp' ); ?>')" aria-hidden="true"></div>
 		<div class="grunge-container">
-			<div class="grunge-section__header">
-				<h2>Be the first to <span class="grunge-text-red">leave a review</span></h2>
+			<div class="grunge-section__header grunge-reviews__products-header">
+				<h2>Review Our <span class="grunge-text-red">Products</span></h2>
 				<p class="grunge-reviews__products-lead">Choose a product below to share your experience, or browse product details before your next order.</p>
 			</div>
 			<div class="myo-review-product-grid">
@@ -197,9 +194,8 @@ get_header();
 					</div>
 					<div class="myo-review-product-card__body">
 						<h3><?php echo esc_html( $product['name'] ); ?></h3>
-						<span class="myo-review-product-card__price"><?php echo wp_kses_post( $product['price'] ); ?></span>
 						<div class="myo-review-product-card__actions">
-							<button type="button" class="grunge-btn grunge-btn--red myo-review-product-card__review" data-review-product="<?php echo esc_attr( $product['id'] ); ?>">Leave a Review</button>
+							<button type="button" class="grunge-btn grunge-btn--red myo-review-product-card__review" data-review-product="<?php echo esc_attr( $product['id'] ); ?>">Leave a Review <?php echo function_exists( 'myogenix_grunge_arrow_svg' ) ? myogenix_grunge_arrow_svg() : ''; ?></button>
 							<a class="grunge-btn grunge-btn--dark myo-review-product-card__purchase" href="<?php echo esc_url( $product['url'] ); ?>">Purchase</a>
 						</div>
 					</div>
@@ -208,7 +204,6 @@ get_header();
 			</div>
 		</div>
 	</section>
-	<?php endif; ?>
 </main>
 
 <script>

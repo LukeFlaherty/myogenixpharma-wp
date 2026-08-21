@@ -46,6 +46,7 @@ body.myo-disable-purchase-popup .myo-purchase-popup {
 	display: grid;
 	justify-items: center;
 	text-align: center;
+	gap: 28px;
 }
 
 .grunge-reviews__hero-copy {
@@ -76,27 +77,12 @@ body.myo-disable-purchase-popup .myo-purchase-popup {
 	line-height: 1.65;
 }
 
-.grunge-reviews__leave-section {
-	padding-top: clamp(44px, 7vw, 72px);
-	padding-bottom: clamp(44px, 7vw, 72px);
-	background:
-		linear-gradient(180deg, rgba(0, 0, 0, 0.98), rgba(14, 14, 14, 0.96)),
-		#000;
-}
-
-.grunge-reviews__leave-container {
-	text-align: center;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 24px;
-}
-
 /* ─── Leave-a-review form ─────────────────────────────────────────────── */
 
 .myo-review-form {
 	width: 100%;
 	max-width: 760px;
+	margin-top: 4px;
 	text-align: left;
 	background:
 		linear-gradient(145deg, rgba(0, 0, 0, 0.9), rgba(22, 22, 22, 0.95)),
@@ -383,7 +369,12 @@ body.myo-disable-purchase-popup .myo-purchase-popup {
 	font-size: 0.78rem;
 }
 
-/* ─── Fallback product grid (shown while there are no reviews yet) ─────── */
+/* ─── Product grid ─────────────────────────────────────────────────────── */
+
+.grunge-reviews__products-header {
+	text-align: center;
+	align-items: center;
+}
 
 .grunge-reviews__products-lead {
 	color: var(--myo-zinc-200);
@@ -447,12 +438,6 @@ body.myo-disable-purchase-popup .myo-purchase-popup {
 	line-height: 1;
 }
 
-.myo-review-product-card__price {
-	color: #fecaca;
-	font-size: 0.92rem;
-	font-weight: 700;
-}
-
 .myo-review-product-card__actions {
 	display: grid;
 	grid-template-columns: 1fr;
@@ -462,15 +447,7 @@ body.myo-disable-purchase-popup .myo-purchase-popup {
 
 .myo-review-product-card__actions .grunge-btn {
 	width: 100%;
-	min-height: 40px;
-	padding: 9px 12px;
-	border: 0;
 	cursor: pointer;
-	font-size: 1.16rem;
-}
-
-.myo-review-product-card__actions .grunge-btn::after {
-	display: none;
 }
 
 .myo-review-product-card__purchase {
