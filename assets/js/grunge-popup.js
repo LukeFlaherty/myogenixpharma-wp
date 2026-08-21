@@ -14,6 +14,14 @@
 	}
 
 	document.addEventListener( 'DOMContentLoaded', function () {
+		if ( document.body.classList.contains( 'grunge-reviews-page' ) || document.body.classList.contains( 'myo-disable-purchase-popup' ) ) {
+			hideLegacyPopup();
+			if ( window.MutationObserver ) {
+				new MutationObserver( hideLegacyPopup ).observe( document.body, { childList: true, subtree: true } );
+			}
+			return;
+		}
+
 		hideLegacyPopup();
 		if ( window.MutationObserver ) {
 			new MutationObserver( hideLegacyPopup ).observe( document.body, { childList: true, subtree: true } );

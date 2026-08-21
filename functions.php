@@ -46,7 +46,7 @@ add_action( 'wp_enqueue_scripts', function() {
 		'myogenix-grunge-popup',
 		get_stylesheet_directory_uri() . '/assets/js/grunge-popup.js',
 		[],
-		'1.0.2',
+		'1.0.3',
 		true
 	);
 } );
@@ -160,6 +160,8 @@ add_action( 'template_redirect', function() {
 
 add_action( 'wp_footer', function() {
 	if ( is_admin() ) return;
+	$request_path = isset( $_SERVER['REQUEST_URI'] ) ? strtok( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), '?' ) : '';
+	if ( is_page( 'reviews' ) || in_array( $request_path, [ '/reviews', '/reviews/' ], true ) ) return;
 	?>
 	<div class="myo-purchase-popup" id="myo-purchase-popup" hidden>
 		<div class="myo-purchase-popup__backdrop" data-myo-popup-close></div>
@@ -1262,13 +1264,13 @@ add_action( 'wp_enqueue_scripts', function() {
 		'myogenix-reviews',
 		get_stylesheet_directory_uri() . '/assets/css/reviews.css',
 		[ 'myogenix-grunge-redesign' ],
-		'1.0.0'
+		'1.1.0'
 	);
 	wp_enqueue_script(
 		'myogenix-reviews',
 		get_stylesheet_directory_uri() . '/assets/js/reviews.js',
 		[],
-		'1.0.0',
+		'1.1.0',
 		true
 	);
 } );

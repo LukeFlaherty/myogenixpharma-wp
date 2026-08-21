@@ -12,6 +12,7 @@ $myo_asset = function( $path ) {
 add_filter( 'body_class', function( $classes ) {
 	$classes[] = 'grunge-redesign-page';
 	$classes[] = 'grunge-reviews-page';
+	$classes[] = 'myo-disable-purchase-popup';
 	return $classes;
 } );
 
@@ -40,7 +41,10 @@ if ( function_exists( 'wc_get_products' ) ) {
 	] );
 	foreach ( $wc_products as $product ) {
 		if ( ! $product || ! is_object( $product ) ) continue;
-		$image = get_the_post_thumbnail_url( $product->get_id(), 'medium' ) ?: get_the_post_thumbnail_url( $product->get_id(), 'full' );
+		$image = function_exists( 'myogenix_grunge_bottle_url' ) ? myogenix_grunge_bottle_url( $product ) : '';
+		if ( ! $image ) {
+			$image = get_the_post_thumbnail_url( $product->get_id(), 'medium' ) ?: get_the_post_thumbnail_url( $product->get_id(), 'full' );
+		}
 		if ( ! $image ) {
 			$image = $myo_asset( 'pharma support staff tp bg.png' );
 		}
@@ -58,28 +62,23 @@ get_header();
 ?>
 
 <main id="content" class="grunge-reviews">
-	<section class="grunge-category-hero grunge-reviews__hero">
-		<div class="grunge-category-hero__bg" style="background-image:url('<?php echo $myo_asset( 'hero bg.png' ); ?>')" aria-hidden="true"></div>
-		<div class="grunge-category-hero__shade" aria-hidden="true"></div>
-		<div class="grunge-category-hero__inner">
-			<div class="grunge-category-hero__copy">
+	<section class="grunge-reviews__hero">
+		<div class="grunge-reviews__hero-texture" style="background-image:url('<?php echo $myo_asset( 'grunge black section bg blank.png' ); ?>')" aria-hidden="true"></div>
+		<div class="grunge-container grunge-reviews__hero-inner">
+			<div class="grunge-reviews__hero-copy">
 				<p class="grunge-kicker">Customer feedback</p>
-				<h1 class="grunge-category-hero__title">
+				<h1 class="grunge-reviews__hero-title">
 					<span class="grunge-word grunge-word--white">Customer</span>
 					<span class="grunge-word grunge-word--red">Reviews</span>
 				</h1>
-				<p class="grunge-category-hero__body">Real feedback from Myogenix Pharma customers. Bought something from us? We'd love to hear about your experience.</p>
-			</div>
-			<div class="grunge-category-hero__media">
-				<img src="<?php echo $myo_asset( 'mgrx-hero-team.webp' ); ?>" alt="" width="620" height="520">
+				<p class="grunge-reviews__hero-body">Real feedback from Myogenix Pharma customers. Bought something from us? We'd love to hear about your experience.</p>
+				<button type="button" class="grunge-btn grunge-btn--red" id="myo-review-cta">Leave a Review <?php echo function_exists( 'myogenix_grunge_arrow_svg' ) ? myogenix_grunge_arrow_svg() : ''; ?></button>
 			</div>
 		</div>
 	</section>
 
 	<section class="grunge-section grunge-reviews__leave-section">
 		<div class="grunge-container grunge-reviews__leave-container">
-			<button type="button" class="grunge-btn grunge-btn--red" id="myo-review-cta">Leave a Review <?php echo function_exists( 'myogenix_grunge_arrow_svg' ) ? myogenix_grunge_arrow_svg() : ''; ?></button>
-
 			<form id="myo-review-form" class="myo-review-form" hidden novalidate>
 				<h2 class="myo-review-form__title">Leave a Review</h2>
 
@@ -103,8 +102,13 @@ get_header();
 					<label>Which product(s) did you buy? Rate each one you're reviewing.<span aria-hidden="true">*</span></label>
 					<div class="myo-review-form__products">
 						<?php foreach ( $products as $product ) : ?>
-						<div class="myo-review-product-row">
-							<span class="myo-review-product-row__name"><?php echo esc_html( $product['name'] ); ?></span>
+						<div class="myo-review-product-row" data-review-product-row="<?php echo esc_attr( $product['id'] ); ?>">
+							<span class="myo-review-product-row__summary">
+								<span class="myo-review-product-row__image">
+									<img src="<?php echo esc_url( $product['image'] ); ?>" alt="" width="56" height="56" loading="lazy">
+								</span>
+								<span class="myo-review-product-row__name"><?php echo esc_html( $product['name'] ); ?></span>
+							</span>
 							<div class="myo-star-rating" data-product-id="<?php echo esc_attr( $product['id'] ); ?>">
 								<?php for ( $i = 5; $i >= 1; $i-- ) : ?>
 								<input type="radio" id="myo-star-<?php echo esc_attr( $product['id'] . '-' . $i ); ?>" name="ratings[<?php echo esc_attr( $product['id'] ); ?>]" value="<?php echo esc_attr( $i ); ?>">
@@ -182,21 +186,24 @@ get_header();
 		<div class="grunge-section__texture" style="background-image:url('<?php echo $myo_asset( 'red-dots-grid-background.webp' ); ?>')" aria-hidden="true"></div>
 		<div class="grunge-container">
 			<div class="grunge-section__header">
-				<p class="grunge-kicker">No reviews yet</p>
 				<h2>Be the first to <span class="grunge-text-red">leave a review</span></h2>
-				<p class="grunge-reviews__products-lead">Take a look at what we offer while you wait for reviews to roll in.</p>
+				<p class="grunge-reviews__products-lead">Choose a product below to share your experience, or browse product details before your next order.</p>
 			</div>
 			<div class="myo-review-product-grid">
 				<?php foreach ( $products as $product ) : ?>
-				<a class="myo-review-product-card" href="<?php echo esc_url( $product['url'] ); ?>">
+				<article class="myo-review-product-card">
 					<div class="myo-review-product-card__image">
 						<img src="<?php echo esc_url( $product['image'] ); ?>" alt="<?php echo esc_attr( $product['name'] ); ?>" width="240" height="240" loading="lazy">
 					</div>
 					<div class="myo-review-product-card__body">
 						<h3><?php echo esc_html( $product['name'] ); ?></h3>
 						<span class="myo-review-product-card__price"><?php echo wp_kses_post( $product['price'] ); ?></span>
+						<div class="myo-review-product-card__actions">
+							<button type="button" class="grunge-btn grunge-btn--red myo-review-product-card__review" data-review-product="<?php echo esc_attr( $product['id'] ); ?>">Leave a Review</button>
+							<a class="grunge-btn grunge-btn--dark myo-review-product-card__purchase" href="<?php echo esc_url( $product['url'] ); ?>">Purchase</a>
+						</div>
 					</div>
-				</a>
+				</article>
 				<?php endforeach; ?>
 			</div>
 		</div>
