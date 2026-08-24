@@ -1087,6 +1087,36 @@ body:has(.home-nav.grunge-nav) {
   filter: drop-shadow(0 28px 45px rgba(0, 0, 0, 0.8));
 }
 
+.grunge-quest-callout {
+  display: inline-grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  width: min(100%, 390px);
+  margin-top: 18px;
+  padding: 12px 14px;
+  border: 1px solid rgba(220, 38, 38, 0.62);
+  background: rgba(0, 0, 0, 0.66);
+}
+
+.grunge-quest-callout img {
+  width: 112px;
+  height: auto;
+  padding: 7px 8px;
+  background: #fff;
+  object-fit: contain;
+  filter: none;
+}
+
+.grunge-quest-callout span {
+  color: #fff;
+  font-family: var(--myo-font-display);
+  font-size: 1.2rem;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
 .grunge-check-list {
   display: grid;
   gap: 12px;
@@ -1698,6 +1728,11 @@ body.myogenix-home-page .myo-faq.grunge-faq .myo-faq__panel-inner.myo-faq__panel
   line-height: 1.6;
 }
 
+.grunge-quest-callout--hero {
+  display: grid;
+  margin: 18px auto 0;
+}
+
 .grunge-category-hero__media {
   position: relative;
   min-height: 320px;
@@ -1858,6 +1893,10 @@ body.myogenix-home-page .myo-faq.grunge-faq .myo-faq__panel-inner.myo-faq__panel
 
 .grunge-steps--icons {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grunge-steps--icons .grunge-step:nth-child(5) {
+  grid-column: 1 / -1;
 }
 
 .grunge-select-medication {
@@ -2560,7 +2599,11 @@ body.single-product .myogenix-pdp__cq-heading {
   }
 
   .grunge-steps--icons {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .grunge-steps--icons .grunge-step:nth-child(5) {
+    grid-column: auto;
   }
 
   .grunge-section__header--split {
@@ -2631,6 +2674,19 @@ body.single-product .myogenix-pdp__cq-heading {
   .grunge-category-hero__title,
   .grunge-category-hero__subtitle,
   .grunge-category-hero__body {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .grunge-program-page--mens-health .grunge-category-hero__copy {
+    padding-bottom: 104px;
+  }
+
+  .grunge-program-page--mens-health .grunge-category-hero__media {
+    padding-bottom: 34px;
+  }
+
+  .grunge-quest-callout--hero {
     margin-left: 0;
     margin-right: 0;
   }
@@ -2782,6 +2838,11 @@ body.single-product .myogenix-pdp__cq-heading {
 }
 
 @media (max-width: 767px) {
+  body.home .grunge-care-strip,
+  body.myogenix-home-page .grunge-care-strip {
+    display: none;
+  }
+
   .grunge-performance .grunge-programs__bg {
     opacity: 0.2;
   }
@@ -2810,7 +2871,7 @@ body.single-product .myogenix-pdp__cq-heading {
   }
 
   .grunge-performance__media img {
-    width: min(58vw, 250px);
+    width: min(52vw, 220px);
     margin-left: auto;
     transform: translateX(20px);
   }
@@ -2818,9 +2879,24 @@ body.single-product .myogenix-pdp__cq-heading {
   .grunge-performance__copy {
     position: relative;
     z-index: 4;
-    max-width: min(72vw, 320px);
+    max-width: min(76vw, 330px);
     color: #fff;
     text-shadow: 0 2px 12px rgba(0, 0, 0, 0.95);
+  }
+
+  .grunge-quest-callout {
+    grid-template-columns: 86px minmax(0, 1fr);
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .grunge-quest-callout img {
+    width: 86px;
+    padding: 6px;
+  }
+
+  .grunge-quest-callout span {
+    font-size: 0.92rem;
   }
 
   .grunge-performance__copy .grunge-kicker,

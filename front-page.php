@@ -163,14 +163,13 @@ get_header();
 		<div class="grunge-hero__shade" aria-hidden="true"></div>
 		<div class="grunge-hero__inner">
 			<div class="grunge-hero__copy">
-				<p class="grunge-kicker">25+ years of performance</p>
 				<h1 class="grunge-hero__title">
 					<span class="grunge-word grunge-word--red">MyoGenix</span>
 					<span class="grunge-word grunge-word--white">Pharma</span>
 				</h1>
-				<p class="grunge-hero__lead">Concierge telehealth for TRT <span>Performance care, guided by humans.</span></p>
+				<p class="grunge-hero__lead">Concierge telehealth <span>Performance care, guided by humans.</span></p>
 				<div class="grunge-hero__actions">
-					<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/product-category/mens-health/' ) ); ?>">Select Medication <?php echo myogenix_grunge_arrow_svg(); ?></a>
+					<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/product-category/mens-health/' ) ); ?>">Shop Mens Health <?php echo myogenix_grunge_arrow_svg(); ?></a>
 					<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				</div>
 			</div>
@@ -200,7 +199,7 @@ get_header();
 					<p class="grunge-kicker">Treatment options</p>
 					<h2>Select the <span class="grunge-text-red">medication path</span></h2>
 				</div>
-				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/medications/' ) ); ?>">View all <?php echo myogenix_grunge_arrow_svg(); ?></a>
+				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/medications/' ) ); ?>">Shop All Medications <?php echo myogenix_grunge_arrow_svg(); ?></a>
 			</div>
 			<div class="grunge-product-grid">
 				<?php foreach ( $featured_keys as $key ) :
@@ -220,6 +219,7 @@ get_header();
 		</div>
 	</section>
 
+	<?php if ( false ) : // Future-use section: Getting evaluated is easier than ever. ?>
 	<section class="grunge-section grunge-how" id="how-it-works">
 		<div class="grunge-section__texture" style="background-image:url('<?php echo $myo_asset( 'grunge black section bg blank.png' ); ?>')" aria-hidden="true"></div>
 		<div class="grunge-container">
@@ -239,25 +239,31 @@ get_header();
 			</div>
 		</div>
 	</section>
+	<?php endif; ?>
 
 	<section class="grunge-section grunge-performance">
 		<div class="grunge-programs__bg" style="background-image:url('<?php echo $myo_asset( 'bg-genetic-wire.webp' ); ?>')" aria-hidden="true"></div>
 		<div class="grunge-container grunge-performance__grid">
 			<div class="grunge-performance__media">
-				<img src="<?php echo $myo_asset( 'mgrx-phone-care-journey.webp' ); ?>" alt="MyoGenix care journey" width="620" height="620" loading="lazy">
+				<img src="<?php echo $myo_asset( 'quest-logo-new.webp' ); ?>" alt="Quest Diagnostics" width="620" height="620" loading="lazy">
 			</div>
 			<div class="grunge-performance__copy">
 				<p class="grunge-kicker">TRT care path</p>
 				<h2>Concierge telehealth <span class="grunge-text-red">for TRT</span></h2>
 				<p><span class="grunge-text-red">Physician-guided</span> treatment. Human support.</p>
+				<div class="grunge-quest-callout">
+					<img src="<?php echo $myo_asset( 'quest-logo-new.webp' ); ?>" alt="" width="132" height="48" loading="lazy">
+					<span>Diagnostic labs through Quest</span>
+				</div>
 				<ul class="grunge-check-list">
 					<li>Online enrollment</li>
+					<li>Quest lab testing</li>
 					<li>Licensed providers</li>
 					<li>Personalized dosing</li>
 					<li>Doorstep delivery</li>
 					<li>Human concierge support</li>
 				</ul>
-				<a class="grunge-btn grunge-btn--red grunge-inline-cta" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">Start TRT <?php echo myogenix_grunge_arrow_svg(); ?></a>
+				<a class="grunge-btn grunge-btn--red grunge-inline-cta" href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">Shop TRT <?php echo myogenix_grunge_arrow_svg(); ?></a>
 			</div>
 		</div>
 	</section>
@@ -270,7 +276,7 @@ get_header();
 					<p class="grunge-kicker">Weight management</p>
 					<h2>Compare your <span class="grunge-text-red">GLP-1 options</span></h2>
 				</div>
-				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/weight-management/' ) ); ?>">View weight loss <?php echo myogenix_grunge_arrow_svg(); ?></a>
+				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/weight-management/' ) ); ?>">Shop Weight Loss <?php echo myogenix_grunge_arrow_svg(); ?></a>
 			</div>
 			<div class="grunge-compare-grid">
 				<?php
@@ -314,10 +320,11 @@ get_header();
 				<li><?php echo esc_html( $symptom ); ?></li>
 				<?php endforeach; ?>
 			</ul>
-			<a class="grunge-btn grunge-btn--red grunge-inline-cta" href="<?php echo esc_url( home_url( '/wellness/' ) ); ?>">Select Medication <?php echo myogenix_grunge_arrow_svg(); ?></a>
+			<a class="grunge-btn grunge-btn--red grunge-inline-cta" href="<?php echo esc_url( home_url( '/wellness/' ) ); ?>">Shop Peptides <?php echo myogenix_grunge_arrow_svg(); ?></a>
 		</div>
 	</section>
 
+	<?php if ( false ) : // Future-use sections: Not a hard sell / 25+ years of performance. ?>
 	<section class="grunge-section grunge-approach">
 		<div class="grunge-section__texture" style="background-image:url('<?php echo $myo_asset( 'red-dots-grid-background.webp' ); ?>')" aria-hidden="true"></div>
 		<div class="grunge-container grunge-approach__grid">
@@ -366,6 +373,7 @@ get_header();
 			</div>
 		</div>
 	</section>
+	<?php endif; ?>
 
 	<section class="myo-faq grunge-faq" id="faq" aria-label="Frequently asked questions">
 		<div class="grunge-faq__bg" style="background-image:url('<?php echo $myo_asset( 'grunge black section bg blank.png' ); ?>')" aria-hidden="true"></div>
@@ -402,7 +410,7 @@ get_header();
 			<img src="<?php echo $myo_asset( 'red and white logo.svg' ); ?>" alt="" width="176" height="54" loading="lazy">
 			<h2><span class="grunge-final-cta__line">Concierge care</span> <span class="grunge-text-red">is live</span></h2>
 			<div class="grunge-final-cta__actions">
-				<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/product-category/mens-health/' ) ); ?>">Select Medication <?php echo myogenix_grunge_arrow_svg(); ?></a>
+				<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/product-category/mens-health/' ) ); ?>">Shop Mens Health <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 			</div>
 		</div>

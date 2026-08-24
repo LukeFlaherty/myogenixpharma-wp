@@ -74,6 +74,7 @@ $programs = [
 		'option_label'  => 'weight loss',
 		'hero_image'    => 'tirz-sema-category-vials.webp',
 		'hero_cta'      => home_url( '/product/compound-tirzepatide/' ),
+		'hero_cta_label' => 'Shop Weight Loss',
 		'products'      => [ 'tirzepatide', 'semaglutide' ],
 	],
 	'mens-health' => [
@@ -85,6 +86,7 @@ $programs = [
 		'option_label'  => "men's health",
 		'hero_image'    => 'mgrx-hero-team.webp',
 		'hero_cta'      => home_url( '/product-category/mens-health/' ),
+		'hero_cta_label' => 'Shop Mens Health',
 		'products'      => [ 'testosterone', 'hcg', 'tadalafil', 'sildenafil' ],
 		'hero_bottles'  => [ 'testosterone', 'tadalafil', 'sildenafil' ],
 	],
@@ -97,6 +99,7 @@ $programs = [
 		'option_label'  => 'sexual health',
 		'hero_image'    => 'sexual-health-products.webp',
 		'hero_cta'      => home_url( '/product/compound-oral-tadalafil/' ),
+		'hero_cta_label' => 'Shop Sexual Health',
 		'products'      => [ 'tadalafil', 'sildenafil' ],
 	],
 	'wellness' => [
@@ -108,6 +111,7 @@ $programs = [
 		'option_label'  => 'peptide',
 		'hero_image'    => 'peptides-category-vials.webp',
 		'hero_cta'      => home_url( '/product/bpc/' ),
+		'hero_cta_label' => 'Shop Peptides',
 		'products'      => [ 'bpc', 'motsc', 'epithalon', 'nad', 'sermorelin', 'glutathione', 'tesamorelin', 'cjc', 'klow', 'wolverine' ],
 	],
 	'womens-health' => [
@@ -119,6 +123,7 @@ $programs = [
 		'option_label'  => "women's health",
 		'hero_image'    => 'pharma support staff tp bg.png',
 		'hero_cta'      => home_url( '/reach-a-concierge/' ),
+		'hero_cta_label' => "Ask About Women's Health",
 		'products'      => [],
 	],
 	'uncategorized' => [
@@ -130,6 +135,7 @@ $programs = [
 		'option_label'  => 'treatment',
 		'hero_image'    => 'pharma support staff tp bg.png',
 		'hero_cta'      => home_url( '/reach-a-concierge/' ),
+		'hero_cta_label' => 'Ask About Treatment',
 		'products'      => [],
 	],
 ];
@@ -150,6 +156,15 @@ $process_steps = [
 	[ 'number' => '3', 'title' => 'Personalized plan', 'body' => 'Your protocol is reviewed for the selected dose and supply.', 'icon' => 'rx.svg' ],
 	[ 'number' => '4', 'title' => 'Shipped to your door', 'body' => 'Discreet, temperature-aware shipping direct to you.', 'icon' => 'box.svg' ],
 ];
+if ( 'mens-health' === $current_slug ) {
+	$process_steps = [
+		[ 'number' => '1', 'title' => 'Quick online intake', 'body' => 'Complete your confidential medical questionnaire in minutes.', 'icon' => 'laptop-check.svg' ],
+		[ 'number' => '2', 'title' => 'Quest lab testing', 'body' => 'Schedule diagnostic labs at a local Quest location.', 'icon' => 'quest-logo-new.webp' ],
+		[ 'number' => '3', 'title' => 'Provider review', 'body' => 'A licensed provider reviews your health history, labs, and goals.', 'icon' => 'doctor.svg' ],
+		[ 'number' => '4', 'title' => 'Personalized plan', 'body' => 'Your protocol is reviewed for the selected dose and supply.', 'icon' => 'rx.svg' ],
+		[ 'number' => '5', 'title' => 'Shipped to your door', 'body' => 'Discreet, temperature-aware shipping direct to you.', 'icon' => 'box.svg' ],
+	];
+}
 
 $get_product = function( $key ) use ( $product_ids, $product_meta ) {
 	$id      = $product_ids[ $key ] ?? 0;
@@ -209,8 +224,14 @@ get_header();
 				</h1>
 				<p class="grunge-category-hero__subtitle"><?php echo esc_html( $program['subtitle'] ); ?></p>
 				<p class="grunge-category-hero__body"><?php echo esc_html( $program['body'] ); ?></p>
+				<?php if ( 'mens-health' === $current_slug ) : ?>
+				<div class="grunge-quest-callout grunge-quest-callout--hero">
+					<img src="<?php echo $myo_asset( 'quest-logo-new.webp' ); ?>" alt="" width="132" height="48" loading="eager">
+					<span>Labs coordinated through Quest</span>
+				</div>
+				<?php endif; ?>
 				<div class="grunge-hero__actions">
-					<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( $program['hero_cta'] ); ?>">Select Medication <?php echo myogenix_grunge_arrow_svg(); ?></a>
+					<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( $program['hero_cta'] ); ?>"><?php echo esc_html( $program['hero_cta_label'] ); ?> <?php echo myogenix_grunge_arrow_svg(); ?></a>
 					<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				</div>
 			</div>
@@ -229,18 +250,6 @@ get_header();
 				<img src="<?php echo $myo_asset( $program['hero_image'] ); ?>" alt="" width="620" height="520">
 				<?php endif; ?>
 			</div>
-		</div>
-	</section>
-
-	<section class="grunge-care-strip" aria-label="Care features">
-		<div class="grunge-care-strip__texture" style="background-image:url('<?php echo $myo_asset( 'thin section bg.png' ); ?>')" aria-hidden="true"></div>
-		<div class="grunge-care-strip__inner">
-			<?php foreach ( $care_features as $feature ) : ?>
-			<div class="grunge-care">
-				<img src="<?php echo $myo_asset( $feature['icon'] ); ?>" alt="" width="52" height="52" loading="lazy">
-				<p><?php echo esc_html( $feature['label'] ); ?></p>
-			</div>
-			<?php endforeach; ?>
 		</div>
 	</section>
 
@@ -266,7 +275,7 @@ get_header();
 						<h3><?php echo esc_html( $product['name'] ); ?></h3>
 						<span>Starting at</span>
 						<strong><?php echo esc_html( $product['price'] ); ?><small><?php echo esc_html( $product['unit'] ); ?></small></strong>
-						<em>Select Medication <?php echo myogenix_grunge_arrow_svg(); ?></em>
+						<em>Shop <?php echo esc_html( $product['name'] ); ?> <?php echo myogenix_grunge_arrow_svg(); ?></em>
 					</div>
 				</a>
 				<?php endforeach; ?>
@@ -306,7 +315,7 @@ get_header();
 			<img src="<?php echo $myo_asset( 'red and white logo.svg' ); ?>" alt="MyoGenix Pharma" width="176" height="54" loading="lazy">
 			<h2>Ready to start? <span class="grunge-text-red">We are here to help.</span></h2>
 			<div class="grunge-final-cta__actions">
-				<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( $program['hero_cta'] ); ?>">Select Medication <?php echo myogenix_grunge_arrow_svg(); ?></a>
+				<a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( $program['hero_cta'] ); ?>"><?php echo esc_html( $program['hero_cta_label'] ); ?> <?php echo myogenix_grunge_arrow_svg(); ?></a>
 				<a class="grunge-btn grunge-btn--dark" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask a question <?php echo myogenix_grunge_arrow_svg(); ?></a>
 			</div>
 		</div>
