@@ -2927,19 +2927,18 @@ body.single-product .myogenix-pdp__cq-heading {
   }
 
   .grunge-quest-callout--compact {
-    grid-template-columns: 58px minmax(0, 1fr);
-    width: min(100%, 214px);
-    gap: 8px;
+    grid-template-columns: minmax(0, 1fr);
+    width: min(100%, 188px);
+    gap: 0;
     padding: 7px 8px;
   }
 
   .grunge-quest-callout--compact img {
-    width: 58px;
-    padding: 4px 5px;
+    display: none;
   }
 
   .grunge-quest-callout--compact span {
-    font-size: 0.78rem;
+    font-size: 0.8rem;
   }
 
   .grunge-performance__copy .grunge-kicker,
