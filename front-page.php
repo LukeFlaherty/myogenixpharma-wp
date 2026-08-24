@@ -252,7 +252,6 @@ get_header();
 				<h2>Concierge telehealth <span class="grunge-text-red">for TRT</span></h2>
 				<p><span class="grunge-text-red">Physician-guided</span> treatment. Human support.</p>
 				<div class="grunge-quest-callout grunge-quest-callout--compact">
-					<img src="<?php echo $myo_asset( 'quest-logo-new.webp' ); ?>" alt="" width="132" height="48" loading="lazy">
 					<span>Free labs through Quest</span>
 				</div>
 				<ul class="grunge-check-list">

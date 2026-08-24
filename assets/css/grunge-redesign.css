@@ -1122,16 +1122,12 @@ body:has(.home-nav.grunge-nav) {
 }
 
 .grunge-quest-callout--compact {
-  grid-template-columns: 78px minmax(0, 1fr);
-  width: min(100%, 300px);
-  gap: 10px;
+  grid-template-columns: minmax(0, 1fr);
+  width: max-content;
+  max-width: min(100%, 250px);
+  gap: 0;
   margin-top: 14px;
-  padding: 8px 10px;
-}
-
-.grunge-quest-callout--compact img {
-  width: 78px;
-  padding: 5px 6px;
+  padding: 10px 12px;
 }
 
 .grunge-quest-callout--compact span {
