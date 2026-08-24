@@ -1087,6 +1087,10 @@ body:has(.home-nav.grunge-nav) {
   filter: drop-shadow(0 28px 45px rgba(0, 0, 0, 0.8));
 }
 
+.grunge-performance__media img[src*="mgrx-phone-quest-concierge"] {
+  width: min(78%, 390px);
+}
+
 .grunge-quest-callout {
   display: inline-grid;
   grid-template-columns: 112px minmax(0, 1fr);
@@ -1115,6 +1119,24 @@ body:has(.home-nav.grunge-nav) {
   letter-spacing: 0.05em;
   line-height: 1;
   text-transform: uppercase;
+}
+
+.grunge-quest-callout--compact {
+  grid-template-columns: 78px minmax(0, 1fr);
+  width: min(100%, 300px);
+  gap: 10px;
+  margin-top: 14px;
+  padding: 8px 10px;
+}
+
+.grunge-quest-callout--compact img {
+  width: 78px;
+  padding: 5px 6px;
+}
+
+.grunge-quest-callout--compact span {
+  font-size: 1rem;
+  line-height: 0.96;
 }
 
 .grunge-check-list {
@@ -2876,6 +2898,11 @@ body.single-product .myogenix-pdp__cq-heading {
     transform: translateX(20px);
   }
 
+  .grunge-performance__media img[src*="mgrx-phone-quest-concierge"] {
+    width: min(47vw, 200px);
+    transform: translateX(12px);
+  }
+
   .grunge-performance__copy {
     position: relative;
     z-index: 4;
@@ -2897,6 +2924,22 @@ body.single-product .myogenix-pdp__cq-heading {
 
   .grunge-quest-callout span {
     font-size: 0.92rem;
+  }
+
+  .grunge-quest-callout--compact {
+    grid-template-columns: 58px minmax(0, 1fr);
+    width: min(100%, 214px);
+    gap: 8px;
+    padding: 7px 8px;
+  }
+
+  .grunge-quest-callout--compact img {
+    width: 58px;
+    padding: 4px 5px;
+  }
+
+  .grunge-quest-callout--compact span {
+    font-size: 0.78rem;
   }
 
   .grunge-performance__copy .grunge-kicker,

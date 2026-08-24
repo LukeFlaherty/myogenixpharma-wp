@@ -245,15 +245,15 @@ get_header();
 		<div class="grunge-programs__bg" style="background-image:url('<?php echo $myo_asset( 'bg-genetic-wire.webp' ); ?>')" aria-hidden="true"></div>
 		<div class="grunge-container grunge-performance__grid">
 			<div class="grunge-performance__media">
-				<img src="<?php echo $myo_asset( 'quest-logo-new.webp' ); ?>" alt="Quest Diagnostics" width="620" height="620" loading="lazy">
+				<img src="<?php echo $myo_asset( 'mgrx-phone-quest-concierge.webp' ); ?>" alt="MyoGenix concierge support call coordinating a free Quest lab visit" width="972" height="1617" loading="lazy">
 			</div>
 			<div class="grunge-performance__copy">
 				<p class="grunge-kicker">TRT care path</p>
 				<h2>Concierge telehealth <span class="grunge-text-red">for TRT</span></h2>
 				<p><span class="grunge-text-red">Physician-guided</span> treatment. Human support.</p>
-				<div class="grunge-quest-callout">
+				<div class="grunge-quest-callout grunge-quest-callout--compact">
 					<img src="<?php echo $myo_asset( 'quest-logo-new.webp' ); ?>" alt="" width="132" height="48" loading="lazy">
-					<span>Diagnostic labs through Quest</span>
+					<span>Free labs through Quest</span>
 				</div>
 				<ul class="grunge-check-list">
 					<li>Online enrollment</li>
