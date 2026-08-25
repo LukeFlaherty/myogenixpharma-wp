@@ -31,10 +31,26 @@ const MYOGENIX_TRT_PRODUCT_ID   = 883;
 const MYOGENIX_TRT_WEEK_TARGET  = 9;
 const MYOGENIX_TRT_CONSENT_TTL  = 85 * DAY_IN_SECONDS; // must expire before the ~90-day native renewal date
 
-// Flip to false once Prescribery's requisition endpoint is wired in and this
-// has been verified end-to-end (see plan step 4/5). While true, the week-9
-// cron still runs its detection but does not send any email.
+// Flip to true only after the lab requisition integration below has been
+// verified end-to-end against a real (non-sandbox) order (see plan step
+// 4/5). While false, the week-9 cron still runs its detection but sends no
+// email, and native WCS renewal is left completely alone.
 const MYOGENIX_TRT_REDESIGN_LIVE = false;
+
+// Lab requisition panel — CONFIRM WITH OMAR BEFORE GOING LIVE. Verified
+// 2026-08-25 against the STAGING/sandbox lab catalog for client_id 16: lab_id
+// 1057 is named "Essential Men's Followup" and includes test_id 59 (CBC) and
+// test_id 5 (CMP) — no test named "Testosterone" exists anywhere in that
+// sandbox catalog (checked all 5 lab methods), so this mapping is a
+// plausible guess by name only, not a confirmed clinical panel. It also
+// applies to the SANDBOX client_id (16) only — production almost certainly
+// uses different lab_id/test_id values under the production client_id (128,
+// see myogenix_trt_lab_api_settings()) and may not even share the same API
+// base path (existing patient-CRUD integration uses .../api/dtg/v1, this
+// lab API uses .../api/v2 — unconfirmed whether production exposes the v2
+// lab endpoints at all).
+const MYOGENIX_TRT_LAB_ID    = 1057;
+const MYOGENIX_TRT_TEST_IDS  = array( 59, 5 );
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
@@ -347,19 +363,122 @@ function myogenix_trt_handle_continue( WC_Subscription $subscription ) {
 }
 
 /**
+ * Prescribery Lab API — credentials/config live in the `myogenix_trt_lab_api`
+ * WP option (DB), never in code: this repo is on a PUBLIC GitHub remote.
+ * Set via `wp option update myogenix_trt_lab_api --format=json` with keys
+ * api_base_url, api_key, client_id, source_id, is_sandbox. Spec verified
+ * 2026-08-25 against https://staging.prescribery.com/api/docs (Labs section)
+ * using sandbox credentials from Omar — see [[reference_prescribery_lab_api]]
+ * memory for the full endpoint reference.
+ */
+function myogenix_trt_lab_api_settings() {
+	$settings = get_option( 'myogenix_trt_lab_api' );
+	return is_array( $settings ) ? $settings : array();
+}
+
+function myogenix_trt_lab_api_token() {
+	$cached = get_transient( 'myogenix_trt_lab_api_token' );
+	if ( $cached ) {
+		return $cached;
+	}
+
+	$settings = myogenix_trt_lab_api_settings();
+	if ( empty( $settings['api_base_url'] ) || empty( $settings['api_key'] ) ) {
+		return new WP_Error( 'trt_lab_api_not_configured', 'myogenix_trt_lab_api option is missing api_base_url/api_key.' );
+	}
+
+	$response = wp_remote_post( rtrim( $settings['api_base_url'], '/' ) . '/access-token', array(
+		'headers' => array( 'Content-Type' => 'application/json', 'Accept' => 'application/json' ),
+		'body'    => wp_json_encode( array( 'api_key' => $settings['api_key'] ) ),
+		'timeout' => 15,
+	) );
+
+	if ( is_wp_error( $response ) ) {
+		return $response;
+	}
+
+	$body       = json_decode( wp_remote_retrieve_body( $response ), true );
+	$token      = $body['data']['access_token'] ?? null;
+	$expires_in = (int) ( $body['data']['expires_in'] ?? 3600 );
+
+	if ( ! $token ) {
+		return new WP_Error( 'trt_lab_api_auth_failed', 'Failed to obtain Prescribery lab API token: ' . wp_remote_retrieve_body( $response ) );
+	}
+
+	set_transient( 'myogenix_trt_lab_api_token', $token, max( 60, $expires_in - 60 ) );
+	return $token;
+}
+
+function myogenix_trt_get_prescribery_patient_id( WC_Subscription $subscription ) {
+	// Written by prescriptionHandleApproval() in prescription-charge-previous-
+	// cart.php on every doctor decision — present on the parent order and,
+	// for older subs, sometimes copied onto the subscription itself.
+	$patient_id = $subscription->get_meta( '_prescribery_patient_id' );
+	if ( $patient_id ) {
+		return $patient_id;
+	}
+	$parent = $subscription->get_parent();
+	return $parent ? $parent->get_meta( '_prescribery_patient_id' ) : null;
+}
+
+/**
  * Places a lab requisition with Prescribery for a TRT renewal.
  *
- * BLOCKED: Prescribery has not yet provided the endpoint/payload spec for
- * this (confirmed via full read of prescribery-wc-integration/includes/
- * class-api.php and prescription-charge-previous-cart.php — the only
- * existing outbound Prescribery calls are patient CRUD, phone validation,
- * saveTransectionDetails, and the post-charge release-erx-to-pharmacy call;
- * nothing places a new lab order). Wire in the real call here once the spec
- * arrives — everything downstream (order creation, meta mapping, hold-for-
- * approval) is already built and does not need to change.
+ * Verified working end-to-end against the sandbox 2026-08-25 (auth exchange
+ * + POST .../lab/{client_id}/save-test-order returned a real token). NOT yet
+ * confirmed for production — see the MYOGENIX_TRT_LAB_ID/TEST_IDS comment
+ * above for what's still unconfirmed before this can go live.
  */
 function myogenix_trt_place_lab_requisition( WC_Subscription $subscription ) {
-	return new WP_Error( 'trt_requisition_not_wired', 'Lab requisition API not yet available — see myogenix_trt_place_lab_requisition() in inc/trt-renewal-redesign.php.' );
+	$settings = myogenix_trt_lab_api_settings();
+	if ( empty( $settings['api_base_url'] ) || empty( $settings['client_id'] ) || empty( $settings['source_id'] ) ) {
+		return new WP_Error( 'trt_lab_api_not_configured', 'myogenix_trt_lab_api option is missing client_id/source_id.' );
+	}
+
+	$patient_id = myogenix_trt_get_prescribery_patient_id( $subscription );
+	if ( ! $patient_id ) {
+		return new WP_Error( 'trt_no_patient_id', 'No _prescribery_patient_id found on this subscription or its parent order.' );
+	}
+
+	$token = myogenix_trt_lab_api_token();
+	if ( is_wp_error( $token ) ) {
+		return $token;
+	}
+
+	$order_items = array();
+	foreach ( MYOGENIX_TRT_TEST_IDS as $test_id ) {
+		$order_items[] = array( 'lab_id' => MYOGENIX_TRT_LAB_ID, 'test_id' => $test_id );
+	}
+
+	$response = wp_remote_post( rtrim( $settings['api_base_url'], '/' ) . '/lab/' . $settings['client_id'] . '/save-test-order', array(
+		'headers' => array(
+			'Authorization' => 'Bearer ' . $token,
+			'Content-Type'  => 'application/json',
+			'Accept'        => 'application/json',
+		),
+		'body'    => wp_json_encode( array(
+			'patient_id' => $patient_id,
+			'order'      => $order_items,
+			'source_id'  => $settings['source_id'],
+			'reason'     => 'TRT renewal — week 9 consent flow',
+		) ),
+		'timeout' => 20,
+	) );
+
+	if ( is_wp_error( $response ) ) {
+		return $response;
+	}
+
+	$code = wp_remote_retrieve_response_code( $response );
+	$body = json_decode( wp_remote_retrieve_body( $response ), true );
+
+	if ( 200 !== $code || empty( $body['token'] ) ) {
+		return new WP_Error( 'trt_lab_order_failed', "Lab requisition failed ({$code}): " . wp_remote_retrieve_body( $response ) );
+	}
+
+	// Confirmed against the sandbox: the API returns "token" as a
+	// single-element array, not the bare string the docs example shows.
+	return is_array( $body['token'] ) ? reset( $body['token'] ) : $body['token'];
 }
 
 function myogenix_trt_handle_decline( WC_Subscription $subscription ) {
