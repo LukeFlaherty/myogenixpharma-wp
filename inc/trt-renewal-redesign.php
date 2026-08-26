@@ -37,20 +37,15 @@ const MYOGENIX_TRT_CONSENT_TTL  = 85 * DAY_IN_SECONDS; // must expire before the
 // email, and native WCS renewal is left completely alone.
 const MYOGENIX_TRT_REDESIGN_LIVE = false;
 
-// Lab requisition panel — CONFIRM WITH OMAR BEFORE GOING LIVE. Verified
-// 2026-08-25 against the STAGING/sandbox lab catalog for client_id 16: lab_id
-// 1057 is named "Essential Men's Followup" and includes test_id 59 (CBC) and
-// test_id 5 (CMP) — no test named "Testosterone" exists anywhere in that
-// sandbox catalog (checked all 5 lab methods), so this mapping is a
-// plausible guess by name only, not a confirmed clinical panel. It also
-// applies to the SANDBOX client_id (16) only — production almost certainly
-// uses different lab_id/test_id values under the production client_id (128,
-// see myogenix_trt_lab_api_settings()) and may not even share the same API
-// base path (existing patient-CRUD integration uses .../api/dtg/v1, this
-// lab API uses .../api/v2 — unconfirmed whether production exposes the v2
-// lab endpoints at all).
-const MYOGENIX_TRT_LAB_ID    = 1057;
-const MYOGENIX_TRT_TEST_IDS  = array( 59, 5 );
+// Lab API environment + panel are read from the myogenix_trt_lab_api WP
+// option (per-environment: sandbox vs production each have their own
+// client_id/source_id/api_key AND their own lab_id/test_ids, since
+// Prescribery's lab catalog is scoped per client). See
+// myogenix_trt_lab_api_settings() below and [[reference_prescribery_lab_api]]
+// memory for the confirmed values (sandbox: lab_id 1057 "Essential Men's
+// Followup"; production: lab_id 627 "Men's Testosterone FollowUp", per Omar
+// 2026-08-26). Switching `active_env` from "sandbox" to "production" in that
+// option is the whole cutover — no code change needed.
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
@@ -365,26 +360,40 @@ function myogenix_trt_handle_continue( WC_Subscription $subscription ) {
 /**
  * Prescribery Lab API — credentials/config live in the `myogenix_trt_lab_api`
  * WP option (DB), never in code: this repo is on a PUBLIC GitHub remote.
- * Set via `wp option update myogenix_trt_lab_api --format=json` with keys
- * api_base_url, api_key, client_id, source_id, is_sandbox. Spec verified
- * 2026-08-25 against https://staging.prescribery.com/api/docs (Labs section)
- * using sandbox credentials from Omar — see [[reference_prescribery_lab_api]]
- * memory for the full endpoint reference.
+ *
+ * Shape (set via `wp option update myogenix_trt_lab_api --format=json`,
+ * piped via stdin — never as a literal CLI arg):
+ *   { "active_env": "sandbox"|"production",
+ *     "sandbox":    { api_base_url, api_key, client_id, source_id, lab_id, test_ids: [] },
+ *     "production": { api_base_url, api_key, client_id, source_id, lab_id, test_ids: [] } }
+ *
+ * Both environments' credentials are kept configured simultaneously so
+ * `active_env` alone controls the cutover — no code change needed to switch.
+ * Spec verified 2026-08-25/26 against https://staging.prescribery.com/api/docs
+ * (Labs section) — see [[reference_prescribery_lab_api]] memory for the full
+ * endpoint reference and confirmed lab_id/test_ids for each environment.
  */
 function myogenix_trt_lab_api_settings() {
-	$settings = get_option( 'myogenix_trt_lab_api' );
-	return is_array( $settings ) ? $settings : array();
+	$all = get_option( 'myogenix_trt_lab_api' );
+	if ( ! is_array( $all ) ) {
+		return array();
+	}
+	$env = $all['active_env'] ?? 'sandbox';
+	return is_array( $all[ $env ] ?? null ) ? $all[ $env ] : array();
 }
 
 function myogenix_trt_lab_api_token() {
-	$cached = get_transient( 'myogenix_trt_lab_api_token' );
-	if ( $cached ) {
-		return $cached;
-	}
-
 	$settings = myogenix_trt_lab_api_settings();
 	if ( empty( $settings['api_base_url'] ) || empty( $settings['api_key'] ) ) {
-		return new WP_Error( 'trt_lab_api_not_configured', 'myogenix_trt_lab_api option is missing api_base_url/api_key.' );
+		return new WP_Error( 'trt_lab_api_not_configured', 'myogenix_trt_lab_api option is missing api_base_url/api_key for the active environment.' );
+	}
+
+	// Keyed by base URL so sandbox/production tokens never collide if
+	// active_env is switched mid-cache-lifetime.
+	$transient_key = 'myogenix_trt_lab_token_' . md5( $settings['api_base_url'] );
+	$cached        = get_transient( $transient_key );
+	if ( $cached ) {
+		return $cached;
 	}
 
 	$response = wp_remote_post( rtrim( $settings['api_base_url'], '/' ) . '/access-token', array(
@@ -405,7 +414,7 @@ function myogenix_trt_lab_api_token() {
 		return new WP_Error( 'trt_lab_api_auth_failed', 'Failed to obtain Prescribery lab API token: ' . wp_remote_retrieve_body( $response ) );
 	}
 
-	set_transient( 'myogenix_trt_lab_api_token', $token, max( 60, $expires_in - 60 ) );
+	set_transient( $transient_key, $token, max( 60, $expires_in - 60 ) );
 	return $token;
 }
 
@@ -424,15 +433,19 @@ function myogenix_trt_get_prescribery_patient_id( WC_Subscription $subscription 
 /**
  * Places a lab requisition with Prescribery for a TRT renewal.
  *
- * Verified working end-to-end against the sandbox 2026-08-25 (auth exchange
- * + POST .../lab/{client_id}/save-test-order returned a real token). NOT yet
- * confirmed for production — see the MYOGENIX_TRT_LAB_ID/TEST_IDS comment
- * above for what's still unconfirmed before this can go live.
+ * Verified working end-to-end against the sandbox 2026-08-25/26 (auth
+ * exchange + POST .../lab/{client_id}/save-test-order returned a real
+ * token, plus error-path testing: invalid lab/test IDs and a missing
+ * patient_id both correctly surface as 422s with field-level messages).
+ * Production credentials + panel (lab_id 627 "Men's Testosterone FollowUp")
+ * confirmed by Omar 2026-08-26 and configured in the myogenix_trt_lab_api
+ * option, but NOT yet exercised with a real production order — switch
+ * `active_env` to "production" only after that's been done deliberately.
  */
 function myogenix_trt_place_lab_requisition( WC_Subscription $subscription ) {
 	$settings = myogenix_trt_lab_api_settings();
-	if ( empty( $settings['api_base_url'] ) || empty( $settings['client_id'] ) || empty( $settings['source_id'] ) ) {
-		return new WP_Error( 'trt_lab_api_not_configured', 'myogenix_trt_lab_api option is missing client_id/source_id.' );
+	if ( empty( $settings['api_base_url'] ) || empty( $settings['client_id'] ) || empty( $settings['source_id'] ) || empty( $settings['lab_id'] ) || empty( $settings['test_ids'] ) ) {
+		return new WP_Error( 'trt_lab_api_not_configured', 'myogenix_trt_lab_api option is missing required fields for the active environment.' );
 	}
 
 	$patient_id = myogenix_trt_get_prescribery_patient_id( $subscription );
@@ -446,8 +459,8 @@ function myogenix_trt_place_lab_requisition( WC_Subscription $subscription ) {
 	}
 
 	$order_items = array();
-	foreach ( MYOGENIX_TRT_TEST_IDS as $test_id ) {
-		$order_items[] = array( 'lab_id' => MYOGENIX_TRT_LAB_ID, 'test_id' => $test_id );
+	foreach ( $settings['test_ids'] as $test_id ) {
+		$order_items[] = array( 'lab_id' => $settings['lab_id'], 'test_id' => $test_id );
 	}
 
 	$response = wp_remote_post( rtrim( $settings['api_base_url'], '/' ) . '/lab/' . $settings['client_id'] . '/save-test-order', array(
