@@ -201,17 +201,29 @@ function myogenix_trt_send_consent_email( WC_Subscription $subscription, $cycle_
 	), rest_url( 'myogenix/v1/trt-renewal-consent' ) );
 
 	$to   = $subscription->get_billing_email();
-	$name = $subscription->get_billing_first_name();
+	$name = esc_html( $subscription->get_billing_first_name() );
 
 	$subject = 'Continue your TRT treatment?';
-	$body    = "Hi {$name},\n\n"
-		. "It's time to plan your next testosterone therapy renewal. Let us know how you'd like to proceed:\n\n"
-		. "Continue treatment: {$continue_url}\n\n"
-		. "Not right now: {$decline_url}\n\n"
-		. "Questions? Reply to this email or reach us at support@myogenixpharma.com.\n\n"
-		. "— Myogenix Pharma";
 
-	wp_mail( $to, $subject, $body, array( 'Content-Type: text/plain; charset=UTF-8' ) );
+	$button = function ( $url, $label, $bg, $color ) {
+		return '<a href="' . esc_url( $url ) . '" style="display:inline-block;padding:12px 28px;margin:6px;border-radius:6px;background:' . $bg . ';color:' . $color . ';text-decoration:none;font-family:Arial,sans-serif;font-size:15px;font-weight:bold;">' . esc_html( $label ) . '</a>';
+	};
+
+	$body = '<div style="font-family:Arial,sans-serif;font-size:15px;color:#222;max-width:520px;margin:0 auto;padding:24px;">'
+		. "<p>Hi {$name},</p>"
+		. '<p>It\'s time to plan your next testosterone therapy renewal. Let us know how you\'d like to proceed:</p>'
+		. '<div style="text-align:center;margin:28px 0;">'
+		. $button( $continue_url, 'Continue treatment', '#1a7f3c', '#ffffff' )
+		. $button( $decline_url, 'Not right now', '#eeeeee', '#333333' )
+		. '</div>'
+		. '<p style="color:#666;font-size:13px;">Questions? Reply to this email or reach us at <a href="mailto:support@myogenixpharma.com">support@myogenixpharma.com</a>.</p>'
+		. '<p>— Myogenix Pharma</p>'
+		. '</div>';
+
+	wp_mail( $to, $subject, $body, array(
+		'Content-Type: text/html; charset=UTF-8',
+		'From: Myogenix Pharma <support@myogenixpharma.com>',
+	) );
 }
 
 // ─── 4. Consent REST route ──────────────────────────────────────────────────
