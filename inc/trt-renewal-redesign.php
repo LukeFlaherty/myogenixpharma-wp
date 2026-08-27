@@ -186,19 +186,19 @@ function myogenix_trt_run_week9_check() {
 function myogenix_trt_send_consent_email( WC_Subscription $subscription, $cycle_start_ts ) {
 	$token = myogenix_trt_consent_token( $subscription->get_id(), $cycle_start_ts );
 
-	$continue_url = add_query_arg( array(
+	$continue_url = myogenix_trt_consent_url( array(
 		'subscription_id' => $subscription->get_id(),
 		'cycle_start'     => $cycle_start_ts,
 		'token'           => $token,
 		'action'          => 'continue',
-	), rest_url( 'myogenix/v1/trt-renewal-consent' ) );
+	) );
 
-	$decline_url = add_query_arg( array(
+	$decline_url = myogenix_trt_consent_url( array(
 		'subscription_id' => $subscription->get_id(),
 		'cycle_start'     => $cycle_start_ts,
 		'token'           => $token,
 		'action'          => 'decline',
-	), rest_url( 'myogenix/v1/trt-renewal-consent' ) );
+	) );
 
 	$to   = $subscription->get_billing_email();
 	$name = esc_html( $subscription->get_billing_first_name() );
@@ -226,32 +226,55 @@ function myogenix_trt_send_consent_email( WC_Subscription $subscription, $cycle_
 	) );
 }
 
-// ─── 4. Consent REST route ──────────────────────────────────────────────────
+// ─── 4. Consent page — plain URL (/trt-renewal-consent), not wp-json ───────
 //
 // GET renders a confirmation page with no side effects (protects against
 // email-client link prefetching/scanning silently triggering an action).
-// POST from that page's own form performs the actual mutation.
+// POST from that page's own form performs the actual mutation. This is a
+// real WP rewrite rule (not a client-side redirect from a REST route) so
+// the URL bar always shows the plain path, never /wp-json/....
+//
+// NOTE: adding/changing this rewrite rule requires a one-time
+// `wp rewrite flush` on the server, or it 404s until permalinks are
+// otherwise flushed (e.g. visiting wp-admin > Settings > Permalinks > Save).
 
-add_action( 'rest_api_init', function () {
-	register_rest_route( 'myogenix/v1', '/trt-renewal-consent', array(
-		array(
-			'methods'             => 'GET',
-			'callback'            => 'myogenix_trt_consent_confirm_page',
-			'permission_callback' => '__return_true',
-		),
-		array(
-			'methods'             => 'POST',
-			'callback'            => 'myogenix_trt_consent_submit',
-			'permission_callback' => '__return_true',
-		),
-	) );
+add_action( 'init', function () {
+	add_rewrite_rule( '^trt-renewal-consent/?$', 'index.php?myogenix_trt_consent=1', 'top' );
 } );
 
-function myogenix_trt_validate_consent_request( WP_REST_Request $request ) {
-	$subscription_id = absint( $request->get_param( 'subscription_id' ) );
-	$cycle_start_ts   = absint( $request->get_param( 'cycle_start' ) );
-	$token            = (string) $request->get_param( 'token' );
-	$action           = (string) $request->get_param( 'action' );
+add_filter( 'query_vars', function ( $vars ) {
+	$vars[] = 'myogenix_trt_consent';
+	return $vars;
+} );
+
+add_action( 'template_redirect', function () {
+	if ( ! get_query_var( 'myogenix_trt_consent' ) ) {
+		return;
+	}
+
+	$params = array(
+		'subscription_id' => wp_unslash( $_REQUEST['subscription_id'] ?? '' ),
+		'cycle_start'     => wp_unslash( $_REQUEST['cycle_start'] ?? '' ),
+		'token'           => wp_unslash( $_REQUEST['token'] ?? '' ),
+		'action'          => wp_unslash( $_REQUEST['action'] ?? '' ),
+	);
+
+	if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
+		myogenix_trt_consent_submit( $params );
+	} else {
+		myogenix_trt_consent_confirm_page( $params );
+	}
+} );
+
+function myogenix_trt_consent_url( array $args ) {
+	return add_query_arg( $args, home_url( '/trt-renewal-consent' ) );
+}
+
+function myogenix_trt_validate_consent_request( array $params ) {
+	$subscription_id = absint( $params['subscription_id'] ?? 0 );
+	$cycle_start_ts   = absint( $params['cycle_start'] ?? 0 );
+	$token            = (string) ( $params['token'] ?? '' );
+	$action           = (string) ( $params['action'] ?? '' );
 
 	if ( ! in_array( $action, array( 'continue', 'decline' ), true ) ) {
 		return new WP_Error( 'trt_bad_action', 'Invalid action.', array( 'status' => 400 ) );
@@ -278,10 +301,10 @@ function myogenix_trt_validate_consent_request( WP_REST_Request $request ) {
 	return array( $subscription, $cycle_start_ts, $action );
 }
 
-function myogenix_trt_consent_confirm_page( WP_REST_Request $request ) {
-	$result = myogenix_trt_validate_consent_request( $request );
+function myogenix_trt_consent_confirm_page( array $params ) {
+	$result = myogenix_trt_validate_consent_request( $params );
 	if ( is_wp_error( $result ) ) {
-		return myogenix_trt_html_response( '<p>' . esc_html( $result->get_error_message() ) . '</p>' );
+		myogenix_trt_html_response( '<p>' . esc_html( $result->get_error_message() ) . '</p>', $result->get_error_data()['status'] ?? 400 );
 	}
 
 	list( $subscription, $cycle_start_ts, $action ) = $result;
@@ -293,22 +316,22 @@ function myogenix_trt_consent_confirm_page( WP_REST_Request $request ) {
 
 	ob_start();
 	?>
-	<form method="post" action="<?php echo esc_url( rest_url( 'myogenix/v1/trt-renewal-consent' ) ); ?>">
+	<form method="post" action="<?php echo esc_url( myogenix_trt_consent_url( array() ) ); ?>">
 		<p><?php echo esc_html( $copy ); ?></p>
 		<input type="hidden" name="subscription_id" value="<?php echo esc_attr( $subscription->get_id() ); ?>">
 		<input type="hidden" name="cycle_start" value="<?php echo esc_attr( $cycle_start_ts ); ?>">
-		<input type="hidden" name="token" value="<?php echo esc_attr( $request->get_param( 'token' ) ); ?>">
+		<input type="hidden" name="token" value="<?php echo esc_attr( $params['token'] ); ?>">
 		<input type="hidden" name="action" value="<?php echo esc_attr( $action ); ?>">
 		<button type="submit"><?php echo esc_html( $label ); ?></button>
 	</form>
 	<?php
-	return myogenix_trt_html_response( ob_get_clean() );
+	myogenix_trt_html_response( ob_get_clean() );
 }
 
-function myogenix_trt_consent_submit( WP_REST_Request $request ) {
-	$result = myogenix_trt_validate_consent_request( $request );
+function myogenix_trt_consent_submit( array $params ) {
+	$result = myogenix_trt_validate_consent_request( $params );
 	if ( is_wp_error( $result ) ) {
-		return myogenix_trt_html_response( '<p>' . esc_html( $result->get_error_message() ) . '</p>' );
+		myogenix_trt_html_response( '<p>' . esc_html( $result->get_error_message() ) . '</p>', $result->get_error_data()['status'] ?? 400 );
 	}
 
 	list( $subscription, $cycle_start_ts, $action ) = $result;
@@ -324,23 +347,22 @@ function myogenix_trt_consent_submit( WP_REST_Request $request ) {
 	$subscription->save();
 
 	if ( is_wp_error( $outcome ) ) {
-		return myogenix_trt_html_response( '<p>Something went wrong: ' . esc_html( $outcome->get_error_message() ) . '. Our team has been notified — please contact support@myogenixpharma.com.</p>' );
+		myogenix_trt_html_response( '<p>Something went wrong: ' . esc_html( $outcome->get_error_message() ) . '. Our team has been notified — please contact support@myogenixpharma.com.</p>', 500 );
 	}
 
 	$message = 'continue' === $action
 		? 'Thanks — we\'ve started your renewal. You\'ll hear from us once your labs are reviewed.'
 		: 'Got it — we\'ve paused your renewal. Our team will follow up shortly.';
 
-	return myogenix_trt_html_response( '<p>' . esc_html( $message ) . '</p>' );
+	myogenix_trt_html_response( '<p>' . esc_html( $message ) . '</p>' );
 }
 
-function myogenix_trt_html_response( $body_html ) {
-	// WP_REST_Response only serializes JSON by default; this route is
-	// deliberately browser-facing (email links, a form submit), so it prints
-	// HTML directly and exits rather than returning through the REST
-	// response/serialization pipeline.
+function myogenix_trt_html_response( $body_html, $status = 200 ) {
+	// This is a plain browser-facing page (email links, a form submit), so
+	// it prints HTML directly and exits rather than going through any
+	// template/theme rendering.
 	nocache_headers();
-	status_header( 200 );
+	status_header( $status );
 	header( 'Content-Type: text/html; charset=utf-8' );
 	echo '<!doctype html><html><head><meta charset="utf-8"><title>Myogenix Pharma</title></head><body>' . $body_html . '</body></html>';
 	exit;
