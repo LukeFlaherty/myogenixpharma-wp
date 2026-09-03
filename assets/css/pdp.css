@@ -2220,9 +2220,9 @@ body.single-product .trt-grunge-pdp .pdp-hero__right {
 	position: relative;
 	z-index: 2;
 	display: grid;
-	grid-template-columns: 1fr 1.65fr;
-	gap: 56px;
-	width: min(100% - 32px, 1152px);
+	grid-template-columns: 1fr 1.9fr;
+	gap: 40px;
+	width: min(100% - 32px, 1320px);
 	margin: 0 auto;
 	padding: 58px 0;
 }
@@ -2254,7 +2254,7 @@ body.single-product .trt-grunge-pdp .pdp-hero__right {
 .trt-grunge-pdp .home-how__steps {
 	display: grid;
 	grid-template-columns: repeat(4, minmax(0, 1fr));
-	gap: 14px;
+	gap: 10px;
 }
 
 .trt-pdp__plan-card,
@@ -2266,6 +2266,11 @@ body.single-product .trt-grunge-pdp .pdp-hero__right {
 		rgba(4, 4, 4, 0.82);
 	padding: 26px 18px 18px;
 	color: #fff;
+}
+
+.trt-grunge-pdp .hp-step {
+	padding-left: 14px;
+	padding-right: 14px;
 }
 
 .trt-pdp__plan-card {
@@ -4400,8 +4405,8 @@ body.single-product .trt-grunge-pdp .pdp-hero__right {
 }
 
 .trt-grunge-pdp .home-how .hp-step__body {
-	padding-left: 18px;
-	padding-right: 18px;
+	padding-left: 0;
+	padding-right: 0;
 }
 
 .trt-grunge-pdp .myo-faq__cta {
