@@ -5540,8 +5540,7 @@ body.single-product .trt-grunge-pdp .pdp-hero__right {
 	.trt-grunge-pdp .pdp-cfg__summary-month-price,
 	.trt-grunge-pdp .pdp-cfg__summary-line,
 	.trt-grunge-pdp .pdp-cfg__summary-sub,
-	.trt-grunge-pdp .peptide-cfg__includes,
-	.trt-grunge-pdp .pdp-cfg__disclaimer {
+	.trt-grunge-pdp .peptide-cfg__includes {
 		display: none !important;
 	}
 
@@ -5580,7 +5579,7 @@ body.single-product .trt-grunge-pdp .pdp-hero__right {
 
 /* TRT readability pass: lab choices, due-today stack, includes, and headline scale. */
 .trt-grunge-pdp .pdp-hero__title {
-	font-size: clamp(4.46rem, 8.5vw, 8.08rem) !important;
+	font-size: clamp(3.5rem, 5.6vw, 5.25rem) !important;
 }
 
 .trt-grunge-pdp .trt-pdp__labs-option {
@@ -6021,21 +6020,36 @@ body.single-product .trt-grunge-pdp .pdp-hero__right {
 }
 
 .trt-pdp__membership-note {
-	display: grid;
-	gap: 4px;
+	display: grid !important;
+	gap: 6px;
 	width: 100%;
-	padding: 12px 14px;
+	margin: 0;
+	padding: 12px 14px 12px 30px;
 	border: 1px solid rgba(255, 255, 255, 0.16);
 	background: rgba(255, 255, 255, 0.04);
 	color: #d4d4d8;
 	font-size: 0.82rem;
 	line-height: 1.4;
+	list-style: disc;
 }
 
-.trt-pdp__membership-note p {
+.trt-pdp__membership-note li {
 	margin: 0;
 }
 
 .trt-pdp__membership-note strong {
 	color: #fff;
+}
+
+.trt-pdp__includes-inline {
+	display: grid;
+	gap: 6px;
+	width: 100%;
+}
+
+.trt-pdp__includes-text {
+	margin: 0;
+	color: #d4d4d8;
+	font-size: 0.86rem;
+	line-height: 1.5;
 }

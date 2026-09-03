@@ -1323,16 +1323,9 @@ if ( $is_weight_loss ) :
 					</div>
 
 					<!-- TRT: what's included lives on the left, alongside eligibility/labs -->
-					<div class="peptide-cfg__includes peptide-cfg__includes--inline">
+					<div class="trt-pdp__includes-inline">
 						<p class="peptide-cfg__includes-title">What's included</p>
-						<ul class="peptide-cfg__includes-list">
-							<?php foreach ( $shcfg['includes'] as $include_item ) : ?>
-							<li class="peptide-cfg__includes-item">
-								<span class="peptide-cfg__includes-icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-								<?php echo $include_item; ?>
-							</li>
-							<?php endforeach; ?>
-						</ul>
+						<p class="trt-pdp__includes-text"><?php echo implode( ', ', $shcfg['includes'] ); ?></p>
 					</div>
 					<?php endif; ?>
 					</div>
@@ -1363,11 +1356,15 @@ if ( $is_weight_loss ) :
 
 					<button id="pdp-cta" class="pdp-cfg__cta"><?php echo esc_html( $shcfg['cta_label'] ); ?></button>
 					<?php if ( 'testosterone' === $slug ) : ?>
-						<div class="trt-pdp__membership-note">
-							<p><strong>Membership fee</strong> $189/month, paid quarterly</p>
-							<p>Only charged once you are approved for treatment.</p>
-						</div>
-					<?php elseif ( $sh_config_option_count >= 2 ) : ?>
+						<p id="pdp-disclaimer" class="pdp-cfg__disclaimer">
+							<?php echo esc_html( $shcfg['disclaimer'] ); ?>
+						</p>
+						<ul class="trt-pdp__membership-note">
+							<li><strong>Membership fee</strong> $189/month, paid quarterly</li>
+							<li>Only charged once you are approved for treatment.</li>
+						</ul>
+					<?php else : ?>
+						<?php if ( $sh_config_option_count >= 2 ) : ?>
 						<div class="peptide-cfg__includes">
 						<p class="peptide-cfg__includes-title">What's included</p>
 						<ul class="peptide-cfg__includes-list">
@@ -1383,6 +1380,7 @@ if ( $is_weight_loss ) :
 					<p id="pdp-disclaimer" class="pdp-cfg__disclaimer">
 						<?php echo esc_html( $shcfg['disclaimer'] ); ?>
 					</p>
+					<?php endif; ?>
 					</div>
 
 				</div>
