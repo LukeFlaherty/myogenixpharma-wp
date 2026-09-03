@@ -1870,10 +1870,12 @@ body.single-product .trt-grunge-pdp .pdp-hero__left {
 
 .trt-grunge-pdp .pdp-hero__title {
 	grid-area: title;
-	max-width: 620px;
+	position: relative;
+	z-index: 3;
+	max-width: 100%;
 	margin: 0;
-	font-size: clamp(4.75rem, 7.6vw, 6.25rem);
-	line-height: 0.78;
+	font-size: clamp(3.75rem, 6vw, 5.5rem);
+	line-height: 0.9;
 }
 
 .trt-grunge-pdp .pdp-hero__desc {
@@ -6016,4 +6018,24 @@ body.single-product .trt-grunge-pdp .pdp-hero__right {
 	.trt-grunge-pdp .pdp-cfg__side .peptide-cfg__includes {
 		gap: 7px !important;
 	}
+}
+
+.trt-pdp__membership-note {
+	display: grid;
+	gap: 4px;
+	width: 100%;
+	padding: 12px 14px;
+	border: 1px solid rgba(255, 255, 255, 0.16);
+	background: rgba(255, 255, 255, 0.04);
+	color: #d4d4d8;
+	font-size: 0.82rem;
+	line-height: 1.4;
+}
+
+.trt-pdp__membership-note p {
+	margin: 0;
+}
+
+.trt-pdp__membership-note strong {
+	color: #fff;
 }

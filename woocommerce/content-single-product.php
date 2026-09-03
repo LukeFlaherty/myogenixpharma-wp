@@ -928,7 +928,7 @@ if ( $is_weight_loss ) :
 			'hero_line'       => 'Provider-managed TRT',
 			'hero_accent'     => 'Testosterone Cypionate',
 			'includes'        => [
-				'Testosterone cypionate',
+				'3 Months of TRT',
 				'Labwork',
 				'Dr. Consultations',
 				'Syringes',
@@ -1321,6 +1321,19 @@ if ( $is_weight_loss ) :
 						<input type="checkbox" id="pdp-own-labs" class="pdp-cfg__own-labs-checkbox" hidden />
 						<p class="pdp-cfg__own-labs-note">Lab details come after checkout.</p>
 					</div>
+
+					<!-- TRT: what's included lives on the left, alongside eligibility/labs -->
+					<div class="peptide-cfg__includes peptide-cfg__includes--inline">
+						<p class="peptide-cfg__includes-title">What's included</p>
+						<ul class="peptide-cfg__includes-list">
+							<?php foreach ( $shcfg['includes'] as $include_item ) : ?>
+							<li class="peptide-cfg__includes-item">
+								<span class="peptide-cfg__includes-icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+								<?php echo $include_item; ?>
+							</li>
+							<?php endforeach; ?>
+						</ul>
+					</div>
 					<?php endif; ?>
 					</div>
 
@@ -1331,7 +1344,7 @@ if ( $is_weight_loss ) :
 							$sh_config_option_count = 3;
 						}
 						?>
-						<?php if ( $sh_config_option_count < 2 ) : ?>
+						<?php if ( 'testosterone' !== $slug && $sh_config_option_count < 2 ) : ?>
 						<div class="peptide-cfg__includes peptide-cfg__includes--inline">
 						<p class="peptide-cfg__includes-title">What's included</p>
 						<ul class="peptide-cfg__includes-list">
@@ -1349,7 +1362,12 @@ if ( $is_weight_loss ) :
 					<div id="sh-summary" class="pdp-cfg__summary"></div>
 
 					<button id="pdp-cta" class="pdp-cfg__cta"><?php echo esc_html( $shcfg['cta_label'] ); ?></button>
-					<?php if ( $sh_config_option_count >= 2 ) : ?>
+					<?php if ( 'testosterone' === $slug ) : ?>
+						<div class="trt-pdp__membership-note">
+							<p><strong>Membership fee</strong> $189/month, paid quarterly</p>
+							<p>Only charged once you are approved for treatment.</p>
+						</div>
+					<?php elseif ( $sh_config_option_count >= 2 ) : ?>
 						<div class="peptide-cfg__includes">
 						<p class="peptide-cfg__includes-title">What's included</p>
 						<ul class="peptide-cfg__includes-list">
@@ -1371,26 +1389,6 @@ if ( $is_weight_loss ) :
 				</div>
 			</div>
 		</section>
-
-	<section class="trt-pdp__trust-strip" aria-label="Care features">
-		<div class="trt-pdp__trust-strip-inner">
-			<?php
-			$trt_trust = [
-				[ 'img' => 'grunge-redesign/doctor.svg',       'label' => 'Physician-Guided Care' ],
-				[ 'img' => 'grunge-redesign/laptop-check.svg', 'label' => 'Online Intake' ],
-				[ 'img' => 'grunge-redesign/rx.svg',           'label' => 'Personalized Dosing' ],
-				[ 'img' => 'grunge-redesign/box.svg',          'label' => 'Shipped to Your Door' ],
-				[ 'img' => 'grunge-redesign/headphones.svg',   'label' => 'Concierge Support' ],
-			];
-			foreach ( $trt_trust as $item ) :
-			?>
-			<div class="trt-pdp__trust-cell">
-				<img src="<?php echo $img_url( $item['img'] ); ?>" alt="" loading="lazy" width="36" height="36">
-				<span><?php echo esc_html( $item['label'] ); ?></span>
-			</div>
-			<?php endforeach; ?>
-		</div>
-	</section>
 
 	<?php if ( $slug === 'testosterone' ) : ?>
 	<section class="trt-pdp__symptoms" aria-label="Common low testosterone symptoms">
