@@ -64,7 +64,7 @@ function myogenix_grunge_bottle_map(): array {
 		'compound-tirzepatide' => 'tirzepatide-square-v2 Background Removed Background Removed.png',
 		'compound-retatrutide' => 'retatrutide-square-v2 Background Removed Background Removed.png',
 		'testosterone' => 'testosterone-square-v2 Background Removed Background Removed.png',
-		'hcg' => 'hcg-square-v2.png',
+		'hcg' => 'hcg-square-v2 Background Removed Background Removed.png',
 		'compound-oral-tadalafil' => 'tadalafil tablets.webp',
 		'compound-sildenafil' => 'sildenafil tablets.webp',
 		'bpc' => 'bpc-157-square-v2 Background Removed Background Removed.png',
