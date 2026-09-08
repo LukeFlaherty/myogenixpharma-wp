@@ -58,7 +58,6 @@ $_footer_groups = [
 
 		<div class="home-footer__bottom grunge-footer__bottom">
 			<p class="home-footer__copy grunge-footer__copy">© <?php echo $_footer_year; ?> MyoGenix Pharma. For informational purposes only. Not medical advice.</p>
-			<p class="home-footer__disclaimer grunge-footer__disclaimer">Compounded medications are not FDA-approved.</p>
 		</div>
 	</div>
 </footer>

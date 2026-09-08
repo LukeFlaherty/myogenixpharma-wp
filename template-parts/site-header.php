@@ -36,7 +36,9 @@ $_nav_links = array_values( array_filter(
 ) );
 $_nav_links = array_slice( $_nav_links, 0, 3 );
 
-$_mobile_links = array_merge( $_nav_all_links, [
+$_mobile_links = array_merge( [
+	[ 'label' => 'Home', 'url' => home_url( '/' ), 'match' => [ '/' ] ],
+], $_nav_all_links, [
 	[ 'label' => 'How it works', 'url' => home_url( '/#how-it-works' ), 'match' => [] ],
 	[ 'label' => 'FAQ', 'url' => home_url( '/#faq' ), 'match' => [] ],
 ] );
@@ -52,6 +54,9 @@ $_mobile_links = array_merge( $_nav_all_links, [
 
 		<nav class="home-nav__links grunge-nav__links" aria-label="Primary navigation">
 			<ul class="home-nav__menu-list grunge-nav__menu-list">
+				<li class="<?php echo $_nav_path === '/' ? 'current-menu-item' : ''; ?>">
+					<a href="<?php echo esc_url( home_url( '/' ) ); ?>">Home</a>
+				</li>
 				<?php foreach ( $_nav_links as $_link ) :
 					$_active = in_array( $_nav_path, $_link['match'], true );
 				?>
