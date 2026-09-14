@@ -105,7 +105,7 @@ $programs = [
 	],
 ];
 
-$featured_keys = [ 'testosterone', 'tirzepatide', 'semaglutide', 'tadalafil', 'sildenafil', 'bpc', 'nad' ];
+$featured_keys = [ 'testosterone', 'hcg', 'tirzepatide', 'semaglutide', 'tadalafil', 'sildenafil', 'bpc', 'nad' ];
 
 $symptoms = [
 	'Low energy',
