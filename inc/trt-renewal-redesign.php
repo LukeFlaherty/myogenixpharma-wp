@@ -31,6 +31,14 @@ const MYOGENIX_TRT_PRODUCT_ID   = 883;
 const MYOGENIX_TRT_WEEK_TARGET  = 9;
 const MYOGENIX_TRT_CONSENT_TTL  = 85 * DAY_IN_SECONDS; // must expire before the ~90-day native renewal date
 
+// Adam's heads-up: gets a week-9 notice for every TRT cycle regardless of
+// MYOGENIX_TRT_REDESIGN_LIVE (informational only, no orders/charges), plus a
+// no-response nudge if the patient hasn't clicked Continue/Decline after
+// MYOGENIX_TRT_NORESPONSE_DAYS days (the latter only fires once the redesign
+// is actually live, since that's the only time a patient email went out).
+const MYOGENIX_TRT_ADMIN_EMAILS    = array( 'adam@myogenixpharma.com', 'adam@myogenix.com' );
+const MYOGENIX_TRT_NORESPONSE_DAYS = 75; // ~10 days of runway before the day-85 consent link expiry
+
 // Flip to true only after the lab requisition integration below has been
 // verified end-to-end against a real (non-sandbox) order (see plan step
 // 4/5). While false, the week-9 cron still runs its detection but sends no
@@ -178,9 +186,90 @@ function myogenix_trt_run_week9_check() {
 			myogenix_trt_send_consent_email( $subscription, $cycle_start_ts );
 		}
 
+		myogenix_trt_notify_admin_week9( $subscription, MYOGENIX_TRT_REDESIGN_LIVE );
+
 		$subscription->update_meta_data( '_trt_consent_sent_for', $cycle_start_ts );
 		$subscription->save();
 	}
+}
+
+function myogenix_trt_notify_admin_week9( WC_Subscription $subscription, $patient_email_sent ) {
+	$name        = trim( $subscription->get_billing_first_name() . ' ' . $subscription->get_billing_last_name() );
+	$status_line = $patient_email_sent
+		? 'Consent email sent to the patient.'
+		: 'Patient consent email NOT sent — the TRT renewal redesign is not live yet (MYOGENIX_TRT_REDESIGN_LIVE = false), so this is detection-only.';
+
+	wp_mail(
+		MYOGENIX_TRT_ADMIN_EMAILS,
+		"TRT week 9 reached — subscription #{$subscription->get_id()} ({$name})",
+		"{$name} ({$subscription->get_billing_email()}) has reached week 9 of their TRT cycle — the labs/renewal consent window is open.\n\n"
+		. "{$status_line}\n\n"
+		. 'Subscription: ' . $subscription->get_edit_order_url()
+	);
+}
+
+// ─── No-response nudge (daily, same cron) ──────────────────────────────────
+//
+// Only meaningful once MYOGENIX_TRT_REDESIGN_LIVE is true, since that's the
+// only time a consent email actually reached the patient.
+
+add_action( 'myogenix_trt_week9_cron', 'myogenix_trt_run_noresponse_check' );
+
+function myogenix_trt_run_noresponse_check() {
+	if ( ! MYOGENIX_TRT_REDESIGN_LIVE || ! function_exists( 'wcs_get_subscriptions' ) ) {
+		return;
+	}
+
+	$subs = wcs_get_subscriptions( array(
+		'subscription_status'    => 'active',
+		'subscriptions_per_page' => -1,
+		'product_id'             => MYOGENIX_TRT_PRODUCT_ID,
+	) );
+
+	foreach ( $subs as $subscription_id => $subscription ) {
+		$cycle_start_ts = myogenix_trt_cycle_start_ts( $subscription );
+		if ( ! $cycle_start_ts ) {
+			continue;
+		}
+
+		$sent_for = $subscription->get_meta( '_trt_consent_sent_for' );
+		if ( (string) $sent_for !== (string) $cycle_start_ts ) {
+			continue; // no consent email sent this cycle
+		}
+
+		$resolved_for = $subscription->get_meta( '_trt_consent_resolved_for' );
+		if ( (string) $resolved_for === (string) $cycle_start_ts ) {
+			continue; // patient already responded
+		}
+
+		$days_elapsed = (int) floor( ( time() - $cycle_start_ts ) / DAY_IN_SECONDS );
+		if ( $days_elapsed < MYOGENIX_TRT_NORESPONSE_DAYS ) {
+			continue;
+		}
+
+		$already_nudged = $subscription->get_meta( '_trt_admin_noresponse_sent_for' );
+		if ( (string) $already_nudged === (string) $cycle_start_ts ) {
+			continue; // already nudged this cycle
+		}
+
+		myogenix_trt_notify_admin_noresponse( $subscription, $days_elapsed );
+
+		$subscription->update_meta_data( '_trt_admin_noresponse_sent_for', $cycle_start_ts );
+		$subscription->save();
+	}
+}
+
+function myogenix_trt_notify_admin_noresponse( WC_Subscription $subscription, $days_elapsed ) {
+	$name          = trim( $subscription->get_billing_first_name() . ' ' . $subscription->get_billing_last_name() );
+	$expires_day   = (int) ( MYOGENIX_TRT_CONSENT_TTL / DAY_IN_SECONDS );
+
+	wp_mail(
+		MYOGENIX_TRT_ADMIN_EMAILS,
+		"TRT renewal no response — subscription #{$subscription->get_id()} ({$name})",
+		"{$name} ({$subscription->get_billing_email()}) was sent a TRT renewal consent email at week 9 and hasn't responded after {$days_elapsed} days.\n\n"
+		. "The consent link expires around day {$expires_day} of the cycle — after that, native WooCommerce Subscriptions renewal behavior takes over on its own schedule.\n\n"
+		. 'Subscription: ' . $subscription->get_edit_order_url()
+	);
 }
 
 function myogenix_trt_send_consent_email( WC_Subscription $subscription, $cycle_start_ts ) {
