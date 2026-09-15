@@ -204,7 +204,7 @@ add_action( 'wp_footer', function() {
 add_action( 'wp_enqueue_scripts', function() {
 	$program_slugs = [ 'weight-management', 'mens-health', 'sexual-health', 'wellness', 'womens-health', 'medications', 'select-medication' ];
 	$product_category_slugs = [ 'weight-loss', 'mens-health', 'sexual-health', 'peptides-longevity', 'womens-health', 'uncategorized' ];
-	$is_coded_grunge_page = is_front_page() || is_page( $program_slugs ) || is_singular( 'product' ) || is_page( 'retatrutide' );
+	$is_coded_grunge_page = is_front_page() || is_page( $program_slugs ) || is_singular( 'product' ) || is_page( [ 'retatrutide', 'trt-renewal' ] );
 	if ( function_exists( 'is_product_category' ) && is_product_category( $product_category_slugs ) ) {
 		$is_coded_grunge_page = true;
 	}
@@ -228,6 +228,12 @@ add_filter( 'template_include', function( $template ) {
 	$program_template = locate_template( 'page-program-category.php' );
 	return $program_template ?: $template;
 }, 50 );
+
+add_action( 'wp_enqueue_scripts', function() {
+	if ( is_page( 'trt-renewal' ) ) {
+		wp_enqueue_style( 'myogenix-trt-renewal', get_stylesheet_directory_uri() . '/assets/css/trt-renewal.css', [ 'myogenix-grunge-redesign' ], '1.0.0' );
+	}
+} );
 
 // ─── TRT Article page styles ─────────────────────────────────────────────────
 add_action( 'wp_enqueue_scripts', function() {

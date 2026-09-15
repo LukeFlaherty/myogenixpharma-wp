@@ -1,0 +1,62 @@
+<?php
+/** Template Name: TRT Ordering and Renewal Guide */
+defined( 'ABSPATH' ) || exit;
+add_filter( 'body_class', function( $classes ) { $classes[] = 'grunge-redesign-page'; return $classes; } );
+get_header();
+?>
+<main id="content" class="trt-renewal">
+<section class="trt-renewal__hero"><div class="grunge-container">
+<div class="trt-renewal__hero-grid"><div>
+<p class="grunge-kicker">Your TRT care guide</p>
+<h1><span class="grunge-word grunge-word--white">Clear steps.</span><span class="grunge-word grunge-word--red">Continued care.</span></h1>
+<p class="lead">From your first order to your next renewal. Know what to expect, what to do, and when your care team steps in.</p>
+<nav class="trt-renewal__jump" aria-label="Guide sections"><a href="#first-order">First order</a><a href="#renewal">Renewal</a><a href="#emails">Your emails</a><a href="#staff">Staff guide</a><a href="#questions">Questions</a></nav>
+</div><aside class="trt-renewal__map" aria-label="Renewal at a glance"><p class="grunge-kicker">Renewal at a glance</p><ol><li>Choose Continue or Pause</li><li>Complete follow-up labs</li><li>Your provider reviews</li><li>Payment, then pharmacy fulfillment</li></ol></aside></div>
+<?php if ( ! MYOGENIX_TRT_REDESIGN_LIVE ) : ?><div class="trt-renewal__notice"><strong>Introducing our new renewal check-in.</strong> The email-based renewal process below is being prepared for launch. Existing subscription arrangements still apply. Until you receive a renewal check-in email, contact our team to confirm your next steps.</div><?php endif; ?>
+</div></section>
+<section id="first-order" class="trt-renewal__section"><div class="grunge-container">
+<div class="trt-renewal__section-intro"><p class="grunge-kicker">Starting treatment</p><h2>Your first TRT order</h2><p>Your provider determines whether treatment is appropriate. Placing an order starts the evaluation process; it does not guarantee a prescription.</p></div>
+<div class="trt-renewal__grid">
+<article class="trt-renewal__step"><span class="number">01 / GET STARTED</span><h3>Choose your TRT path</h3><p>Start on the <a href="<?php echo esc_url( home_url( '/product/testosterone/' ) ); ?>">testosterone page</a>, review your selection and checkout total, and complete the medical questionnaire. Use an email address you check regularly.</p><p>Review any evaluation or lab charges shown at checkout separately from the medication amount due after provider approval.</p></article>
+<article class="trt-renewal__step"><span class="number">02 / LAB WORK</span><h3>Follow your lab instructions</h3><p>If labs are needed, watch for your lab-work email. Your requisition is the lab order form that tells the lab which tests your provider requested.</p><p>Download it, use the scheduling links, and bring the form and photo ID to your appointment. If you have recent results, ask the care team whether your provider can accept them.</p></article>
+<article class="trt-renewal__step"><span class="number">03 / PROVIDER REVIEW</span><h3>Meet your provider</h3><p>The care team coordinates your next steps once your information and results are ready. Your provider reviews your history and labs, completes the consultation, and decides whether to prescribe treatment.</p><p>Respond promptly if the team needs more information.</p></article>
+<article class="trt-renewal__step"><span class="number">04 / YOUR TREATMENT PLAN</span><h3>Approval, payment &amp; delivery</h3><p>Medication payment is processed after provider approval. Once payment succeeds, the prescription can proceed to pharmacy fulfillment.</p><p>Look for your payment receipt and delivery updates. Follow your provider’s treatment instructions and contact the care team with questions.</p></article>
+</div></div></section>
+<section id="renewal" class="trt-renewal__section"><div class="grunge-container">
+<div class="trt-renewal__section-intro"><p class="grunge-kicker">Your next treatment cycle</p><h2>One check-in. Two clear choices.</h2><p>For patients using the new renewal process, we begin the check-in around week 9 of the treatment cycle so there is time for labs and provider review. Your email includes your response deadline.</p></div>
+<div class="trt-renewal__choices"><article><h3>Continue my renewal</h3><p>Choose Continue in your email, then confirm on the next page. We request follow-up labs and prepare your renewal order.</p><p><strong>Confirming does not charge your card.</strong> Complete your labs and any requested follow-up. Payment is processed only after provider approval.</p></article><article><h3>Pause my renewal</h3><p>Choose Pause in your email, then confirm. Your subscription goes on hold, and the care team is notified.</p><p><strong>No renewal payment is taken for this choice.</strong> If you change your mind, contact the team to discuss restarting.</p></article></div>
+<div class="trt-renewal__grid">
+<article class="trt-renewal__step"><span class="number">AFTER CONTINUE</span><h3>Complete the lab visit</h3><p>Open “Next Step: Complete Your Lab Work.” Download the requisition and follow the Quest location and appointment links. If prompted for a test type during scheduling, follow the email’s instructions.</p><p>Use the preparation instructions provided by your lab or care team. Missing the email or unable to open the form? Contact us before booking another order.</p></article>
+<article class="trt-renewal__step"><span class="number">AFTER YOUR LABS</span><h3>Review, then renewal</h3><p>Your provider reviews the results and renewal request. The team contacts you if a consultation or more information is needed. Approval comes before payment; successful payment comes before pharmacy fulfillment.</p><p>The charge follows approval and may occur before your current supply runs out. Check your receipt for the amount charged and your account for the next scheduled date.</p></article>
+</div>
+<div class="trt-renewal__notice"><strong>Haven’t decided yet?</strong> If you have not responded around day 75, we notify the care team to follow up. If you still have not responded by the deadline (day 85), the new renewal process places your subscription on hold without a renewal charge. Opening the email or clicking a button alone does not record your choice—you confirm it on the next page.</div>
+</div></section>
+<section id="emails" class="trt-renewal__section"><div class="grunge-container">
+<p class="grunge-kicker">Know what’s in your inbox</p><h2>Which email means what?</h2>
+<div class="trt-renewal__table-wrap"><table><caption class="screen-reader-text">Patient emails and the next step for each</caption><thead><tr><th scope="col">Email</th><th scope="col">Why you receive it</th><th scope="col">Your next step</th></tr></thead><tbody>
+<tr><td>Your renewal is ready to review</td><td>It is time to choose whether to continue or pause.</td><td>Choose one of the two buttons and confirm on the website.</td></tr>
+<tr><td>We’ve received your renewal request</td><td>Your Continue choice was saved and your labs were requested. This is not a payment receipt.</td><td>Watch for your separate lab instructions.</td></tr>
+<tr><td>Next Step: Complete Your Lab Work</td><td>Your lab form and scheduling instructions are ready. This may arrive before the renewal confirmation.</td><td>Download the requisition and arrange your lab visit.</td></tr>
+<tr><td>Your renewal has been paused</td><td>Your Pause choice was saved and your subscription is on hold.</td><td>Contact the team if you want to restart or have questions.</td></tr>
+<tr><td>Prescription approval / payment receipt</td><td>Your provider approved treatment and payment was processed.</td><td>Review the amount and watch for fulfillment updates.</td></tr>
+</tbody></table></div></div></section>
+<section id="staff" class="trt-renewal__section"><div class="grunge-container">
+<div class="trt-renewal__section-intro"><p class="grunge-kicker">For the care team</p><h2>Keep every patient moving.</h2><p>Use the patient’s subscription and current renewal order together. The original order, new renewal order, and lab requisition are different records for the same care journey.</p></div>
+<div class="trt-renewal__grid">
+<article class="trt-renewal__step"><h3>Week 9: check-in</h3><p>A staff heads-up identifies a subscription approaching renewal. Confirm that the patient received their invitation and has a valid email and provider patient record.</p><p>During rollout, a staff heads-up alone does not mean a patient invitation was sent. Verify the patient communication before following up.</p></article>
+<article class="trt-renewal__step"><h3>Continue: labs &amp; review</h3><p>Confirm the patient’s choice, the current renewal order, and the associated lab request. Help the patient locate the requisition and schedule their visit.</p><p>A pending renewal is awaiting the care process; do not ask the patient to pay it before provider approval.</p></article>
+<article class="trt-renewal__step"><h3>Pause or no response</h3><p>After a confirmed Pause, the subscription is on hold. For unanswered invitations, follow up when notified around day 75 and check the hold after the response deadline.</p><p>Discuss the patient’s wishes before arranging a restart. Pausing renewal is an administrative choice; medication questions go to the provider.</p></article>
+<article class="trt-renewal__step"><h3>Resolve a missing step</h3><p>If a lab request is delayed or a link fails, check the existing lab record before issuing another request. Confirm that provider approval references the current renewal order.</p><p>If payment fails, use the existing order and payment follow-up process. Verify successful payment before pharmacy fulfillment; do not create a second renewal to work around an error.</p></article>
+</div></div></section>
+<section id="questions" class="trt-renewal__section"><div class="grunge-container">
+<p class="grunge-kicker">A little clarity</p><h2>Common questions</h2>
+<details><summary>Does clicking Continue charge me immediately?</summary><p>No. In the new renewal process, you first confirm your choice on the website. That requests labs and prepares the renewal. The renewal charge happens only after provider approval.</p></details>
+<details><summary>Is the lab-work email a second order or another bill?</summary><p>It is the instruction email for completing your lab work. The requisition is your lab order form. Receiving this email does not mean your medication renewal has been approved or charged.</p></details>
+<details><summary>What if my link has expired or I already responded?</summary><p>Contact the care team. A personal renewal link is tied to one treatment cycle. An old link cannot be used to start another renewal or reverse a completed choice.</p></details>
+<details><summary>How long will labs, approval, and shipping take?</summary><p>Timing depends on appointment availability, results, provider review, and pharmacy fulfillment. Complete each requested step promptly. If you are concerned about your remaining supply, contact the team so they can review your situation.</p></details>
+<details><summary>Can I change my treatment or restart after pausing?</summary><p>Contact the care team to discuss the next steps. Your provider determines any treatment changes and whether updated labs or a consultation are needed.</p></details>
+<details><summary>Where do I find my order and payment details?</summary><p>Sign in to <a href="<?php echo esc_url( home_url( '/my-account/' ) ); ?>">My Account</a> for your orders and subscription details. For help understanding a charge or your next date, contact support with your order number.</p></details>
+</div></section>
+<section class="trt-renewal__section"><div class="grunge-container trt-renewal__support"><div><p class="grunge-kicker">Guided by humans</p><h2>Not sure what’s next?</h2><p>Email <a href="mailto:support@myogenixpharma.com">support@myogenixpharma.com</a>. Your care team can help.</p></div><a class="grunge-btn grunge-btn--red" href="<?php echo esc_url( home_url( '/reach-a-concierge/' ) ); ?>">Ask your care team →</a></div></section>
+</main>
+<?php get_footer(); ?>

@@ -3,28 +3,29 @@
 defined( 'ABSPATH' ) || exit;
 
 function myogenix_trt_email_shell( $title, $content, $preview = '' ) {
+	$texture = set_url_scheme( get_stylesheet_directory_uri(), 'https' ) . '/assets/images/grunge-redesign/' . rawurlencode( 'grunge black section bg blank.png' );
+	$logo = set_url_scheme( get_stylesheet_directory_uri(), 'https' ) . '/assets/images/trt-email-logo.png';
 	return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . esc_html( $title ) . '</title></head>'
-		. '<body style="margin:0;background:#f2f2f2;color:#202020;font-family:Arial,Helvetica,sans-serif"><div style="display:none;max-height:0;overflow:hidden;opacity:0">' . esc_html( $preview ) . '</div>'
-		. '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f2f2f2"><tr><td align="center" style="padding:32px 16px"><table role="presentation" width="560" cellpadding="0" cellspacing="0" style="width:100%;max-width:560px;background:#fff;border:1px solid #dedede">'
-		. '<tr><td style="background:#111;padding:27px 32px;border-bottom:4px solid #dc2626"><a href="' . esc_url( home_url( '/' ) ) . '" style="color:#fff;text-decoration:none;font-size:25px;font-weight:800;letter-spacing:2px">MYOGENIX<span style="color:#ef4444">.</span></a><div style="color:#c7c7c7;font-size:10px;letter-spacing:4px;margin-top:5px">PHARMA</div></td></tr>'
-		. '<tr><td style="padding:32px;font-size:16px;line-height:1.65"><p style="font-size:11px;font-weight:bold;letter-spacing:2px;color:#b91c1c;margin:0 0 12px">YOUR CARE. YOUR CHOICE.</p><h1 style="font-size:29px;line-height:1.2;letter-spacing:-0.5px;margin:0 0 24px;color:#111">' . esc_html( $title ) . '</h1>' . $content . '</td></tr>'
-		. '<tr><td style="padding:23px 32px;background:#fafafa;border-top:1px solid #e5e5e5;font-size:13px;line-height:1.6;color:#666">Here to help.<br>Reply to this email or contact <a style="color:#a61b1b" href="mailto:support@myogenixpharma.com">support@myogenixpharma.com</a>.<br><span style="font-size:11px">Myogenix Pharma · Your renewal support team</span></td></tr></table></td></tr></table></body></html>';
+		. '<body style="margin:0;background:#090909;color:#fff;font-family:Arial,Helvetica,sans-serif"><div style="display:none;max-height:0;overflow:hidden;opacity:0">' . esc_html( $preview ) . '</div>'
+		. '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#090909"><tr><td align="center" style="padding:24px 12px"><table role="presentation" width="560" cellpadding="0" cellspacing="0" bgcolor="#111111" style="width:100%;max-width:560px;border:1px solid #442020;background:#111 url(' . esc_url( $texture ) . ') center/cover">'
+		. '<tr><td style="padding:28px 28px 22px;border-bottom:2px solid #a82323"><a href="' . esc_url( home_url( '/' ) ) . '"><img src="' . esc_url( $logo ) . '" width="184" alt="MYOGENIX PHARMA" style="display:block;width:184px;max-width:100%;height:auto;border:0;color:#fff"></a></td></tr>'
+		. '<tr><td style="padding:30px 28px;font-size:15px;line-height:1.6;color:#e4e4e7"><p style="font-size:11px;font-weight:bold;letter-spacing:3px;color:#ef5350;margin:0 0 14px">YOUR CARE. YOUR CHOICE.</p><h1 style="font-family:Impact,Arial Narrow,Arial,sans-serif;font-size:44px;font-weight:900;text-transform:uppercase;line-height:1.05;letter-spacing:0.5px;margin:0 0 25px;color:#fff">' . esc_html( $title ) . '</h1>' . $content . '</td></tr>'
+		. '<tr><td style="padding:20px 28px;background:#0b0b0b;border-top:1px solid #442020;font-size:12px;line-height:1.7;color:#b8b8bd"><a href="' . esc_url( home_url( '/trt-renewal/' ) ) . '" style="color:#fff;text-decoration:underline">How TRT ordering &amp; renewal work</a><br>Need help? Reply or <a style="color:#fff" href="mailto:support@myogenixpharma.com">contact your care team</a>.</td></tr></table></td></tr></table></body></html>';
 }
 
 function myogenix_trt_email_button( $url, $label, $secondary = false ) {
-	return '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:14px 0;width:100%"><tr><td align="center" style="border-radius:4px;background:' . ( $secondary ? '#f4f4f4' : '#b91c1c' ) . ';border:1px solid ' . ( $secondary ? '#ddd' : '#b91c1c' ) . '"><a href="' . esc_url( $url ) . '" style="display:block;padding:15px 20px;color:' . ( $secondary ? '#252525' : '#fff' ) . ';font-size:15px;font-weight:bold;text-decoration:none">' . esc_html( $label ) . '</a></td></tr></table>';
+	return '<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:12px 0;width:100%"><tr><td align="center" bgcolor="' . ( $secondary ? '#141414' : '#c8322e' ) . '" style="border:2px solid ' . ( $secondary ? '#929292' : '#e14b44' ) . '"><a href="' . esc_url( $url ) . '" style="display:block;padding:20px 12px;color:#fff;font-family:Impact,Arial Narrow,Arial,sans-serif;font-size:23px;line-height:1.2;letter-spacing:0.7px;font-weight:bold;text-transform:uppercase;text-decoration:none">' . esc_html( $label ) . '</a></td></tr></table>';
 }
 
 function myogenix_trt_consent_email_html( $sub, $cycle ) {
 	$args = array( 'subscription_id' => $sub->get_id(), 'cycle_start' => $cycle, 'token' => myogenix_trt_consent_token( $sub->get_id(), $cycle ) );
 	$date = wp_date( 'F j, Y', $cycle + MYOGENIX_TRT_CONSENT_TTL );
-	$content = '<p>Hi ' . esc_html( $sub->get_billing_first_name() ?: 'there' ) . ',</p><p>You’re approaching the next renewal of your testosterone treatment. It’s time to let us know how you’d like to proceed.</p>'
-		. '<div style="background:#f7f7f7;border-left:3px solid #dc2626;padding:16px 20px;margin:24px 0"><strong>What happens if you continue?</strong><br>We’ll request your follow-up labs and prepare your renewal for provider review. <strong>No renewal payment is taken when you confirm.</strong> Payment is processed only after provider approval.</div>'
-		. myogenix_trt_email_button( myogenix_trt_consent_url( $args + array( 'action' => 'continue' ) ), 'Review & continue treatment' )
+	$content = myogenix_trt_email_button( myogenix_trt_consent_url( $args + array( 'action' => 'continue' ) ), 'Continue my renewal →' )
 		. myogenix_trt_email_button( myogenix_trt_consent_url( $args + array( 'action' => 'decline' ) ), 'Pause my renewal', true )
-		. '<p style="font-size:13px;color:#666">You’ll confirm your choice on the next page. Please respond by <strong>' . esc_html( $date ) . '</strong>. If you don’t respond, your renewal will pause for our team to follow up.</p><p style="font-size:13px;color:#666">This link is personal to you. Please don’t forward it.</p><p>With you at every step,<br><strong>The Myogenix Pharma team</strong></p>';
-	if ( myogenix_trt_is_qa( $sub ) ) { $content = '<p style="padding:10px;background:#fff1d6;font-size:12px"><strong>TEST PREVIEW</strong> · Fake subscription. No live card will be charged.</p>' . $content; }
-	return myogenix_trt_email_shell( 'Ready for your next step?', $content, 'Review your renewal options. No renewal payment is taken when you confirm.' );
+		. '<p style="margin:24px 0 12px"><strong style="color:#fff">No renewal charge when you confirm.</strong><br>Continue → follow-up labs → provider review → payment after approval.</p>'
+		. '<p style="font-size:13px;color:#b8b8bd;margin:0">Confirm your choice on the next page by <strong style="color:#fff">' . esc_html( $date ) . '</strong>. No response? We’ll pause your renewal and follow up.</p><p style="font-size:11px;color:#a1a1aa;margin:16px 0 0">This link is just for you. Please don’t forward it.</p>';
+	if ( myogenix_trt_is_qa( $sub ) ) { $content .= '<p style="color:#f6cf82;font-size:11px;margin:14px 0 0"><strong>TEST PREVIEW</strong> · Fake subscription. No live card will be charged.</p>'; }
+	return myogenix_trt_email_shell( 'Your TRT. Your next step.', $content, 'Continue or pause your renewal. Confirming does not charge your card.' );
 }
 
 function myogenix_trt_mail( $sub, $subject, $body ) {
@@ -36,7 +37,7 @@ function myogenix_trt_send_consent_email( WC_Subscription $sub, $cycle ) {
 function myogenix_trt_send_response_email( $sub, $action ) {
 	$title = 'continue' === $action ? 'Your renewal is underway.' : 'Your renewal is paused.';
 	$content = 'continue' === $action
-		? '<p>Thanks for confirming you’d like to continue. We’ve requested your follow-up labs and prepared renewal order <strong>#' . absint( $sub->get_meta( '_trt_pending_renewal_order' ) ) . '</strong> for review.</p><p><strong>No renewal payment has been taken.</strong> Your provider will review your labs before a renewal payment is processed.</p><p>Our team will help with your lab requisition and next steps. If you need assistance, reply to this email.</p>'
+		? '<p>Thanks for confirming you’d like to continue. We’ve requested your follow-up labs and prepared renewal order <strong>#' . absint( $sub->get_meta( '_trt_pending_renewal_order' ) ) . '</strong> for review.</p><p><strong>No renewal payment has been taken.</strong> Your provider will review your labs before a renewal payment is processed.</p><p>Watch for “Next Step: Complete Your Lab Work” with your lab form and scheduling links. Need help or can’t find it? Reply to this email.</p>'
 		: '<p>We’ve recorded your choice and placed your subscription on hold. <strong>No renewal payment has been taken.</strong></p><p>Our team will follow up with you. If you change your mind, reply to this email and we’ll help you with the next steps.</p>';
 	return myogenix_trt_mail( $sub, 'continue' === $action ? 'We’ve received your renewal request' : 'Your renewal has been paused', myogenix_trt_email_shell( $title, '<p>Hi ' . esc_html( $sub->get_billing_first_name() ?: 'there' ) . ',</p>' . $content ) );
 }
@@ -47,9 +48,19 @@ function myogenix_trt_staff_notice( $sub, $subject, $message ) {
 }
 
 function myogenix_trt_page_html( $title, $body, $status = 200 ) {
-	return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><title>' . esc_html( $title ) . ' | Myogenix Pharma</title><style>'
-		. '*{box-sizing:border-box}body{margin:0;background:#111;color:#1b1b1b;font-family:Arial,Helvetica,sans-serif;line-height:1.65}header{padding:27px 24px;border-bottom:1px solid #333}.brand{font-weight:900;letter-spacing:2px;font-size:24px;color:#fff;text-decoration:none}.brand b{color:#ef4444}.brand small{display:block;font-size:9px;letter-spacing:5px;color:#bdbdbd}main{max-width:640px;margin:48px auto;padding:36px;background:#fff;border-top:4px solid #dc2626;border-radius:5px}.kicker{font-size:11px;letter-spacing:2px;font-weight:bold;color:#b91c1c}h1{font-size:36px;line-height:1.15;letter-spacing:-1px;margin:14px 0 24px}p{margin:18px 0}.steps{background:#f5f5f5;padding:20px 24px;margin:24px 0;border-left:3px solid #dc2626}.steps ol{padding-left:20px;margin:0}.steps li+li{margin-top:10px}button,.button{width:100%;display:block;background:#b91c1c;color:#fff;padding:16px 20px;border:0;border-radius:4px;font-size:16px;font-weight:bold;cursor:pointer;text-align:center;text-decoration:none}button:hover,.button:hover{background:#991b1b}button:focus-visible,a:focus-visible{outline:3px solid #2563eb;outline-offset:4px}.secondary{background:#eee;color:#222;margin-top:12px}.secondary:hover{background:#ddd}.muted{color:#666;font-size:13px}.support{border-top:1px solid #ddd;margin-top:28px;padding-top:20px;font-size:13px;color:#666}a{color:#a61b1b}.test{background:#fff1d6;padding:10px 15px;font-size:12px}footer{text-align:center;font-size:12px;color:#aaa;margin:28px 16px 40px}@media(max-width:680px){header{padding:22px}main{margin:24px 16px;padding:26px 22px}h1{font-size:30px}.steps{padding:16px 18px}.support a{overflow-wrap:anywhere}}'
-		. '</style></head><body><header><a class="brand" href="' . esc_url( home_url( '/' ) ) . '">MYOGENIX<b>.</b><small>PHARMA</small></a></header><main><div class="kicker">YOUR CARE. YOUR CHOICE.</div><h1>' . esc_html( $title ) . '</h1>' . $body . '<div class="support">We’re here to help.<br><a href="mailto:support@myogenixpharma.com">support@myogenixpharma.com</a></div></main><footer>Myogenix Pharma · Your renewal support team</footer></body></html>';
+	// Reuse the real navigation/footer without wp_head/wp_footer: signed links
+	// must not load analytics, chat, or other third-party tracking scripts.
+	ob_start();
+	get_template_part( 'template-parts/site-header' );
+	$header = ob_get_clean();
+	ob_start();
+	get_template_part( 'template-parts/site-footer' );
+	$footer = ob_get_clean();
+	$base = set_url_scheme( get_stylesheet_directory_uri(), 'https' );
+	return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><title>' . esc_html( $title ) . ' | Myogenix Pharma</title>'
+		. '<link rel="stylesheet" href="' . esc_url( $base . '/assets/css/home.css?ver=1.5.0' ) . '"><link rel="stylesheet" href="' . esc_url( $base . '/assets/css/grunge-redesign.css?ver=0.3.9' ) . '"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=Oswald:wght@700&amp;family=Poppins:wght@400;500;600;700;800&amp;display=swap"><link rel="stylesheet" href="' . esc_url( $base . '/assets/css/trt-renewal.css?ver=1.0.0' ) . '"></head><body class="grunge-redesign-page trt-consent-page">'
+		. $header . '<main id="content" class="trt-renewal trt-consent"><div class="trt-consent__layout"><section class="trt-consent__intro"><p class="grunge-kicker">TRT renewal check-in</p><h1><span class="grunge-word grunge-word--white">Your care.</span><span class="grunge-word grunge-word--red">Your choice.</span></h1><p>A clear next step.<br>A care team in your corner.</p><a href="' . esc_url( home_url( '/trt-renewal/' ) ) . '">How your renewal works →</a></section><section class="trt-consent__card" aria-labelledby="renewal-title"><h2 id="renewal-title">' . esc_html( $title ) . '</h2>' . $body
+		. '<div class="support">Need a hand? <a href="mailto:support@myogenixpharma.com">Email your care team</a> or <a href="' . esc_url( home_url( '/reach-a-concierge/' ) ) . '">reach a concierge</a>.</div></section></div></main>' . $footer . '<script src="' . esc_url( $base . '/assets/js/home.js?ver=1.6.2' ) . '" defer></script></body></html>';
 }
 function myogenix_trt_html_response( $body, $status = 200, $title = 'Your renewal' ) {
 	nocache_headers();
@@ -57,7 +68,7 @@ function myogenix_trt_html_response( $body, $status = 200, $title = 'Your renewa
 	header( 'Content-Type: text/html; charset=utf-8' );
 	header( 'Referrer-Policy: no-referrer' );
 	header( 'X-Robots-Tag: noindex, nofollow' );
-	header( "Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'" );
+	header( "Content-Security-Policy: default-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'" );
 	echo myogenix_trt_page_html( $title, $body, $status ); // Generated HTML; dynamic values are escaped at construction.
 	exit;
 }
@@ -74,7 +85,7 @@ add_action( 'template_redirect', function () {
 		$result = myogenix_trt_process_consent( $params );
 		if ( is_wp_error( $result ) ) { myogenix_trt_render_error( $result ); }
 		$continued = 'continue' === $result['action'];
-		myogenix_trt_html_response( $continued ? '<p>We’ve requested your follow-up labs and prepared your renewal for provider review.</p><div class="steps"><strong>No renewal payment has been taken.</strong><p>Our team will help with your lab requisition and next steps. Payment is processed only after provider approval.</p></div><p>Look for a confirmation in your inbox.</p>' : '<p>Your subscription is now on hold. No renewal payment has been taken.</p><p>Our team will follow up. If you change your mind, contact us and we’ll help you with the next steps.</p>', 200, $continued ? 'Your renewal is underway.' : 'Your renewal is paused.' );
+		myogenix_trt_html_response( $continued ? '<p>We’ve requested your follow-up labs and prepared your renewal for provider review.</p><div class="steps"><strong>No renewal payment has been taken.</strong><p>Watch for “Next Step: Complete Your Lab Work” in your inbox. Download your lab form and follow the scheduling instructions. Payment is processed only after provider approval.</p></div><p>Look for a confirmation in your inbox.</p>' : '<p>Your subscription is now on hold. No renewal payment has been taken.</p><p>Our team will follow up. If you change your mind, contact us and we’ll help you with the next steps.</p>', 200, $continued ? 'Your renewal is underway.' : 'Your renewal is paused.' );
 	}
 	$result = myogenix_trt_validate_consent_request( $params );
 	if ( is_wp_error( $result ) ) { myogenix_trt_render_error( $result ); }

@@ -22,6 +22,7 @@ $_footer_groups = [
 	'Company' => [
 		[ 'How it works', home_url( '/#how-it-works' ) ],
 		[ 'FAQ', home_url( '/#faq' ) ],
+		[ 'TRT Ordering & Renewal', home_url( '/trt-renewal/' ) ],
 		[ 'Affiliate Program', home_url( '/affiliate-registration/' ) ],
 		[ 'Concierge', home_url( '/reach-a-concierge/' ) ],
 	],

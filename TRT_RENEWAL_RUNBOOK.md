@@ -66,3 +66,12 @@ Commit and push `main`, then verify the production URL and deployed file hashes.
 - Fake orders were trashed (recoverable), fake subscriptions disabled, and QA allowlisting removed after checks. Provider test patient/lab records remain clearly labeled for provider verification. Do not create another lab request for the same test to compensate for an unknown delivery state.
 - Global Stripe mode remains live; the test-mode override existed only within the controlled CLI payment request.
 - Actual Prescribery-to-site approval correlation and patient requisition delivery are still unverified. Production activation remains blocked on those points and confirmation of the clinical panel. The code is not evidence that Prescribery implements that missing contract.
+
+## Patient experience update — 2026-09-15 afternoon
+
+- Consent and response emails now use the homepage’s black texture, red accents, and a raster export of its existing logo. The invitation leads with a headline and two large choices; next-step detail lives at `/trt-renewal/`.
+- Consent, success, and error pages reuse the actual site navigation/footer and grunge styles. They deliberately omit WordPress head/footer tracking hooks, retain no-cache/no-referrer/noindex protections, and allow only the required styles, fonts, images, and site navigation script.
+- `/trt-renewal/` explains initial ordering, consent renewal, labs, payment, each email’s purpose, and staff follow-up. A launch notice appears while the global renewal switch is off.
+- Luke supplied an inbox screenshot of “Next Step: Complete Your Lab Work” for the fake patient. Email delivery is now evidenced; the linked requisition contents and external approval-to-renewal correlation still need verification. The email is absent from the WordPress mail log and the local integration templates, suggesting provider-side delivery; confirm ownership with Prescribery before changing that template.
+- Global Stripe mode was rechecked as `live`. Scoped test mode must never be replaced with a site-wide switch for QA.
+- The 37 guarded integration checks passed again after the presentation update; all HTTP and mail were mocked for that suite.
