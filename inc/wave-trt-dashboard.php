@@ -103,6 +103,7 @@ function wave_trt_assess( array $f, array $s ) {
 	if ( $s['fees'] ) { $flags[] = 'Recurring subscription includes a lab / consultation fee — verify intent'; $tone = 'amber'; }
 	if ( $s['zero'] ) { $flags[] = 'Active subscription total is zero — verify future billing'; $tone = 'amber'; }
 	if ( $s['multiple'] ) { $flags[] = 'Multiple active TRT subscriptions'; $tone = 'amber'; }
+	if ( ! empty( $s['partial_refund_active'] ) ) { $flags[] = 'Partial refund on an active subscription — verify context'; $tone = 'amber'; }
 	if ( in_array( $f['lab'], array( 'submitting', 'uncertain', 'rejected' ), true ) ) {
 		$flags[] = 'Lab request needs verification; do not resubmit blindly'; $queue = 'attention'; $tone = 'red'; $action = 'Verify the existing lab request with Prescribery.';
 	}
@@ -119,7 +120,7 @@ function wave_trt_money( $order, $amount ) { return wc_price( $amount, array( 'c
 function wave_trt_patient_model( $patient ) {
 	$order = $patient['orders'][0] ?? null;
 	$record = $order ?: $patient['subscriptions'][0];
-	$s = array( 'due_soon' => false, 'overdue' => false, 'fees' => false, 'zero' => false, 'multiple' => false, 'refund_active' => false );
+	$s = array( 'due_soon' => false, 'overdue' => false, 'fees' => false, 'zero' => false, 'multiple' => false, 'refund_active' => false, 'partial_refund_active' => false );
 	$active = 0;
 	foreach ( $patient['subscriptions'] as $sub ) {
 		if ( ! $sub->has_status( 'active' ) ) { continue; }
@@ -134,7 +135,9 @@ function wave_trt_patient_model( $patient ) {
 		// Only flag a refund on this subscription's own related orders, not another plan.
 		$related = $sub->get_related_orders( 'ids', array( 'parent', 'renewal' ) );
 		foreach ( $patient['orders'] as $past ) {
-			if ( in_array( $past->get_id(), array_map( 'intval', $related ), true ) && ( $past->has_status( 'refunded' ) || (float) $past->get_total_refunded() > 0 ) ) { $s['refund_active'] = true; }
+			if ( ! in_array( $past->get_id(), array_map( 'intval', $related ), true ) ) { continue; }
+			if ( $past->has_status( 'refunded' ) || ( (float) $past->get_total_refunded() > 0 && (float) $past->get_total_refunded() >= (float) $past->get_total() ) ) { $s['refund_active'] = true; }
+			elseif ( (float) $past->get_total_refunded() > 0 ) { $s['partial_refund_active'] = true; }
 		}
 	}
 	$s['multiple'] = $active > 1;
@@ -153,7 +156,8 @@ function wave_trt_render() {
 	$counts = array( 'all' => count( $rows ), 'attention' => 0, 'fulfillment' => 0, 'labs' => 0, 'renewal' => 0, 'closed' => 0 );
 	foreach ( $rows as $row ) {
 		if ( in_array( $row['a']['tone'], array( 'red', 'amber' ), true ) ) { $counts['attention']++; }
-		if ( isset( $counts[ $row['a']['queue'] ] ) && ! in_array( $row['a']['queue'], array( 'attention', 'renewal' ), true ) ) { $counts[ $row['a']['queue'] ]++; }
+		if ( isset( $counts[ $row['a']['queue'] ] ) && ! in_array( $row['a']['queue'], array( 'attention', 'renewal', 'closed' ), true ) ) { $counts[ $row['a']['queue'] ]++; }
+		if ( $row['f']['closed'] ) { $counts['closed']++; }
 		if ( $row['s']['due_soon'] ) { $counts['renewal']++; }
 	}
 	?>
@@ -177,6 +181,7 @@ function wave_trt_render() {
 			$ids = array_map( function ( $record ) { return (string) $record->get_id(); }, array_merge( $row['orders'], $row['subscriptions'] ) );
 			$filters = array( 'all', $a['queue'] ); if ( in_array( $a['tone'], array( 'red', 'amber' ), true ) ) { $filters[] = 'attention'; }
 			if ( $row['s']['due_soon'] ) { $filters[] = 'renewal'; }
+			if ( $f['closed'] ) { $filters[] = 'closed'; }
 			?>
 			<article class="wave-patient" data-filters="<?php echo esc_attr( implode( ' ', array_unique( $filters ) ) ); ?>" data-search="<?php echo esc_attr( strtolower( $name . ' ' . $r->get_billing_email() . ' ' . implode( ' ', $ids ) ) ); ?>">
 				<div class="wave-row">

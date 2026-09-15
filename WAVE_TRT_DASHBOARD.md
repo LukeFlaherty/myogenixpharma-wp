@@ -15,7 +15,7 @@ Read-only dashboard restricted to `manage_woocommerce`. No mutation routes, pati
 - Lab creation requires both created state and requisition marker. Intake, lab results, delivery are unconfirmed. Order completion never means confirmed delivery.
 - Transaction reference and positive order total are labeled transaction recorded, not a reconciled medication payment amount. Order totals/refunds can include mixed products or fees; use source order to reconcile.
 - Seven days from creation triggers follow-up for payment without pharmacy evidence; not a clinical turnaround SLA. Upcoming renewals are within 21 days. Counts may overlap.
-- Refund/active flag matches refunded parent or renewal orders to their own active subscription. Historical resolved refunds can still flag until reviewed in source records.
+- Refund/active flag matches refunded parent or renewal orders to their own active subscription. Full refunds are red; partial refunds are amber and ask for context. Historical resolved refunds can still flag until reviewed in source records.
 - No automatic status changes or external provider polling. Refresh for current WooCommerce records.
 
 ## Validation

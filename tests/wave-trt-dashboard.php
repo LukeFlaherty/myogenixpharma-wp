@@ -22,6 +22,8 @@ $a = wave_trt_assess( array_merge( $facts, array( 'pharmacy' => true, 'approved'
 check_rule( 'Pharmacy handoff recorded' === $a['stage'] && str_contains( $a['action'], 'Confirm shipment' ), 'Pharmacy handoff does not prove shipment' );
 $a = wave_trt_assess( array_merge( $facts, array( 'closed' => true, 'status' => 'refunded' ) ), array_merge( $subscription, array( 'refund_active' => true ) ) );
 check_rule( 'red' === $a['tone'] && 'attention' === $a['queue'], 'Refund with active subscription is urgent' );
+$a = wave_trt_assess( $facts, array_merge( $subscription, array( 'partial_refund_active' => true ) ) );
+check_rule( 'amber' === $a['tone'], 'Partial refund calls for context, not an urgent cancellation assumption' );
 $a = wave_trt_assess( $facts, array_merge( $subscription, array( 'fees' => true ) ) );
 check_rule( 'amber' === $a['tone'], 'Recurring consultation fee needs review' );
 $a = wave_trt_assess( $facts, array_merge( $subscription, array( 'zero' => true ) ) );
