@@ -163,7 +163,7 @@ add_action( 'template_redirect', function() {
 add_action( 'wp_footer', function() {
 	if ( is_admin() ) return;
 	$request_path = isset( $_SERVER['REQUEST_URI'] ) ? strtok( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), '?' ) : '';
-	if ( is_page( 'reviews' ) || in_array( $request_path, [ '/reviews', '/reviews/' ], true ) ) return;
+	if ( is_page( [ 'reviews', 'trt-renewal' ] ) || in_array( $request_path, [ '/reviews', '/reviews/' ], true ) ) return;
 	?>
 	<div class="myo-purchase-popup" id="myo-purchase-popup" hidden>
 		<div class="myo-purchase-popup__backdrop" data-myo-popup-close></div>
@@ -231,7 +231,7 @@ add_filter( 'template_include', function( $template ) {
 
 add_action( 'wp_enqueue_scripts', function() {
 	if ( is_page( 'trt-renewal' ) ) {
-		wp_enqueue_style( 'myogenix-trt-renewal', get_stylesheet_directory_uri() . '/assets/css/trt-renewal.css', [ 'myogenix-grunge-redesign' ], '1.0.0' );
+		wp_enqueue_style( 'myogenix-trt-renewal', get_stylesheet_directory_uri() . '/assets/css/trt-renewal.css', [ 'myogenix-grunge-redesign' ], '1.0.1' );
 	}
 } );
 

@@ -1,7 +1,7 @@
 <?php
 /** Template Name: TRT Ordering and Renewal Guide */
 defined( 'ABSPATH' ) || exit;
-add_filter( 'body_class', function( $classes ) { $classes[] = 'grunge-redesign-page'; return $classes; } );
+add_filter( 'body_class', function( $classes ) { $classes[] = 'grunge-redesign-page'; $classes[] = 'myo-disable-purchase-popup'; return $classes; } );
 get_header();
 ?>
 <main id="content" class="trt-renewal">
@@ -34,11 +34,11 @@ get_header();
 <section id="emails" class="trt-renewal__section"><div class="grunge-container">
 <p class="grunge-kicker">Know what’s in your inbox</p><h2>Which email means what?</h2>
 <div class="trt-renewal__table-wrap"><table><caption class="screen-reader-text">Patient emails and the next step for each</caption><thead><tr><th scope="col">Email</th><th scope="col">Why you receive it</th><th scope="col">Your next step</th></tr></thead><tbody>
-<tr><td>Your renewal is ready to review</td><td>It is time to choose whether to continue or pause.</td><td>Choose one of the two buttons and confirm on the website.</td></tr>
-<tr><td>We’ve received your renewal request</td><td>Your Continue choice was saved and your labs were requested. This is not a payment receipt.</td><td>Watch for your separate lab instructions.</td></tr>
-<tr><td>Next Step: Complete Your Lab Work</td><td>Your lab form and scheduling instructions are ready. This may arrive before the renewal confirmation.</td><td>Download the requisition and arrange your lab visit.</td></tr>
-<tr><td>Your renewal has been paused</td><td>Your Pause choice was saved and your subscription is on hold.</td><td>Contact the team if you want to restart or have questions.</td></tr>
-<tr><td>Prescription approval / payment receipt</td><td>Your provider approved treatment and payment was processed.</td><td>Review the amount and watch for fulfillment updates.</td></tr>
+<tr><td data-label="Email">Your renewal is ready to review</td><td data-label="Why you receive it">It is time to choose whether to continue or pause.</td><td data-label="Your next step">Choose one of the two buttons and confirm on the website.</td></tr>
+<tr><td data-label="Email">We’ve received your renewal request</td><td data-label="Why you receive it">Your Continue choice was saved and your labs were requested. This is not a payment receipt.</td><td data-label="Your next step">Watch for your separate lab instructions.</td></tr>
+<tr><td data-label="Email">Next Step: Complete Your Lab Work</td><td data-label="Why you receive it">Your lab form and scheduling instructions are ready. This may arrive before the renewal confirmation.</td><td data-label="Your next step">Download the requisition and arrange your lab visit.</td></tr>
+<tr><td data-label="Email">Your renewal has been paused</td><td data-label="Why you receive it">Your Pause choice was saved and your subscription is on hold.</td><td data-label="Your next step">Contact the team if you want to restart or have questions.</td></tr>
+<tr><td data-label="Email">Prescription approval / payment receipt</td><td data-label="Why you receive it">Your provider approved treatment and payment was processed.</td><td data-label="Your next step">Review the amount and watch for fulfillment updates.</td></tr>
 </tbody></table></div></div></section>
 <section id="staff" class="trt-renewal__section"><div class="grunge-container">
 <div class="trt-renewal__section-intro"><p class="grunge-kicker">For the care team</p><h2>Keep every patient moving.</h2><p>Use the patient’s subscription and current renewal order together. The original order, new renewal order, and lab requisition are different records for the same care journey.</p></div>
