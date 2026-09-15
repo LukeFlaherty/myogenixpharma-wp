@@ -1,61 +1,20 @@
 <?php
 /**
- * TRT Renewal Redesign — self-detected week-9 trigger + consent-gated renewal.
- *
- * Replaces WooCommerce Subscriptions' native auto-renewal for TRT
- * (TESTOSTERONE CYPIONATE, product #883) only. Other subscription products
- * (Progesterone, Estrogen) are untouched and keep renewing natively.
- *
- * Flow: daily cron finds active TRT subscriptions at week 9 of their current
- * 3-month cycle -> emails a Continue/Decline consent link -> Continue places
- * a lab requisition with Prescribery, creates a renewal order via WCS's own
- * wcs_create_renewal_order(), and leaves it unpaid until Prescribery's
- * existing approval webhook (prescription/v1/approve) charges it -> Decline
- * puts the subscription on hold for staff review.
- *
- * See /Users/lukeflaherty/.claude/plans/tranquil-petting-reddy.md for the
- * full design and rationale (git history here won't have that context).
- *
- * IMPORTANT: this file only edits theme code. Two related fixes described in
- * the plan live in plugin files outside this repo (prescription-charge-
- * previous-cart.php's cancel_subscription no-op, and prescribery-wc-
- * integration.php's duplicate renewal callback) and are NOT touched here.
- * Instead: the native-renewal suppression below removes WCS's own hook
- * callbacks by their exact registered reference (no plugin file edit needed),
- * and the duplicate-callback suppression short-circuits the specific
- * outbound HTTP call via `pre_http_request` rather than unhooking it.
+ * TRT renewals: explicit patient consent, labs, then provider-approved payment.
+ * Configuration and credentials live in WP options, never in this public repo.
+ * See TRT_RENEWAL_RUNBOOK.md for rollout and recovery.
  */
 defined( 'ABSPATH' ) || exit;
 
-const MYOGENIX_TRT_PRODUCT_ID   = 883;
-const MYOGENIX_TRT_WEEK_TARGET  = 9;
-const MYOGENIX_TRT_CONSENT_TTL  = 85 * DAY_IN_SECONDS; // must expire before the ~90-day native renewal date
-
-// Adam's heads-up: gets a week-9 notice for every TRT cycle regardless of
-// MYOGENIX_TRT_REDESIGN_LIVE (informational only, no orders/charges), plus a
-// no-response nudge if the patient hasn't clicked Continue/Decline after
-// MYOGENIX_TRT_NORESPONSE_DAYS days (the latter only fires once the redesign
-// is actually live, since that's the only time a patient email went out).
-const MYOGENIX_TRT_ADMIN_EMAILS    = array( 'adam@myogenixpharma.com', 'adam@myogenix.com' );
-const MYOGENIX_TRT_NORESPONSE_DAYS = 75; // ~10 days of runway before the day-85 consent link expiry
-
-// Flip to true only after the lab requisition integration below has been
-// verified end-to-end against a real (non-sandbox) order (see plan step
-// 4/5). While false, the week-9 cron still runs its detection but sends no
-// email, and native WCS renewal is left completely alone.
+const MYOGENIX_TRT_PRODUCT_ID = 883;
+const MYOGENIX_TRT_WEEK_TARGET = 9;
+const MYOGENIX_TRT_CONSENT_TTL = 85 * DAY_IN_SECONDS;
+const MYOGENIX_TRT_NORESPONSE_DAYS = 75;
+const MYOGENIX_TRT_ADMIN_EMAILS = array( 'adam@myogenixpharma.com', 'adam@myogenix.com' );
 const MYOGENIX_TRT_REDESIGN_LIVE = false;
 
-// Lab API environment + panel are read from the myogenix_trt_lab_api WP
-// option (per-environment: sandbox vs production each have their own
-// client_id/source_id/api_key AND their own lab_id/test_ids, since
-// Prescribery's lab catalog is scoped per client). See
-// myogenix_trt_lab_api_settings() below and [[reference_prescribery_lab_api]]
-// memory for the confirmed values (sandbox: lab_id 1057 "Essential Men's
-// Followup"; production: lab_id 627 "Men's Testosterone FollowUp", per Omar
-// 2026-08-26). Switching `active_env` from "sandbox" to "production" in that
-// option is the whole cutover — no code change needed.
-
-// ─── Helpers ───────────────────────────────────────────────────────────────
+require_once __DIR__ . '/trt-renewal-presentation.php';
+require_once __DIR__ . '/trt-renewal-approval.php';
 
 function myogenix_trt_subscription_has_product( WC_Subscription $subscription, $product_id ) {
 	foreach ( $subscription->get_items() as $item ) {
@@ -66,566 +25,324 @@ function myogenix_trt_subscription_has_product( WC_Subscription $subscription, $
 	return false;
 }
 
+/** Only explicitly allowlisted QA subscriptions can run before launch. */
+function myogenix_trt_is_qa( $subscription ) {
+	$qa = get_option( 'myogenix_trt_qa', array() );
+	return $subscription instanceof WC_Subscription
+		&& (int) ( $qa['expires_at'] ?? 0 ) > time()
+		&& in_array( $subscription->get_id(), array_map( 'intval', $qa['subscription_ids'] ?? array() ), true )
+		&& ! empty( $qa['email'] )
+		&& strtolower( $subscription->get_billing_email() ) === strtolower( $qa['email'] )
+		&& 'yes' === $subscription->get_meta( '_trt_qa_test' );
+}
+
+function myogenix_trt_enabled( $subscription ) {
+	return $subscription instanceof WC_Subscription
+		&& myogenix_trt_subscription_has_product( $subscription, MYOGENIX_TRT_PRODUCT_ID )
+		&& ( MYOGENIX_TRT_REDESIGN_LIVE || myogenix_trt_is_qa( $subscription ) );
+}
+
 function myogenix_trt_cycle_start_ts( WC_Subscription $subscription ) {
-	$last_order_date = $subscription->get_date( 'last_order_date_created' );
-	$cycle_start      = $last_order_date ? $last_order_date : $subscription->get_date( 'start' );
-	return $cycle_start ? strtotime( $cycle_start . ' UTC' ) : false;
+	// Freeze the cycle before creating an unpaid order: WCS's last-order date
+	// changes immediately on creation, which must not create another consent window.
+	$saved = (int) $subscription->get_meta( '_trt_cycle_start' );
+	if ( $saved ) {
+		return $saved;
+	}
+	$date = $subscription->get_date( 'last_order_date_created' ) ?: $subscription->get_date( 'start' );
+	return $date ? strtotime( $date . ' UTC' ) : false;
 }
 
 function myogenix_trt_consent_token( $subscription_id, $cycle_start_ts ) {
 	return wp_hash( "trt_renewal_consent|{$subscription_id}|{$cycle_start_ts}" );
 }
 
-// ─── 1. Native WCS auto-renewal suppression, TRT only ─────────────────────
-//
-// WCS still creates a renewal order (and puts the subscription on-hold) on
-// its own native cron date even for a manual-renewal subscription — it only
-// skips auto-charging (verified in class-wc-subscriptions-manager.php
-// process_renewal()). That's the wrong timing for us, so for TRT we remove
-// WCS's own callbacks on this one dispatch before they run.
-
-add_action( 'woocommerce_scheduled_subscription_payment', 'myogenix_trt_suppress_native_renewal', -10, 1 );
-
-function myogenix_trt_suppress_native_renewal( $subscription_id ) {
-	// Until the redesign is fully wired and verified (plan step 4/5), leave
-	// native WCS renewal completely alone — suppressing it early would leave
-	// real patients with neither an auto-renewal order nor a consent email.
-	if ( ! MYOGENIX_TRT_REDESIGN_LIVE ) {
-		return;
-	}
-
-	$subscription = wcs_get_subscription( $subscription_id );
-	if ( ! $subscription instanceof WC_Subscription ) {
-		return;
-	}
-	if ( ! myogenix_trt_subscription_has_product( $subscription, MYOGENIX_TRT_PRODUCT_ID ) ) {
-		return;
-	}
-
-	// Exact callables WCS core registers on this hook — removed for this
-	// dispatch only; WordPress re-registers them fresh on the next request,
-	// so non-TRT subscriptions processed in a different request are unaffected.
-	remove_action( 'woocommerce_scheduled_subscription_payment', 'WC_Subscriptions_Manager::maybe_process_failed_renewal_for_repair', 0 );
-	remove_action( 'woocommerce_scheduled_subscription_payment', 'WC_Subscriptions_Manager::prepare_renewal', 1 );
-	remove_action( 'woocommerce_scheduled_subscription_payment', array( 'WC_Subscriptions_Payment_Gateways', 'gateway_scheduled_subscription_payment' ), 10 );
-
-	$subscription->add_order_note( 'Native WCS renewal suppressed — TRT renewals are now driven by the week-9 consent flow.' );
+function myogenix_trt_consent_url( array $args ) {
+	return add_query_arg( $args, home_url( '/trt-renewal-consent/' ) );
 }
 
-// ─── 2. Duplicate Prescribery callback suppression, TRT renewal orders only ─
-//
-// wcs_create_renewal_order() (called by us in the Continue handler) fires
-// WCS's own `wcs_renewal_order_created` hook internally, which
-// prescribery-wc-integration.php still listens to and would POST the old
-// "shopify/callback" notification for. We supersede that with our own lab
-// requisition call, so we short-circuit just that one outbound request while
-// our flag is set — no plugin file edit required.
+/** DB advisory locks serialize all actions for a subscription across PHP workers. */
+function myogenix_trt_lock( $id ) {
+	global $wpdb;
+	return '1' === (string) $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 0)', 'myogenix_trt_' . absint( $id ) ) );
+}
 
-$GLOBALS['myogenix_trt_suppress_shopify_callback'] = false;
+function myogenix_trt_unlock( $id ) {
+	global $wpdb;
+	$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', 'myogenix_trt_' . absint( $id ) ) );
+}
 
+/**
+ * Wrap the exact registered handlers once. Never remove them during a dispatch:
+ * Action Scheduler may process TRT and non-TRT subscriptions in the same request.
+ */
+add_action( 'wp_loaded', 'myogenix_trt_install_renewal_guards', 100 );
+function myogenix_trt_install_renewal_guards() {
+	$hook = 'woocommerce_scheduled_subscription_payment';
+	$methods = array( 'maybe_process_failed_renewal_for_repair', 'prepare_renewal', 'gateway_scheduled_subscription_payment' );
+	foreach ( $GLOBALS['wp_filter'][ $hook ]->callbacks ?? array() as $priority => $callbacks ) {
+		foreach ( $callbacks as $entry ) {
+			$fn = $entry['function'];
+			$name = is_array( $fn ) ? ( is_object( $fn[0] ) ? get_class( $fn[0] ) : $fn[0] ) . '::' . $fn[1] : ( is_string( $fn ) ? $fn : '' );
+			$parts = explode( '::', $name );
+			if ( ! in_array( $parts[0], array( 'WC_Subscriptions_Manager', 'WC_Subscriptions_Payment_Gateways' ), true ) || ! in_array( $parts[1] ?? '', $methods, true ) ) {
+				continue;
+			}
+			remove_action( $hook, $fn, $priority );
+			add_action( $hook, function ( $id ) use ( $fn ) {
+				$sub = $id instanceof WC_Subscription ? $id : wcs_get_subscription( $id );
+				if ( ! myogenix_trt_enabled( $sub ) ) {
+					return call_user_func( $fn, $id );
+				}
+			}, $priority, $entry['accepted_args'] );
+		}
+	}
+}
+
+// Block the legacy callback only while our own renewal is being constructed.
+$GLOBALS['myogenix_trt_creating_subscription'] = 0;
 add_filter( 'pre_http_request', 'myogenix_trt_maybe_block_shopify_callback', 10, 3 );
-
 function myogenix_trt_maybe_block_shopify_callback( $preempt, $args, $url ) {
-	if ( empty( $GLOBALS['myogenix_trt_suppress_shopify_callback'] ) ) {
+	if ( ! $GLOBALS['myogenix_trt_creating_subscription'] || '/shopify/callback' !== substr( wp_parse_url( $url, PHP_URL_PATH ) ?? '', -17 ) ) {
 		return $preempt;
 	}
-	if ( false === strpos( $url, '/shopify/callback' ) ) {
+	$host = wp_parse_url( $url, PHP_URL_HOST );
+	if ( ! in_array( $host, array( 'staff.prescribery.com', 'staging.prescribery.com' ), true ) ) {
 		return $preempt;
 	}
-	return array(
-		'headers'  => array(),
-		'body'     => wp_json_encode( array( 'suppressed' => 'trt-renewal-redesign' ) ),
-		'response' => array( 'code' => 200, 'message' => 'OK' ),
-		'cookies'  => array(),
-		'filename' => null,
-	);
+	return array( 'headers' => array(), 'body' => '{"suppressed":"trt-consent-renewal"}', 'response' => array( 'code' => 200, 'message' => 'OK' ), 'cookies' => array(), 'filename' => null );
 }
 
-// ─── 3. Week-9 detector + consent email (daily cron) ───────────────────────
-
-add_action( 'init', 'myogenix_trt_schedule_week9_cron' );
-
-function myogenix_trt_schedule_week9_cron() {
+add_action( 'init', function () {
 	if ( ! wp_next_scheduled( 'myogenix_trt_week9_cron' ) ) {
 		wp_schedule_event( time(), 'daily', 'myogenix_trt_week9_cron' );
 	}
-}
-
+	add_rewrite_rule( '^trt-renewal-consent/?$', 'index.php?myogenix_trt_consent=1', 'top' );
+} );
+add_filter( 'query_vars', function ( $vars ) { $vars[] = 'myogenix_trt_consent'; return $vars; } );
 add_action( 'myogenix_trt_week9_cron', 'myogenix_trt_run_week9_check' );
 
 function myogenix_trt_run_week9_check() {
 	if ( ! function_exists( 'wcs_get_subscriptions' ) ) {
 		return;
 	}
-
-	$subs = wcs_get_subscriptions( array(
-		'subscription_status'    => 'active',
-		'subscriptions_per_page' => -1,
-		'product_id'             => MYOGENIX_TRT_PRODUCT_ID,
-	) );
-
-	foreach ( $subs as $subscription_id => $subscription ) {
-		$cycle_start_ts = myogenix_trt_cycle_start_ts( $subscription );
-		if ( ! $cycle_start_ts ) {
-			continue;
-		}
-
-		$days_elapsed = (int) floor( ( time() - $cycle_start_ts ) / DAY_IN_SECONDS );
-		$week         = (int) floor( $days_elapsed / 7 );
-
-		if ( MYOGENIX_TRT_WEEK_TARGET !== $week ) {
-			continue;
-		}
-
-		$already_sent = $subscription->get_meta( '_trt_consent_sent_for' );
-		if ( (string) $already_sent === (string) $cycle_start_ts ) {
-			continue; // already handled this cycle
-		}
-
-		if ( MYOGENIX_TRT_REDESIGN_LIVE ) {
-			myogenix_trt_send_consent_email( $subscription, $cycle_start_ts );
-		}
-
-		myogenix_trt_notify_admin_week9( $subscription, MYOGENIX_TRT_REDESIGN_LIVE );
-
-		$subscription->update_meta_data( '_trt_consent_sent_for', $cycle_start_ts );
-		$subscription->save();
+	foreach ( wcs_get_subscriptions( array( 'subscription_status' => 'active', 'subscriptions_per_page' => -1, 'product_id' => MYOGENIX_TRT_PRODUCT_ID ) ) as $sub ) {
+		myogenix_trt_check_subscription( $sub->get_id() );
 	}
 }
 
-function myogenix_trt_notify_admin_week9( WC_Subscription $subscription, $patient_email_sent ) {
-	$name        = trim( $subscription->get_billing_first_name() . ' ' . $subscription->get_billing_last_name() );
-	$status_line = $patient_email_sent
-		? 'Consent email sent to the patient.'
-		: 'Patient consent email NOT sent — the TRT renewal redesign is not live yet (MYOGENIX_TRT_REDESIGN_LIVE = false), so this is detection-only.';
-
-	wp_mail(
-		MYOGENIX_TRT_ADMIN_EMAILS,
-		"TRT week 9 reached — subscription #{$subscription->get_id()} ({$name})",
-		"{$name} ({$subscription->get_billing_email()}) has reached week 9 of their TRT cycle — the labs/renewal consent window is open.\n\n"
-		. "{$status_line}\n\n"
-		. 'Subscription: ' . $subscription->get_edit_order_url()
-	);
-}
-
-// ─── No-response nudge (daily, same cron) ──────────────────────────────────
-//
-// Only meaningful once MYOGENIX_TRT_REDESIGN_LIVE is true, since that's the
-// only time a consent email actually reached the patient.
-
-add_action( 'myogenix_trt_week9_cron', 'myogenix_trt_run_noresponse_check' );
-
-function myogenix_trt_run_noresponse_check() {
-	if ( ! MYOGENIX_TRT_REDESIGN_LIVE || ! function_exists( 'wcs_get_subscriptions' ) ) {
+function myogenix_trt_check_subscription( $id ) {
+	if ( ! myogenix_trt_lock( $id ) ) {
 		return;
 	}
-
-	$subs = wcs_get_subscriptions( array(
-		'subscription_status'    => 'active',
-		'subscriptions_per_page' => -1,
-		'product_id'             => MYOGENIX_TRT_PRODUCT_ID,
-	) );
-
-	foreach ( $subs as $subscription_id => $subscription ) {
-		$cycle_start_ts = myogenix_trt_cycle_start_ts( $subscription );
-		if ( ! $cycle_start_ts ) {
-			continue;
+	try {
+		$sub = wcs_get_subscription( $id );
+		if ( ! $sub || ! $sub->has_status( 'active' ) || ! myogenix_trt_subscription_has_product( $sub, MYOGENIX_TRT_PRODUCT_ID ) ) { return; }
+		$cycle = myogenix_trt_cycle_start_ts( $sub );
+		if ( ! $cycle ) { return; }
+		$days = (int) floor( ( time() - $cycle ) / DAY_IN_SECONDS );
+		if ( $days < 63 ) { return; }
+		if ( $days < 70 && (string) ( $sub->get_meta( '_trt_admin_week9_for' ) ?: $sub->get_meta( '_trt_consent_sent_for' ) ) !== (string) $cycle ) {
+			if ( myogenix_trt_staff_notice( $sub, 'Week 9 renewal review', myogenix_trt_enabled( $sub ) ? 'The patient consent window is open.' : 'Detection only. Patient emails and consent renewals are not live.' ) ) {
+				$sub->update_meta_data( '_trt_admin_week9_for', $cycle );
+				$sub->save();
+			}
 		}
-
-		$sent_for = $subscription->get_meta( '_trt_consent_sent_for' );
-		if ( (string) $sent_for !== (string) $cycle_start_ts ) {
-			continue; // no consent email sent this cycle
+		if ( ! myogenix_trt_enabled( $sub ) || (string) $sub->get_meta( '_trt_consent_resolved_for' ) === (string) $cycle ) { return; }
+		if ( $days >= 85 ) {
+			// Consent is required; native charging never acts as a fallback.
+			$sub->update_meta_data( '_trt_consent_resolved_for', $cycle );
+			$sub->update_meta_data( '_trt_consent_resolved_action', 'expired' );
+			$sub->update_status( 'on-hold', 'TRT renewal paused: consent deadline passed. Staff review required; no renewal charge.' );
+			$sub->save();
+			myogenix_trt_staff_notice( $sub, 'Consent expired — follow-up needed', 'Renewal paused without a charge. Contact the patient to discuss next steps.' );
+			return;
 		}
-
-		$resolved_for = $subscription->get_meta( '_trt_consent_resolved_for' );
-		if ( (string) $resolved_for === (string) $cycle_start_ts ) {
-			continue; // patient already responded
+		// New key deliberately ignores the old detection-only _trt_consent_sent_for.
+		if ( (string) $sub->get_meta( '_trt_patient_email_for' ) !== (string) $cycle ) {
+			$sub->update_meta_data( '_trt_cycle_start', $cycle );
+			$sub->save();
+			if ( myogenix_trt_send_consent_email( $sub, $cycle ) ) {
+				$sub->update_meta_data( '_trt_patient_email_for', $cycle );
+				$sub->update_meta_data( '_trt_patient_email_sent_at', time() );
+				$sub->save();
+			} else {
+				myogenix_trt_staff_notice( $sub, 'Consent email failed', 'Patient email was not accepted for delivery. The next daily check will retry.' );
+			}
 		}
-
-		$days_elapsed = (int) floor( ( time() - $cycle_start_ts ) / DAY_IN_SECONDS );
-		if ( $days_elapsed < MYOGENIX_TRT_NORESPONSE_DAYS ) {
-			continue;
+		$sent_at = (int) $sub->get_meta( '_trt_patient_email_sent_at' );
+		if ( $days >= MYOGENIX_TRT_NORESPONSE_DAYS && $sent_at && time() - $sent_at >= DAY_IN_SECONDS && (string) $sub->get_meta( '_trt_admin_noresponse_sent_for' ) !== (string) $cycle ) {
+			if ( myogenix_trt_staff_notice( $sub, 'No response — follow-up needed', 'The patient has not responded. The renewal will pause at day 85; there is no automatic charge.' ) ) {
+				$sub->update_meta_data( '_trt_admin_noresponse_sent_for', $cycle );
+				$sub->save();
+			}
 		}
-
-		$already_nudged = $subscription->get_meta( '_trt_admin_noresponse_sent_for' );
-		if ( (string) $already_nudged === (string) $cycle_start_ts ) {
-			continue; // already nudged this cycle
-		}
-
-		myogenix_trt_notify_admin_noresponse( $subscription, $days_elapsed );
-
-		$subscription->update_meta_data( '_trt_admin_noresponse_sent_for', $cycle_start_ts );
-		$subscription->save();
+	} finally {
+		myogenix_trt_unlock( $id );
 	}
-}
-
-function myogenix_trt_notify_admin_noresponse( WC_Subscription $subscription, $days_elapsed ) {
-	$name          = trim( $subscription->get_billing_first_name() . ' ' . $subscription->get_billing_last_name() );
-	$expires_day   = (int) ( MYOGENIX_TRT_CONSENT_TTL / DAY_IN_SECONDS );
-
-	wp_mail(
-		MYOGENIX_TRT_ADMIN_EMAILS,
-		"TRT renewal no response — subscription #{$subscription->get_id()} ({$name})",
-		"{$name} ({$subscription->get_billing_email()}) was sent a TRT renewal consent email at week 9 and hasn't responded after {$days_elapsed} days.\n\n"
-		. "The consent link expires around day {$expires_day} of the cycle — after that, native WooCommerce Subscriptions renewal behavior takes over on its own schedule.\n\n"
-		. 'Subscription: ' . $subscription->get_edit_order_url()
-	);
-}
-
-function myogenix_trt_send_consent_email( WC_Subscription $subscription, $cycle_start_ts ) {
-	$token = myogenix_trt_consent_token( $subscription->get_id(), $cycle_start_ts );
-
-	$continue_url = myogenix_trt_consent_url( array(
-		'subscription_id' => $subscription->get_id(),
-		'cycle_start'     => $cycle_start_ts,
-		'token'           => $token,
-		'action'          => 'continue',
-	) );
-
-	$decline_url = myogenix_trt_consent_url( array(
-		'subscription_id' => $subscription->get_id(),
-		'cycle_start'     => $cycle_start_ts,
-		'token'           => $token,
-		'action'          => 'decline',
-	) );
-
-	$to   = $subscription->get_billing_email();
-	$name = esc_html( $subscription->get_billing_first_name() );
-
-	$subject = 'Continue your TRT treatment?';
-
-	$button = function ( $url, $label, $bg, $color ) {
-		return '<a href="' . esc_url( $url ) . '" style="display:inline-block;padding:12px 28px;margin:6px;border-radius:6px;background:' . $bg . ';color:' . $color . ';text-decoration:none;font-family:Arial,sans-serif;font-size:15px;font-weight:bold;">' . esc_html( $label ) . '</a>';
-	};
-
-	$body = '<div style="font-family:Arial,sans-serif;font-size:15px;color:#222;max-width:520px;margin:0 auto;padding:24px;">'
-		. "<p>Hi {$name},</p>"
-		. '<p>It\'s time to plan your next testosterone therapy renewal. Let us know how you\'d like to proceed:</p>'
-		. '<div style="text-align:center;margin:28px 0;">'
-		. $button( $continue_url, 'Continue treatment', '#1a7f3c', '#ffffff' )
-		. $button( $decline_url, 'Not right now', '#eeeeee', '#333333' )
-		. '</div>'
-		. '<p style="color:#666;font-size:13px;">Questions? Reply to this email or reach us at <a href="mailto:support@myogenixpharma.com">support@myogenixpharma.com</a>.</p>'
-		. '<p>— Myogenix Pharma</p>'
-		. '</div>';
-
-	wp_mail( $to, $subject, $body, array(
-		'Content-Type: text/html; charset=UTF-8',
-		'From: Myogenix Pharma <support@myogenixpharma.com>',
-	) );
-}
-
-// ─── 4. Consent page — plain URL (/trt-renewal-consent), not wp-json ───────
-//
-// GET renders a confirmation page with no side effects (protects against
-// email-client link prefetching/scanning silently triggering an action).
-// POST from that page's own form performs the actual mutation. This is a
-// real WP rewrite rule (not a client-side redirect from a REST route) so
-// the URL bar always shows the plain path, never /wp-json/....
-//
-// NOTE: adding/changing this rewrite rule requires a one-time
-// `wp rewrite flush` on the server, or it 404s until permalinks are
-// otherwise flushed (e.g. visiting wp-admin > Settings > Permalinks > Save).
-
-add_action( 'init', function () {
-	add_rewrite_rule( '^trt-renewal-consent/?$', 'index.php?myogenix_trt_consent=1', 'top' );
-} );
-
-add_filter( 'query_vars', function ( $vars ) {
-	$vars[] = 'myogenix_trt_consent';
-	return $vars;
-} );
-
-add_action( 'template_redirect', function () {
-	if ( ! get_query_var( 'myogenix_trt_consent' ) ) {
-		return;
-	}
-
-	$params = array(
-		'subscription_id' => wp_unslash( $_REQUEST['subscription_id'] ?? '' ),
-		'cycle_start'     => wp_unslash( $_REQUEST['cycle_start'] ?? '' ),
-		'token'           => wp_unslash( $_REQUEST['token'] ?? '' ),
-		'action'          => wp_unslash( $_REQUEST['action'] ?? '' ),
-	);
-
-	if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
-		myogenix_trt_consent_submit( $params );
-	} else {
-		myogenix_trt_consent_confirm_page( $params );
-	}
-} );
-
-function myogenix_trt_consent_url( array $args ) {
-	return add_query_arg( $args, home_url( '/trt-renewal-consent' ) );
 }
 
 function myogenix_trt_validate_consent_request( array $params ) {
-	$subscription_id = absint( $params['subscription_id'] ?? 0 );
-	$cycle_start_ts   = absint( $params['cycle_start'] ?? 0 );
-	$token            = (string) ( $params['token'] ?? '' );
-	$action           = (string) ( $params['action'] ?? '' );
-
-	if ( ! in_array( $action, array( 'continue', 'decline' ), true ) ) {
-		return new WP_Error( 'trt_bad_action', 'Invalid action.', array( 'status' => 400 ) );
+	foreach ( array( 'subscription_id', 'cycle_start', 'token', 'action' ) as $key ) {
+		if ( ! isset( $params[ $key ] ) || ! is_scalar( $params[ $key ] ) ) { return new WP_Error( 'invalid', 'This renewal link is invalid.', array( 'status' => 400 ) ); }
 	}
-
-	$subscription = wcs_get_subscription( $subscription_id );
-	if ( ! $subscription instanceof WC_Subscription ) {
-		return new WP_Error( 'trt_bad_subscription', 'Subscription not found.', array( 'status' => 404 ) );
+	$id = absint( $params['subscription_id'] );
+	$cycle = absint( $params['cycle_start'] );
+	$action = (string) $params['action'];
+	$sub = wcs_get_subscription( $id );
+	if ( ! $sub || ! in_array( $action, array( 'continue', 'decline' ), true ) || ! hash_equals( myogenix_trt_consent_token( $id, $cycle ), (string) $params['token'] ) ) {
+		return new WP_Error( 'invalid', 'This renewal link is invalid.', array( 'status' => 403 ) );
 	}
-
-	if ( ! hash_equals( myogenix_trt_consent_token( $subscription_id, $cycle_start_ts ), $token ) ) {
-		return new WP_Error( 'trt_bad_token', 'This link is invalid.', array( 'status' => 403 ) );
+	if ( ! myogenix_trt_enabled( $sub ) ) { return new WP_Error( 'unavailable', 'Online renewal is not available for this subscription. Please contact our team.', array( 'status' => 403 ) ); }
+	if ( ! $cycle || $cycle !== (int) myogenix_trt_cycle_start_ts( $sub ) || time() < $cycle || time() >= $cycle + MYOGENIX_TRT_CONSENT_TTL ) {
+		return new WP_Error( 'expired', 'This renewal link has expired. Our team can help you with the next steps.', array( 'status' => 410 ) );
 	}
-
-	if ( time() > $cycle_start_ts + MYOGENIX_TRT_CONSENT_TTL ) {
-		return new WP_Error( 'trt_expired', 'This link has expired. Please contact support@myogenixpharma.com.', array( 'status' => 410 ) );
+	if ( (string) $sub->get_meta( '_trt_consent_resolved_for' ) === (string) $cycle ) {
+		return new WP_Error( 'resolved', 'Your response has already been recorded. No additional order or charge has been made.', array( 'status' => 409 ) );
 	}
-
-	$resolved = $subscription->get_meta( '_trt_consent_resolved_for' );
-	if ( (string) $resolved === (string) $cycle_start_ts ) {
-		return new WP_Error( 'trt_already_resolved', 'This renewal has already been handled.', array( 'status' => 409 ) );
+	if ( ! $sub->has_status( 'active' ) || (string) $sub->get_meta( '_trt_patient_email_for' ) !== (string) $cycle ) {
+		return new WP_Error( 'unavailable', 'This renewal is not awaiting a response. Please contact our team.', array( 'status' => 409 ) );
 	}
-
-	return array( $subscription, $cycle_start_ts, $action );
+	return array( $sub, $cycle, $action );
 }
 
-function myogenix_trt_consent_confirm_page( array $params ) {
-	$result = myogenix_trt_validate_consent_request( $params );
-	if ( is_wp_error( $result ) ) {
-		myogenix_trt_html_response( '<p>' . esc_html( $result->get_error_message() ) . '</p>', $result->get_error_data()['status'] ?? 400 );
+/** Mutation service is separate from rendering, allowing integration testing. */
+function myogenix_trt_process_consent( array $params ) {
+	$id = is_scalar( $params['subscription_id'] ?? null ) ? absint( $params['subscription_id'] ) : 0;
+	if ( ! myogenix_trt_lock( $id ) ) { return new WP_Error( 'busy', 'Your renewal is being processed. Please wait a moment before checking again.', array( 'status' => 409 ) ); }
+	try {
+		$result = myogenix_trt_validate_consent_request( $params );
+		if ( is_wp_error( $result ) ) { return $result; }
+		list( $sub, $cycle, $action ) = $result;
+		$outcome = 'continue' === $action ? myogenix_trt_handle_continue( $sub ) : myogenix_trt_handle_decline( $sub );
+		if ( is_wp_error( $outcome ) ) {
+			$sub->add_order_note( 'TRT renewal needs review: ' . $outcome->get_error_code() );
+			myogenix_trt_staff_notice( $sub, 'Renewal needs attention', 'Processing stopped: ' . $outcome->get_error_code() . '. Review the linked renewal before retrying any external lab request.' );
+			return $outcome;
+		}
+		$sub->update_meta_data( '_trt_consent_resolved_for', $cycle );
+		$sub->update_meta_data( '_trt_consent_resolved_action', $action );
+		$sub->save();
+		myogenix_trt_send_response_email( $sub, $action );
+		return array( 'action' => $action, 'order_id' => $outcome instanceof WC_Order ? $outcome->get_id() : 0 );
+	} catch ( Throwable $error ) {
+		wc_get_logger()->error( 'TRT consent exception for subscription ' . $id . ': ' . get_class( $error ), array( 'source' => 'trt-renewal' ) );
+		return new WP_Error( 'processing_error', 'We could not complete your renewal. Please contact our team before trying again.', array( 'status' => 503 ) );
+	} finally {
+		myogenix_trt_unlock( $id );
 	}
-
-	list( $subscription, $cycle_start_ts, $action ) = $result;
-
-	$label = 'continue' === $action ? 'Continue my treatment' : 'Not right now';
-	$copy  = 'continue' === $action
-		? 'Confirm you want to continue your TRT treatment. We\'ll place your lab requisition and prepare your renewal order.'
-		: 'Confirm you\'d like to pause. Our team will follow up before anything is cancelled.';
-
-	ob_start();
-	?>
-	<form method="post" action="<?php echo esc_url( myogenix_trt_consent_url( array() ) ); ?>">
-		<p><?php echo esc_html( $copy ); ?></p>
-		<input type="hidden" name="subscription_id" value="<?php echo esc_attr( $subscription->get_id() ); ?>">
-		<input type="hidden" name="cycle_start" value="<?php echo esc_attr( $cycle_start_ts ); ?>">
-		<input type="hidden" name="token" value="<?php echo esc_attr( $params['token'] ); ?>">
-		<input type="hidden" name="action" value="<?php echo esc_attr( $action ); ?>">
-		<button type="submit"><?php echo esc_html( $label ); ?></button>
-	</form>
-	<?php
-	myogenix_trt_html_response( ob_get_clean() );
 }
 
-function myogenix_trt_consent_submit( array $params ) {
-	$result = myogenix_trt_validate_consent_request( $params );
-	if ( is_wp_error( $result ) ) {
-		myogenix_trt_html_response( '<p>' . esc_html( $result->get_error_message() ) . '</p>', $result->get_error_data()['status'] ?? 400 );
+function myogenix_trt_handle_continue( WC_Subscription $sub ) {
+	if ( ! myogenix_trt_enabled( $sub ) ) { return new WP_Error( 'disabled', 'Online renewal is unavailable.' ); }
+	if ( ! myogenix_trt_get_prescribery_patient_id( $sub ) ) { return new WP_Error( 'missing_patient', 'Our team needs to verify your patient record before continuing.' ); }
+	$cycle = myogenix_trt_cycle_start_ts( $sub );
+	$sub->update_meta_data( '_trt_cycle_start', $cycle );
+	$sub->save();
+	$order = wc_get_order( $sub->get_meta( '_trt_pending_renewal_order' ) );
+	if ( ! $order ) {
+		$GLOBALS['myogenix_trt_creating_subscription'] = $sub->get_id();
+		try { $order = wcs_create_renewal_order( $sub ); }
+		finally { $GLOBALS['myogenix_trt_creating_subscription'] = 0; }
+		if ( is_wp_error( $order ) ) { return new WP_Error( 'order_failed', 'We could not prepare your renewal. Please contact our team.' ); }
+		// Persist before the external API call, so a timeout cannot create another order.
+		$sub->update_meta_data( '_trt_pending_renewal_order', $order->get_id() );
+		$sub->save();
 	}
-
-	list( $subscription, $cycle_start_ts, $action ) = $result;
-
-	if ( 'continue' === $action ) {
-		$outcome = myogenix_trt_handle_continue( $subscription );
-	} else {
-		$outcome = myogenix_trt_handle_decline( $subscription );
+	if ( (int) $order->get_meta( '_trt_cycle_start' ) !== (int) $cycle ) { return new WP_Error( 'cycle_mismatch', 'An earlier renewal needs staff review.' ); }
+	if ( ! $order->get_meta( '_trt_pricing_ready' ) ) {
+		$pricing = myogenix_trt_prepare_renewal_prices( $order, $sub );
+		if ( is_wp_error( $pricing ) ) { return $pricing; }
 	}
-
-	$subscription->update_meta_data( '_trt_consent_resolved_for', $cycle_start_ts );
-	$subscription->update_meta_data( '_trt_consent_resolved_action', $action );
-	$subscription->save();
-
-	if ( is_wp_error( $outcome ) ) {
-		myogenix_trt_html_response( '<p>Something went wrong: ' . esc_html( $outcome->get_error_message() ) . '. Our team has been notified — please contact support@myogenixpharma.com.</p>', 500 );
+	$state = $order->get_meta( '_trt_lab_state' );
+	if ( in_array( $state, array( 'submitting', 'uncertain' ), true ) ) { return new WP_Error( 'lab_needs_review', 'Our team is checking your lab request. Please contact us before trying again.' ); }
+	if ( ! $order->get_meta( '_prescribery_requisition_id' ) ) {
+		$order->update_meta_data( '_trt_lab_state', 'submitting' );
+		$order->save();
+		$requisition = myogenix_trt_place_lab_requisition( $sub, $order );
+		if ( is_wp_error( $requisition ) ) {
+			$order->update_meta_data( '_trt_lab_state', in_array( $requisition->get_error_code(), array( 'lab_rejected', 'lab_config', 'lab_auth' ), true ) ? 'rejected' : 'uncertain' );
+			$order->save();
+			return $requisition;
+		}
+		$order->update_meta_data( '_prescribery_requisition_id', $requisition );
+		$order->update_meta_data( '_trt_lab_state', 'created' );
+		$order->add_order_note( 'Patient consent recorded; lab request accepted. Unpaid renewal awaits provider approval.' );
+		$order->save();
 	}
-
-	$message = 'continue' === $action
-		? 'Thanks — we\'ve started your renewal. You\'ll hear from us once your labs are reviewed.'
-		: 'Got it — we\'ve paused your renewal. Our team will follow up shortly.';
-
-	myogenix_trt_html_response( '<p>' . esc_html( $message ) . '</p>' );
+	return $order;
 }
 
-function myogenix_trt_html_response( $body_html, $status = 200 ) {
-	// This is a plain browser-facing page (email links, a form submit), so
-	// it prints HTML directly and exits rather than going through any
-	// template/theme rendering.
-	nocache_headers();
-	status_header( $status );
-	header( 'Content-Type: text/html; charset=utf-8' );
-	echo '<!doctype html><html><head><meta charset="utf-8"><title>Myogenix Pharma</title></head><body>' . $body_html . '</body></html>';
-	exit;
+// Mark a renewal inside WCS's creation hook, before any integration sees it.
+add_filter( 'wcs_renewal_order_created', function ( $order, $sub ) {
+	if ( (int) $GLOBALS['myogenix_trt_creating_subscription'] !== $sub->get_id() ) { return $order; }
+	$order->update_meta_data( '_trt_consent_renewal', 'yes' );
+	$order->update_meta_data( '_trt_cycle_start', myogenix_trt_cycle_start_ts( $sub ) );
+	$order->update_meta_data( '_trt_subscription_id', $sub->get_id() );
+	$order->update_meta_data( '_trt_next_payment_before', $sub->get_time( 'next_payment' ) );
+	$order->update_meta_data( '_prescribery_patient_id', myogenix_trt_get_prescribery_patient_id( $sub ) );
+	$order->set_transaction_id( '' );
+	$order->set_date_paid( null );
+	foreach ( array( '_prescription_charge_amount', '_prescription_stripe_charging', '_pharmacy_webhook_sent', '_stripe_intent_id', '_child_order_ids', '_approved_appointment_ids', 'appointment_id', '_lab_fee_paid', '_parent_order_id', '_trt_pricing_ready', '_prescribery_requisition_id', '_trt_provider_approved', '_trt_cycle_advanced', '_trt_wcs_payment_recorded', '_trt_lab_state' ) as $key ) { $order->delete_meta_data( $key ); }
+	foreach ( $order->get_items() as $item ) {
+		foreach ( array( '_item_approved', '_item_rejected', '_item_approved_appointment', '_item_rejected_appointment' ) as $key ) { $item->delete_meta_data( $key ); }
+		$item->save();
+	}
+	$order->save();
+	// WCS relation already exists here; recoverable even if a later callback throws.
+	$sub->update_meta_data( '_trt_pending_renewal_order', $order->get_id() );
+	$sub->save();
+	return $order;
+}, -100, 2 );
+
+function myogenix_trt_handle_decline( WC_Subscription $sub ) {
+	if ( $sub->get_meta( '_trt_pending_renewal_order' ) ) { return new WP_Error( 'already_started', 'Your renewal has already started. Contact our team to pause it.' ); }
+	$sub->update_status( 'on-hold', 'Patient chose to pause the TRT renewal. Staff follow-up required; no charge.' );
+	$sub->save();
+	myogenix_trt_staff_notice( $sub, 'Patient paused renewal', 'The subscription is on hold. Follow up with the patient before resuming or cancelling.' );
+	return true;
 }
 
-// ─── 5. Continue / Decline handlers ────────────────────────────────────────
-
-function myogenix_trt_handle_continue( WC_Subscription $subscription ) {
-	$requisition_id = myogenix_trt_place_lab_requisition( $subscription );
-	if ( is_wp_error( $requisition_id ) ) {
-		return $requisition_id;
-	}
-
-	$GLOBALS['myogenix_trt_suppress_shopify_callback'] = true;
-	$renewal_order = wcs_create_renewal_order( $subscription );
-	$GLOBALS['myogenix_trt_suppress_shopify_callback'] = false;
-
-	if ( is_wp_error( $renewal_order ) ) {
-		return $renewal_order;
-	}
-
-	$renewal_order->update_meta_data( '_prescribery_requisition_id', $requisition_id );
-	$renewal_order->add_order_note( "TRT renewal: lab requisition {$requisition_id} placed via week-9 consent flow. Order left unpaid pending Prescribery approval." );
-	$renewal_order->save();
-
-	return $renewal_order;
-}
-
-/**
- * Prescribery Lab API — credentials/config live in the `myogenix_trt_lab_api`
- * WP option (DB), never in code: this repo is on a PUBLIC GitHub remote.
- *
- * Shape (set via `wp option update myogenix_trt_lab_api --format=json`,
- * piped via stdin — never as a literal CLI arg):
- *   { "active_env": "sandbox"|"production",
- *     "sandbox":    { api_base_url, api_key, client_id, source_id, lab_id, test_ids: [] },
- *     "production": { api_base_url, api_key, client_id, source_id, lab_id, test_ids: [] } }
- *
- * Both environments' credentials are kept configured simultaneously so
- * `active_env` alone controls the cutover — no code change needed to switch.
- * Spec verified 2026-08-25/26 against https://staging.prescribery.com/api/docs
- * (Labs section) — see [[reference_prescribery_lab_api]] memory for the full
- * endpoint reference and confirmed lab_id/test_ids for each environment.
- */
 function myogenix_trt_lab_api_settings() {
-	$all = get_option( 'myogenix_trt_lab_api' );
-	if ( ! is_array( $all ) ) {
-		return array();
-	}
-	$env = $all['active_env'] ?? 'sandbox';
-	return is_array( $all[ $env ] ?? null ) ? $all[ $env ] : array();
+	$all = get_option( 'myogenix_trt_lab_api', array() );
+	return $all[ $all['active_env'] ?? 'sandbox' ] ?? array();
 }
 
 function myogenix_trt_lab_api_token() {
-	$settings = myogenix_trt_lab_api_settings();
-	if ( empty( $settings['api_base_url'] ) || empty( $settings['api_key'] ) ) {
-		return new WP_Error( 'trt_lab_api_not_configured', 'myogenix_trt_lab_api option is missing api_base_url/api_key for the active environment.' );
-	}
-
-	// Keyed by base URL so sandbox/production tokens never collide if
-	// active_env is switched mid-cache-lifetime.
-	$transient_key = 'myogenix_trt_lab_token_' . md5( $settings['api_base_url'] );
-	$cached        = get_transient( $transient_key );
-	if ( $cached ) {
-		return $cached;
-	}
-
-	$response = wp_remote_post( rtrim( $settings['api_base_url'], '/' ) . '/access-token', array(
-		'headers' => array( 'Content-Type' => 'application/json', 'Accept' => 'application/json' ),
-		'body'    => wp_json_encode( array( 'api_key' => $settings['api_key'] ) ),
-		'timeout' => 15,
-	) );
-
-	if ( is_wp_error( $response ) ) {
-		return $response;
-	}
-
-	$body       = json_decode( wp_remote_retrieve_body( $response ), true );
-	$token      = $body['data']['access_token'] ?? null;
-	$expires_in = (int) ( $body['data']['expires_in'] ?? 3600 );
-
-	if ( ! $token ) {
-		return new WP_Error( 'trt_lab_api_auth_failed', 'Failed to obtain Prescribery lab API token: ' . wp_remote_retrieve_body( $response ) );
-	}
-
-	set_transient( $transient_key, $token, max( 60, $expires_in - 60 ) );
-	return $token;
+	$s = myogenix_trt_lab_api_settings();
+	if ( empty( $s['api_key'] ) || empty( $s['api_base_url'] ) ) { return new WP_Error( 'lab_config', 'Lab connection is not configured.' ); }
+	$key = 'myogenix_trt_lab_token_' . md5( $s['api_base_url'] . $s['api_key'] );
+	if ( $token = get_transient( $key ) ) { return $token; }
+	$r = wp_remote_post( rtrim( $s['api_base_url'], '/' ) . '/access-token', array( 'headers' => array( 'Content-Type' => 'application/json', 'Accept' => 'application/json' ), 'body' => wp_json_encode( array( 'api_key' => $s['api_key'] ) ), 'timeout' => 15 ) );
+	if ( is_wp_error( $r ) ) { return new WP_Error( 'lab_auth', 'The lab connection is temporarily unavailable.' ); }
+	$b = json_decode( wp_remote_retrieve_body( $r ), true );
+	if ( 200 !== wp_remote_retrieve_response_code( $r ) || empty( $b['data']['access_token'] ) ) { return new WP_Error( 'lab_auth', 'The lab connection is temporarily unavailable.' ); }
+	set_transient( $key, $b['data']['access_token'], max( 1, (int) ( $b['data']['expires_in'] ?? 3600 ) - 60 ) );
+	return $b['data']['access_token'];
 }
 
-function myogenix_trt_get_prescribery_patient_id( WC_Subscription $subscription ) {
-	// Written by prescriptionHandleApproval() in prescription-charge-previous-
-	// cart.php on every doctor decision — present on the parent order and,
-	// for older subs, sometimes copied onto the subscription itself.
-	$patient_id = $subscription->get_meta( '_prescribery_patient_id' );
-	if ( $patient_id ) {
-		return $patient_id;
-	}
-	$parent = $subscription->get_parent();
-	return $parent ? $parent->get_meta( '_prescribery_patient_id' ) : null;
+function myogenix_trt_get_prescribery_patient_id( WC_Subscription $sub ) {
+	$id = $sub->get_meta( '_prescribery_patient_id' );
+	if ( ! $id && $sub->get_parent() ) { $id = $sub->get_parent()->get_meta( '_prescribery_patient_id' ); }
+	return absint( $id );
 }
 
-/**
- * Places a lab requisition with Prescribery for a TRT renewal.
- *
- * Verified working end-to-end against the sandbox 2026-08-25/26 (auth
- * exchange + POST .../lab/{client_id}/save-test-order returned a real
- * token, plus error-path testing: invalid lab/test IDs and a missing
- * patient_id both correctly surface as 422s with field-level messages).
- * Production credentials + panel (lab_id 627 "Men's Testosterone FollowUp")
- * confirmed by Omar 2026-08-26 and configured in the myogenix_trt_lab_api
- * option, but NOT yet exercised with a real production order — switch
- * `active_env` to "production" only after that's been done deliberately.
- */
-function myogenix_trt_place_lab_requisition( WC_Subscription $subscription ) {
-	$settings = myogenix_trt_lab_api_settings();
-	if ( empty( $settings['api_base_url'] ) || empty( $settings['client_id'] ) || empty( $settings['source_id'] ) || empty( $settings['lab_id'] ) || empty( $settings['test_ids'] ) ) {
-		return new WP_Error( 'trt_lab_api_not_configured', 'myogenix_trt_lab_api option is missing required fields for the active environment.' );
+function myogenix_trt_place_lab_requisition( WC_Subscription $sub, $order = null ) {
+	$s = myogenix_trt_lab_api_settings();
+	foreach ( array( 'api_base_url', 'client_id', 'source_id', 'lab_id', 'test_ids' ) as $key ) {
+		if ( empty( $s[ $key ] ) ) { return new WP_Error( 'lab_config', 'The lab connection needs to be configured by our team.' ); }
 	}
-
-	$patient_id = myogenix_trt_get_prescribery_patient_id( $subscription );
-	if ( ! $patient_id ) {
-		return new WP_Error( 'trt_no_patient_id', 'No _prescribery_patient_id found on this subscription or its parent order.' );
-	}
-
 	$token = myogenix_trt_lab_api_token();
-	if ( is_wp_error( $token ) ) {
-		return $token;
+	if ( is_wp_error( $token ) ) { return $token; }
+	$body = array( 'patient_id' => myogenix_trt_get_prescribery_patient_id( $sub ), 'order' => array_map( function ( $id ) use ( $s ) { return array( 'lab_id' => (int) $s['lab_id'], 'test_id' => (int) $id ); }, $s['test_ids'] ), 'source_id' => (int) $s['source_id'], 'reason' => ( myogenix_trt_is_qa( $sub ) ? 'TEST ONLY — ' : '' ) . 'TRT renewal; WooCommerce order ' . ( $order ? $order->get_id() : 'test' ), 'payment_status' => 'pending' );
+	$r = wp_remote_post( rtrim( $s['api_base_url'], '/' ) . '/lab/' . $s['client_id'] . '/save-test-order', array( 'headers' => array( 'Authorization' => 'Bearer ' . $token, 'Content-Type' => 'application/json', 'Accept' => 'application/json' ), 'body' => wp_json_encode( $body ), 'timeout' => 25 ) );
+	if ( is_wp_error( $r ) ) { return new WP_Error( 'lab_uncertain', 'Our team needs to check whether your lab request was received. Please contact us before trying again.' ); }
+	$code = wp_remote_retrieve_response_code( $r );
+	$b = json_decode( wp_remote_retrieve_body( $r ), true );
+	$token = $b['token'] ?? null;
+	$token = is_array( $token ) && 1 === count( $token ) ? reset( $token ) : $token;
+	if ( ! in_array( $code, array( 200, 201 ), true ) || ! is_string( $token ) || '' === $token ) {
+		return new WP_Error( in_array( $code, array( 400, 401, 403, 422 ), true ) ? 'lab_rejected' : 'lab_uncertain', 'We could not confirm your lab request. Our team will help you complete your renewal.' );
 	}
-
-	$order_items = array();
-	foreach ( $settings['test_ids'] as $test_id ) {
-		$order_items[] = array( 'lab_id' => $settings['lab_id'], 'test_id' => $test_id );
-	}
-
-	$response = wp_remote_post( rtrim( $settings['api_base_url'], '/' ) . '/lab/' . $settings['client_id'] . '/save-test-order', array(
-		'headers' => array(
-			'Authorization' => 'Bearer ' . $token,
-			'Content-Type'  => 'application/json',
-			'Accept'        => 'application/json',
-		),
-		'body'    => wp_json_encode( array(
-			'patient_id' => $patient_id,
-			'order'      => $order_items,
-			'source_id'  => $settings['source_id'],
-			'reason'     => 'TRT renewal — week 9 consent flow',
-		) ),
-		'timeout' => 20,
-	) );
-
-	if ( is_wp_error( $response ) ) {
-		return $response;
-	}
-
-	$code = wp_remote_retrieve_response_code( $response );
-	$body = json_decode( wp_remote_retrieve_body( $response ), true );
-
-	if ( 200 !== $code || empty( $body['token'] ) ) {
-		return new WP_Error( 'trt_lab_order_failed', "Lab requisition failed ({$code}): " . wp_remote_retrieve_body( $response ) );
-	}
-
-	// Confirmed against the sandbox: the API returns "token" as a
-	// single-element array, not the bare string the docs example shows.
-	return is_array( $body['token'] ) ? reset( $body['token'] ) : $body['token'];
-}
-
-function myogenix_trt_handle_decline( WC_Subscription $subscription ) {
-	$subscription->update_status( 'on-hold', 'Patient declined TRT renewal via week-9 consent email — awaiting staff review.' );
-	$subscription->save();
-
-	wp_mail(
-		'support@myogenixpharma.com',
-		"TRT renewal declined — subscription #{$subscription->get_id()}",
-		"Patient {$subscription->get_billing_first_name()} {$subscription->get_billing_last_name()} ({$subscription->get_billing_email()}) declined their TRT renewal.\n\nSubscription: " . $subscription->get_edit_order_url() . "\n\nPlease review and close out manually."
-	);
-
-	return true;
+	return $token;
 }
