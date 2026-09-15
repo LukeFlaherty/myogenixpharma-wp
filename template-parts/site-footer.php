@@ -17,6 +17,7 @@ $_footer_groups = [
 		[ 'Peptides', home_url( '/wellness/' ) ],
 		[ 'Sexual Health', home_url( '/sexual-health/' ) ],
 		[ 'Mens Health', home_url( '/mens-health/' ) ],
+		[ 'Search Medications', home_url( '/medications/' ) ],
 	],
 	'Company' => [
 		[ 'How it works', home_url( '/#how-it-works' ) ],

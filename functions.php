@@ -229,32 +229,6 @@ add_filter( 'template_include', function( $template ) {
 	return $program_template ?: $template;
 }, 50 );
 
-// ─── Home Redesign (Staging) page — isolated navbar, does NOT touch the
-// shared site-wide nav above. Only loads on page-home-redesign.php so other
-// pages are completely unaffected while the redesign is in progress.
-add_action( 'wp_enqueue_scripts', function() {
-	if ( ! is_page_template( 'page-home-redesign.php' ) ) return;
-	wp_enqueue_style(
-		'myogenix-home-redesign-font-bebas',
-		'https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap',
-		[],
-		null
-	);
-	wp_enqueue_style(
-		'myogenix-home-redesign',
-		get_stylesheet_directory_uri() . '/assets/css/home-redesign.css',
-		[ 'myogenix-home-redesign-font-bebas' ],
-		'1.5.0'
-	);
-	wp_enqueue_script(
-		'myogenix-home-redesign',
-		get_stylesheet_directory_uri() . '/assets/js/home-redesign.js',
-		[],
-		'1.5.0',
-		true
-	);
-} );
-
 // ─── TRT Article page styles ─────────────────────────────────────────────────
 add_action( 'wp_enqueue_scripts', function() {
 	if ( ! is_page_template( 'page-trt-article.php' ) ) return;
