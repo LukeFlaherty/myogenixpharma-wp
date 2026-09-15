@@ -86,6 +86,7 @@ function myogenix_trt_approval_callback( WP_REST_Request $request ) {
 			if ( $reasons && ! array_filter( $reasons, function ( $name ) use ( $item ) { return prescription_fuzzy_match( $name, $item->get_name() ); } ) ) { return new WP_REST_Response( array( 'error' => 'Approval does not match the renewal medicine.' ), 422 ); }
 		}
 		$order->update_meta_data( 'appointment_id', $appointment_id );
+		$order->update_meta_data( '_order_origin', 'doctor_approval_api' );
 		$order->update_meta_data( '_trt_provider_approved', 'yes' );
 		$order->update_meta_data( '_prescription_charge_amount', $amount );
 		$order->update_meta_data( '_wc_stripe_customer', prescription_get_stripe_customer( $order, $order->get_customer_id() ) );

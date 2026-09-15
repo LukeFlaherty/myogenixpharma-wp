@@ -60,6 +60,10 @@ try {
 	$assert( $order->has_status( 'pending' ) && ! $order->get_transaction_id(), 'Renewal stays unpaid' );
 	$assert( $order->get_meta( '_prescribery_requisition_id' ) === 'qa-requisition-token', 'Lab token is mapped to renewal' );
 	$assert( ! $order->needs_payment(), 'Patient cannot bypass provider approval through pay link' );
+	$blocked = myogenix_trt_maybe_block_shopify_callback( false, array( 'body' => wp_json_encode( array( 'orderId' => $order->get_id() ) ) ), 'https://staff.prescribery.com/shopify/callback' );
+	$assert( is_array( $blocked ), 'Legacy callback is suppressed after creation as well as during creation' );
+	$allowed = myogenix_trt_maybe_block_shopify_callback( false, array( 'body' => wp_json_encode( array( 'orderId' => $sub->get_parent_id() ) ) ), 'https://staff.prescribery.com/shopify/callback' );
+	$assert( false === $allowed, 'Unrelated order callback is preserved' );
 	$assert( (float) $order->get_total() === 567.0, 'Zero-price copied line receives established approval price' );
 	$assert( myogenix_trt_cycle_start_ts( wcs_get_subscription( $id ) ) === $cycle, 'Unpaid renewal does not advance cycle' );
 	$http_count = count( $test_http ); $assert( is_wp_error( myogenix_trt_process_consent( $p ) ), 'Repeated consent rejected' ); $assert( count( $test_http ) === $http_count, 'Repeated click sends no second lab request' );
@@ -87,6 +91,17 @@ try {
 	$discounted = $fixture( 65, 283.50 ); myogenix_trt_check_subscription( $discounted->get_id() ); $test_lab_mode = 'success';
 	$discount_result = myogenix_trt_process_consent( $params_for( $discounted ) ); $assert( ! is_wp_error( $discount_result ), 'Discounted renewal created' ); $test_ids[] = $discount_result['order_id'];
 	$assert( (float) wc_get_order( $discount_result['order_id'] )->get_total() === 283.50, 'Established half-price plan is preserved' );
+	$mail_failure = $fixture();
+	$fail_mail = function ( $result, $mail ) { return str_contains( $mail['subject'], 'ready to review' ) ? false : $result; };
+	add_filter( 'pre_wp_mail', $fail_mail, 1000, 2 ); myogenix_trt_check_subscription( $mail_failure->get_id() );
+	$assert( ! wcs_get_subscription( $mail_failure->get_id() )->get_meta( '_trt_patient_email_for' ), 'Failed email is not marked delivered' );
+	remove_filter( 'pre_wp_mail', $fail_mail, 1000 ); myogenix_trt_check_subscription( $mail_failure->get_id() );
+	$assert( (bool) wcs_get_subscription( $mail_failure->get_id() )->get_meta( '_trt_patient_email_for' ), 'Failed invitation retries on the next check' );
+	$missing = $fixture(); $missing->delete_meta_data( '_prescribery_patient_id' ); $missing->save(); myogenix_trt_check_subscription( $missing->get_id() );
+	$assert( is_wp_error( myogenix_trt_process_consent( $params_for( $missing ) ) ) && ! wcs_get_subscription( $missing->get_id() )->get_meta( '_trt_pending_renewal_order' ), 'Missing patient mapping stops before lab or order creation' );
+	$disabled = $fixture(); myogenix_trt_check_subscription( $disabled->get_id() );
+	$qa = get_option( 'myogenix_trt_qa' ); $qa['subscription_ids'] = array_values( array_diff( $qa['subscription_ids'], array( $disabled->get_id() ) ) ); update_option( 'myogenix_trt_qa', $qa, false );
+	$assert( is_wp_error( myogenix_trt_process_consent( $params_for( $disabled ) ) ), 'Global off switch blocks a valid token outside the QA allowlist' );
 	$due_before = wcs_get_subscription( $id = $sub->get_id() )->get_time( 'next_payment' );
 	$order->update_meta_data( '_trt_provider_approved', 'yes' ); $order->update_meta_data( '_prescription_stripe_charging', 1 ); $order->save();
 	$order->payment_complete( 'qa_simulated_payment_no_real_charge' );

@@ -99,17 +99,21 @@ function myogenix_trt_install_renewal_guards() {
 	}
 }
 
-// Block the legacy callback only while our own renewal is being constructed.
+// Suppress legacy callbacks for the exact consent renewal, including later
+// status transitions. Provider correlation must use the verified launch contract.
 $GLOBALS['myogenix_trt_creating_subscription'] = 0;
 add_filter( 'pre_http_request', 'myogenix_trt_maybe_block_shopify_callback', 10, 3 );
 function myogenix_trt_maybe_block_shopify_callback( $preempt, $args, $url ) {
-	if ( ! $GLOBALS['myogenix_trt_creating_subscription'] || '/shopify/callback' !== substr( wp_parse_url( $url, PHP_URL_PATH ) ?? '', -17 ) ) {
+	if ( '/shopify/callback' !== substr( wp_parse_url( $url, PHP_URL_PATH ) ?? '', -17 ) ) {
 		return $preempt;
 	}
 	$host = wp_parse_url( $url, PHP_URL_HOST );
 	if ( ! in_array( $host, array( 'staff.prescribery.com', 'staging.prescribery.com' ), true ) ) {
 		return $preempt;
 	}
+	$payload = is_string( $args['body'] ?? null ) ? json_decode( $args['body'], true ) : ( $args['body'] ?? array() );
+	$order = wc_get_order( absint( $payload['orderId'] ?? 0 ) );
+	if ( ! myogenix_trt_is_renewal_order( $order ) ) { return $preempt; }
 	return array( 'headers' => array(), 'body' => '{"suppressed":"trt-consent-renewal"}', 'response' => array( 'code' => 200, 'message' => 'OK' ), 'cookies' => array(), 'filename' => null );
 }
 

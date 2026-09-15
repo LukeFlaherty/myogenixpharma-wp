@@ -19,7 +19,7 @@ Updated 2026-09-15. Patient rollout remains **off** until the provider-side hand
 
 1. Confirm the production panel with Prescribery. Configuration currently uses panel 627, Men's Testosterone FollowUp, with tests 2, 13, 15, 9, 10, 8, 11. Previous notes claimed confirmation but their detailed reference says the ID was inferred by name.
 2. Confirm how a pending lab API order delivers a usable requisition to the patient.
-3. Confirm how Prescribery associates the lab request with the NEW WooCommerce renewal order and sends its approval with that order ID. `save-test-order` has no documented WooCommerce order-ID field. The `reason` includes a reference for staff; it is **not a verified machine correlation contract**. The legacy callback remains suppressed during creation because its effect alongside the lab API is unverified.
+3. Confirm how Prescribery associates the lab request with the NEW WooCommerce renewal order and sends its approval with that order ID. `save-test-order` has no documented WooCommerce order-ID field. The `reason` includes a reference for staff; it is **not a verified machine correlation contract**. The legacy callback remains suppressed for this exact renewal during creation and later status transitions because its effect alongside the lab API is unverified.
 4. Complete an actual provider-to-site callback test. A direct test of our approval handler proves local behavior only.
 5. Review overdue active subscriptions and missing patient IDs before changing the live constant.
 
@@ -37,7 +37,7 @@ TRT_TEST_SOURCE=/tmp wp --skip-plugins=affiliate-wp --skip-themes eval-file /tmp
 
 Copy the three `inc/trt-renewal-*.php` files and `tests/trt-renewal-integration.php` to the chosen private candidate directory first. The suite mocks all HTTP and email, creates labeled fixtures, and trashes its fake orders afterward. It never operates on real subscriptions. It leaves a dedicated test customer account for subsequent preview work.
 
-31 checks passed on the installed WordPress/WooCommerce/WCS stack on 2026-09-15 before deployment. PHP lint and `git diff --check` also passed. This does not establish the external provider handoff.
+37 checks passed on the installed WordPress/WooCommerce/WCS stack on 2026-09-15 before deployment. PHP lint and `git diff --check` also passed. This does not establish the external provider handoff.
 
 ## Failure recovery
 
@@ -51,3 +51,18 @@ Copy the three `inc/trt-renewal-*.php` files and `tests/trt-renewal-integration.
 ## Deployment
 
 Commit and push `main`, then verify the production URL and deployed file hashes. Keep `MYOGENIX_TRT_REDESIGN_LIVE=false` until the launch gates pass. Remove QA allowlisting and put every retained fake subscription on hold after testing.
+
+## Production QA evidence — 2026-09-15
+
+- Test patient 351289 (TRT Test / Renewal QA; Luke’s requested email).
+- Browser Continue: fake subscription 4910 created renewal 4913 at $567, pending and unpaid, with a real production lab token. Prescribery lists lab order 2423, panel 627, results pending. The free panel reports `Paid` in Prescribery even though the request specifies pending and no live payment was made; do not infer patient billing from that label.
+- Browser Pause: fake subscription 4912 moved to on-hold. Patient and staff-preview messages were routed to Luke.
+- Desktop and 390px mobile checks: no horizontal overflow; signed GET is read-only; buttons submit a POST; invalid links show a styled error.
+- Authenticated in-process REST approval test: existing Stripe pipeline succeeded for 56700 cents using `livemode=false`. No live card was charged. Pharmacy release was intercepted.
+- Repeated approval: returned already paid, with no additional charge.
+- Subscription schedule advanced from 2026-10-10 to 2027-01-10 and preserved the prepaid period.
+- Approval adapter sets the existing invoice-origin marker so the normal approval receipt is sent.
+- Test emails: consent invitations, renewal confirmation, pause confirmation, staff preview, and test payment receipt were accepted by WordPress mail. Inbox delivery is for Luke to confirm.
+- Fake orders were trashed (recoverable), fake subscriptions disabled, and QA allowlisting removed after checks. Provider test patient/lab records remain clearly labeled for provider verification. Do not create another lab request for the same test to compensate for an unknown delivery state.
+- Global Stripe mode remains live; the test-mode override existed only within the controlled CLI payment request.
+- Actual Prescribery-to-site approval correlation and patient requisition delivery are still unverified. Production activation remains blocked on those points and confirmation of the clinical panel. The code is not evidence that Prescribery implements that missing contract.
