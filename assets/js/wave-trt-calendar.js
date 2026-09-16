@@ -59,10 +59,11 @@
       button.title = label + (events.length ? '\n' + events.slice(0, 6).map(event => event.patient + ': ' + event.title).join('\n') + (events.length > 6 ? '\nMore events — click to view all' : '') : '');
     });
     root.querySelectorAll('[data-month-count]').forEach(label => {
-      label.textContent = filtered.filter(event => event.date.startsWith(label.dataset.monthCount)).length + ' events';
+      const count = filtered.filter(event => event.date.startsWith(label.dataset.monthCount)).length;
+      label.textContent = count + (count === 1 ? ' event' : ' events');
     });
     const affected = new Set(filtered.map(event => event.patientId)).size;
-    root.querySelector('#wave-cal-summary').textContent = filtered.length + ' visible events · ' + affected + ' patients with events · ' + filtered.filter(overdue).length + ' past-due scheduled items · Outlined date = today';
+    root.querySelector('#wave-cal-summary').textContent = filtered.length + ' visible events · ' + affected + (affected === 1 ? ' patient with events · ' : ' patients with events · ') + filtered.filter(overdue).length + ' past-due scheduled items · Outlined date = today';
     const gaps = root.querySelector('#wave-cal-gaps'); gaps.replaceChildren();
     const missing = data.undated.filter(person => (!patient.value || person.patientId === patient.value) && (!query || person.name.toLowerCase().includes(query) || data.events.some(event => event.patientId === person.patientId && String(event.recordId).includes(query))));
     missing.forEach(person => {
