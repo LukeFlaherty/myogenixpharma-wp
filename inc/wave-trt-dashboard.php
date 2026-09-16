@@ -2,6 +2,7 @@
 /** Wave Consulting TRT operations view. Staff workflow with separate billing controls. */
 defined( 'ABSPATH' ) || exit;
 require_once __DIR__ . '/wave-trt-actions.php';
+require_once __DIR__ . '/wave-trt-calendar.php';
 
 add_action( 'admin_menu', function () {
 	add_menu_page( 'TRT Patients', 'Wave Consulting', 'manage_woocommerce', 'wave-trt', 'wave_trt_render', 'dashicons-chart-area', 56 );

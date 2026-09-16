@@ -32,3 +32,22 @@ Lint PHP and run `git diff --check` before deployment. On production verify menu
 - Workflow belongs to the displayed order (or subscription when no order exists). New treatment orders begin a separate workflow; previous notes remain on the original order.
 - Saves retain the latest 50 staff events in metadata plus private WooCommerce audit notes. Duplicate/stale submissions are rejected.
 - `php tests/wave-trt-actions.php`: isolated request-handler checks covering authorized writes, invalid actions, stale revisions, invalid dates, missing evidence, permissions, nonce failure and non-TRT records. No live patient changes during QA.
+
+## Annual patient calendar
+
+Admin URL: `/wp-admin/admin.php?page=wave-trt-calendar`, under Wave Consulting → TRT Patient Calendar. Same `manage_woocommerce` restriction and no-cache headers as the patient dashboard. All 12 months render together; the desktop layout uses four columns. Patient search, patient selection and event-type filters update month totals, day markers, the agenda, and scheduling gaps. Click a day for all matching events with patient-action and source-record links.
+
+Sources and date meaning:
+
+- Initial and renewal order creation dates, with current order status labeled separately.
+- Refund record creation dates.
+- Recognized provider approval, pharmacy handoff and medication-payment note dates.
+- Staff follow-up due dates, with closed tasks labeled closed.
+- Contact-note logging dates from retained staff history (latest 50 events per record).
+- Current staff milestone verification dates, explicitly not assumed to be actual occurrence dates; removed verifications disappear.
+- Next payment dates on active subscriptions only. Later cycles are not invented. On-hold/cancelled subscriptions do not appear as upcoming renewals.
+- Optional suggested check-ins exactly 21 local calendar days before the next stored renewal. Off by default; not appointments, automated reminders, or messages.
+
+All timestamps are converted using the WordPress timezone. Dates without timestamps (staff follow-ups) retain their stored local day. Scheduling gaps show patients with no open dated follow-up or no active scheduled renewal, independently of the viewed year. Past-due denotes an open scheduled date in the past, not proof of missed care. The existing record scan limit and test exclusions apply.
+
+`php tests/wave-trt-calendar.php` validates year inputs, timezone boundaries, leap years, prior-year suggestions, renewal identification, closed follow-ups, paused subscriptions and removal of staff verification.
