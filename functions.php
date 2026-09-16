@@ -6,6 +6,7 @@
 require_once get_stylesheet_directory() . '/inc/product-reviews.php';
 require_once get_stylesheet_directory() . '/inc/trt-renewal-redesign.php';
 require_once get_stylesheet_directory() . '/inc/wave-trt-dashboard.php';
+require_once get_stylesheet_directory() . '/inc/wave-affiliates.php';
 
 // Enqueue parent theme styles
 add_action( 'wp_enqueue_scripts', function() {
