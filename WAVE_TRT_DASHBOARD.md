@@ -2,7 +2,7 @@
 
 Admin URL: `/wp-admin/admin.php?page=wave-trt`
 
-Read-only dashboard restricted to `manage_woocommerce`. No mutation routes, patient emails, payment calls, background jobs, or persistent patient caches. Assets load only on this admin page. Data is queried through WooCommerce CRUD for HPOS/legacy compatibility.
+Dashboard restricted to `manage_woocommerce`. Staff workflow actions use authenticated POST requests with record-specific nonces, revision checks and per-record database locks. No patient emails, payment calls, background jobs, or persistent patient caches. Assets load only on this admin page. Data is queried through WooCommerce CRUD for HPOS/legacy compatibility.
 
 ## Scope
 
@@ -22,3 +22,13 @@ Read-only dashboard restricted to `manage_woocommerce`. No mutation routes, pati
 
 `php tests/wave-trt-dashboard.php` tests conservative classification using fictional facts only.
 Lint PHP and run `git diff --check` before deployment. On production verify menu visibility, records/subscriptions, known refund flags, search, card filters, expanders, source links and mobile overflow. No patient data or screenshots should be committed.
+
+## Staff actions
+
+- Assign follow-up to self or clear assignment; save status, next action and due date.
+- Log private contact notes; close/reopen staff follow-up with a resolution note.
+- Record or remove verified intake, lab completion, pharmacy, shipment and delivery milestones with supporting notes. Manual milestones are labeled staff verified and never write clinical/financial integration fields.
+- Source alerts remain visible after closing a staff follow-up. Billing and subscription changes use clearly labeled links to native WooCommerce records.
+- Workflow belongs to the displayed order (or subscription when no order exists). New treatment orders begin a separate workflow; previous notes remain on the original order.
+- Saves retain the latest 50 staff events in metadata plus private WooCommerce audit notes. Duplicate/stale submissions are rejected.
+- `php tests/wave-trt-actions.php`: isolated request-handler checks covering authorized writes, invalid actions, stale revisions, invalid dates, missing evidence, permissions, nonce failure and non-TRT records. No live patient changes during QA.

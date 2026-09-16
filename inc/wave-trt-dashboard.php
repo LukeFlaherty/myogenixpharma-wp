@@ -1,6 +1,7 @@
 <?php
-/** Wave Consulting's read-only TRT operations view. No billing or clinical mutations. */
+/** Wave Consulting TRT operations view. Staff workflow with separate billing controls. */
 defined( 'ABSPATH' ) || exit;
+require_once __DIR__ . '/wave-trt-actions.php';
 
 add_action( 'admin_menu', function () {
 	add_menu_page( 'TRT Patients', 'Wave Consulting', 'manage_woocommerce', 'wave-trt', 'wave_trt_render', 'dashicons-chart-area', 56 );
@@ -8,8 +9,8 @@ add_action( 'admin_menu', function () {
 } );
 add_action( 'admin_enqueue_scripts', function ( $hook ) {
 	if ( 'toplevel_page_wave-trt' !== $hook ) { return; }
-	wp_enqueue_style( 'wave-trt', get_stylesheet_directory_uri() . '/assets/css/wave-trt-dashboard.css', array(), '1.0.0' );
-	wp_enqueue_script( 'wave-trt', get_stylesheet_directory_uri() . '/assets/js/wave-trt-dashboard.js', array(), '1.0.0', true );
+	wp_enqueue_style( 'wave-trt', get_stylesheet_directory_uri() . '/assets/css/wave-trt-dashboard.css', array(), '1.1.0' );
+	wp_enqueue_script( 'wave-trt', get_stylesheet_directory_uri() . '/assets/js/wave-trt-dashboard.js', array(), '1.1.0', true );
 } );
 add_action( 'admin_init', function () {
 	if ( isset( $_GET['page'] ) && 'wave-trt' === $_GET['page'] ) { nocache_headers(); }
@@ -162,9 +163,10 @@ function wave_trt_render() {
 	}
 	?>
 	<div class="wrap wave-trt" id="wave-trt">
+		<?php if ( isset( $_GET['wave_saved'] ) && '1' === $_GET['wave_saved'] ) : ?><div class="notice notice-success inline"><p>Staff update saved. Patient billing and clinical records were not changed.</p></div><?php endif; ?>
 		<div class="wave-brand">WAVE CONSULTING <span>Patient operations</span></div>
 		<header class="wave-heading"><div><p class="wave-eyebrow">MYOGENIX PHARMA</p><h1>TRT patient dashboard</h1><p>See the evidence. Find the next step. Keep every patient moving.</p></div><a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=wave-trt' ) ); ?>">Refresh records</a></header>
-		<p class="wave-fresh">Live WordPress snapshot · <?php echo esc_html( wp_date( 'M j, Y · g:i a T' ) ); ?> · Read-only · Testosterone product #883 · <?php echo esc_html( $excluded ); ?> test records excluded</p>
+		<p class="wave-fresh">Live WordPress snapshot · <?php echo esc_html( wp_date( 'M j, Y · g:i a T' ) ); ?> · Staff workspace · Testosterone product #883 · <?php echo esc_html( $excluded ); ?> test records excluded</p>
 		<?php if ( $limited ) : ?><div class="notice notice-warning inline"><p>Partial results: the scan reached 2,000 records of an order type. Older patients may be missing. Counts below cover loaded records only.</p></div><?php endif; ?>
 		<div class="wave-notice"><strong>What these records can tell you</strong><p>Payments, order notes and subscriptions come from WooCommerce. Lab completion, intake and shipping are unconfirmed unless supported by verified data. “Completed” is an order status, not proof of delivery. Follow-up is flagged after 7 days from order creation; this is a review threshold, not a promised turnaround.</p><?php if ( defined( 'MYOGENIX_TRT_REDESIGN_LIVE' ) && ! MYOGENIX_TRT_REDESIGN_LIVE ) : ?><p><strong>Consent renewal rollout is off.</strong> Existing subscriptions may still use legacy billing. Confirm the provider handoff before enabling the new flow.</p><?php endif; ?></div>
 		<div class="wave-stats" aria-label="Patient filters">
@@ -183,7 +185,7 @@ function wave_trt_render() {
 			if ( $row['s']['due_soon'] ) { $filters[] = 'renewal'; }
 			if ( $f['closed'] ) { $filters[] = 'closed'; }
 			?>
-			<article class="wave-patient" data-filters="<?php echo esc_attr( implode( ' ', array_unique( $filters ) ) ); ?>" data-search="<?php echo esc_attr( strtolower( $name . ' ' . $r->get_billing_email() . ' ' . implode( ' ', $ids ) ) ); ?>">
+			<article id="wave-record-<?php echo esc_attr( $r->get_id() ); ?>" class="wave-patient" data-filters="<?php echo esc_attr( implode( ' ', array_unique( $filters ) ) ); ?>" data-search="<?php echo esc_attr( strtolower( $name . ' ' . $r->get_billing_email() . ' ' . implode( ' ', $ids ) ) ); ?>">
 				<div class="wave-row">
 					<div class="wave-person"><h2><?php echo esc_html( $name ); ?></h2><p><?php echo esc_html( $r->get_billing_email() ); ?></p><a href="<?php echo esc_url( $r->get_edit_order_url() ); ?>"><?php echo $o ? 'Order #' : 'Subscription #'; echo esc_html( $r->get_id() ); ?></a><span> · <?php echo esc_html( wave_trt_date( $r->get_date_created() ) ); ?></span></div>
 					<div><span class="wave-label">Latest cycle evidence</span><span class="wave-badge <?php echo esc_attr( $a['tone'] ); ?>"><?php echo esc_html( $a['stage'] ); ?></span><p><?php echo $o ? esc_html( $f['age'] . ' days since order · ' . wc_get_order_status_name( $o->get_status() ) ) : 'No linked TRT order loaded'; ?></p></div>
@@ -191,9 +193,10 @@ function wave_trt_render() {
 					<div class="wave-next"><span class="wave-label">Suggested next action</span><strong><?php echo esc_html( $a['action'] ); ?></strong></div>
 				</div>
 				<?php if ( $a['flags'] ) : ?><ul class="wave-flags"><?php foreach ( $a['flags'] as $flag ) : ?><li><?php echo esc_html( $flag ); ?></li><?php endforeach; ?></ul><?php endif; ?>
+				<?php wave_trt_render_actions( $row ); ?>
 				<details><summary>View journey, subscriptions &amp; order history</summary><div class="wave-detail-body">
 					<div class="wave-journey" aria-label="Confirmed milestones for the latest order">
-					<?php foreach ( array( 'Order' => $o ? 'Recorded' : 'Unconfirmed', 'Intake' => 'Unconfirmed', 'Labs' => 'created' === $f['lab'] && $f['requisition'] ? 'Request created; results unconfirmed' : 'Unconfirmed', 'Provider' => $f['approved'] ? 'Approval recorded' : 'Unconfirmed', 'Payment' => $f['refunded'] ? 'Refund recorded' : ( $f['paid'] ? 'Transaction recorded; see order' : 'Unconfirmed' ), 'Pharmacy' => $f['pharmacy'] ? 'Handoff acknowledged' : 'Unconfirmed', 'Delivery' => 'Unconfirmed' ) as $step => $value ) : ?><div class="wave-step <?php echo 'Unconfirmed' === $value ? '' : 'recorded'; ?>"><strong><?php echo esc_html( $step ); ?></strong><span><?php echo esc_html( $value ); ?></span></div><?php endforeach; ?>
+					<?php $staff_milestones = wave_trt_work( $r )['milestones'] ?? array(); foreach ( array( 'Order' => $o ? 'Recorded' : 'Unconfirmed', 'Intake' => isset( $staff_milestones['intake'] ) ? 'Staff verified' : 'Unconfirmed', 'Labs' => isset( $staff_milestones['labs'] ) ? 'Completion staff verified' : ( 'created' === $f['lab'] && $f['requisition'] ? 'Request created; results unconfirmed' : 'Unconfirmed' ), 'Provider' => $f['approved'] ? 'Approval recorded' : 'Unconfirmed', 'Payment' => $f['refunded'] ? 'Refund recorded' : ( $f['paid'] ? 'Transaction recorded; see order' : 'Unconfirmed' ), 'Pharmacy' => isset( $staff_milestones['pharmacy'] ) ? 'Handoff staff verified' : ( $f['pharmacy'] ? 'Handoff acknowledged' : 'Unconfirmed' ), 'Delivery' => isset( $staff_milestones['delivery'] ) ? 'Delivery staff verified' : ( isset( $staff_milestones['shipped'] ) ? 'Shipment staff verified; delivery unconfirmed' : 'Unconfirmed' ) ) as $step => $value ) : ?><div class="wave-step <?php echo 'Unconfirmed' === $value ? '' : 'recorded'; ?>"><strong><?php echo esc_html( $step ); ?></strong><span><?php echo esc_html( $value ); ?></span></div><?php endforeach; ?>
 					</div>
 					<div class="wave-detail-grid"><section><h3>Subscription &amp; next billing</h3>
 					<?php if ( ! $row['subscriptions'] ) : ?><p>No TRT subscription matched to this customer. Check the order for legacy or guest records.</p><?php endif; ?>
@@ -204,7 +207,7 @@ function wave_trt_render() {
 			</article>
 		<?php endforeach; ?>
 		</div><p id="wave-empty" <?php echo $rows ? 'hidden' : ''; ?>>No patients match this view.</p>
-		<footer class="wave-footer">Wave Consulting · Operational visibility from existing records. Refresh to load new updates. Guest records are grouped by billing email; registered customers by customer ID. No charges, emails or subscription changes are triggered here.</footer>
+		<footer class="wave-footer">Wave Consulting · Operational visibility from existing records. Refresh to load new updates. Guest records are grouped by billing email; registered customers by customer ID. Staff actions are recorded privately on the selected record. Billing changes use the linked WooCommerce controls.</footer>
 	</div>
 	<?php
 }
