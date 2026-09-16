@@ -1,6 +1,6 @@
 # TRT consent renewal operations
 
-Updated 2026-09-15. Patient rollout remains **off** until the provider-side handoff is verified.
+Updated 2026-09-16. Patient rollout remains **off** until the provider-side handoff is verified.
 
 ## Behavior
 
@@ -17,11 +17,12 @@ Updated 2026-09-15. Patient rollout remains **off** until the provider-side hand
 
 ## Launch gates
 
-1. Confirm the production panel with Prescribery. Configuration currently uses panel 627, Men's Testosterone FollowUp, with tests 2, 13, 15, 9, 10, 8, 11. Previous notes claimed confirmation but their detailed reference says the ID was inferred by name.
-2. Confirm how a pending lab API order delivers a usable requisition to the patient.
-3. Confirm how Prescribery associates the lab request with the NEW WooCommerce renewal order and sends its approval with that order ID. `save-test-order` has no documented WooCommerce order-ID field. The `reason` includes a reference for staff; it is **not a verified machine correlation contract**. The legacy callback remains suppressed for this exact renewal during creation and later status transitions because its effect alongside the lab API is unverified.
+1. **Complete:** Omar confirmed panel 627, Men's Testosterone FollowUp, with tests 2, 13, 15, 9, 10, 8, 11 in his September 15, 2026, 7:27 PM reply supplied by Luke. The production configuration was checked September 16 and matches exactly.
+2. **Partially complete:** Luke received the lab-work email for the fake patient. Verify that its requisition download opens the correct usable form; inbox delivery alone does not establish this.
+3. **Waiting on Prescribery:** Omar says an optional correlation field is being added, with production deployment planned September 16. Obtain its exact name, type, example, deployment confirmation, and approval callback contract before implementation. Confirm how Prescribery associates the lab request with the NEW WooCommerce renewal order and sends its approval with that order ID. `save-test-order` has no documented WooCommerce order-ID field. The `reason` includes a reference for staff; it is **not a verified machine correlation contract**. The legacy callback remains suppressed for this exact renewal during creation and later status transitions because its effect alongside the lab API is unverified.
 4. Complete an actual provider-to-site callback test. A direct test of our approval handler proves local behavior only.
-5. Review overdue active subscriptions and missing patient IDs before changing the live constant.
+5. Resolve the lab-cost discrepancy described below. Prescribery charges are not automatic authorization to change patient pricing or add a charge before consent/provider approval.
+6. Review overdue active subscriptions and missing patient IDs before changing the live constant.
 
 Do not equate receiving a lab token with completion of these gates.
 
@@ -75,3 +76,27 @@ Commit and push `main`, then verify the production URL and deployed file hashes.
 - Luke supplied an inbox screenshot of “Next Step: Complete Your Lab Work” for the fake patient. Email delivery is now evidenced; the linked requisition contents and external approval-to-renewal correlation still need verification. The email is absent from the WordPress mail log and the local integration templates, suggesting provider-side delivery; confirm ownership with Prescribery before changing that template.
 - Global Stripe mode was rechecked as `live`. Scoped test mode must never be replaced with a site-wide switch for QA.
 - The 37 guarded integration checks passed again after the presentation update; all HTTP and mail were mocked for that suite.
+
+
+## Prescribery follow-up — 2026-09-16
+
+### Confirmed / read-only checks
+
+- Omar confirmed the configured production panel and all seven test IDs. No lab configuration change was necessary.
+- Production Stripe remains `live`; `MYOGENIX_TRT_REDESIGN_LIVE` remains `false`.
+- Authenticated production `GET /api/v2/lab/list/128/1/1` returned HTTP 200, panel 627 with `type: free`, and `price: 0.00` for each selected test. The response does not establish Prescribery's wholesale invoice amount or whether processing fees are included.
+- Omar's statement that Prescribery charges each test price plus 28 in lab processing fees requires clarification against those zero prices. Ask for the authoritative amount, whether the processing fee is per requisition or per test, whether Myogenix is invoiced separately, and which payment fields are appropriate when labs are included for the patient. Preserve existing customer pricing until Luke approves any change.
+- Read-only checks of fake patient 351289 returned no patient documents; lab order 2423 remains present with amount `0`, payment `Paid`, and results `Pending`. These API views did not expose the emailed requisition download, so that link still needs direct verification.
+- The publicly accessible staging API documentation still does not list the new WooCommerce correlation field at the time of review. The production documentation could not be retrieved with the web reader; neither observation proves the new field is or is not deployed. Do not guess a field name or treat the `reason` reference as sufficient.
+
+### Exact callback behavior to explain to Omar
+
+Checked against a fresh copy of the installed `prescribery-wc-integration` plugin, unchanged from the September 15 audit:
+
+- `woocommerce_order_status_processing` and `woocommerce_order_status_on-hold`, priority 20: `Pre_Woo_Integration::on_order_processed_send_callback()` invokes the callback for orders containing synced products. The sender returns early when `is_admin()` is true. These are status-transition hooks, not an explicit once-only checkout hook; later transitions can attempt another callback.
+- `wcs_renewal_order_created`, priority 10: `Pre_Woo_Integration::on_renewal_order_created_callback()` invokes the callback as soon as a native WCS renewal order exists. The plugin calculates a synced-product flag here but does not use it to guard the send.
+- Endpoint: `https://staff.prescribery.com/shopify/callback`. Both payloads include `uuid`, `orderId`, `platform: woocommerce`, `source_id`, and `client_id`; the status-transition sender also includes `patient_id`.
+- New consent renewals: Continue creates a pending WooCommerce renewal, then calls the lab API. The theme suppresses the legacy callback for that specifically tagged renewal, including later order-status transitions, while its required role and duplicate effects are unconfirmed. Existing initial orders and ordinary renewals retain their current behavior while the new workflow is off.
+- Ask whether the new correlation field alone registers the renewal for review/approval, or whether the legacy callback must also run. If it must run, request exact sequencing and how Prescribery prevents a second lab order. Obtain an example approval payload returning the new WooCommerce order ID and appointment ID, then coordinate the controlled external callback test.
+
+Reference: [Prescribery lab API documentation](https://staging.prescribery.com/api/docs#labs-POSTapi-v2-lab--clientId--save-test-order). No new production lab request, live payment, or pharmacy release was initiated during this follow-up.
