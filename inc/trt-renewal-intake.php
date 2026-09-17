@@ -16,16 +16,9 @@ function myogenix_trt_register_intake( WC_Subscription $sub, WC_Order $order ) {
 	$host = wp_parse_url( $s['api_base_url'] ?? '', PHP_URL_HOST );
 	$patient = myogenix_trt_get_prescribery_patient_id( $sub );
 	if ( ! in_array( $host, array( 'staff.prescribery.com', 'staging.prescribery.com' ), true ) || empty( $s['client_id'] ) || empty( $s['source_id'] ) || ! $patient || ! is_callable( array( 'PreWoo_Utils', 'encode_order_id' ) ) ) {
-		return new WP_Error( 'intake_config', 'The intake connection needs to be configured by our team.' );
+		return new WP_Error( 'intake_config', 'The renewal connection needs to be configured by our team.' );
 	}
 	$options = get_option( 'pre_woo_options', array() );
-	$base = $s['intake_base_url'] ?? '';
-	if ( ! $base && (int) ( $options['client_id'] ?? 0 ) === (int) $s['client_id'] && (int) ( $options['source_id'] ?? 0 ) === (int) $s['source_id'] && wp_parse_url( $options['dashcallback_base_url'] ?? '', PHP_URL_HOST ) === $host ) {
-		$base = $options['external_base_url'] ?? '';
-	}
-	if ( 'https' !== wp_parse_url( $base, PHP_URL_SCHEME ) || ! preg_match( '/(^|\.)prescribery\.com$/', wp_parse_url( $base, PHP_URL_HOST ) ?? '' ) ) {
-		return new WP_Error( 'intake_config', 'Our team needs to configure your questionnaire link.' );
-	}
 	$payload = array(
 		'uuid' => PreWoo_Utils::encode_order_id( $order->get_id(), $s['client_id'] ),
 		'orderId' => $order->get_id(),
@@ -55,13 +48,8 @@ function myogenix_trt_register_intake( WC_Subscription $sub, WC_Order $order ) {
 	$order->update_meta_data( '_trt_intake_state', $accepted ? 'sent' : 'uncertain' );
 	if ( $accepted ) {
 		$order->update_meta_data( '_trt_intake_sent_at', time() );
-		$order->update_meta_data( '_trt_intake_url', add_query_arg( 'token', $payload['uuid'], $base ) );
-		$order->add_order_note( 'Prescribery accepted this renewal for intake. Duplicate callback sends are blocked.' );
+		$order->add_order_note( 'Prescribery accepted this renewal registration. Duplicate callback sends are blocked.' );
 	}
 	$order->save();
-	return $accepted ? true : new WP_Error( 'intake_needs_review', 'We could not confirm your intake request. Our team will check it before requesting your labs.' );
-}
-
-function myogenix_trt_intake_url( $order ) {
-	return myogenix_trt_is_renewal_order( $order ) && 'sent' === $order->get_meta( '_trt_intake_state' ) ? esc_url_raw( $order->get_meta( '_trt_intake_url' ) ) : '';
+	return $accepted ? true : new WP_Error( 'intake_needs_review', 'We could not confirm your renewal registration. Our team will check it before requesting your labs.' );
 }
