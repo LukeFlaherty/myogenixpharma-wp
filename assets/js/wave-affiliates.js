@@ -20,7 +20,7 @@
         row.hidden = !match || (!query && !expanded && visible >= limit);
         if (!row.hidden) visible++;
       });
-      count.textContent = query ? matching + ' matching affiliates / records' : 'Showing ' + visible + ' of ' + rows.length;
+      count.textContent = query ? matching + ' matching results' : 'Showing ' + visible + ' of ' + rows.length;
       if (expand) {
         expand.hidden = Boolean(query) || rows.length <= limit;
         expand.textContent = expanded ? 'Show top ' + limit : 'Show all ' + rows.length + ' affiliates';

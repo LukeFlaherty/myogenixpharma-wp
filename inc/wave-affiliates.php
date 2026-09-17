@@ -9,9 +9,9 @@ add_action( 'admin_menu', function () {
 }, 20 );
 add_action( 'admin_enqueue_scripts', function ( $hook ) {
 	if ( $hook !== ( $GLOBALS['wave_aff_hook'] ?? '' ) ) { return; }
-	wp_enqueue_style( 'wave-trt', get_stylesheet_directory_uri() . '/assets/css/wave-trt-dashboard.css', array(), '1.1.0' );
-	wp_enqueue_style( 'wave-affiliates', get_stylesheet_directory_uri() . '/assets/css/wave-affiliates.css', array( 'wave-trt' ), '1.1.0' );
-	wp_enqueue_script( 'wave-affiliates', get_stylesheet_directory_uri() . '/assets/js/wave-affiliates.js', array(), '1.1.0', true );
+	wp_enqueue_style( 'wave-trt', get_stylesheet_directory_uri() . '/assets/css/wave-trt-dashboard.css', array(), '1.1.1' );
+	wp_enqueue_style( 'wave-affiliates', get_stylesheet_directory_uri() . '/assets/css/wave-affiliates.css', array( 'wave-trt' ), '1.1.1' );
+	wp_enqueue_script( 'wave-affiliates', get_stylesheet_directory_uri() . '/assets/js/wave-affiliates.js', array(), '1.1.1', true );
 } );
 add_action( 'admin_init', function () { if ( isset( $_GET['page'] ) && 'wave-affiliates' === $_GET['page'] ) { nocache_headers(); } } );
 add_action( 'init', function () { register_post_type( 'wave_aff_report', array( 'public' => false, 'show_ui' => false, 'show_in_rest' => false, 'can_export' => false, 'supports' => array( 'title' ) ) ); } );
