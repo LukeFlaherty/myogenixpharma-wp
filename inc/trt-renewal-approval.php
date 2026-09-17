@@ -62,19 +62,23 @@ function myogenix_trt_approval_callback( WP_REST_Request $request ) {
 	$p = $request->get_params();
 	$id = absint( $p['order_id'] ?? $p['data']['order_id'] ?? $p['payload']['data']['order_id'] ?? 0 );
 	$order = wc_get_order( $id );
-	if ( ! myogenix_trt_is_renewal_order( $order ) ) { return prescriptionHandleApproval( $request ); }
-	$sub = wcs_get_subscription( $order->get_meta( '_trt_subscription_id' ) );
-	// QA approval is exercised by a controlled CLI test, never by an external callback.
-	if ( 'yes' === $order->get_meta( '_trt_qa_test' ) && ! ( defined( 'WP_CLI' ) && WP_CLI && apply_filters( 'myogenix_trt_allow_qa_approval', false, $order ) ) ) {
+	// Protect fake parents too: a miscorrelated provider callback must never charge
+	// or release their medication through the legacy handler. The REST route still
+	// requires its existing authentication before reaching this observer.
+	if ( $order && 'yes' === $order->get_meta( '_trt_qa_test' ) && ! ( defined( 'WP_CLI' ) && WP_CLI && apply_filters( 'myogenix_trt_allow_qa_approval', false, $order ) ) ) {
+		$order->update_meta_data( '_trt_qa_callback_seen', array( 'at' => time(), 'order_id' => $id, 'patient_id' => absint( $p['patient_id'] ?? 0 ), 'appointment_id' => absint( $p['appointment_id'] ?? 0 ), 'status' => sanitize_key( $p['status'] ?? $p['data']['event'] ?? $p['payload']['event'] ?? '' ), 'keys' => array_map( 'sanitize_key', array_keys( $p ) ) ) );
+		$order->save();
 		return new WP_REST_Response( array( 'error' => 'Test order: external approval disabled.' ), 403 );
 	}
+	if ( ! myogenix_trt_is_renewal_order( $order ) ) { return prescriptionHandleApproval( $request ); }
+	$sub = wcs_get_subscription( $order->get_meta( '_trt_subscription_id' ) );
 	if ( ! $sub || ! myogenix_trt_lock( $sub->get_id() ) ) { return new WP_REST_Response( array( 'error' => 'Renewal is being processed.' ), 409 ); }
 	try {
 		$status = strtolower( sanitize_key( $p['status'] ?? $p['data']['event'] ?? $p['payload']['event'] ?? '' ) );
 		if ( 'approved' !== $status ) { return prescriptionHandleApproval( $request ); }
 		if ( $order->get_transaction_id() ) { return new WP_REST_Response( array( 'success' => true, 'message' => 'Already paid; no additional charge.' ) ); }
-		if ( ! $sub->has_status( 'active' ) || ! $order->has_status( array( 'pending', 'failed', 'on-hold' ) ) || 'continue' !== $sub->get_meta( '_trt_consent_resolved_action' ) || (int) $sub->get_meta( '_trt_pending_renewal_order' ) !== $order->get_id() || 'created' !== $order->get_meta( '_trt_lab_state' ) || ! $order->get_meta( '_prescribery_requisition_id' ) ) {
-			return new WP_REST_Response( array( 'error' => 'Renewal requires consent and a confirmed lab request before approval.' ), 409 );
+		if ( ! $sub->has_status( 'active' ) || ! $order->has_status( array( 'pending', 'failed', 'on-hold' ) ) || 'continue' !== $sub->get_meta( '_trt_consent_resolved_action' ) || (int) $sub->get_meta( '_trt_pending_renewal_order' ) !== $order->get_id() || 'sent' !== $order->get_meta( '_trt_intake_state' ) || 'created' !== $order->get_meta( '_trt_lab_state' ) || ! $order->get_meta( '_prescribery_requisition_id' ) ) {
+			return new WP_REST_Response( array( 'error' => 'Renewal requires consent, intake registration, and a confirmed lab request before approval.' ), 409 );
 		}
 		$patient_id = absint( $p['patient_id'] ?? 0 );
 		$appointment_id = absint( $p['appointment_id'] ?? 0 );

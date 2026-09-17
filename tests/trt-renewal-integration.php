@@ -7,13 +7,19 @@
 if ( ! defined( 'WP_CLI' ) || ! WP_CLI || ! getenv( 'TRT_TEST_SOURCE' ) ) { exit( 'WP-CLI test runner only.' ); }
 require rtrim( getenv( 'TRT_TEST_SOURCE' ), '/' ) . '/trt-renewal-redesign.php';
 myogenix_trt_install_renewal_guards();
-$test_ids = array(); $test_checks = 0; $test_http = array(); $test_mail = array(); $test_lab_mode = 'success';
+$test_ids = array(); $test_checks = 0; $test_http = array(); $test_mail = array(); $test_lab_mode = 'success'; $test_intake_mode = 'success'; $test_requests = array();
 $old_qa = get_option( 'myogenix_trt_qa', null );
 $assert = function ( $condition, $message ) use ( &$test_checks ) { if ( ! $condition ) { throw new RuntimeException( $message ); } ++$test_checks; echo "PASS: $message\n"; };
 add_filter( 'pre_wp_mail', function ( $result, $mail ) use ( &$test_mail ) { $test_mail[] = $mail; return true; }, 999, 2 );
-add_filter( 'pre_http_request', function ( $pre, $args, $url ) use ( &$test_http, &$test_lab_mode ) {
+add_filter( 'pre_http_request', function ( $pre, $args, $url ) use ( &$test_http, &$test_lab_mode, &$test_intake_mode, &$test_requests ) {
+	if ( false !== $pre ) { return $pre; }
 	$test_http[] = $url;
+	$test_requests[] = array( 'url' => $url, 'body' => json_decode( $args['body'] ?? '{}', true ) );
 	if ( str_contains( $url, '/access-token' ) ) { $body = array( 'data' => array( 'access_token' => 'qa-only-not-a-real-token', 'expires_in' => 1 ) ); }
+	elseif ( str_contains( $url, '/shopify/callback' ) ) {
+		if ( 'timeout' === $test_intake_mode ) { return new WP_Error( 'http_request_failed', 'QA intake timeout' ); }
+		$body = array( 'ok' => 'success' === $test_intake_mode );
+	}
 	elseif ( str_contains( $url, '/save-test-order' ) ) {
 		if ( 'timeout' === $test_lab_mode ) { return new WP_Error( 'http_request_failed', 'QA simulated timeout' ); }
 		if ( 'reject' === $test_lab_mode ) { return array( 'headers' => array(), 'body' => '{"message":"QA invalid test"}', 'response' => array( 'code' => 422, 'message' => 'Unprocessable' ), 'cookies' => array() ); }
@@ -22,7 +28,7 @@ add_filter( 'pre_http_request', function ( $pre, $args, $url ) use ( &$test_http
 	return array( 'headers' => array(), 'body' => wp_json_encode( $body ), 'response' => array( 'code' => 200, 'message' => 'OK' ), 'cookies' => array() );
 }, 999, 3 );
 // Prevent the auth mock from ever entering the real site's token cache.
-add_filter( 'pre_option_myogenix_trt_lab_api', function () { return array( 'active_env' => 'sandbox', 'sandbox' => array( 'api_base_url' => 'https://staging.prescribery.com/api/v2', 'api_key' => 'integration-fixture', 'client_id' => 16, 'source_id' => 1198, 'lab_id' => 1057, 'test_ids' => array( 59, 5 ) ) ); } );
+add_filter( 'pre_option_myogenix_trt_lab_api', function () { return array( 'active_env' => 'sandbox', 'sandbox' => array( 'api_base_url' => 'https://staging.prescribery.com/api/v2', 'api_key' => 'integration-fixture', 'intake_base_url' => 'https://staging.prescribery.com/qa-fixture', 'client_id' => 16, 'source_id' => 1198, 'lab_id' => 1057, 'test_ids' => array( 59, 5 ) ) ); } );
 $qa_user = get_user_by( 'login', 'trt_renewal_qa_20260915' );
 $qa_user_id = $qa_user ? $qa_user->ID : wp_insert_user( array( 'user_login' => 'trt_renewal_qa_20260915', 'user_pass' => wp_generate_password( 40, true, true ), 'user_email' => 'luke+trt-qa-20260915@waveconsulting.biz', 'display_name' => 'TRT TEST ONLY', 'role' => 'customer' ) );
 if ( is_wp_error( $qa_user_id ) ) { throw new RuntimeException( 'Unable to create test customer' ); }
@@ -59,6 +65,20 @@ try {
 	$order = wc_get_order( $result['order_id'] ); $test_ids[] = $order->get_id();
 	$assert( $order->has_status( 'pending' ) && ! $order->get_transaction_id(), 'Renewal stays unpaid' );
 	$assert( $order->get_meta( '_prescribery_requisition_id' ) === 'qa-requisition-token', 'Lab token is mapped to renewal' );
+	$intakes = array_values( array_filter( $test_requests, function ( $r ) { return str_contains( $r['url'], '/shopify/callback' ); } ) );
+	$labs = array_values( array_filter( $test_requests, function ( $r ) { return str_contains( $r['url'], '/save-test-order' ); } ) );
+	$assert( count( $intakes ) === 1 && 'sent' === $order->get_meta( '_trt_intake_state' ), 'Exactly one explicit intake callback is accepted' );
+	$assert( $intakes[0]['url'] === 'https://staging.prescribery.com/shopify/callback' && $intakes[0]['body']['client_id'] === 16 && $intakes[0]['body']['source_id'] === 1198 && $intakes[0]['body']['patient_id'] === 1, 'Intake uses the matching environment and verified patient' );
+	$assert( $intakes[0]['body']['orderId'] === $order->get_id() && base64_decode( $intakes[0]['body']['uuid'] ) === 'wc-16-' . $order->get_id(), 'Intake identifies the new WooCommerce renewal' );
+	$assert( $labs[0]['body']['external_order_id'] === (string) $order->get_id() && $order->get_id() !== $sub->get_parent_id(), 'Lab external_order_id is the new renewal ID as a string' );
+	$assert( array_search( $intakes[0], $test_requests, true ) < array_search( $labs[0], $test_requests, true ), 'Intake registration precedes the lab request' );
+	$assert( is_wp_error( myogenix_trt_place_lab_requisition( $sub ) ), 'Lab request without a linked renewal is blocked' );
+	parse_str( wp_parse_url( myogenix_trt_intake_url( $order ), PHP_URL_QUERY ), $intake_query );
+	$assert( base64_decode( $intake_query['token'] ?? '' ) === 'wc-16-' . $order->get_id(), 'Patient questionnaire link identifies the same renewal' );
+	foreach ( array( $order->get_id(), $sub->get_parent_id() ) as $qa_order_id ) {
+		$request = new WP_REST_Request( 'POST', '/prescription/v1/approve' ); $request->set_body_params( array( 'order_id' => $qa_order_id, 'status' => 'approved', 'patient_id' => 1, 'appointment_id' => 123 ) );
+		$assert( myogenix_trt_approval_callback( $request )->get_status() === 403 && ! wc_get_order( $qa_order_id )->get_transaction_id(), 'External QA approval cannot charge fake order ' . $qa_order_id );
+	}
 	$assert( ! $order->needs_payment(), 'Patient cannot bypass provider approval through pay link' );
 	$blocked = myogenix_trt_maybe_block_shopify_callback( false, array( 'body' => wp_json_encode( array( 'orderId' => $order->get_id() ) ) ), 'https://staff.prescribery.com/shopify/callback' );
 	$assert( is_array( $blocked ), 'Legacy callback is suppressed after creation as well as during creation' );
@@ -91,6 +111,23 @@ try {
 	$discounted = $fixture( 65, 283.50 ); myogenix_trt_check_subscription( $discounted->get_id() ); $test_lab_mode = 'success';
 	$discount_result = myogenix_trt_process_consent( $params_for( $discounted ) ); $assert( ! is_wp_error( $discount_result ), 'Discounted renewal created' ); $test_ids[] = $discount_result['order_id'];
 	$assert( (float) wc_get_order( $discount_result['order_id'] )->get_total() === 283.50, 'Established half-price plan is preserved' );
+	$retry = $fixture(); myogenix_trt_check_subscription( $retry->get_id() ); $test_lab_mode = 'reject';
+	$assert( is_wp_error( myogenix_trt_process_consent( $params_for( $retry ) ) ), 'Lab rejection leaves consent unresolved' );
+	$retry_order = wcs_get_subscription( $retry->get_id() )->get_meta( '_trt_pending_renewal_order' ); $test_ids[] = $retry_order;
+	$before = count( array_filter( $test_http, function ( $url ) { return str_contains( $url, '/shopify/callback' ); } ) );
+	$test_lab_mode = 'success'; $retried = myogenix_trt_process_consent( $params_for( $retry ) );
+	$assert( ! is_wp_error( $retried ) && $retried['order_id'] === (int) $retry_order, 'Known lab rejection retries the same renewal' );
+	$assert( $before === count( array_filter( $test_http, function ( $url ) { return str_contains( $url, '/shopify/callback' ); } ) ), 'Lab retry does not repeat the accepted intake callback' );
+	foreach ( array( 'timeout', 'error' ) as $mode ) {
+		$intake_failure = $fixture(); myogenix_trt_check_subscription( $intake_failure->get_id() ); $test_intake_mode = $mode;
+		$before = count( array_filter( $test_http, function ( $url ) { return str_contains( $url, '/save-test-order' ); } ) );
+		$assert( is_wp_error( myogenix_trt_process_consent( $params_for( $intake_failure ) ) ), 'Intake ' . $mode . ' stops processing' );
+		$test_ids[] = wcs_get_subscription( $intake_failure->get_id() )->get_meta( '_trt_pending_renewal_order' );
+		$assert( $before === count( array_filter( $test_http, function ( $url ) { return str_contains( $url, '/save-test-order' ); } ) ), 'Intake ' . $mode . ' cannot create a lab request' );
+		$before = count( $test_http ); myogenix_trt_process_consent( $params_for( $intake_failure ) );
+		$assert( count( $test_http ) === $before, 'Uncertain intake ' . $mode . ' cannot be resent automatically' );
+	}
+	$test_intake_mode = 'success';
 	$mail_failure = $fixture();
 	$fail_mail = function ( $result, $mail ) { return str_contains( $mail['subject'], 'ready to review' ) ? false : $result; };
 	add_filter( 'pre_wp_mail', $fail_mail, 1000, 2 ); myogenix_trt_check_subscription( $mail_failure->get_id() );

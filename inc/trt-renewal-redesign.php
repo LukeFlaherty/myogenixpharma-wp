@@ -15,6 +15,7 @@ const MYOGENIX_TRT_REDESIGN_LIVE = false;
 
 require_once __DIR__ . '/trt-renewal-presentation.php';
 require_once __DIR__ . '/trt-renewal-approval.php';
+require_once __DIR__ . '/trt-renewal-intake.php';
 
 function myogenix_trt_subscription_has_product( WC_Subscription $subscription, $product_id ) {
 	foreach ( $subscription->get_items() as $item ) {
@@ -100,7 +101,7 @@ function myogenix_trt_install_renewal_guards() {
 }
 
 // Suppress legacy callbacks for the exact consent renewal, including later
-// status transitions. Provider correlation must use the verified launch contract.
+// status transitions. The explicit intake sender permits exactly its own request.
 $GLOBALS['myogenix_trt_creating_subscription'] = 0;
 add_filter( 'pre_http_request', 'myogenix_trt_maybe_block_shopify_callback', 10, 3 );
 function myogenix_trt_maybe_block_shopify_callback( $preempt, $args, $url ) {
@@ -114,6 +115,7 @@ function myogenix_trt_maybe_block_shopify_callback( $preempt, $args, $url ) {
 	$payload = is_string( $args['body'] ?? null ) ? json_decode( $args['body'], true ) : ( $args['body'] ?? array() );
 	$order = wc_get_order( absint( $payload['orderId'] ?? 0 ) );
 	if ( ! myogenix_trt_is_renewal_order( $order ) ) { return $preempt; }
+	if ( (int) ( $GLOBALS['myogenix_trt_sending_intake_order'] ?? 0 ) === $order->get_id() && (int) ( $args['myogenix_trt_intake_order_id'] ?? 0 ) === $order->get_id() ) { return $preempt; }
 	return array( 'headers' => array(), 'body' => '{"suppressed":"trt-consent-renewal"}', 'response' => array( 'code' => 200, 'message' => 'OK' ), 'cookies' => array(), 'filename' => null );
 }
 
@@ -260,6 +262,8 @@ function myogenix_trt_handle_continue( WC_Subscription $sub ) {
 	}
 	$state = $order->get_meta( '_trt_lab_state' );
 	if ( in_array( $state, array( 'submitting', 'uncertain' ), true ) ) { return new WP_Error( 'lab_needs_review', 'Our team is checking your lab request. Please contact us before trying again.' ); }
+	$intake = myogenix_trt_register_intake( $sub, $order );
+	if ( is_wp_error( $intake ) ) { return $intake; }
 	if ( ! $order->get_meta( '_prescribery_requisition_id' ) ) {
 		$order->update_meta_data( '_trt_lab_state', 'submitting' );
 		$order->save();
@@ -287,7 +291,7 @@ add_filter( 'wcs_renewal_order_created', function ( $order, $sub ) {
 	$order->update_meta_data( '_prescribery_patient_id', myogenix_trt_get_prescribery_patient_id( $sub ) );
 	$order->set_transaction_id( '' );
 	$order->set_date_paid( null );
-	foreach ( array( '_prescription_charge_amount', '_prescription_stripe_charging', '_pharmacy_webhook_sent', '_stripe_intent_id', '_child_order_ids', '_approved_appointment_ids', 'appointment_id', '_lab_fee_paid', '_parent_order_id', '_trt_pricing_ready', '_prescribery_requisition_id', '_trt_provider_approved', '_trt_cycle_advanced', '_trt_wcs_payment_recorded', '_trt_lab_state' ) as $key ) { $order->delete_meta_data( $key ); }
+	foreach ( array( '_prescription_charge_amount', '_prescription_stripe_charging', '_pharmacy_webhook_sent', '_stripe_intent_id', '_child_order_ids', '_approved_appointment_ids', 'appointment_id', '_lab_fee_paid', '_parent_order_id', '_trt_pricing_ready', '_prescribery_requisition_id', '_trt_provider_approved', '_trt_cycle_advanced', '_trt_wcs_payment_recorded', '_trt_lab_state', '_trt_intake_state', '_trt_intake_sent_at', '_trt_intake_http_code', '_trt_intake_url', '_trt_qa_callback_seen' ) as $key ) { $order->delete_meta_data( $key ); }
 	foreach ( $order->get_items() as $item ) {
 		foreach ( array( '_item_approved', '_item_rejected', '_item_approved_appointment', '_item_rejected_appointment' ) as $key ) { $item->delete_meta_data( $key ); }
 		$item->save();
@@ -332,6 +336,7 @@ function myogenix_trt_get_prescribery_patient_id( WC_Subscription $sub ) {
 }
 
 function myogenix_trt_place_lab_requisition( WC_Subscription $sub, $order = null ) {
+	if ( ! myogenix_trt_is_renewal_order( $order ) || (int) $order->get_meta( '_trt_subscription_id' ) !== $sub->get_id() || 'sent' !== $order->get_meta( '_trt_intake_state' ) ) { return new WP_Error( 'lab_config', 'Your renewal must be registered for intake before requesting labs.' ); }
 	$s = myogenix_trt_lab_api_settings();
 	foreach ( array( 'api_base_url', 'client_id', 'source_id', 'lab_id', 'test_ids' ) as $key ) {
 		if ( empty( $s[ $key ] ) ) { return new WP_Error( 'lab_config', 'The lab connection needs to be configured by our team.' ); }
@@ -339,6 +344,7 @@ function myogenix_trt_place_lab_requisition( WC_Subscription $sub, $order = null
 	$token = myogenix_trt_lab_api_token();
 	if ( is_wp_error( $token ) ) { return $token; }
 	$body = array( 'patient_id' => myogenix_trt_get_prescribery_patient_id( $sub ), 'order' => array_map( function ( $id ) use ( $s ) { return array( 'lab_id' => (int) $s['lab_id'], 'test_id' => (int) $id ); }, $s['test_ids'] ), 'source_id' => (int) $s['source_id'], 'reason' => ( myogenix_trt_is_qa( $sub ) ? 'TEST ONLY — ' : '' ) . 'TRT renewal; WooCommerce order ' . ( $order ? $order->get_id() : 'test' ), 'payment_status' => 'pending' );
+	$body['external_order_id'] = (string) $order->get_id();
 	$r = wp_remote_post( rtrim( $s['api_base_url'], '/' ) . '/lab/' . $s['client_id'] . '/save-test-order', array( 'headers' => array( 'Authorization' => 'Bearer ' . $token, 'Content-Type' => 'application/json', 'Accept' => 'application/json' ), 'body' => wp_json_encode( $body ), 'timeout' => 25 ) );
 	if ( is_wp_error( $r ) ) { return new WP_Error( 'lab_uncertain', 'Our team needs to check whether your lab request was received. Please contact us before trying again.' ); }
 	$code = wp_remote_retrieve_response_code( $r );
