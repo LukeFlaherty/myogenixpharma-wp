@@ -45,7 +45,7 @@ The earlier plugin-side `prescription_cancel_subscription()` fix was verified li
 
 All marked fake orders, including fake original parents, are blocked from external approval charges. After the existing REST authentication succeeds, `_trt_qa_callback_seen` records only IDs, status, top-level field names, and time; the endpoint returns 403 for these fake orders. Tell Prescribery this rejection is expected during the mapping test. No raw clinical payload or credentials are retained there.
 
-Keep fake renewal 5021 and its parent for that provider check; keep subscription 5020 on hold and remove the temporary QA allowlist after browser verification. These retained fake records cannot be charged by the external approval handler. Other test-suite fixtures are trashed after each run.
+Fake renewal 5021 and its parent are retained for that provider check. Browser verification is complete, subscription 5020 is on hold, and the temporary QA allowlist has been removed. These retained fake records cannot be charged by the external approval handler. Other test-suite fixtures are trashed after each run.
 
 Candidate integration suite:
 
@@ -54,6 +54,8 @@ TRT_TEST_SOURCE=/tmp/myogenix-trt-20260917 wp --skip-plugins=affiliate-wp --skip
 ```
 
 Copy all four `inc/trt-renewal-*.php` files and `tests/trt-renewal-integration.php` into the private candidate directory first. All HTTP and email are mocked. **55 checks passed** on the installed WooCommerce/WCS stack September 17, covering consent, unpaid orders, intake ordering/correlation, duplicate suppression, lab retries, ambiguous intake/lab outcomes, QA approval protection, pricing, and subscription scheduling.
+
+Final production browser verification passed on desktop and at 390px: the confirmation displayed its working questionnaire button, and the revised confirmation reached Luke’s inbox. The already-created test renewal was reused for this presentation check; the final provider lab list remained exactly 2439 and 2423. Deployed PHP hashes matched the committed candidate; Stripe stayed live, rollout stayed off, and the fake renewal had neither a transaction nor pharmacy-release marker. The public renewal guide loaded with its updated questionnaire instructions.
 
 Earlier September 15 payment verification used the existing Stripe pipeline with request-scoped test credentials (`livemode=false`), a 56700-cent test charge, and intercepted pharmacy release. Repeat approval did not charge again; the billing date advanced from October 10 to January 10. Production Stripe mode remained live throughout. That local test is separate from the pending real provider callback test.
 
