@@ -125,6 +125,10 @@ function wave_aff_handle_action() {
 		elseif ( 'link' === $op ) {
 			if ( 'yes' !== wave_aff_input( 'confirmed' ) ) { wave_aff_fail( 'Confirm that you verified this attribution change.' ); }
 			$args['target'] = wave_aff_change_link( wave_aff_input( 'target' ), absint( wave_aff_input( 'customer_id' ) ), wave_aff_input( 'revision' ), absint( wave_aff_input( 'affiliate_id' ) ), wave_aff_input( 'reason' ) );
+		} elseif ( 'resolve_referral' === $op ) {
+			if ( 'yes' !== wave_aff_input( 'confirmed' ) ) { wave_aff_fail( 'Confirm the commission decision and supporting evidence.' ); }
+			wave_aff_resolve_referral( absint( wave_aff_input( 'referral_id' ) ), wave_aff_input( 'revision' ), wave_aff_input( 'decision' ), wave_aff_input( 'amount' ), wave_aff_input( 'reason' ) );
+			$args['view'] = 'review';
 		} elseif ( 'referral' === $op ) {
 			if ( 'yes' !== wave_aff_input( 'confirmed' ) ) { wave_aff_fail( 'Confirm the commission amount and attribution evidence.' ); }
 			wave_aff_create_referral( absint( wave_aff_input( 'order_id' ) ), absint( wave_aff_input( 'affiliate_id' ) ), wave_aff_input( 'amount' ), wave_aff_input( 'reason' ) ); $args['view'] = 'review';

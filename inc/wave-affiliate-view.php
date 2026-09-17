@@ -24,31 +24,41 @@ function wave_aff_table_end() { echo '</tbody></table></div>'; }
 function wave_aff_render() {
 	wave_aff_authorize();
 	$month = wave_aff_month( wave_aff_get( 'month' ) ); $view = wave_aff_get( 'view' ) ?: 'overview';
-	$views = array( 'overview' => 'Performance & leaderboard', 'customers' => 'Customer links', 'review' => 'Commission review', 'reports' => 'Monthly reports' );
+	$views = array( 'overview' => 'Overview', 'customers' => 'Customer links', 'review' => 'Needs attention', 'reports' => 'Monthly payout report' );
 	if ( ! isset( $views[ $view ] ) ) { $view = 'overview'; }
 	$data = wave_aff_load( $month );
-	echo '<div class="wrap wave-trt wave-aff"><div class="wave-brand">WAVE CONSULTING <span>OPERATIONS WORKSPACE</span></div><div class="wave-heading"><div><p class="wave-eyebrow">AFFILIATE OPERATIONS</p><h1>Affiliates</h1><p>Traffic, customer attribution and a clear path from commission review to monthly payout proposals.</p></div><a class="button" href="' . esc_url( wave_aff_native( 'affiliates' ) ) . '">Manage affiliate accounts ↗</a></div>';
+	echo '<div class="wrap wave-trt wave-aff"><div class="wave-brand">WAVE CONSULTING <span>OPERATIONS WORKSPACE</span></div><div class="wave-heading"><div><p class="wave-eyebrow">AFFILIATE OPERATIONS</p><h1>Affiliates</h1><p>See who is driving business, fix attribution, and prepare affiliate payouts.</p></div><a class="button" href="' . esc_url( wave_aff_native( 'affiliates' ) ) . '">Manage affiliate accounts ↗</a></div>';
 	echo '<nav class="wa-nav" aria-label="Affiliate workspace">'; foreach ( $views as $key => $label ) { echo '<a class="' . ( $view === $key ? 'is-current' : '' ) . '" ' . ( $view === $key ? 'aria-current="page"' : '' ) . ' href="' . esc_url( wave_aff_url( array( 'view' => $key, 'month' => $month ) ) ) . '">' . esc_html( $label ) . '</a>'; } echo '</nav>';
-	echo '<form method="get" class="wa-month">'; wave_aff_hidden( 'page', 'wave-affiliates' ); wave_aff_hidden( 'view', $view ); echo '<label>Reporting month <input type="month" name="month" value="' . esc_attr( $month ) . '" required></label> <button class="button">Apply month</button><span>Calendar boundaries: ' . esc_html( wp_timezone_string() ) . '. Loaded ' . esc_html( wp_date( 'M j, Y g:i a' ) ) . '.</span></form>';
+	echo '<form method="get" class="wa-month">'; wave_aff_hidden( 'page', 'wave-affiliates' ); wave_aff_hidden( 'view', $view ); echo '<label>Reporting month <input type="month" name="month" value="' . esc_attr( $month ) . '" required></label> <button class="button">Apply month</button><span>Site time: ' . esc_html( wp_timezone_string() ) . '. Loaded ' . esc_html( wp_date( 'M j, Y g:i a' ) ) . '.</span></form>';
 	if ( '1' === wave_aff_get( 'saved' ) ) { echo '<div class="notice notice-success inline"><p>Saved successfully. Review the updated record below.</p></div>'; }
+	$report_id = absint( wave_aff_get( 'report' ) );
+	if ( $report_id && 'wave_aff_report' === get_post_type( $report_id ) ) { echo '<div class="wa-review-banner wa-download-ready"><div><strong>Saved report #' . esc_html( $report_id ) . ' is ready</strong><span>Download the payout proposal or its supporting detail.</span></div><div><a class="button button-primary" href="' . esc_url( wave_aff_download_url( $report_id, 'summary' ) ) . '">Who to pay · CSV</a> <a class="button" href="' . esc_url( wave_aff_download_url( $report_id, 'detail' ) ) . '">Commission detail · CSV</a></div></div>'; }
 	if ( $data['limited'] ) { echo '<div class="notice notice-error inline"><p><strong>Partial data:</strong> a safety limit was reached. Counts are incomplete and report generation is disabled.</p></div>'; }
-	if ( $data['orphan'] ) { echo '<div class="wave-notice wa-warning"><strong>Attribution data needs attention</strong><p>' . esc_html( $data['orphan'] ) . ' existing lifetime-link records do not resolve to an AffiliateWP customer. These are excluded from attached-customer counts. Validated customer corrections are available below; orphan records require source review.</p><a href="' . esc_url( wave_aff_native( 'affiliates' ) ) . '">Review affiliate accounts ↗</a></div>'; }
+
 	call_user_func( 'wave_aff_view_' . $view, $data );
 	echo '<p class="wave-footer">Restricted to administrators with WooCommerce and AffiliateWP management access. AffiliateWP remains the source for visits, attribution and commissions. Customer links are current; historical referrals retain their original affiliate. Reports are proposals and do not send payments or mark commissions paid.</p></div>';
+}
+function wave_aff_attention_links( $d ) {
+	$count = count( array_filter( $d['report'], function( $r ) { return 'Review' === $r['decision']; } ) );
+	echo '<div class="wa-shortcuts"><a href="' . esc_url( wave_aff_url( array( 'view' => 'review', 'month' => $d['month'] ) ) ) . '"><strong>' . esc_html( $count ) . '</strong> commissions need attention →</a><a href="' . esc_url( wave_aff_url( array( 'view' => 'review', 'month' => $d['month'], 'issue' => 'missing' ) ) ) . '"><strong>' . esc_html( count( $d['missing'] ) ) . '</strong> orders to check for a missing commission →</a><a href="' . esc_url( wave_aff_url( array( 'view' => 'reports', 'month' => $d['month'] ) ) ) . '">Prepare monthly payout report →</a></div>';
 }
 function wave_aff_view_overview( $d ) {
 	$visits = 0; $converted = 0; $earned = array();
 	foreach ( $d['board'] as $a ) { $visits += $a['visits']; $converted += $a['converted']; foreach ( $a['earned'] as $currency => $units ) { wave_aff_sum( $earned, $currency, $units ); } }
 	$attached = count( array_filter( $d['people'], function( $p ){ return ! empty( $p['links'] ); } ) );
-	$stats = array( 'Tracked visits this month' => $visits, 'Visits with a referral' => $converted, 'Customers currently linked' => $attached, 'Recorded earned this month' => wave_aff_money( $earned ), 'Proposed payable through month' => wave_aff_money( $d['totals']['payable'] ) );
+	$stats = array( 'Visits this month' => $visits, 'Visits with a referral' => $converted, 'Customers linked to affiliates' => $attached, 'Commissions earned this month' => wave_aff_display_money( $earned ) );
 	echo '<div class="wa-stats">'; foreach ( $stats as $label => $value ) { echo '<div class="wa-stat"><span>' . esc_html( $label ) . '</span><strong>' . esc_html( $value ) . '</strong></div>'; } echo '</div>';
-	echo '<section class="wa-panel"><h2>Affiliate leaderboard</h2><p>Ranked by recorded paid + unpaid commission earned in ' . esc_html( $d['month'] . ' / ' . $d['rank_currency'] ) . ', then tracked visits. Pending and rejected referrals do not count as earned. Visits are tracking events, not unique people; converted visits can include referrals awaiting approval.</p>';
-	wave_aff_search( 'Affiliate name, ID or status' ); wave_aff_table_start( array( 'Rank / affiliate', 'Status', 'Month visits', 'Converted visits', 'Current customers', 'Month referrals', 'Month earned', 'Month pending', 'Proposed payable', 'Links' ) );
+	wave_aff_attention_links( $d );
+	$all = '1' === wave_aff_get( 'all' );
+	echo '<section class="wa-panel" data-wa-limit="10" data-wa-all="' . ( $all ? '1' : '0' ) . '"><div class="wa-section-head"><div><h2>Top affiliates</h2><p>Top 10 by this month’s earned commission. Search includes every affiliate.</p></div><label>Rank by <select data-wa-sort><option value="earned">Commission earned</option><option value="visits">Traffic</option><option value="linked">Customers attached</option><option value="converted">Converted visits</option></select></label></div>';
+	wave_aff_search( 'Search all affiliates by name or ID' ); wave_aff_table_start( array( 'Rank / affiliate', 'Visits', 'Converted visits', 'Customers', 'Month earned', 'Actions' ) );
 	$rank = 0;
 	foreach ( $d['board'] as $id => $a ) {
-		echo '<tr data-wa-row><td><strong>' . esc_html( ++$rank . '. ' . $a['name'] ) . '</strong><small>Affiliate #' . esc_html( $id ) . '</small></td><td><span class="wave-badge ' . ( 'active' === $a['status'] ? 'blue' : 'gray' ) . '">' . esc_html( $a['status'] ) . '</span></td><td>' . esc_html( $a['visits'] ) . '</td><td>' . esc_html( $a['converted'] ) . '<small>' . esc_html( $a['visits'] ? round( 100 * $a['converted'] / $a['visits'], 1 ) . '%' : '—' ) . '</small></td><td><a href="' . esc_url( wave_aff_url( array( 'view' => 'customers', 'affiliate' => $id, 'month' => $d['month'] ) ) ) . '">' . esc_html( $a['linked'] ) . ' customers</a></td><td>' . esc_html( $a['referrals'] ) . '</td><td>' . esc_html( wave_aff_money( $a['earned'] ) ) . '</td><td>' . esc_html( wave_aff_money( $a['pending'] ) ) . '</td><td>' . esc_html( wave_aff_money( $a['payable'] ) ) . '</td><td><a href="' . esc_url( wave_aff_native( 'affiliates', array( 'action' => 'edit_affiliate', 'affiliate_id' => $id ) ) ) . '">Profile ↗</a><details><summary>Referral URL</summary><input aria-label="Referral URL for ' . esc_attr( $a['name'] ) . '" readonly value="' . esc_attr( affwp_get_affiliate_referral_url( array( 'affiliate_id' => $id ) ) ) . '"><button type="button" class="button wa-copy">Copy URL</button></details></td></tr>';
+		$rank++;
+		echo '<tr data-wa-row data-earned="' . esc_attr( $a['earned'][ $d['rank_currency'] ] ?? 0 ) . '" data-visits="' . esc_attr( $a['visits'] ) . '" data-linked="' . esc_attr( $a['linked'] ) . '" data-converted="' . esc_attr( $a['converted'] ) . '"' . ( $rank > 10 && ! $all ? ' hidden' : '' ) . '><td><strong><span data-wa-rank>' . esc_html( $rank ) . '</span>. ' . esc_html( $a['name'] ) . '</strong><small>#' . esc_html( $id . ' · ' . $a['status'] ) . '</small></td><td>' . esc_html( $a['visits'] ) . '</td><td>' . esc_html( $a['converted'] ) . '</td><td><a href="' . esc_url( wave_aff_url( array( 'view' => 'customers', 'affiliate' => $id, 'month' => $d['month'] ) ) ) . '">' . esc_html( $a['linked'] ) . ' customers</a></td><td>' . esc_html( wave_aff_display_money( $a['earned'] ) ) . '</td><td><a href="' . esc_url( wave_aff_native( 'affiliates', array( 'action' => 'edit_affiliate', 'affiliate_id' => $id ) ) ) . '">Profile ↗</a><details><summary>Referral link</summary><input aria-label="Referral URL for ' . esc_attr( $a['name'] ) . '" readonly value="' . esc_attr( affwp_get_affiliate_referral_url( array( 'affiliate_id' => $id ) ) ) . '"><button type="button" class="button wa-copy">Copy URL</button></details></td></tr>';
 	}
-	wave_aff_table_end(); echo '</section>';
+	wave_aff_table_end();
+	echo '<a class="button" data-wa-expand href="' . esc_url( wave_aff_url( array( 'month' => $d['month'], 'all' => $all ? '0' : '1' ) ) ) . '">' . ( $all ? 'Show top 10' : 'Show all ' . count( $d['board'] ) . ' affiliates' ) . '</a><p class="wave-muted">Earned = paid + unpaid commissions in ' . esc_html( $d['month'] . ' / ' . $d['rank_currency'] ) . '. Traffic counts visits, not unique people. A converted visit may still have a pending commission.</p></section>';
 }
 function wave_aff_view_customers( $d ) {
 	$target = wave_aff_get( 'target' ); $filter = wave_aff_get( 'affiliate' );
@@ -80,12 +90,48 @@ function wave_aff_view_customers( $d ) {
 	}
 	if ( ! $count ) { echo '<tr><td colspan="4">No customers match this filter.</td></tr>'; } wave_aff_table_end(); echo '</section>';
 }
-function wave_aff_render_referrals( $rows ) {
-	wave_aff_table_start( array( 'Referral / order', 'Affiliate', 'Earned (UTC)', 'Commission', 'Decision / reason', 'Period' ) );
-	foreach ( $rows as $r ) { echo '<tr data-wa-row><td><a href="' . esc_url( wave_aff_native( 'referrals', array( 'action' => 'edit_referral', 'referral_id' => $r['referral_id'] ) ) ) . '">Referral #' . esc_html( $r['referral_id'] ) . ' ↗</a><small>Order ref: ' . esc_html( $r['order'] ) . '</small></td><td>' . esc_html( $r['affiliate'] . ' (#' . $r['affiliate_id'] . ')' ) . '</td><td>' . esc_html( $r['date'] ) . '</td><td>' . esc_html( $r['currency'] . ' ' . $r['amount'] ) . '<small>Source: ' . esc_html( $r['source_status'] ) . '</small></td><td><span class="wave-badge ' . ( 'Review' === $r['decision'] ? 'amber' : 'blue' ) . '">' . esc_html( $r['decision'] ) . '</span><small>' . esc_html( $r['reason'] ) . '</small></td><td>' . esc_html( $r['period'] ) . '</td></tr>'; }
-	if ( ! $rows ) { echo '<tr><td colspan="6">No referrals in this queue.</td></tr>'; } wave_aff_table_end();
+function wave_aff_render_referrals( $rows, $month = null ) {
+	$month = $month ?: wave_aff_month( wave_aff_get( 'month' ) );
+	wave_aff_table_start( array( 'Affiliate / referral', 'Commission', 'What needs to happen', 'Action' ) );
+	foreach ( $rows as $r ) {
+		list( $key, $label, $help ) = wave_aff_issue( $r );
+		echo '<tr data-wa-row><td><strong>' . esc_html( $r['affiliate'] ) . '</strong><small>Referral #' . esc_html( $r['referral_id'] ) . ' · Order ' . esc_html( $r['order'] ) . '</small><small>' . esc_html( substr( $r['date'], 0, 10 ) . ' · ' . ( 'Selected month' === $r['period'] ? 'This month' : 'Older balance' ) ) . '</small></td><td><strong>' . esc_html( $r['currency'] . ' ' . $r['amount'] ) . '</strong><small>' . esc_html( $r['source_status'] ) . '</small></td><td><span class="wave-badge ' . ( 'ready' === $key ? 'blue' : 'amber' ) . '">' . esc_html( $label ) . '</span><small>' . esc_html( $help ) . '</small></td><td><a class="button" href="' . esc_url( wave_aff_url( array( 'view' => 'review', 'month' => $month, 'referral' => $r['referral_id'] ) ) ) . '">Review &amp; resolve</a><a class="wa-secondary" href="' . esc_url( wave_aff_native( 'referrals', array( 'action' => 'edit_referral', 'referral_id' => $r['referral_id'] ) ) ) . '">Source referral ↗</a></td></tr>';
+	}
+	if ( ! $rows ) { echo '<tr><td colspan="4">No commissions match this queue.</td></tr>'; } wave_aff_table_end();
+}
+function wave_aff_issue_cards( $d, $affiliate = 0 ) {
+	$rows = $affiliate ? array_values( array_filter( $d['report'], function( $r ) use ( $affiliate ) { return $r['affiliate_id'] === $affiliate; } ) ) : $d['report'];
+	echo '<div class="wa-issue-grid">';
+	foreach ( wave_aff_issue_groups( $rows ) as $key => $group ) {
+		echo '<a class="wa-issue" href="' . esc_url( wave_aff_url( array( 'view' => 'review', 'month' => $d['month'], 'issue' => $key, 'affiliate' => $affiliate ?: '' ) ) ) . '"><strong>' . esc_html( $group['count'] ) . '</strong><span>' . esc_html( $group['label'] ) . '</span><small>' . esc_html( wave_aff_display_money( $group['totals'] ) ) . ' · Review →</small></a>';
+	}
+	echo '</div>';
+}
+function wave_aff_resolution_editor( $d, $rid ) {
+	$ref = affwp_get_referral( $rid );
+	if ( ! $ref ) { echo '<div class="notice notice-warning inline"><p>This referral is no longer available.</p></div>'; return; }
+	$order = 'woocommerce' === $ref->context ? wc_get_order( absint( $ref->reference ) ) : false;
+	$probe = clone $ref; $probe->status = 'unpaid';
+	$other = affiliate_wp()->referrals->get_referrals( array( 'reference' => $ref->reference, 'context' => $ref->context, 'number' => 2 ) );
+	$block = wave_aff_review_reason( $probe, affwp_get_affiliate( $ref->affiliate_id ), $order, count( $other ) > 1 );
+	if ( ! $block && 'pending' === $ref->status ) { $block = 'Source status: pending'; }
+	$row = array( 'reason' => $block, 'decision' => $block ? 'Review' : 'Proposed payable' ); list( $key, $label, $help ) = wave_aff_issue( $row );
+	echo '<section class="wa-panel wa-editor"><h2>Resolve referral #' . esc_html( $rid ) . '</h2><p><strong>' . esc_html( $d['board'][ $ref->affiliate_id ]['name'] ?? 'Affiliate #' . $ref->affiliate_id ) . '</strong> · ' . esc_html( $ref->currency . ' ' . $ref->amount . ' · ' . $ref->status ) . '</p><div class="wave-notice"><strong>' . esc_html( $label ) . '</strong><p>' . esc_html( $help ) . '</p></div>';
+	if ( $order ) { echo '<p><a class="button" target="_blank" rel="noopener" href="' . esc_url( $order->get_edit_order_url() ) . '">Open order #' . esc_html( $order->get_order_number() ) . ' ↗</a> ' . esc_html( 'Status: ' . $order->get_status() . ' · Total: ' . $order->get_currency() . ' ' . $order->get_total() . ' · Refunded: ' . $order->get_total_refunded() ) . '</p>'; }
+	echo '<p><a target="_blank" rel="noopener" href="' . esc_url( wave_aff_native( 'referrals', array( 'action' => 'edit_referral', 'referral_id' => $rid ) ) ) . '">Open source referral ↗</a> · <a target="_blank" rel="noopener" href="' . esc_url( wave_aff_native( 'affiliates', array( 'action' => 'edit_affiliate', 'affiliate_id' => $ref->affiliate_id ) ) ) . '">Open affiliate account ↗</a></p>';
+	if ( in_array( $ref->status, array( 'pending', 'unpaid' ), true ) && empty( $ref->payout_id ) && current_user_can( 'manage_referrals' ) ) {
+		$can_correct = in_array( $key, array( 'ready', 'approval', 'rounding', 'amount' ), true );
+		if ( ! $can_correct ) { echo '<p><strong>Fix the source issue before correcting or approving this commission.</strong> You can reject it here if you have verified that nothing is owed.</p>'; }
+		wave_aff_form_start( 'resolve_referral', $d['month'] ); wave_aff_hidden( 'referral_id', $rid ); wave_aff_hidden( 'revision', wave_aff_referral_revision( $ref, $order ) );
+		echo '<label>Decision<select name="decision" required><option value="">Choose an action…</option>' . ( $can_correct ? '<option value="correct">Correct amount — keep current status</option>' : '' ) . ( $can_correct && 'pending' === $ref->status ? '<option value="approve">Approve as unpaid — include when eligible</option>' : '' ) . '<option value="reject">Reject — no commission owed</option></select></label><label>Confirmed commission (' . esc_html( $ref->currency ) . ')<input type="number" name="amount" min="0" step="0.0001" value="' . esc_attr( $ref->amount ) . '"><small>Enter the agreed amount. Rejection keeps the original amount for history.</small></label><label>Reason / supporting evidence<textarea name="reason" required minlength="5" maxlength="1500" rows="3" placeholder="State the agreed calculation, payment evidence or reason this commission is not owed."></textarea></label><label class="wa-confirm"><input type="checkbox" name="confirmed" value="yes" required> I checked the order and affiliate agreement and confirm this decision.</label><button class="button button-primary">Save review decision</button><p class="wave-muted">Approval records an unpaid commission. Payment happens separately. Saved reports retain their original values; generate a new report after changes.</p></form>';
+	} else { echo '<p>This record is protected. Review its current payout/status in AffiliateWP.</p>'; }
+	$events = affwp_get_referral_meta( $rid, '_wave_aff_resolution', false );
+	if ( $events ) { echo '<details><summary>Review history</summary>'; foreach ( array_reverse( $events ) as $e ) { if ( ! is_array( $e ) ) { continue; } echo '<p>' . esc_html( $e['at'] . ' · Staff #' . $e['by'] . ' · ' . $e['decision'] . ': ' . $e['reason'] ) . '</p>'; } echo '</details>'; }
+	echo '</section>';
 }
 function wave_aff_view_review( $d ) {
+	$issue = wave_aff_get( 'issue' ); $affiliate = absint( wave_aff_get( 'affiliate' ) );
+	if ( absint( wave_aff_get( 'referral' ) ) ) { wave_aff_resolution_editor( $d, absint( wave_aff_get( 'referral' ) ) ); }
 	$oid = absint( wave_aff_get( 'order' ) );
 	if ( $oid && isset( $d['orders'][ $oid ] ) ) {
 		$o = $d['orders'][ $oid ]; $person = null;
@@ -96,8 +142,19 @@ function wave_aff_view_review( $d ) {
 			echo '<label>Commission (' . esc_html( $o->get_currency() ) . ')<input type="number" name="amount" min="0.0001" step="0.0001" max="' . esc_attr( $o->get_total() ) . '" required></label><label>Agreed rate / calculation and attribution evidence<textarea name="reason" required minlength="5" maxlength="1500" rows="3"></textarea></label><label class="wa-confirm"><input type="checkbox" name="confirmed" value="yes" required> I verified the historical attribution and commission calculation.</label><button class="button button-primary">Create pending referral</button></form></section>';
 		}
 	}
-	$held = array_values( array_filter( $d['report'], function( $r ){ return 'Review' === $r['decision']; } ) );
-	echo '<section class="wa-panel"><h2>Commissions held for review (' . esc_html( count( $held ) ) . ')</h2><p>Currently pending or unpaid referrals earned through ' . esc_html( $d['month'] ) . '. Resolve the source issue, then regenerate the monthly proposal. Paid and rejected referrals remain in <a href="' . esc_url( wave_aff_native( 'referrals' ) ) . '">AffiliateWP ↗</a>.</p>'; wave_aff_search( 'Affiliate, referral, order or review reason' ); wave_aff_render_referrals( $held ); echo '</section>';
+	$held = array_values( array_filter( $d['report'], function( $r ) use ( $affiliate, $issue ) { return 'Review' === $r['decision'] && ( ! $affiliate || $r['affiliate_id'] === $affiliate ) && ( ! $issue || wave_aff_issue( $r )[0] === $issue ); } ) );
+	echo '<section class="wa-panel"><h2>What needs attention?</h2><p>Pick an issue to see the affected commissions and the next action. Fix the source issue, then refresh this page.</p>';
+	wave_aff_issue_cards( $d, $affiliate );
+	echo '<div class="wa-filters"><a href="' . esc_url( wave_aff_url( array( 'view' => 'review', 'month' => $d['month'] ) ) ) . '">All commission issues</a><a href="' . esc_url( wave_aff_url( array( 'view' => 'review', 'month' => $d['month'], 'issue' => 'missing' ) ) ) . '">Missing commissions (' . esc_html( count( $d['missing'] ) ) . ')</a><a href="' . esc_url( wave_aff_url( array( 'view' => 'review', 'month' => $d['month'], 'issue' => 'data' ) ) ) . '">Customer data issues (' . esc_html( $d['orphan'] ) . ')</a></div>';
+	if ( $affiliate && isset( $d['board'][ $affiliate ] ) ) { echo '<p>Filtered to <strong>' . esc_html( $d['board'][ $affiliate ]['name'] ) . '</strong>.</p>'; }
+	if ( ! in_array( $issue, array( 'missing', 'data' ), true ) ) {
+		echo '<h3>' . esc_html( $issue && $held ? wave_aff_issue( $held[0] )[1] : 'Commission issues' ) . ' (' . esc_html( count( $held ) ) . ')</h3>';
+		wave_aff_search( 'Affiliate, order, referral or issue' ); wave_aff_render_referrals( $held, $d['month'] );
+	}
+	echo '</section>';
+	if ( 'data' === $issue ) { wave_aff_data_issues( $d ); return; }
+	if ( 'missing' !== $issue && ! $oid ) { return; }
+
 	echo '<section class="wa-panel"><h2>Paid orders without a recorded referral (' . esc_html( count( $d['missing'] ) ) . ')</h2><p>All loaded order dates. These include direct purchases and are <strong>not automatically commissions owed</strong>. Verify the customer link and historical agreement first. Existing referrals are never duplicated.</p>'; wave_aff_search( 'Customer, order or affiliate' ); wave_aff_table_start( array( 'Order / customer', 'Current affiliate', 'Payment / status', 'Next action' ) );
 	foreach ( $d['missing'] as $m ) {
 		$o = $m['order']; $p = $m['person'];
@@ -106,21 +163,35 @@ function wave_aff_view_review( $d ) {
 	}
 	if ( ! $d['missing'] ) { echo '<tr><td colspan="4">No paid orders without referrals found.</td></tr>'; } wave_aff_table_end(); echo '</section>';
 }
-function wave_aff_summary_table( $summary ) {
-	wave_aff_table_start( array( 'Affiliate', 'Currency', 'Proposed payable', 'Includes prior-month carryover', 'Held for review', 'Referrals' ) );
-	foreach ( $summary as $r ) { echo '<tr data-wa-row><td>' . esc_html( $r['affiliate'] . ' (#' . $r['affiliate_id'] . ')' ) . '</td><td>' . esc_html( $r['currency'] ) . '</td><td><strong>' . esc_html( wave_aff_amount( $r['payable'] ) ) . '</strong></td><td>' . esc_html( wave_aff_amount( $r['carryover'] ) ) . '</td><td>' . esc_html( wave_aff_amount( $r['held'] ) ) . '</td><td>' . esc_html( $r['count'] ) . '</td></tr>'; }
+function wave_aff_data_issues( $d ) {
+	$known = array(); foreach ( $d['customers'] as $customer ) { $known[ $customer->customer_id ] = true; }
+	echo '<section class="wa-panel"><h2>Customer links with no matching customer</h2><p>These records do not identify a valid customer. Use the affiliate’s records to establish who the customer was, then assign the verified customer in Customer links. Do not guess from an empty customer ID.</p>';
+	wave_aff_table_start( array( 'Affiliate', 'Link record', 'Next action' ) );
+	foreach ( $d['links'] as $link ) { if ( isset( $known[ $link->affwp_customer_id ] ) ) { continue; } echo '<tr><td>' . esc_html( $d['board'][ $link->affiliate_id ]['name'] ?? 'Unknown affiliate' ) . '</td><td>#' . esc_html( $link->lifetime_customer_id ) . '<small>Customer ID: ' . esc_html( $link->affwp_customer_id ) . '</small></td><td><a target="_blank" rel="noopener" href="' . esc_url( wave_aff_native( 'affiliates', array( 'action' => 'edit_affiliate', 'affiliate_id' => $link->affiliate_id ) ) ) . '">Review affiliate records ↗</a> · <a href="' . esc_url( wave_aff_url( array( 'view' => 'customers', 'month' => $d['month'] ) ) ) . '">Find / link customer</a></td></tr>'; }
+	wave_aff_table_end(); echo '</section>';
+}
+function wave_aff_summary_table( $summary, $rows, $month ) {
+	usort( $summary, function( $a, $b ) { return strcmp( $a['currency'], $b['currency'] ) ?: ( $b['payable'] <=> $a['payable'] ); } );
+	wave_aff_table_start( array( 'Affiliate', 'From this month', 'Older unpaid', 'Ready for payout review', 'Needs attention', 'Action' ) );
+	foreach ( $summary as $r ) {
+		$count = count( array_filter( $rows, function( $row ) use ( $r ) { return $row['affiliate_id'] === $r['affiliate_id'] && $row['currency'] === $r['currency'] && 'Review' === $row['decision']; } ) );
+		echo '<tr data-wa-row><td><strong>' . esc_html( $r['affiliate'] ) . '</strong><small>#' . esc_html( $r['affiliate_id'] ) . '</small></td><td>' . esc_html( wave_aff_display_money( array( $r['currency'] => $r['payable'] - $r['carryover'] ) ) ) . '</td><td>' . esc_html( wave_aff_display_money( array( $r['currency'] => $r['carryover'] ) ) ) . '</td><td class="wa-ready-cell"><strong>' . esc_html( wave_aff_display_money( array( $r['currency'] => $r['payable'] ) ) ) . '</strong></td><td>' . esc_html( $count . ' issues' ) . '<small>' . esc_html( wave_aff_display_money( array( $r['currency'] => $r['held'] ) ) ) . '</small></td><td>';
+		if ( $count ) { echo '<a class="button" href="' . esc_url( wave_aff_url( array( 'view' => 'review', 'month' => $month, 'affiliate' => $r['affiliate_id'] ) ) ) . '">Resolve ' . esc_html( $count ) . ' issues</a>'; } else { echo '<span class="wave-badge blue">No blocking issues</span>'; }
+		echo '</td></tr>';
+	}
 	if ( ! $summary ) { echo '<tr><td colspan="6">No outstanding commissions through this month.</td></tr>'; } wave_aff_table_end();
 }
 function wave_aff_download_url( $id, $format ) { return wp_nonce_url( add_query_arg( array( 'action' => 'wave_aff_export', 'report' => $id, 'format' => $format ), admin_url( 'admin-post.php' ) ), 'wave_aff_export_' . $id ); }
 function wave_aff_view_reports( $d ) {
-	echo '<section class="wa-panel"><h2>Monthly payout proposal · ' . esc_html( $d['month'] ) . '</h2><p>Based on AffiliateWP’s recorded amounts. Includes <strong>currently unpaid and pending</strong> commissions earned before the end of this month, evaluated now. Prior-month carryover is included in proposed payable and shown separately. This is not a reconstruction of the historical month-end balance.</p><div class="wa-stats">';
-	foreach ( array( 'payable' => 'Proposed payable', 'carryover' => 'Included carryover', 'held' => 'Held for review' ) as $key => $label ) { echo '<div class="wa-stat"><span>' . esc_html( $label ) . '</span><strong>' . esc_html( wave_aff_money( $d['totals'][ $key ] ) ) . '</strong></div>'; } echo '</div>';
-	wave_aff_summary_table( wave_aff_report_summary( $d['report'] ) );
-	echo '<p>A saved snapshot preserves these amounts and decisions. CSV exports provide an affiliate payout summary and referral-level detail. Missing commissions are not estimated; resolve them in Commission review and generate a fresh snapshot. Any payout must be reconciled against payments made since the snapshot.</p>';
-	wave_aff_form_start( 'report', $d['month'] ); echo '<button class="button button-primary" ' . disabled( $d['limited'], true, false ) . '>Generate & save monthly report</button></form><p><a href="' . esc_url( wave_aff_native( 'payouts' ) ) . '">Open AffiliateWP payouts for reconciliation ↗</a></p><details><summary>Inspect proposal referral detail (' . esc_html( count( $d['report'] ) ) . ')</summary>'; wave_aff_render_referrals( $d['report'] ); echo '</details></section>';
+	$held = count( array_filter( $d['report'], function( $r ) { return 'Review' === $r['decision']; } ) );
+	echo '<section class="wa-panel"><h2>Prepare payouts · ' . esc_html( $d['month'] ) . '</h2><p>Current unpaid commissions earned through this month. Older unpaid balances are included and shown separately.</p><ol class="wa-steps"><li><strong>1. Review amounts</strong><span>See this month + older unpaid below.</span></li><li><strong>2. Resolve issues</strong><span>Held commissions stay out of the payout total.</span></li><li><strong>3. Save &amp; export</strong><span>Check past payouts before sending payment.</span></li></ol>';
+	echo '<div class="wa-payout-equation"><div><span>From this month</span><strong>' . esc_html( wave_aff_display_money( wave_aff_month_payable( $d['totals'] ) ) ) . '</strong></div><b>+</b><div><span>Older unpaid</span><strong>' . esc_html( wave_aff_display_money( $d['totals']['carryover'] ) ) . '</strong></div><b>=</b><div class="wa-ready"><span>Ready for payout review</span><strong>' . esc_html( wave_aff_display_money( $d['totals']['payable'] ) ) . '</strong></div></div>';
+	echo '<div class="wa-review-banner"><div><strong>' . esc_html( $held ) . ' commissions need attention</strong><span>' . esc_html( wave_aff_display_money( $d['totals']['held'] ) ) . ' held outside the total above.</span></div><a class="button" href="' . esc_url( wave_aff_url( array( 'view' => 'review', 'month' => $d['month'] ) ) ) . '">Resolve issues →</a></div>';
+	wave_aff_search( 'Find an affiliate in this report' ); wave_aff_summary_table( wave_aff_report_summary( $d['report'] ), $d['report'], $d['month'] );
+	wave_aff_form_start( 'report', $d['month'] ); echo '<button class="button button-primary" ' . disabled( $d['limited'], true, false ) . '>Save report &amp; prepare downloads</button></form><p class="wave-muted">Saving a report does not send money or mark commissions paid. After corrections, save a new version. ≈ means the summary is rounded for display; detail and CSVs preserve the exact recorded amount.</p><details><summary>How these amounts are calculated</summary><p>Evaluated using today’s statuses. Includes currently unpaid and pending referrals earned before the selected month ends; paid and rejected referrals are excluded. Eligible unpaid commissions go into the payout-review total. Missing commissions are not estimated. This is not a reconstruction of the historical month-end balance.</p><a href="' . esc_url( wave_aff_native( 'payouts' ) ) . '">Check existing payouts ↗</a></details><details><summary>All referral details (' . esc_html( count( $d['report'] ) ) . ')</summary>'; wave_aff_render_referrals( $d['report'], $d['month'] ); echo '</details></section>';
 	$reports = get_posts( array( 'post_type' => 'wave_aff_report', 'post_status' => 'private', 'posts_per_page' => 24, 'orderby' => 'ID', 'order' => 'DESC' ) );
-	echo '<section class="wa-panel"><h2>Saved reports</h2><p>Latest 24 immutable snapshots. Generate a new version after corrections; old exports remain a record of what was reviewed.</p>';
-	wave_aff_table_start( array( 'Report', 'Generated / author', 'Proposed payable', 'Downloads' ) );
-	foreach ( $reports as $post ) { $s = get_post_meta( $post->ID, '_wave_aff_snapshot', true ); if ( ! is_array( $s ) ) { continue; } $user = get_userdata( $s['generated_by'] ); echo '<tr><td><strong>' . esc_html( $s['month'] . ' · #' . $post->ID ) . '</strong></td><td>' . esc_html( $s['generated_at'] ) . '<small>' . esc_html( $user ? $user->display_name : 'Staff' ) . '</small></td><td>' . esc_html( wave_aff_money( $s['totals']['payable'] ) ) . '</td><td><a class="button" href="' . esc_url( wave_aff_download_url( $post->ID, 'summary' ) ) . '">Payout summary CSV</a> <a class="button" href="' . esc_url( wave_aff_download_url( $post->ID, 'detail' ) ) . '">Referral detail CSV</a></td></tr>'; }
-	if ( ! $reports ) { echo '<tr><td colspan="4">No reports saved yet. Generate the first monthly snapshot above.</td></tr>'; } wave_aff_table_end(); echo '</section>';
+	echo '<section class="wa-panel"><h2>Download saved reports</h2><p>Saved versions keep the amounts recorded at that time. After a correction or payout, generate a fresh version.</p>';
+	wave_aff_table_start( array( 'Month / version', 'Saved', 'Payout-review total', 'Downloads' ) );
+	foreach ( $reports as $post ) { $s = get_post_meta( $post->ID, '_wave_aff_snapshot', true ); if ( ! is_array( $s ) ) { continue; } $user = get_userdata( $s['generated_by'] ); echo '<tr><td><strong>' . esc_html( $s['month'] . ' · #' . $post->ID ) . '</strong></td><td>' . esc_html( wp_date( 'M j, Y g:i a', strtotime( $s['generated_at'] ) ) ) . '<small>' . esc_html( $user ? $user->display_name : 'Staff' ) . '</small></td><td>' . esc_html( wave_aff_display_money( $s['totals']['payable'] ) ) . '</td><td><a class="button button-primary" href="' . esc_url( wave_aff_download_url( $post->ID, 'summary' ) ) . '">Who to pay · CSV</a> <a class="button" href="' . esc_url( wave_aff_download_url( $post->ID, 'detail' ) ) . '">Commission detail · CSV</a></td></tr>'; }
+	if ( ! $reports ) { echo '<tr><td colspan="4">Save your first report above to prepare downloads.</td></tr>'; } wave_aff_table_end(); echo '</section>';
 }

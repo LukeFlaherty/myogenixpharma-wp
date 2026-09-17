@@ -30,3 +30,14 @@ The monthly interval uses the WordPress site timezone and converts both bounds t
 ## Validation
 
 Run `php tests/wave-affiliates.php`, the three existing TRT tests, PHP lint and `git diff --check`. Live predeployment validation includes read-only loader/render checks against the installed plugin versions and an isolated temporary AffiliateWP customer for assign/reassign/unlink, audit and alias-retention verification. That fixture is removed; real orders/referrals are not mutated.
+
+## Usability update
+
+- Overview shows the top 10 affiliates by default. Search spans the entire list; staff can expand all affiliates and rank by traffic, earned commission, customers or converted visits.
+- Monthly report shows **this month + older unpaid = ready for payout review**. Held commissions are separate, with issue counts and per-affiliate resolution links. Display summaries use currency precision and mark approximations; source records and exports retain exact values.
+- Needs attention groups records by the next action (approval, amount, rounding, refund, payment, affiliate, duplicate, payout or other source issue). Pending status no longer masks an underlying eligibility problem. Missing commissions and orphan customer links have dedicated queues.
+- The individual review form links directly to the order, affiliate and source referral. Users with `manage_referrals` may correct amounts at the existing status, approve an eligible pending referral as unpaid, or reject a pending/unpaid referral. No paid or payout-associated referral is editable here. Edits require explicit decision, reason, confirmation and a fresh hash of referral/order facts.
+- Amount corrections precede approval so AffiliateWP updates its balances at the appropriate status. Rejection retains the old amount for correct balance reversal. Refund, duplicate, payment, currency and self-referral checks block correction/approval; staff resolve those in the source records first. Private referral metadata records before/after, operator, timestamp and reason.
+- After saving a report, download buttons appear at the top of the page. Saved exports are unchanged by later commission edits.
+
+Additional checks: `php tests/wave-affiliate-workflow.php` (includes the base affiliate suite). Review mutations are tested with synthetic records; production QA does not approve, reject or change real commissions.

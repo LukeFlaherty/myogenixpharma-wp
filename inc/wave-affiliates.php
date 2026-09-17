@@ -3,14 +3,15 @@
 defined( 'ABSPATH' ) || exit;
 require_once __DIR__ . '/wave-affiliate-actions.php';
 require_once __DIR__ . '/wave-affiliate-view.php';
+require_once __DIR__ . '/wave-affiliate-workflow.php';
 add_action( 'admin_menu', function () {
 	$GLOBALS['wave_aff_hook'] = add_submenu_page( 'wave-trt', 'Affiliates', 'Affiliates', 'manage_options', 'wave-affiliates', 'wave_aff_render' );
 }, 20 );
 add_action( 'admin_enqueue_scripts', function ( $hook ) {
 	if ( $hook !== ( $GLOBALS['wave_aff_hook'] ?? '' ) ) { return; }
 	wp_enqueue_style( 'wave-trt', get_stylesheet_directory_uri() . '/assets/css/wave-trt-dashboard.css', array(), '1.1.0' );
-	wp_enqueue_style( 'wave-affiliates', get_stylesheet_directory_uri() . '/assets/css/wave-affiliates.css', array( 'wave-trt' ), '1.0.0' );
-	wp_enqueue_script( 'wave-affiliates', get_stylesheet_directory_uri() . '/assets/js/wave-affiliates.js', array(), '1.0.0', true );
+	wp_enqueue_style( 'wave-affiliates', get_stylesheet_directory_uri() . '/assets/css/wave-affiliates.css', array( 'wave-trt' ), '1.1.0' );
+	wp_enqueue_script( 'wave-affiliates', get_stylesheet_directory_uri() . '/assets/js/wave-affiliates.js', array(), '1.1.0', true );
 } );
 add_action( 'admin_init', function () { if ( isset( $_GET['page'] ) && 'wave-affiliates' === $_GET['page'] ) { nocache_headers(); } } );
 add_action( 'init', function () { register_post_type( 'wave_aff_report', array( 'public' => false, 'show_ui' => false, 'show_in_rest' => false, 'can_export' => false, 'supports' => array( 'title' ) ) ); } );
@@ -121,7 +122,9 @@ function wave_aff_load( $month ) {
 		// An as-of-now report of unpaid balances earned through the selected month, not a historical balance reconstruction.
 		if ( $r->date >= $end || ! in_array( $r->status, array( 'unpaid', 'pending' ), true ) ) { continue; }
 		$order = 'woocommerce' === $r->context ? ( $orders[ (int) $r->reference ] ?? wc_get_order( absint( $r->reference ) ) ) : false;
-		$reason = wave_aff_review_reason( $r, $affmap[ $id ] ?? null, $order, count( $order_refs[ (int) $r->reference ] ?? array() ) > 1 );
+		$probe = clone $r; if ( 'pending' === $probe->status ) { $probe->status = 'unpaid'; }
+		$reason = wave_aff_review_reason( $probe, $affmap[ $id ] ?? null, $order, count( $order_refs[ (int) $r->reference ] ?? array() ) > 1 );
+		if ( ! $reason && 'pending' === $r->status ) { $reason = 'Source status: pending'; }
 		if ( $order && wave_trt_test_record( $order ) ) { $reason = 'Test order excluded'; }
 		$bucket = $reason ? 'held' : 'payable';
 		if ( null !== $units ) { wave_aff_sum( $totals[ $bucket ], $currency, $units ); }
