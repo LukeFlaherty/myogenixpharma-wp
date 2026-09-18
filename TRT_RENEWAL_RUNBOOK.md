@@ -1,6 +1,6 @@
 # TRT consent renewal operations
 
-Updated 2026-09-17. Patient rollout remains **off**. Stripe remains **live** for ordinary production orders.
+Updated 2026-09-18. Patient rollout remains **off**. Stripe remains **live** for ordinary production orders.
 
 ## Current behavior
 
@@ -9,7 +9,7 @@ Updated 2026-09-17. Patient rollout remains **off**. Stripe remains **live** for
 - GET renders a confirmation page; a signed POST records the choice. Email scanners cannot create an order by opening a link.
 - Continue creates one pending renewal, registers it with `/shopify/callback`, then requests labs through `/api/v2/lab/128/save-test-order` with `external_order_id` equal to the **new renewal ID as a string**.
 - The explicit intake callback runs once after the pending order and its prices are saved. Legacy creation/status callbacks remain suppressed for that exact renewal. Other orders retain existing behavior.
-- Patients choose Continue/Pause in the email and confirm on our site. Renewal registration and lab ordering run through the APIs. Do not add a Prescribery questionnaire to the renewal journey: its necessity was never established. The callback acknowledgment records technical registration, not completion of clinical intake.
+- Patients choose Continue/Pause in the email and confirm on our site. Renewal registration and lab ordering run through the APIs. **Omar confirmed on September 18 that patients must submit intake every three months.** The patient-facing renewal intake step is not implemented. The callback acknowledgment records technical registration, not completion of clinical intake. Do not enable rollout until required intake is connected and verified.
 - No renewal payment link works before provider approval. Pause and expiry put the subscription on hold for staff follow-up.
 - Provider approval must identify the correct patient, appointment, and pending renewal; consent, accepted renewal registration, and confirmed lab creation are prerequisites.
 - Approved renewals use the existing Stripe charge/retry/receipt/pharmacy function. Established medicine prices, including discounted plans, are preserved. Zero-price legacy lines use the stored approval price; copied upfront lab/consultation fees are removed. Missing prices require review.
@@ -26,13 +26,13 @@ A controlled production test used fake patient **351289**, subscription **5020**
 - Renewal 5021 stayed pending and unpaid; no live charge or pharmacy release occurred.
 - Gmail confirmed receipt of the renewal confirmation and the new “Next Step: Complete Your Lab Work” email. Both the September 15 and new requisition links returned readable one-page Quest PDFs with the fake patient's details, lab reference/barcodes, and all seven tests.
 - The questionnaire token loaded Prescribery's refill flow and recognized the fake patient's email/DOB. No medical questionnaire or clinical consent was submitted.
-- The provider's lab-list API does not expose `external_order_id`; API acceptance alone does not prove the eventual approval callback will return the right WooCommerce ID.
+- The provider's lab-list API does not expose `external_order_id`. On September 18, Omar triggered an approval and our authenticated handler recorded **order 5021, patient 351289, appointment 448501, status approved**. The fake-order guard returned its expected 403 before payment/pharmacy processing. Renewal 5021 remains pending with no transaction or pharmacy release; the fake parent was untouched. Production Stripe remains live and rollout remains off. This verifies provider-to-renewal correlation, not completion of patient intake or an actual charge.
 
 Prescribery's screenshot totals **$90.60 + $28 = $118.60**, versus Omar's approximate $90.50 + $28. This is vendor cost information, not a change to patient pricing. Preserve customer prices; the ten-cent estimate difference is not itself a launch blocker. The catalog's free/zero-price label does not establish Myogenix's wholesale invoice amount.
 
 ## Remaining launch gates
 
-1. **Provider approval round trip:** Have Prescribery trigger a test approval for renewal 5021 / patient 351289 / lab 2439. Confirm the incoming new order ID, patient ID, and appointment ID. An invented approval request tests our handler but cannot establish Prescribery's mapping.
+1. **Required quarterly intake:** Connect the correct provider-approved TRT refill questions and verify fresh patient answers reach the correct renewal. Read-only production discovery found refill template 10622 on source 769, while client 128 exposes TRT Injectable service 559 on source 768 with template 8173. Both `/questionnaires/10622?service_ids=559` and `/questionnaires/8173?service_ids=559` return HTTP 200 with empty question lists. Unfiltered templates contain questions for many treatments; do not select clinical questions by guesswork. Ask Prescribery for the correct TRT refill template/service pairing and how answer submission associates with the new renewal. The documented answers endpoint accepts patient/template/service identifiers but does not document a WooCommerce order identifier. No answers or clinical attestations were submitted in discovery. API-based intake on Myogenix is a candidate, not a verified working flow.
 2. **Existing subscription review:** Read-only audit of 23 active non-QA TRT subscriptions found patient mappings missing on 4679 and 2899; cycle age past 85 days on 2880 and 2899. Subscription 4843 has an upcoming September 22 payment but an August 27 last-order date and no recorded paid orders; its cycle anchor also needs review. All four use a three-month billing interval. Do not blindly enable a rule that immediately pauses overdue records or suppresses legacy billing before their cycle is established. No real subscription was modified by this audit.
 3. Only after those checks, set `MYOGENIX_TRT_REDESIGN_LIVE=true` and verify the first eligible cohort.
 
@@ -44,7 +44,7 @@ The earlier plugin-side `prescription_cancel_subscription()` fix was verified li
 
 All marked fake orders, including fake original parents, are blocked from external approval charges. After the existing REST authentication succeeds, `_trt_qa_callback_seen` records only IDs, status, top-level field names, and time; the endpoint returns 403 for these fake orders. Tell Prescribery this rejection is expected during the mapping test. No raw clinical payload or credentials are retained there.
 
-Fake renewal 5021 and its parent are retained for that provider check. Browser verification is complete, subscription 5020 is on hold, and the temporary QA allowlist has been removed. These retained fake records cannot be charged by the external approval handler. Other test-suite fixtures are trashed after each run.
+Fake renewal 5021 and its parent are retained as evidence of the completed provider check. Browser verification is complete, subscription 5020 is on hold, and the temporary QA allowlist has been removed. These retained fake records cannot be charged by the external approval handler. Other test-suite fixtures are trashed after each run.
 
 Candidate integration suite:
 
@@ -75,6 +75,6 @@ Run PHP lint and `git diff --check`, commit only TRT files on `main`, push, then
 
 Reference: [Prescribery lab API documentation](https://staging.prescribery.com/api/docs#labs-POSTapi-v2-lab--clientId--save-test-order).
 
-## Correction: keep renewal patient actions on Myogenix
+## Historical correction on September 17: keep renewal patient actions on Myogenix
 
-The questionnaire buttons and instructions were added based on an unsupported interpretation of Omar’s callback explanation. They have been removed from renewal confirmations, emails, and the renewal guide. The legacy plugin's questionnaire shortcode is also suppressed for tagged consent renewals, including payment receipts. The callback still registers the renewal automatically and lab ordering still uses `external_order_id`; neither API request required a completed questionnaire in the production test. Questionnaire wording is not a launch gate. Initial-purchase intake is outside this correction. Prior test emails already delivered cannot be recalled.
+The questionnaire buttons and instructions were added before the requirement was established and were removed on September 17. The legacy plugin's questionnaire shortcode is also suppressed for tagged consent renewals, including payment receipts. Neither registration nor lab creation required a completed questionnaire in the production test. **That API behavior did not establish whether intake was clinically required. Omar's September 18 confirmation supersedes the earlier assumption:** intake every three months is required. Patient copy now reflects that requirement; the actual intake interface remains a launch gate. Initial-purchase intake is unchanged. Prior test emails already delivered cannot be recalled.

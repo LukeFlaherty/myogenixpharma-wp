@@ -3,7 +3,8 @@
 defined( 'ABSPATH' ) || exit;
 
 // The integration also inserts its questionnaire shortcode in WooCommerce
-// receipts. Consent renewals use the API flow, so omit that extra patient task.
+// receipts. Keep this generic link suppressed while the required quarterly
+// renewal intake flow is connected; registration alone is not completed intake.
 add_filter( 'pre_do_shortcode_tag', function ( $output, $tag, $attributes ) {
 	if ( 'pre_woo_questionnaire_link' !== $tag || ! is_array( $attributes ) ) { return $output; }
 	$id = $attributes['order_id'] ?? 0;
@@ -30,7 +31,7 @@ function myogenix_trt_consent_email_html( $sub, $cycle ) {
 	$date = wp_date( 'F j, Y', $cycle + MYOGENIX_TRT_CONSENT_TTL );
 	$content = myogenix_trt_email_button( myogenix_trt_consent_url( $args + array( 'action' => 'continue' ) ), 'Continue my renewal →' )
 		. myogenix_trt_email_button( myogenix_trt_consent_url( $args + array( 'action' => 'decline' ) ), 'Pause my renewal', true )
-		. '<p style="margin:24px 0 12px"><strong style="color:#fff">No renewal charge when you confirm.</strong><br>Continue → follow-up labs → provider review → payment after approval.</p>'
+		. '<p style="margin:24px 0 12px"><strong style="color:#fff">No renewal charge when you confirm.</strong><br>Continue → updated intake &amp; labs → provider review → payment after approval.</p><p style="font-size:13px;color:#b8b8bd">Your provider requires updated medical intake every three months.</p>'
 		. '<p style="font-size:13px;color:#b8b8bd;margin:0">Confirm your choice on the next page by <strong style="color:#fff">' . esc_html( $date ) . '</strong>. No response? We’ll pause your renewal and follow up.</p><p style="font-size:11px;color:#a1a1aa;margin:16px 0 0">This link is just for you. Please don’t forward it.</p>';
 	if ( myogenix_trt_is_qa( $sub ) ) { $content .= '<p style="color:#f6cf82;font-size:11px;margin:14px 0 0"><strong>TEST PREVIEW</strong> · Fake subscription. No live card will be charged.</p>'; }
 	return myogenix_trt_email_shell( 'Your TRT. Your next step.', $content, 'Continue or pause your renewal. Confirming does not charge your card.' );
@@ -45,7 +46,7 @@ function myogenix_trt_send_consent_email( WC_Subscription $sub, $cycle ) {
 function myogenix_trt_send_response_email( $sub, $action ) {
 	$title = 'continue' === $action ? 'Your renewal is underway.' : 'Your renewal is paused.';
 	$content = 'continue' === $action
-		? '<p>Thanks for confirming you’d like to continue. We’ve requested your follow-up labs and prepared renewal order <strong>#' . absint( $sub->get_meta( '_trt_pending_renewal_order' ) ) . '</strong> for review.</p><p><strong>No renewal payment has been taken.</strong> Your provider will review your labs before a renewal payment is processed.</p><p>Watch for “Next Step: Complete Your Lab Work” with your lab form and scheduling links. Need help or can’t find it? Reply to this email.</p>'
+		? '<p>Thanks for confirming you’d like to continue. We’ve requested your follow-up labs and prepared renewal order <strong>#' . absint( $sub->get_meta( '_trt_pending_renewal_order' ) ) . '</strong> for review.</p><p><strong>No renewal payment has been taken.</strong> Your provider requires updated medical intake every three months and reviews your intake and labs before approval.</p><p>Watch for “Next Step: Complete Your Lab Work” with your lab form and scheduling links. Contact your care team for help with your intake or lab instructions.</p>'
 		: '<p>We’ve recorded your choice and placed your subscription on hold. <strong>No renewal payment has been taken.</strong></p><p>Our team will follow up with you. If you change your mind, reply to this email and we’ll help you with the next steps.</p>';
 	return myogenix_trt_mail( $sub, 'continue' === $action ? 'We’ve received your renewal request' : 'Your renewal has been paused', myogenix_trt_email_shell( $title, '<p>Hi ' . esc_html( $sub->get_billing_first_name() ?: 'there' ) . ',</p>' . $content ) );
 }
@@ -93,14 +94,14 @@ add_action( 'template_redirect', function () {
 		$result = myogenix_trt_process_consent( $params );
 		if ( is_wp_error( $result ) ) { myogenix_trt_render_error( $result ); }
 		$continued = 'continue' === $result['action'];
-		myogenix_trt_html_response( $continued ? '<p>We’ve requested your follow-up labs and prepared your renewal for provider review.</p><div class="steps"><strong>No renewal payment has been taken.</strong><p>Watch for “Next Step: Complete Your Lab Work” in your inbox. Download your lab form and follow the scheduling instructions. Payment is processed only after provider approval.</p></div><p>Look for a confirmation in your inbox.</p>' : '<p>Your subscription is now on hold. No renewal payment has been taken.</p><p>Our team will follow up. If you change your mind, contact us and we’ll help you with the next steps.</p>', 200, $continued ? 'Your renewal is underway.' : 'Your renewal is paused.' );
+		myogenix_trt_html_response( $continued ? '<p>We’ve requested your follow-up labs and prepared your renewal for provider review.</p><div class="steps"><strong>No renewal payment has been taken.</strong><p>Your provider requires updated medical intake every three months. Contact your care team for help completing it.</p><p>Watch for “Next Step: Complete Your Lab Work” in your inbox. Download your lab form and follow the scheduling instructions. Payment is processed only after provider approval.</p></div><p>Look for a confirmation in your inbox.</p>' : '<p>Your subscription is now on hold. No renewal payment has been taken.</p><p>Our team will follow up. If you change your mind, contact us and we’ll help you with the next steps.</p>', 200, $continued ? 'Your renewal is underway.' : 'Your renewal is paused.' );
 	}
 	$result = myogenix_trt_validate_consent_request( $params );
 	if ( is_wp_error( $result ) ) { myogenix_trt_render_error( $result ); }
 	list( $sub, $cycle, $action ) = $result;
 	$continued = 'continue' === $action;
 	$body = myogenix_trt_is_qa( $sub ) ? '<p class="test"><strong>TEST PREVIEW</strong> · Fake subscription. No live card will be charged.</p>' : '';
-	$body .= $continued ? '<p>You’re choosing to continue your testosterone treatment. Here’s what happens next:</p><div class="steps"><ol><li>We request your follow-up labs.</li><li>Your provider reviews your labs and renewal.</li><li>Payment is processed only after provider approval.</li></ol></div><p><strong>No renewal payment is taken when you confirm.</strong></p>' : '<p>We’ll place your subscription on hold and let our team know you’d like to pause your renewal.</p><div class="steps"><strong>No renewal payment will be taken.</strong><p>Our team will follow up with you before any further steps.</p></div>';
+	$body .= $continued ? '<p>You’re choosing to continue your testosterone treatment. Here’s what happens next:</p><div class="steps"><ol><li>We request your follow-up labs.</li><li>You complete updated medical intake, required every three months, and your lab visit.</li><li>Your provider reviews your intake, labs, and renewal.</li><li>Payment is processed only after provider approval.</li></ol></div><p><strong>No renewal payment is taken when you confirm.</strong></p>' : '<p>We’ll place your subscription on hold and let our team know you’d like to pause your renewal.</p><div class="steps"><strong>No renewal payment will be taken.</strong><p>Our team will follow up with you before any further steps.</p></div>';
 	$body .= '<form method="post" action="' . esc_url( myogenix_trt_consent_url( array() ) ) . '">';
 	foreach ( array( 'subscription_id', 'cycle_start', 'token', 'action' ) as $key ) { $body .= '<input type="hidden" name="' . esc_attr( $key ) . '" value="' . esc_attr( $params[ $key ] ) . '">'; }
 	$body .= '<button type="submit">' . ( $continued ? 'Confirm & continue' : 'Confirm pause' ) . '</button></form>';
