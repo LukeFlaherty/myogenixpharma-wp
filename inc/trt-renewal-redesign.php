@@ -40,7 +40,8 @@ function myogenix_trt_is_qa( $subscription ) {
 function myogenix_trt_enabled( $subscription ) {
 	return $subscription instanceof WC_Subscription
 		&& myogenix_trt_subscription_has_product( $subscription, MYOGENIX_TRT_PRODUCT_ID )
-		&& ( MYOGENIX_TRT_REDESIGN_LIVE || myogenix_trt_is_qa( $subscription ) );
+		&& 'yes' !== $subscription->get_meta( '_trt_internal_test' )
+		&& ( ( MYOGENIX_TRT_REDESIGN_LIVE && 'yes' !== $subscription->get_meta( '_trt_qa_test' ) ) || myogenix_trt_is_qa( $subscription ) );
 }
 
 function myogenix_trt_cycle_start_ts( WC_Subscription $subscription ) {
@@ -143,7 +144,7 @@ function myogenix_trt_check_subscription( $id ) {
 	}
 	try {
 		$sub = wcs_get_subscription( $id );
-		if ( ! $sub || ! $sub->has_status( 'active' ) || ! myogenix_trt_subscription_has_product( $sub, MYOGENIX_TRT_PRODUCT_ID ) ) { return; }
+		if ( ! $sub || ! $sub->has_status( 'active' ) || ! myogenix_trt_subscription_has_product( $sub, MYOGENIX_TRT_PRODUCT_ID ) || 'yes' === $sub->get_meta( '_trt_internal_test' ) || ( 'yes' === $sub->get_meta( '_trt_qa_test' ) && ! myogenix_trt_is_qa( $sub ) ) ) { return; }
 		$cycle = myogenix_trt_cycle_start_ts( $sub );
 		if ( ! $cycle ) { return; }
 		$days = (int) floor( ( time() - $cycle ) / DAY_IN_SECONDS );

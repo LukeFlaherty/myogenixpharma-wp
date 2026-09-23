@@ -49,6 +49,13 @@ $fixture = function ( $days = 65, $price = 0, $trt = true ) use ( &$test_ids, $q
 };
 $params_for = function ( $sub, $action = 'continue' ) { $cycle = myogenix_trt_cycle_start_ts( $sub ); return array( 'subscription_id' => $sub->get_id(), 'cycle_start' => $cycle, 'action' => $action, 'token' => myogenix_trt_consent_token( $sub->get_id(), $cycle ) ); };
 try {
+	$internal = $fixture(); $internal->update_meta_data( '_trt_internal_test', 'yes' ); $internal->save();
+	$before_mail = count( $test_mail ); $before_http = count( $test_http );
+	myogenix_trt_check_subscription( $internal->get_id() );
+	$assert( ! myogenix_trt_enabled( $internal ) && count( $test_mail ) === $before_mail && count( $test_http ) === $before_http, 'Legacy internal test is excluded from invitations and provider requests even if QA allowlisted' );
+	$internal->update_meta_data( '_trt_cycle_start', time() - 90 * DAY_IN_SECONDS ); $internal->save();
+	myogenix_trt_check_subscription( $internal->get_id() );
+	$assert( wcs_get_subscription( $internal->get_id() )->has_status( 'active' ), 'Overdue internal test does not enter patient expiry processing' );
 	$sub = $fixture(); $id = $sub->get_id(); $cycle = myogenix_trt_cycle_start_ts( $sub );
 	$assert( myogenix_trt_lock( $id ), 'Database lock is available' ); myogenix_trt_unlock( $id );
 	$sub->update_meta_data( '_trt_consent_sent_for', $cycle ); $sub->save();

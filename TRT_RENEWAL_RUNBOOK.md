@@ -1,6 +1,6 @@
 # TRT consent renewal operations
 
-Updated 2026-09-18. Patient rollout remains **off**. Stripe remains **live** for ordinary production orders.
+Updated 2026-09-23. Patient rollout remains **off**. Stripe remains **live** for ordinary production orders.
 
 ## Current behavior
 
@@ -32,9 +32,11 @@ Prescribery's screenshot totals **$90.60 + $28 = $118.60**, versus Omar's approx
 
 ## Remaining launch gates
 
-1. **Required quarterly intake:** Connect the correct provider-approved TRT refill questions and verify fresh patient answers reach the correct renewal. Read-only production discovery found refill template 10622 on source 769, while client 128 exposes TRT Injectable service 559 on source 768 with template 8173. Both `/questionnaires/10622?service_ids=559` and `/questionnaires/8173?service_ids=559` return HTTP 200 with empty question lists. Unfiltered templates contain questions for many treatments; do not select clinical questions by guesswork. Ask Prescribery for the correct TRT refill template/service pairing and how answer submission associates with the new renewal. The documented answers endpoint accepts patient/template/service identifiers but does not document a WooCommerce order identifier. No answers or clinical attestations were submitted in discovery. API-based intake on Myogenix is a candidate, not a verified working flow.
-2. **Existing subscription review:** Read-only audit of 23 active non-QA TRT subscriptions found patient mappings missing on 4679 and 2899; cycle age past 85 days on 2880 and 2899. Subscription 4843 has an upcoming September 22 payment but an August 27 last-order date and no recorded paid orders; its cycle anchor also needs review. All four use a three-month billing interval. Do not blindly enable a rule that immediately pauses overdue records or suppresses legacy billing before their cycle is established. No real subscription was modified by this audit.
+1. **Required quarterly intake:** Connect the correct provider-approved TRT refill questions and verify fresh patient answers reach the correct renewal. On September 23, Omar's requested `service_ids=559` calls returned HTTP 200 with **432 questions for template 8173 and 449 for template 10622**, including unrelated treatments. This supersedes September 18's empty-list result. Template 10622 returns identical normalized `data` with and without the service filter; grouped format puts all questions into one group. Do not choose clinical questions by guesswork. [Full redacted requests and observed responses](TRT_QUESTIONNAIRE_API_REPRO.md) are ready for Omar/Virender. They must confirm the refill template and working service filtering, plus how submitted answers associate with the current registered renewal. No answers or clinical attestations were submitted. The patient intake interface and submission verification remain unfinished.
+2. **Existing subscription review:** September 23 audit found **21 active real TRT subscriptions**, all with patient mappings and none past the consent deadline. Only **2899** still needs a price decision: its medication line and September 22 renewal 5125 are $0, with no saved approval price. Do not infer the established patient price from the current catalog. Confirm the intended renewal amount or explicitly exclude the subscription from rollout pending staff review. The other previously flagged records are resolved as launch-review items: 4679 is now cancelled and mapped; 2880 renewed September 19 with a $567 total and transaction reference; 4843 carries `_trt_internal_test=yes` and a test name and is excluded from the patient rollout. These status/payment changes were already present when audited, not performed by this task.
 3. Only after those checks, set `MYOGENIX_TRT_REDESIGN_LIVE=true` and verify the first eligible cohort.
+
+On September 23, the missing patient mapping on subscription 2899 was repaired to patient **321236** after a unique exact email, full-name, and phone match from the authenticated client-scoped provider API. Only subscription metadata changed; no billing dates, prices, order statuses, payments, labs, or patient answers were changed. Its next payment remains December 22.
 
 The earlier plugin-side `prescription_cancel_subscription()` fix was verified live. Patient Pause independently sets on-hold and does not call the provider-rejection cancellation helper.
 
@@ -44,15 +46,17 @@ The earlier plugin-side `prescription_cancel_subscription()` fix was verified li
 
 All marked fake orders, including fake original parents, are blocked from external approval charges. After the existing REST authentication succeeds, `_trt_qa_callback_seen` records only IDs, status, top-level field names, and time; the endpoint returns 403 for these fake orders. Tell Prescribery this rejection is expected during the mapping test. No raw clinical payload or credentials are retained there.
 
+Legacy `_trt_internal_test=yes` subscriptions never enter the new renewal flow, including staff detection emails and expiry handling. `_trt_qa_test=yes` subscriptions remain restricted to the temporary QA allowlist even after the production flag is enabled. These exclusions do not alter the separate legacy billing process.
+
 Fake renewal 5021 and its parent are retained as evidence of the completed provider check. Browser verification is complete, subscription 5020 is on hold, and the temporary QA allowlist has been removed. These retained fake records cannot be charged by the external approval handler. Other test-suite fixtures are trashed after each run.
 
 Candidate integration suite:
 
 ```sh
-TRT_TEST_SOURCE=/tmp/myogenix-trt-20260917 wp --skip-plugins=affiliate-wp --skip-themes eval-file /tmp/myogenix-trt-20260917/trt-renewal-integration.php
+TRT_TEST_SOURCE=/tmp/myogenix-trt-20260923 wp --skip-plugins=affiliate-wp --skip-themes eval-file /tmp/myogenix-trt-20260923/trt-renewal-integration.php
 ```
 
-Copy all four `inc/trt-renewal-*.php` files and `tests/trt-renewal-integration.php` into the private candidate directory first. All HTTP and email are mocked. **56 checks passed** on the installed WooCommerce/WCS stack after the questionnaire correction, covering consent, unpaid orders, registration ordering/correlation, duplicate suppression, lab retries, ambiguous callback/lab outcomes, QA approval protection, pricing, scheduling, and omission of the legacy questionnaire from renewal receipts.
+Copy all four `inc/trt-renewal-*.php` files and `tests/trt-renewal-integration.php` into the private candidate directory first. All HTTP and email are mocked. **58 checks passed on September 23**, covering internal-test exclusion from invitations/provider requests and expiry handling, consent, unpaid orders, registration ordering/correlation, duplicate suppression, lab retries, ambiguous callback/lab outcomes, QA approval protection, pricing, scheduling, and omission of the legacy questionnaire from renewal receipts. Fixtures were cleaned up and the original QA option restored.
 
 Historical verification before the questionnaire correction: production browser verification passed on desktop and at 390px: the confirmation displayed its working questionnaire button, and the revised confirmation reached Luke’s inbox. The already-created test renewal was reused for this presentation check; the final provider lab list remained exactly 2439 and 2423. Deployed PHP hashes matched the committed candidate; Stripe stayed live, rollout stayed off, and the fake renewal had neither a transaction nor pharmacy-release marker. The public renewal guide loaded with its updated questionnaire instructions.
 
