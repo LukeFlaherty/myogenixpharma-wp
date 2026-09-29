@@ -41,7 +41,7 @@ function myogenix_trt_prepare_renewal_prices( $order, $sub ) {
 
 // Pending renewals cannot be paid from My Account or an old pay-link before approval.
 add_filter( 'woocommerce_order_needs_payment', function ( $needs, $order ) {
-	if ( myogenix_trt_is_renewal_order( $order ) && 'yes' !== $order->get_meta( '_trt_provider_approved' ) ) { return false; }
+	if ( myogenix_trt_is_renewal_order( $order ) && ( 'yes' !== $order->get_meta( '_trt_provider_approved' ) || ! myogenix_trt_intake_verified( $order ) ) ) { return false; }
 	return $needs;
 }, PHP_INT_MAX, 2 );
 add_filter( 'woocommerce_cancel_unpaid_order', function ( $cancel, $order ) {
@@ -74,8 +74,14 @@ function myogenix_trt_approval_callback( WP_REST_Request $request ) {
 	$sub = wcs_get_subscription( $order->get_meta( '_trt_subscription_id' ) );
 	if ( ! $sub || ! myogenix_trt_lock( $sub->get_id() ) ) { return new WP_REST_Response( array( 'error' => 'Renewal is being processed.' ), 409 ); }
 	try {
+		// Staff may have verified intake just before this worker acquired the lock.
+		$order = wc_get_order( $id );
+		$sub = wcs_get_subscription( $sub->get_id() );
 		$status = strtolower( sanitize_key( $p['status'] ?? $p['data']['event'] ?? $p['payload']['event'] ?? '' ) );
-		if ( 'approved' !== $status ) { return prescriptionHandleApproval( $request ); }
+		if ( 'approved' !== $status ) {
+			$order->delete_meta_data( '_trt_waiting_approval' ); $order->save();
+			return prescriptionHandleApproval( $request );
+		}
 		if ( $order->get_transaction_id() ) { return new WP_REST_Response( array( 'success' => true, 'message' => 'Already paid; no additional charge.' ) ); }
 		if ( ! $sub->has_status( 'active' ) || ! $order->has_status( array( 'pending', 'failed', 'on-hold' ) ) || 'continue' !== $sub->get_meta( '_trt_consent_resolved_action' ) || (int) $sub->get_meta( '_trt_pending_renewal_order' ) !== $order->get_id() || 'sent' !== $order->get_meta( '_trt_intake_state' ) || 'created' !== $order->get_meta( '_trt_lab_state' ) || ! $order->get_meta( '_prescribery_requisition_id' ) ) {
 			return new WP_REST_Response( array( 'error' => 'Renewal requires consent, intake registration, and a confirmed lab request before approval.' ), 409 );
@@ -89,6 +95,18 @@ function myogenix_trt_approval_callback( WP_REST_Request $request ) {
 		foreach ( $order->get_items() as $item ) {
 			if ( $reasons && ! array_filter( $reasons, function ( $name ) use ( $item ) { return prescription_fuzzy_match( $name, $item->get_name() ); } ) ) { return new WP_REST_Response( array( 'error' => 'Approval does not match the renewal medicine.' ), 422 ); }
 		}
+		$order->update_meta_data( '_trt_approval_received_at', time() );
+		if ( ! myogenix_trt_intake_verified( $order ) ) {
+			$first = ! $order->get_meta( '_trt_waiting_approval' );
+			$order->update_meta_data( '_trt_waiting_approval', array( 'order_id' => $id, 'status' => 'approved', 'patient_id' => $patient_id, 'appointment_id' => $appointment_id, 'appointment_reason' => $p['appointment_reason'] ?? '' ) );
+			$order->save();
+			if ( $first ) {
+				$order->add_order_note( 'Provider approval received and retained. Payment blocked until staff verifies quarterly intake on this renewal order.' );
+				myogenix_trt_staff_notice( $sub, 'Approval waiting on quarterly intake', 'Renewal #' . $id . ' has provider approval. Verify its quarterly intake with Prescribery and record Intake completed in Wave Consulting. Do not mark it complete based only on this approval. Once verified, the saved approval will be processed for payment.' );
+			}
+			return new WP_REST_Response( array( 'success' => true, 'order_id' => $id, 'message' => 'Approval retained; payment awaits verified quarterly intake.' ), 202 );
+		}
+		$order->delete_meta_data( '_trt_waiting_approval' );
 		$order->update_meta_data( 'appointment_id', $appointment_id );
 		$order->update_meta_data( '_order_origin', 'doctor_approval_api' );
 		$order->update_meta_data( '_trt_provider_approved', 'yes' );

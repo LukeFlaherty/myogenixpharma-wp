@@ -11,11 +11,12 @@ const MYOGENIX_TRT_WEEK_TARGET = 9;
 const MYOGENIX_TRT_CONSENT_TTL = 85 * DAY_IN_SECONDS;
 const MYOGENIX_TRT_NORESPONSE_DAYS = 75;
 const MYOGENIX_TRT_ADMIN_EMAILS = array( 'adam@myogenixpharma.com', 'adam@myogenix.com' );
-const MYOGENIX_TRT_REDESIGN_LIVE = false;
+const MYOGENIX_TRT_REDESIGN_LIVE = true;
 
 require_once __DIR__ . '/trt-renewal-presentation.php';
 require_once __DIR__ . '/trt-renewal-approval.php';
 require_once __DIR__ . '/trt-renewal-intake.php';
+require_once __DIR__ . '/trt-renewal-staff.php';
 
 function myogenix_trt_subscription_has_product( WC_Subscription $subscription, $product_id ) {
 	foreach ( $subscription->get_items() as $item ) {
@@ -41,6 +42,7 @@ function myogenix_trt_enabled( $subscription ) {
 	return $subscription instanceof WC_Subscription
 		&& myogenix_trt_subscription_has_product( $subscription, MYOGENIX_TRT_PRODUCT_ID )
 		&& 'yes' !== $subscription->get_meta( '_trt_internal_test' )
+		&& ! myogenix_trt_launch_exception( $subscription )
 		&& ( ( MYOGENIX_TRT_REDESIGN_LIVE && 'yes' !== $subscription->get_meta( '_trt_qa_test' ) ) || myogenix_trt_is_qa( $subscription ) );
 }
 
@@ -157,9 +159,18 @@ function myogenix_trt_check_subscription( $id ) {
 		}
 		if ( ! myogenix_trt_enabled( $sub ) || (string) $sub->get_meta( '_trt_consent_resolved_for' ) === (string) $cycle ) { return; }
 		if ( $days >= 85 ) {
+			if ( (string) $sub->get_meta( '_trt_patient_email_for' ) !== (string) $cycle ) {
+				if ( (string) $sub->get_meta( '_trt_missed_invitation_for' ) !== (string) $cycle ) {
+					$sub->update_meta_data( '_wave_trt_workflow', array( 'revision' => 1, 'status' => 'open', 'due' => wp_date( 'Y-m-d' ), 'next' => 'Renewal invitation was not sent before the deadline. Contact the patient and review the cycle before restarting consent. Automatic renewal payment is blocked.' ) );
+					if ( myogenix_trt_staff_notice( $sub, 'Missed renewal invitation — review today', 'No patient invitation was sent for this cycle. Contact the patient and review the renewal. It has not been marked as a patient non-response, and automatic renewal charging remains blocked.' ) ) { $sub->update_meta_data( '_trt_missed_invitation_for', $cycle ); }
+					$sub->save();
+				}
+				return;
+			}
 			// Consent is required; native charging never acts as a fallback.
 			$sub->update_meta_data( '_trt_consent_resolved_for', $cycle );
 			$sub->update_meta_data( '_trt_consent_resolved_action', 'expired' );
+			$sub->update_meta_data( '_trt_consent_resolved_at', time() );
 			$sub->update_status( 'on-hold', 'TRT renewal paused: consent deadline passed. Staff review required; no renewal charge.' );
 			$sub->save();
 			myogenix_trt_staff_notice( $sub, 'Consent expired — follow-up needed', 'Renewal paused without a charge. Contact the patient to discuss next steps.' );
@@ -181,6 +192,7 @@ function myogenix_trt_check_subscription( $id ) {
 		if ( $days >= MYOGENIX_TRT_NORESPONSE_DAYS && $sent_at && time() - $sent_at >= DAY_IN_SECONDS && (string) $sub->get_meta( '_trt_admin_noresponse_sent_for' ) !== (string) $cycle ) {
 			if ( myogenix_trt_staff_notice( $sub, 'No response — follow-up needed', 'The patient has not responded. The renewal will pause at day 85; there is no automatic charge.' ) ) {
 				$sub->update_meta_data( '_trt_admin_noresponse_sent_for', $cycle );
+				$sub->update_meta_data( '_trt_admin_noresponse_sent_at', time() );
 				$sub->save();
 			}
 		}
@@ -229,6 +241,7 @@ function myogenix_trt_process_consent( array $params ) {
 		}
 		$sub->update_meta_data( '_trt_consent_resolved_for', $cycle );
 		$sub->update_meta_data( '_trt_consent_resolved_action', $action );
+		$sub->update_meta_data( '_trt_consent_resolved_at', time() );
 		$sub->save();
 		myogenix_trt_send_response_email( $sub, $action );
 		return array( 'action' => $action, 'order_id' => $outcome instanceof WC_Order ? $outcome->get_id() : 0 );
@@ -276,9 +289,11 @@ function myogenix_trt_handle_continue( WC_Subscription $sub ) {
 		}
 		$order->update_meta_data( '_prescribery_requisition_id', $requisition );
 		$order->update_meta_data( '_trt_lab_state', 'created' );
-		$order->add_order_note( 'Patient consent recorded; lab request accepted. Unpaid renewal awaits provider approval.' );
+		$order->update_meta_data( '_trt_lab_created_at', time() );
+		$order->add_order_note( 'Patient consent recorded; lab request accepted. Unpaid renewal awaits verified quarterly intake and provider approval.' );
 		$order->save();
 	}
+	myogenix_trt_queue_intake( $sub, $order );
 	return $order;
 }
 
@@ -292,6 +307,7 @@ add_filter( 'wcs_renewal_order_created', function ( $order, $sub ) {
 	$order->update_meta_data( '_prescribery_patient_id', myogenix_trt_get_prescribery_patient_id( $sub ) );
 	$order->set_transaction_id( '' );
 	$order->set_date_paid( null );
+	foreach ( array( '_wave_trt_workflow', '_trt_staff_intake_queued', '_trt_waiting_approval', '_trt_approval_received_at', '_trt_lab_created_at' ) as $key ) { $order->delete_meta_data( $key ); }
 	foreach ( array( '_prescription_charge_amount', '_prescription_stripe_charging', '_pharmacy_webhook_sent', '_stripe_intent_id', '_child_order_ids', '_approved_appointment_ids', 'appointment_id', '_lab_fee_paid', '_parent_order_id', '_trt_pricing_ready', '_prescribery_requisition_id', '_trt_provider_approved', '_trt_cycle_advanced', '_trt_wcs_payment_recorded', '_trt_lab_state', '_trt_intake_state', '_trt_intake_sent_at', '_trt_intake_http_code', '_trt_intake_url', '_trt_qa_callback_seen' ) as $key ) { $order->delete_meta_data( $key ); }
 	foreach ( $order->get_items() as $item ) {
 		foreach ( array( '_item_approved', '_item_rejected', '_item_approved_appointment', '_item_rejected_appointment' ) as $key ) { $item->delete_meta_data( $key ); }

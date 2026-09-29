@@ -2,6 +2,12 @@
 /** Isolated POST-handler regression checks. No network, WordPress DB, or patient data. */
 define( 'ABSPATH', __DIR__ );
 function add_action( ...$args ) {}
+function do_action( ...$args ) { $GLOBALS['milestone_hooks'][] = $args; }
+function myogenix_trt_is_renewal_order( $order ) { return 'yes' === $order->get_meta( '_trt_consent_renewal' ); }
+function myogenix_trt_lock( $id ) { return $GLOBALS['sub_lock_available'] ?? true; }
+function myogenix_trt_unlock( $id ) { $GLOBALS['sub_unlocked'] = $id; }
+function wp_date( $format, $timestamp ) { return gmdate( $format, $timestamp ); }
+define( 'DAY_IN_SECONDS', 86400 );
 function absint( $s ) { return abs( (int) $s ); }
 function wp_unslash( $s ) { return stripslashes( $s ); }
 function sanitize_key( $s ) { return preg_replace( '/[^a-z0-9_-]/', '', strtolower( $s ) ); }
@@ -25,6 +31,7 @@ class FakeDB {
 class FakeOrder {
 	public $meta = array(); public $notes = array(); public $writes = 0; public $product = 883;
 	function get_meta( $key ) { return $this->meta[ $key ] ?? ''; }
+	function get_transaction_id() { return ''; }
 	function get_type() { return 'shop_order'; }
 	function get_items() { $p = $this->product; return array( new class($p) { function __construct( public $p ) {} function get_product_id() { return $this->p; } } ); }
 	function get_formatted_billing_full_name() { return 'Fictional Fixture'; }
@@ -68,4 +75,13 @@ $allowed = false; expect_action('assign', array(), false); $allowed = true;
 expect_action('charge', array(), false);
 expect_action('note', array('note'=>str_repeat('x',2001)), false);
 if (count($order->notes) !== 8) { throw new Exception('Private audit note mismatch'); }
+$order->meta['_trt_consent_renewal'] = 'yes'; $order->meta['_trt_subscription_id'] = 777;
+expect_action('verify', array('milestone'=>'intake','note'=>'Confirmed current-cycle completion with provider'));
+if (wave_trt_work($order)['status'] !== 'provider' || $GLOBALS['sub_unlocked'] !== 777 || end($GLOBALS['milestone_hooks'])[0] !== 'wave_trt_milestone_updated') { throw new Exception('Intake verification did not advance staff follow-up or release lock'); }
+expect_action('clear_milestone', array('milestone'=>'intake','note'=>'Provider corrected completion status'));
+$GLOBALS['sub_lock_available'] = false;
+expect_action('verify', array('milestone'=>'intake','note'=>'Concurrent update'), false);
+$GLOBALS['sub_lock_available'] = true;
+$order->meta['_trt_provider_approved'] = 'yes';
+expect_action('clear_milestone', array('milestone'=>'intake','note'=>'Cannot undo authorized payment'), false);
 echo "$checks action-handler checks passed; all mutations isolated to staff metadata/private notes.\n";

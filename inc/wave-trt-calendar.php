@@ -7,14 +7,14 @@ add_action( 'admin_menu', function () {
 add_action( 'admin_enqueue_scripts', function ( $hook ) {
 	if ( ( $GLOBALS['wave_trt_calendar_hook'] ?? '' ) !== $hook ) { return; }
 	wp_enqueue_style( 'wave-trt', get_stylesheet_directory_uri() . '/assets/css/wave-trt-dashboard.css', array(), '1.1.0' );
-	wp_enqueue_style( 'wave-trt-calendar', get_stylesheet_directory_uri() . '/assets/css/wave-trt-calendar.css', array( 'wave-trt' ), '1.0.1' );
+	wp_enqueue_style( 'wave-trt-calendar', get_stylesheet_directory_uri() . '/assets/css/wave-trt-calendar.css', array( 'wave-trt' ), '1.1.0' );
 	wp_enqueue_script( 'wave-trt-calendar', get_stylesheet_directory_uri() . '/assets/js/wave-trt-calendar.js', array(), '1.0.1', true );
 } );
 add_action( 'admin_init', function () {
 	if ( isset( $_GET['page'] ) && 'wave-trt-calendar' === $_GET['page'] ) { nocache_headers(); }
 } );
 function wave_trt_calendar_types() {
-	return array( 'order' => 'Orders', 'renewal_order' => 'Renewal orders', 'renewal' => 'Scheduled renewals', 'followup' => 'Check-ins / follow-ups', 'contact' => 'Contact logged', 'milestone' => 'Progress recorded', 'refund' => 'Refunds', 'suggested' => 'Suggested check-ins' );
+	return array( 'order' => 'Orders', 'renewal_order' => 'Renewal orders', 'renewal' => 'Scheduled renewals', 'renewal_flow' => 'Renewal invitations / deadlines / labs', 'followup' => 'Intake / staff follow-ups', 'contact' => 'Contact logged', 'milestone' => 'Progress recorded', 'refund' => 'Refunds', 'suggested' => 'Suggested check-ins' );
 }
 function wave_trt_calendar_year( $value, $default ) {
 	return is_scalar( $value ) && preg_match( '/^20\d{2}$/', (string) $value ) ? (int) $value : $default;
@@ -49,6 +49,9 @@ function wave_trt_calendar_collect( $patients, $year ) {
 			}
 		}
 		foreach ( array_merge( $patient['orders'], $patient['subscriptions'] ) as $record ) {
+			if ( function_exists( 'myogenix_trt_calendar_events' ) ) {
+				foreach ( myogenix_trt_calendar_events( $record ) as $event ) { $add( $event['date'], 'renewal_flow', $event['title'], $record, $event['detail'], $event['state'] ); }
+			}
 			$work = wave_trt_work( $record );
 			if ( ! empty( $work['due'] ) ) {
 				$closed = 'resolved' === ( $work['status'] ?? '' );
@@ -68,7 +71,9 @@ function wave_trt_calendar_collect( $patients, $year ) {
 			$has_renewal = true;
 			$day = wp_date( 'Y-m-d', $next );
 			$add( $day, 'renewal', 'Scheduled renewal · #' . $sub->get_id(), $sub, 'Next payment date stored in WooCommerce. This does not confirm consent, clinical clearance, payment, or shipment.', 'scheduled' );
-			$add( wave_trt_calendar_checkin_date( $day ), 'suggested', 'Suggested pre-renewal check-in', $sub, 'Planning suggestion: 21 days before the stored renewal date (' . $day . '). Not a booked appointment, reminder, or patient message.', 'suggested' );
+			if ( ! function_exists( 'myogenix_trt_enabled' ) || ! myogenix_trt_enabled( $sub ) ) {
+				$add( wave_trt_calendar_checkin_date( $day ), 'suggested', 'Suggested pre-renewal check-in', $sub, 'Planning suggestion: 21 days before the stored renewal date (' . $day . '). Not a booked appointment, reminder, or patient message.', 'suggested' );
+			}
 		}
 		if ( ! $had_followup || ! $has_renewal ) { $undated[] = array( 'patientId' => (string) $key, 'name' => $name, 'url' => $patient_url, 'reason' => implode( ' · ', array_filter( array( ! $had_followup ? 'No open dated follow-up' : '', ! $has_renewal ? 'No active scheduled renewal' : '' ) ) ) ); }
 	}
@@ -92,7 +97,7 @@ function wave_trt_calendar_render() {
 		<?php if ( $limited ) : ?><div class="notice notice-warning inline"><p>Partial calendar: the 2,000-record scan limit was reached. Older events and patients may be missing.</p></div><?php endif; ?>
 		<div class="wave-cal-controls"><label>Find a patient or record<input type="search" id="wave-cal-search" placeholder="Patient name or order / subscription number" autocomplete="off"></label><label>Patient<select id="wave-cal-patient"><option value="">All patients</option><?php foreach ( $data['directory'] as $person ) : ?><option value="<?php echo esc_attr( $person['id'] ); ?>"><?php echo esc_html( $person['name'] ); ?></option><?php endforeach; ?></select></label><button class="button" type="button" id="wave-cal-reset">Reset filters</button><a class="button" href="#wave-year-grid">View all 12 months</a><a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=wave-trt' ) ); ?>">Patient dashboard</a></div>
 		<fieldset class="wave-cal-legend"><legend>Show events</legend><?php foreach ( wave_trt_calendar_types() as $type => $label ) : ?><label><input type="checkbox" value="<?php echo esc_attr( $type ); ?>" <?php checked( 'suggested' !== $type ); ?>><span class="wave-cal-dot <?php echo esc_attr( $type ); ?>"></span><?php echo esc_html( $label ); ?></label><?php endforeach; ?></fieldset>
-		<p class="wave-cal-context">Renewals show the next payment date currently stored in WooCommerce; later cycles are not yet scheduled here. Check-ins use staff follow-up dates. Suggested check-ins are optional planning dates, 21 days before renewal. <strong>Click any day to see every event and open the patient record.</strong></p>
+		<p class="wave-cal-context">The live renewal flow shows week 9 invitations, day 75 no-response follow-ups, day 85 response deadlines, lab requests, and provider approvals. Quarterly intake coordination uses dated staff follow-ups; completed intake appears when staff verifies it. Stored WooCommerce payment dates are reference dates, not proof of approval or a promised charge date. Suggested check-ins apply to subscriptions outside the new flow. <strong>Click any day to see every event and open the patient record.</strong></p>
 		<div id="wave-cal-summary" class="wave-cal-summary" role="status" aria-live="polite"></div>
 		<div class="wave-year-grid" id="wave-year-grid" aria-label="Twelve-month patient calendar">
 		<?php for ( $month = 1; $month <= 12; $month++ ) :

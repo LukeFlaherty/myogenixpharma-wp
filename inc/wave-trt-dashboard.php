@@ -145,6 +145,17 @@ function wave_trt_patient_model( $patient ) {
 	$s['multiple'] = $active > 1;
 	$f = $order ? wave_trt_order_facts( $order ) : array( 'approved' => false, 'pharmacy' => false, 'paid' => false, 'age' => 0, 'events' => array(), 'lab' => '', 'requisition' => false, 'refunded' => false, 'closed' => false, 'status' => '' );
 	$a = wave_trt_assess( $f, $s );
+	if ( $order && ! $f['closed'] && ! $f['paid'] && function_exists( 'myogenix_trt_is_renewal_order' ) && myogenix_trt_is_renewal_order( $order ) && ! myogenix_trt_intake_verified( $order ) ) {
+		$a['stage'] = $order->get_meta( '_trt_waiting_approval' ) ? 'Approval waiting on quarterly intake' : 'Quarterly intake needs staff coordination';
+		$a['action'] = 'Coordinate this quarter’s intake with Prescribery. Record Intake completed on this renewal only after verifying completion. Payment is blocked until verified intake and provider approval.';
+		$a['queue'] = 'attention'; $a['tone'] = 'red';
+	}
+	foreach ( $patient['subscriptions'] as $sub ) {
+		if ( function_exists( 'myogenix_trt_launch_exception' ) && myogenix_trt_launch_exception( $sub ) && $sub->has_status( 'active' ) ) {
+			$a['flags'][] = 'Existing process — #' . $sub->get_id() . ': ' . myogenix_trt_launch_exception( $sub );
+			$a['queue'] = 'attention'; $a['tone'] = 'red';
+		}
+	}
 	return array_merge( $patient, compact( 'record', 'order', 'f', 'a', 's' ) );
 }
 
@@ -164,12 +175,12 @@ function wave_trt_render() {
 	}
 	?>
 	<div class="wrap wave-trt" id="wave-trt">
-		<?php if ( isset( $_GET['wave_saved'] ) && '1' === $_GET['wave_saved'] ) : ?><div class="notice notice-success inline"><p>Staff update saved. Patient billing and clinical records were not changed.</p></div><?php endif; ?>
+		<?php if ( isset( $_GET['wave_saved'] ) && '1' === $_GET['wave_saved'] ) : ?><div class="notice notice-success inline"><p>Staff update saved. Verified quarterly intake allows an already received provider approval to proceed to payment. Check the renewal order for its payment outcome.</p></div><?php endif; ?>
 		<div class="wave-brand">WAVE CONSULTING <span>Patient operations</span></div>
 		<header class="wave-heading"><div><p class="wave-eyebrow">MYOGENIX PHARMA</p><h1>TRT patient dashboard</h1><p>See the evidence. Find the next step. Keep every patient moving.</p></div><a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=wave-trt' ) ); ?>">Refresh records</a></header>
 		<p class="wave-fresh">Live WordPress snapshot · <?php echo esc_html( wp_date( 'M j, Y · g:i a T' ) ); ?> · Staff workspace · Testosterone product #883 · <?php echo esc_html( $excluded ); ?> test records excluded</p>
 		<?php if ( $limited ) : ?><div class="notice notice-warning inline"><p>Partial results: the scan reached 2,000 records of an order type. Older patients may be missing. Counts below cover loaded records only.</p></div><?php endif; ?>
-		<div class="wave-notice"><strong>What these records can tell you</strong><p>Payments, order notes and subscriptions come from WooCommerce. Lab completion, intake and shipping are unconfirmed unless supported by verified data. “Completed” is an order status, not proof of delivery. Follow-up is flagged after 7 days from order creation; this is a review threshold, not a promised turnaround.</p><?php if ( defined( 'MYOGENIX_TRT_REDESIGN_LIVE' ) && ! MYOGENIX_TRT_REDESIGN_LIVE ) : ?><p><strong>Consent renewal rollout is off.</strong> Existing subscriptions may still use legacy billing. Confirm the provider handoff before enabling the new flow.</p><?php endif; ?></div>
+		<div class="wave-notice"><strong>What these records can tell you</strong><p>Payments, order notes and subscriptions come from WooCommerce. Lab completion, intake and shipping are unconfirmed unless supported by verified data. “Completed” is an order status, not proof of delivery. Follow-up is flagged after 7 days from order creation; this is a review threshold, not a promised turnaround.</p><?php if ( defined( 'MYOGENIX_TRT_REDESIGN_LIVE' ) && ! MYOGENIX_TRT_REDESIGN_LIVE ) : ?><p><strong>Consent renewal rollout is off.</strong> Existing subscriptions may still use legacy billing. Confirm the provider handoff before enabling the new flow.</p><?php elseif ( defined( 'MYOGENIX_TRT_REDESIGN_LIVE' ) ) : ?><p><strong>Renewal check-ins are live; quarterly intake is staff-assisted.</strong> Coordinate intake with Prescribery and record verified completion on the current renewal order. Payment waits for both intake verification and provider approval. Flagged individual-review subscriptions retain their existing process. See the <a href="<?php echo esc_url( admin_url( 'admin.php?page=wave-trt-calendar' ) ); ?>">TRT Patient Calendar</a> for deadlines and staff tasks.</p><?php endif; ?></div>
 		<div class="wave-stats" aria-label="Patient filters">
 		<?php foreach ( array( 'all' => 'All patients', 'attention' => 'Needs attention', 'fulfillment' => 'Fulfillment review', 'labs' => 'Lab request created', 'renewal' => 'Renewal upcoming', 'closed' => 'Latest order closed' ) as $key => $label ) : ?>
 			<button type="button" class="wave-stat <?php echo 'all' === $key ? 'is-active' : ''; ?>" data-filter="<?php echo esc_attr( $key ); ?>" aria-pressed="<?php echo 'all' === $key ? 'true' : 'false'; ?>"><span><?php echo esc_html( $label ); ?></span><strong><?php echo esc_html( $counts[ $key ] ); ?></strong></button>

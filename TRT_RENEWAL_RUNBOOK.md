@@ -1,6 +1,22 @@
 # TRT consent renewal operations
 
-Updated 2026-09-29. Patient rollout remains **off**. Stripe remains **live** for ordinary production orders.
+Updated 2026-09-29. **Staff-assisted renewal flow is live:** renewal invitations, consent, lab requests, and staff calendar tasks are enabled. Stripe remains **live**. Quarterly intake automation remains pending with Prescribery; required intake is coordinated and verified by staff, never waived.
+
+## Staff-assisted launch operations — September 29
+
+- `MYOGENIX_TRT_REDESIGN_LIVE=true`; candidate checks passed and `myogenix_trt_launch_exceptions` was set before deployment. This section supersedes earlier all-automation launch gates below.
+- Eligible active subscriptions enter the day 63 invitation / day 75 staff follow-up / day 85 response-deadline flow. The launch audit found 20 eligible real subscriptions out of 23.
+- Three subscriptions stay on their **existing process**, without changing status, price, dates, or legacy billing: **5168** (patient mapping), **2899** (medication price), **3452** (day 85 without an invitation). Each needs a dated staff review, visible in the Wave calendar. Remove an exception only after its issue and transition timing are resolved.
+- Continue creates the unpaid renewal, registers its ID with Prescribery, and requests labs. It creates a next-day staff task to coordinate the required quarterly intake. The care team must arrange actual current-quarter intake with Prescribery; order registration is not clinical intake.
+- In **WP Admin → Wave Consulting**, use the **new renewal order’s** actions, select **Intake completed**, enter the verification source, and record the milestone only after verifying actual completion. Earlier-cycle staff metadata is not copied to new renewals.
+- Payment is blocked until both current-order intake verification and authenticated provider approval exist. An early valid approval returns HTTP 202 and is retained on the renewal without charging. Recording verified intake schedules that saved approval for processing; existing Stripe retries, receipts, and pharmacy handling then apply. Staff must inspect payment outcome. No staff action substitutes for provider approval.
+- Intake verification and provider approval share a subscription lock. Intake cannot be removed after payment processing has been authorized; resolve such corrections with the care team.
+- The calendar shows invitation dates, no-response follow-up, response deadlines, lab-request timestamps, provider approval receipt, and staff follow-ups/milestones. Resolved choices stop showing future unanswered-consent deadlines. These dates do not invent clinical appointments or shipment dates.
+- An uninvited patient already beyond day 85 goes to dated staff review without being labeled non-responsive. Native automatic renewal charging remains blocked for eligible subscriptions; it never substitutes for missing consent.
+- Required quarterly intake **automation** remains open: Prescribery must supply working filtering and confirm answer-to-renewal association. The patient and staff guide is `/trt-renewal/`.
+- Candidate verification: **75 mocked integration checks**, plus **23 staff-action checks**, **17 calendar checks**, and **15 dashboard checks**. No real patient order, clinical answers, charge, or pharmacy release is created by these tests.
+
+## Historical investigation (before staff-assisted launch decision)
 
 ## Latest verification: September 29
 
@@ -10,15 +26,15 @@ Updated 2026-09-29. Patient rollout remains **off**. Stripe remains **live** for
 - **2899** still lacks a medication renewal price. **3452** has reached day 85, with next payment October 6 and no new-flow invitation recorded. Its paid renewal is 4742 (paid July 5; cycle creation July 6). Before activation, staff must resolve its current renewal or arrange a transition that does not treat a never-sent invitation as unanswered. No real subscription was paused during the audit.
 - The intake interface and submission verification remain unfinished. September 23's cohort counts and eligibility findings below are historical; this section supersedes them. Production Stripe remains live and the rollout flag remains false.
 
-## Current behavior
+## Core behavior (updated for staff-assisted launch)
 
 - Product 883 only. WCS remains the subscription record.
 - Daily checks invite the patient starting on day 63 (week 9), catching up through day 84. Day 75 prompts staff follow-up; no response by day 85 pauses the subscription without a charge.
 - GET renders a confirmation page; a signed POST records the choice. Email scanners cannot create an order by opening a link.
 - Continue creates one pending renewal, registers it with `/shopify/callback`, then requests labs through `/api/v2/lab/128/save-test-order` with `external_order_id` equal to the **new renewal ID as a string**.
 - The explicit intake callback runs once after the pending order and its prices are saved. Legacy creation/status callbacks remain suppressed for that exact renewal. Other orders retain existing behavior.
-- Patients choose Continue/Pause in the email and confirm on our site. Renewal registration and lab ordering run through the APIs. **Omar confirmed on September 18 that patients must submit intake every three months.** The patient-facing renewal intake step is not implemented. The callback acknowledgment records technical registration, not completion of clinical intake. Do not enable rollout until required intake is connected and verified.
-- No renewal payment link works before provider approval. Pause and expiry put the subscription on hold for staff follow-up.
+- Patients choose Continue/Pause in the email and confirm on our site. Renewal registration and lab ordering run through the APIs. **Omar confirmed on September 18 that patients must submit intake every three months.** The automated patient-facing renewal intake step is not implemented. Staff coordinates and verifies actual quarterly intake. The callback acknowledgment records technical registration, not completion of clinical intake.
+- No renewal payment link works before verified quarterly intake and provider approval. Pause and expiry put the subscription on hold for staff follow-up.
 - Provider approval must identify the correct patient, appointment, and pending renewal; consent, accepted renewal registration, and confirmed lab creation are prerequisites.
 - Approved renewals use the existing Stripe charge/retry/receipt/pharmacy function. Established medicine prices, including discounted plans, are preserved. Zero-price legacy lines use the stored approval price; copied upfront lab/consultation fees are removed. Missing prices require review.
 - Payment can follow early approval, but advancing the subscription preserves the existing paid-through period. Repeated callbacks do not charge or advance twice.
@@ -38,7 +54,7 @@ A controlled production test used fake patient **351289**, subscription **5020**
 
 Prescribery's screenshot totals **$90.60 + $28 = $118.60**, versus Omar's approximate $90.50 + $28. This is vendor cost information, not a change to patient pricing. Preserve customer prices; the ten-cent estimate difference is not itself a launch blocker. The catalog's free/zero-price label does not establish Myogenix's wholesale invoice amount.
 
-## Remaining launch gates
+## Earlier full-automation launch gates (superseded by staff-assisted launch above)
 
 1. **Required quarterly intake:** Connect the correct provider-approved TRT refill questions and verify fresh patient answers reach the correct renewal. On September 23, Omar's requested `service_ids=559` calls returned HTTP 200 with **432 questions for template 8173 and 449 for template 10622**, including unrelated treatments. This supersedes September 18's empty-list result. Template 10622 returns identical normalized `data` with and without the service filter; grouped format puts all questions into one group. Do not choose clinical questions by guesswork. [Full redacted requests and observed responses](TRT_QUESTIONNAIRE_API_REPRO.md) are ready for Omar/Virender. They must confirm the refill template and working service filtering, plus how submitted answers associate with the current registered renewal. No answers or clinical attestations were submitted. The patient intake interface and submission verification remain unfinished.
 2. **Existing subscription review:** September 23 audit found **21 active real TRT subscriptions**, all with patient mappings and none past the consent deadline. Only **2899** still needs a price decision: its medication line and September 22 renewal 5125 are $0, with no saved approval price. Do not infer the established patient price from the current catalog. Confirm the intended renewal amount or explicitly exclude the subscription from rollout pending staff review. The other previously flagged records are resolved as launch-review items: 4679 is now cancelled and mapped; 2880 renewed September 19 with a $567 total and transaction reference; 4843 carries `_trt_internal_test=yes` and a test name and is excluded from the patient rollout. These status/payment changes were already present when audited, not performed by this task.
@@ -52,7 +68,7 @@ The earlier plugin-side `prescription_cancel_subscription()` fix was verified li
 
 `myogenix_trt_qa` is a private option with `subscription_ids`, `email`, and `expires_at`. A fixture also requires `_trt_qa_test=yes` and matching billing email. Never use a site-wide Stripe test-mode switch.
 
-All marked fake orders, including fake original parents, are blocked from external approval charges. After the existing REST authentication succeeds, `_trt_qa_callback_seen` records only IDs, status, top-level field names, and time; the endpoint returns 403 for these fake orders. Tell Prescribery this rejection is expected during the mapping test. No raw clinical payload or credentials are retained there.
+All marked fake orders, including fake original parents, are blocked from external approval charges. After the existing REST authentication succeeds, `_trt_qa_callback_seen` records only IDs, status, top-level field names, and time; the endpoint returns 403 for these fake orders. Tell Prescribery this rejection is expected during the mapping test. No raw clinical payload or credentials are retained there. Pending genuine approvals retain only the validated order, patient, appointment, status, and medication-reason fields needed to resume the same approval.
 
 Legacy `_trt_internal_test=yes` subscriptions never enter the new renewal flow, including staff detection emails and expiry handling. `_trt_qa_test=yes` subscriptions remain restricted to the temporary QA allowlist even after the production flag is enabled. These exclusions do not alter the separate legacy billing process.
 
@@ -64,7 +80,7 @@ Candidate integration suite:
 TRT_TEST_SOURCE=/tmp/myogenix-trt-20260923 wp --skip-plugins=affiliate-wp --skip-themes eval-file /tmp/myogenix-trt-20260923/trt-renewal-integration.php
 ```
 
-Copy all four `inc/trt-renewal-*.php` files and `tests/trt-renewal-integration.php` into the private candidate directory first. All HTTP and email are mocked. **58 checks passed on September 23**, covering internal-test exclusion from invitations/provider requests and expiry handling, consent, unpaid orders, registration ordering/correlation, duplicate suppression, lab retries, ambiguous callback/lab outcomes, QA approval protection, pricing, scheduling, and omission of the legacy questionnaire from renewal receipts. Fixtures were cleaned up and the original QA option restored.
+Copy all five `inc/trt-renewal-*.php` files and `tests/trt-renewal-integration.php` into the private candidate directory first. All HTTP and email are mocked. **58 checks passed on September 23**, covering internal-test exclusion from invitations/provider requests and expiry handling, consent, unpaid orders, registration ordering/correlation, duplicate suppression, lab retries, ambiguous callback/lab outcomes, QA approval protection, pricing, scheduling, and omission of the legacy questionnaire from renewal receipts. Fixtures were cleaned up and the original QA option restored.
 
 Historical verification before the questionnaire correction: production browser verification passed on desktop and at 390px: the confirmation displayed its working questionnaire button, and the revised confirmation reached Luke’s inbox. The already-created test renewal was reused for this presentation check; the final provider lab list remained exactly 2439 and 2423. Deployed PHP hashes matched the committed candidate; Stripe stayed live, rollout stayed off, and the fake renewal had neither a transaction nor pharmacy-release marker. The public renewal guide loaded with its updated questionnaire instructions.
 

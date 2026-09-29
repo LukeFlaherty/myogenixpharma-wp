@@ -50,9 +50,16 @@ function wave_trt_handle_action() {
 	global $wpdb;
 	$lock = 'wave_trt_action_' . $id;
 	if ( '1' !== (string) $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 0)', $lock ) ) ) { wave_trt_action_fail( 'Another update is saving. Refresh this dashboard and try again.', 409 ); }
+	$subscription_lock = 0;
 	try {
 		$order = wc_get_order( $id );
 		if ( ! $order || ! in_array( $order->get_type(), array( 'shop_order', 'shop_subscription' ), true ) || ! wave_trt_contains_product( $order ) || wave_trt_test_record( $order ) || $order->has_status( array( 'trash', 'auto-draft', 'checkout-draft' ) ) ) { throw new RuntimeException( 'This TRT record is not available for updates.' ); }
+		if ( 'intake' === $milestone && in_array( $operation, array( 'verify', 'clear_milestone' ), true ) && function_exists( 'myogenix_trt_is_renewal_order' ) && myogenix_trt_is_renewal_order( $order ) ) {
+			$subscription_lock = (int) $order->get_meta( '_trt_subscription_id' );
+			if ( ! $subscription_lock || ! myogenix_trt_lock( $subscription_lock ) ) { $subscription_lock = 0; throw new RuntimeException( 'This renewal is being processed. Refresh before updating intake.' ); }
+			$order = wc_get_order( $id );
+			if ( ( $order->get_transaction_id() || 'yes' === $order->get_meta( '_trt_provider_approved' ) ) && 'clear_milestone' === $operation ) { throw new RuntimeException( 'Payment processing has already been authorized. Contact the care team to correct the clinical record; payment cannot be reversed by removing a milestone.' ); }
+		}
 		$work = wave_trt_work( $order );
 		if ( (string) ( $work['revision'] ?? 0 ) !== wave_trt_action_input( 'revision' ) ) { throw new RuntimeException( 'This record changed since you opened it. Refresh the dashboard before saving.' ); }
 		$user = wp_get_current_user();
@@ -65,6 +72,10 @@ function wave_trt_handle_action() {
 			case 'verify':
 				if ( 'shop_order' !== $order->get_type() ) { throw new RuntimeException( 'Record journey evidence on a treatment order, not a subscription.' ); }
 				$work['milestones'][ $milestone ] = array( 'at' => time(), 'by' => $user->display_name, 'note' => $note );
+				if ( $subscription_lock ) {
+					$work['status'] = 'provider'; $work['due'] = wp_date( 'Y-m-d', time() + DAY_IN_SECONDS );
+					$work['next'] = 'Quarterly intake verified. Check lab completion, provider review, medication payment outcome, and pharmacy handoff on this renewal. An already received approval can now proceed to payment.';
+				}
 				$label = 'Staff verified: ' . wave_trt_milestones()[ $milestone ]; break;
 			case 'clear_milestone': unset( $work['milestones'][ $milestone ] ); $label = 'Removed staff verification: ' . wave_trt_milestones()[ $milestone ]; break;
 			case 'resolve': $work['status'] = 'resolved'; $label = 'Closed staff follow-up (source alerts retained)'; break;
@@ -77,9 +88,11 @@ function wave_trt_handle_action() {
 		$order->update_meta_data( '_wave_trt_workflow', $work );
 		$order->save_meta_data();
 		$order->add_order_note( 'Wave Consulting — ' . $user->display_name . ': ' . $label . ( $note ? "\n" . $note : '' ), false, true );
+		if ( in_array( $operation, array( 'verify', 'clear_milestone' ), true ) ) { do_action( 'wave_trt_milestone_updated', $order, $milestone, $operation ); }
 	} catch ( Throwable $e ) {
 		$error = $e instanceof RuntimeException ? $e->getMessage() : 'The update could not be completed. Refresh the dashboard and check the record before retrying.';
 	} finally {
+		if ( $subscription_lock ) { myogenix_trt_unlock( $subscription_lock ); }
 		$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock ) );
 	}
 	if ( $error ) { wave_trt_action_fail( $error, 409 ); }
@@ -110,7 +123,7 @@ function wave_trt_render_actions( $row ) {
 			<label>Contact note, verification source, or resolution<textarea name="note" maxlength="2000" rows="3" placeholder="What was checked, with whom, and the outcome"></textarea></label>
 			<div class="wave-action-buttons"><button class="button" name="operation" value="note">Log contact / add note</button><?php if ( 'resolved' === ( $work['status'] ?? '' ) ) : ?><button class="button" name="operation" value="reopen">Reopen follow-up</button><?php else : ?><button class="button" name="operation" value="resolve">Close follow-up</button><?php endif; ?></div>
 			<?php if ( $row['order'] ) : ?><div class="wave-form-grid"><label>Verified milestone<select name="milestone"><option value="">Choose a verified milestone</option><?php foreach ( wave_trt_milestones() as $key => $text ) : ?><option value="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $text ); ?></option><?php endforeach; ?></select></label><div class="wave-action-buttons"><button class="button" name="operation" value="verify">Record verified milestone</button><button class="button" name="operation" value="clear_milestone">Remove staff verification</button></div></div><?php endif; ?>
-			<p class="wave-muted">Closing a follow-up does not clear source alerts. These actions do not send messages, order labs, approve treatment, or change billing.</p>
+			<p class="wave-muted">Closing a follow-up does not clear source alerts. For a consent renewal, record “Intake completed” only after verifying this quarter’s intake with the provider. <strong>If provider approval is already waiting, this verification allows payment processing to resume.</strong> It does not replace clinical approval. Other staff updates do not change billing.</p>
 		</form>
 		<?php if ( ! empty( $work['history'] ) ) : ?><div class="wave-action-history"><h3>Staff action history</h3><?php foreach ( array_reverse( $work['history'] ) as $event ) : ?><p><strong><?php echo esc_html( $event['label'] ); ?></strong><br><small><?php echo esc_html( $event['by'] . ' · ' . wp_date( 'M j, Y g:i a', $event['at'] ) ); ?></small><?php if ( $event['note'] ) : ?><br><?php echo nl2br( esc_html( $event['note'] ) ); ?><?php endif; ?></p><?php endforeach; ?></div><?php endif; ?>
 	</details>
