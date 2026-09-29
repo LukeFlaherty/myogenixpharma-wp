@@ -4,6 +4,8 @@ Updated 2026-09-29. **Staff-assisted renewal flow is live:** renewal invitations
 
 ## Staff-assisted launch operations — September 29
 
+- Production activation verified at **20:25 UTC / 4:25 p.m. Eastern**. Five invitations were accepted for subscriptions **4775, 4766, 4761, 3996, 3928**; no mail failures were reported. The daily checker remains scheduled. Twenty active real subscriptions are enabled; the three exceptions below retain their existing process.
+- Production calendar verification found **60 renewal workflow events** and **three dated review tasks**, with no scan truncation. The authenticated calendar and dashboard show the live instructions and exception details. The public guide was refreshed after clearing stale page cache, then checked at desktop and mobile sizes. Luke’s clearly labeled preview email was confirmed in Gmail; preview buttons open the guide without changing an order.
 - `MYOGENIX_TRT_REDESIGN_LIVE=true`; candidate checks passed and `myogenix_trt_launch_exceptions` was set before deployment. This section supersedes earlier all-automation launch gates below.
 - Eligible active subscriptions enter the day 63 invitation / day 75 staff follow-up / day 85 response-deadline flow. The launch audit found 20 eligible real subscriptions out of 23.
 - Three subscriptions stay on their **existing process**, without changing status, price, dates, or legacy billing: **5168** (patient mapping), **2899** (medication price), **3452** (day 85 without an invitation). Each needs a dated staff review, visible in the Wave calendar. Remove an exception only after its issue and transition timing are resolved.

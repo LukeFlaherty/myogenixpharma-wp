@@ -62,7 +62,7 @@ function wave_trt_load_patients() {
 /** Conservative signals: a status alone is never evidence of labs or shipment. */
 function wave_trt_order_facts( $order ) {
 	$events = array();
-	$approved = 'yes' === $order->get_meta( '_trt_provider_approved' );
+	$approved = 'yes' === $order->get_meta( '_trt_provider_approved' ) || (bool) $order->get_meta( '_trt_waiting_approval' );
 	$pharmacy = false;
 	$notes = wc_get_order_notes( array( 'order_id' => $order->get_id(), 'limit' => 100, 'orderby' => 'date_created', 'order' => 'DESC', 'type' => 'internal' ) );
 	foreach ( $notes as $note ) {
