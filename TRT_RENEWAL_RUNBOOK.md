@@ -1,6 +1,14 @@
 # TRT consent renewal operations
 
-Updated 2026-09-23. Patient rollout remains **off**. Stripe remains **live** for ordinary production orders.
+Updated 2026-09-29. Patient rollout remains **off**. Stripe remains **live** for ordinary production orders.
+
+## Latest verification: September 29
+
+- Virender's proposed `service_ids=560` still returns HTTP 200 with all 449 refill questions (template 10622) and 432 initial questions (8173). Grouping and alternate parameter encodings do not fix it. The refill response is identical to the unfiltered response. [Updated reproduction details](TRT_QUESTIONNAIRE_API_REPRO.md) include the full request and current service definitions.
+- Service 560 is now labeled **TRT Cream ORAL**, with cream and tablet products. Service 559 is **TRT Injectable CA Commercial** and now has populated injectable products. Both identify 10622 as their renewal template. Do not silently configure injectable renewals to an oral/cream service. No clinical answers, orders, labs, or charges were submitted in this check.
+- Current audit: **23 active real subscriptions** plus excluded internal test 4843. Newly missing patient mapping **5166** was repaired to patient **353175** after a unique exact email, full-name, and phone match; metadata only, no status/date/price changes. **5168** had no unique match on all three identifiers and needs staff verification. Do not create a duplicate provider patient to bypass this.
+- **2899** still lacks a medication renewal price. **3452** has reached day 85, with next payment October 6 and no new-flow invitation recorded. Its paid renewal is 4742 (paid July 5; cycle creation July 6). Before activation, staff must resolve its current renewal or arrange a transition that does not treat a never-sent invitation as unanswered. No real subscription was paused during the audit.
+- The intake interface and submission verification remain unfinished. September 23's cohort counts and eligibility findings below are historical; this section supersedes them. Production Stripe remains live and the rollout flag remains false.
 
 ## Current behavior
 

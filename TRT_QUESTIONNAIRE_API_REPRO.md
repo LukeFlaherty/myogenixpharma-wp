@@ -1,5 +1,29 @@
 # TRT questionnaire filtering: production reproduction
 
+## September 29 update: service 560 does not resolve filtering
+
+Virender requested service 560 on September 25. Production retest September 29 at 19:49 UTC:
+
+```bash
+curl --request GET \
+  --url 'https://staff.prescribery.com/api/v2/questionnaires/10622?service_ids=560' \
+  --header 'Authorization: Bearer <REDACTED>' \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/json'
+```
+
+- HTTP 200, **449 questions**, including mandatory and nonconditional Vitamin B12, PT-141, and GLP-1 questions.
+- Initial template 8173 with `service_ids=560` returns HTTP 200 and **432 questions**.
+- Explicit grouped/ungrouped formats, array query syntax, and a trailing-comma service list also return all 449 refill questions. The normalized refill data hash matches the unfiltered response and the September 23 response below.
+- `/services/560` reports **TRT Cream ORAL** and its `product_and_price` contains testosterone cream and rapid-dissolve tablets. `renewal_template_id=10622`, `renewal_source_id=769`.
+- `/services/559` now reports **TRT Injectable CA Commercial**, with populated `product_and_price` entries for testosterone cypionate and an injection kit. It also specifies renewal template 10622/source 769. No service, medication, source, or price settings were changed by this investigation.
+
+The service 560 treatment listing does not match the injectable product in this renewal project. Ask Prescribery to confirm the applicable injectable service and demonstrate a working filtered request with our production client credentials. The returned clinical question set must be selected by the provider configuration, not by guessing which of the 449 questions apply.
+
+Full response retained locally at `output/trt-api-20260929/refill-template-10622-service-560.json` for sharing with the engineers. It contains questionnaire definitions only, with no token or patient answers.
+
+## September 23 evidence
+
 Verified September 23, 2026, 16:32–16:34 UTC. Read-only GET requests. No patient answers, credentials, orders, or personal details are included here.
 
 ## Request context
