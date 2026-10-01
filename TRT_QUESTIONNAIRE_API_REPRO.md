@@ -1,5 +1,27 @@
 # TRT questionnaire filtering: production reproduction
 
+## September 30 update: service 558 filters the refill questionnaire
+
+Neha requested service 558 on September 30. A read-only production retest at September 30, 2026, 9:24 p.m. Eastern (October 1, 01:24 UTC), using the existing client 128 integration, found:
+
+```bash
+curl --request GET \
+  --url 'https://staff.prescribery.com/api/v2/questionnaires/10622?service_ids=558' \
+  --header 'Authorization: Bearer <REDACTED>' \
+  --header 'Accept: application/json'
+```
+
+- HTTP 200 with **12 questions**, compared with 449 in the unfiltered response. The filtered and unfiltered `data` are not identical.
+- The 12 returned entries are refill/check-in questions covering treatment progress, dose changes, side effects, testosterone contraindications, new medications/interactions, treatment effectiveness, requested treatment changes, pregnancy/breastfeeding with a male N/A choice, last physical/labs, and additional provider notes.
+- The filtered response contains none of the unrelated GLP-1, Vitamin B12, PT-141, hair-restoration, BPC-157, or GHK-Cu content previously flagged.
+- `GET /services/558` identifies **Hormone Replacement Therapy**, client 128, initial template 5705/source 768, and refill template **10622/source 769**. Its current product list contains commercial and compounded testosterone cypionate injections plus injection kits. The service description mentions injection or oral therapy, but no oral product appeared in the returned product list.
+- The service's configured initial template 5705 returned HTTP 403 both with and without the service filter. That does not block this refill-questionnaire GET, but Prescribery should clarify it before service 558 is used for new-patient intake.
+- For comparison only, template 8173 with `service_ids=558` now returns 20 filtered entries instead of all 432. Template 8173 is not the initial template currently reported by service 558.
+
+This resolves the question-selection defect for the refill GET. It does **not** by itself establish the submission workflow or prove that completed answers attach to the new WooCommerce renewal registered through `/shopify/callback`. Before replacing staff-assisted intake, Prescribery must confirm the patient-facing submission/link flow for service 558 and identify the field or mechanism that correlates the completed template 10622 response to that exact renewal/order. No answers, patient data, orders, labs, charges, or service settings were changed during this verification.
+
+Prescribery's API documentation, updated September 28, documents `POST /api/v2/questionnaires/answers` with required `template_id`, `patient_id`, and `answers`, plus optional `ques_map_id`, `questionnaire_id`, and `service_ids`. It documents no `order_id`, `external_order_id`, or `source_id` field for that submission. The documented patient-questionnaire listing returns questionnaire mapping/submission state but no external order reference. Therefore the public API does not currently describe how to prove that a fresh response belongs to one particular quarterly WooCommerce renewal.
+
 ## September 29 update: service 560 does not resolve filtering
 
 Virender requested service 560 on September 25. Production retest September 29 at 19:49 UTC:
@@ -72,8 +94,8 @@ Additional read-only checks:
 
 ## Needed from Prescribery
 
-Please confirm the production template for **TRT quarterly refills** and correct the service filtering, or provide the exact working request if another parameter is required. We should receive the applicable clinical questions without choosing the question set ourselves.
+Please confirm that service 558 and template 10622 are the provider-approved production configuration for **injectable TRT quarterly refills**. The September 30 GET now returns a focused 12-entry question set, so the filtering issue appears resolved.
 
-The answer submission must also associate the completed intake with the current renewal registered through `/shopify/callback`; the lab request already sends the new WooCommerce ID as `external_order_id`. Please identify the required association if it is not automatic for the current registered renewal.
+The remaining blocker is the patient-facing completion and association workflow. Please provide the supported submission/link flow and confirm how completed template 10622 answers for service 558 associate with the current renewal registered through `/shopify/callback`. In particular, please confirm whether the renewal callback must send service 558 and renewal source 769 rather than the currently configured source 768. The documented questionnaire-answer endpoint has no order-reference field. The lab request already sends the new WooCommerce ID as `external_order_id`; please identify the equivalent questionnaire association if it is not automatic for the registered renewal.
 
 Documentation: [Questionnaire endpoint](https://staging.prescribery.com/api/docs#questionnaires-GETapi-v2-questionnaires--templateId-).

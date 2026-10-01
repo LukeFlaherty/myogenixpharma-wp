@@ -1,6 +1,13 @@
 # TRT consent renewal operations
 
-Updated 2026-09-29. **Staff-assisted renewal flow is live:** renewal invitations, consent, lab requests, and staff calendar tasks are enabled. Stripe remains **live**. Quarterly intake automation remains pending with Prescribery; required intake is coordinated and verified by staff, never waived.
+Updated 2026-09-30. **Staff-assisted renewal flow is live:** renewal invitations, consent, lab requests, and staff calendar tasks are enabled. Stripe remains **live**. Quarterly intake automation remains pending with Prescribery; required intake is coordinated and verified by staff, never waived.
+
+## Prescribery service 558 verification — September 30
+
+- Neha's proposed `service_ids=558` now filters refill template 10622 successfully: HTTP 200 with **12 focused refill questions**, rather than all 449. The returned data is different from the unfiltered response and does not contain the unrelated GLP-1, Vitamin B12, PT-141, hair-restoration, BPC-157, or GHK-Cu content previously flagged.
+- Service 558 is **Hormone Replacement Therapy** for client 128. It reports initial template 5705/source 768 and refill template 10622/source 769. Its returned product list contains commercial and compounded testosterone cypionate injections and injection kits. Read-only checks made no patient, order, lab, payment, or Prescribery configuration changes.
+- This clears the refill-question-selection issue, but not answer submission/correlation. Prescribery's documented answer endpoint accepts template, patient, answers, and optional questionnaire/service mapping IDs, but no order or external-order reference. Our current renewal callback sends source 768 and no service ID, while service 558 reports renewal source 769. Prescribery must confirm the supported patient-facing flow and the exact callback/submission fields that attach answers to the WooCommerce renewal. Keep staff-assisted intake and its payment gate in place until that end-to-end association is verified with a controlled test.
+- Service 558's configured initial template 5705 returned HTTP 403. This is not part of the quarterly refill path, but it should be clarified before using service 558 for new-patient intake.
 
 ## Staff-assisted launch operations — September 29
 
@@ -15,7 +22,7 @@ Updated 2026-09-29. **Staff-assisted renewal flow is live:** renewal invitations
 - Intake verification and provider approval share a subscription lock. Intake cannot be removed after payment processing has been authorized; resolve such corrections with the care team.
 - The calendar shows invitation dates, no-response follow-up, response deadlines, lab-request timestamps, provider approval receipt, and staff follow-ups/milestones. Resolved choices stop showing future unanswered-consent deadlines. These dates do not invent clinical appointments or shipment dates.
 - An uninvited patient already beyond day 85 goes to dated staff review without being labeled non-responsive. Native automatic renewal charging remains blocked for eligible subscriptions; it never substitutes for missing consent.
-- Required quarterly intake **automation** remains open: Prescribery must supply working filtering and confirm answer-to-renewal association. The patient and staff guide is `/trt-renewal/`.
+- Required quarterly intake **automation** remains open: filtering now works with service 558, but Prescribery must confirm the patient-facing submission flow and answer-to-renewal association. The patient and staff guide is `/trt-renewal/`.
 - Candidate verification: **75 mocked integration checks**, plus **23 staff-action checks**, **17 calendar checks**, and **15 dashboard checks**. No real patient order, clinical answers, charge, or pharmacy release is created by these tests.
 
 ## Historical investigation (before staff-assisted launch decision)
