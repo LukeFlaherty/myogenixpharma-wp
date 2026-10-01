@@ -4,6 +4,20 @@ Admin URL: `/wp-admin/admin.php?page=wave-trt`
 
 Dashboard restricted to `manage_woocommerce`. Staff workflow actions use authenticated POST requests with record-specific nonces, revision checks and per-record database locks. No patient emails, payment calls, background jobs, or persistent patient caches. Assets load only on this admin page. Data is queried through WooCommerce CRUD for HPOS/legacy compatibility.
 
+## Billing overview
+
+Admin URL: `/wp-admin/admin.php?page=wave-billing`, under Wave Consulting → Billing. Restricted to `manage_woocommerce`; this is a read-only operational view and never charges, refunds or changes an order.
+
+- Date-range totals use the WooCommerce paid date for collections and refund creation date for refunds. Open pending, processing, on-hold and failed orders remain visible even when they began before the selected period.
+- “Collected” requires both a positive order total, transaction reference and paid date. A single missing signal is flagged for review rather than counted as collected.
+- “Paid & processing” means collection evidence is recorded while the WooCommerce order remains in processing. It does not describe processor settlement timing.
+- “On hold” preserves the source WooCommerce status and clearly distinguishes paid from unverified collection. Recognized TRT renewal holds explain when intake verification is blocking payment.
+- Period refunds, current processing value, holds, failed/pending/mismatched orders, customer/order detail and the next 30 days of active subscription value are visible and filterable.
+- Monetary totals remain separated by currency. They are WooCommerce records, not bank deposits, processor fees, disputes, tax reporting or reconciled payouts.
+- Recognized test records are excluded. At most 2,000 recent orders and 2,000 active subscriptions are scanned, with a visible warning when the limit makes totals incomplete.
+
+`php tests/wave-billing.php` validates conservative payment classification without WordPress or live order access.
+
 ## Scope
 
 - Product 883, including its variations, on orders and subscriptions.
