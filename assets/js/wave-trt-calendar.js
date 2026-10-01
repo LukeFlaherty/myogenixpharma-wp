@@ -5,6 +5,8 @@
   const data = JSON.parse(document.getElementById('wave-cal-data').textContent);
   const search = root.querySelector('#wave-cal-search');
   const patient = root.querySelector('#wave-cal-patient');
+  const view = root.querySelector('#wave-cal-view');
+  const grid = root.querySelector('#wave-year-grid');
   const toggles = Array.from(root.querySelectorAll('.wave-cal-legend input'));
   const range = root.querySelector('#wave-cal-range');
   const dialog = root.querySelector('#wave-day-dialog');
@@ -20,6 +22,15 @@
     return new Date(bits[0], bits[1] - 1, bits[2]).toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'});
   }
   function overdue(event) { return event.state === 'scheduled' && event.date < data.today; }
+  function inlineEvent(event) {
+    const item = element('span', undefined, 'wave-day-inline-event ' + event.type);
+    item.append(
+      element('span', data.types[event.type], 'wave-event-tag ' + event.type),
+      element('strong', event.patient),
+      element('span', event.title, 'wave-day-inline-title')
+    );
+    return item;
+  }
   function eventCard(event) {
     const card = element('article', undefined, 'wave-calendar-event');
     const top = element('div', undefined, 'wave-event-top');
@@ -50,8 +61,10 @@
     root.querySelectorAll('.wave-day').forEach(button => {
       const events = byDay[button.dataset.date] || [];
       const marks = button.querySelector('.wave-day-marks'); marks.replaceChildren();
+      const inline = button.querySelector('.wave-day-inline'); inline.replaceChildren();
       Array.from(new Set(events.map(event => event.type))).slice(0, 4).forEach(type => marks.append(element('i', undefined, 'wave-cal-dot ' + type)));
       if (events.length) marks.append(element('b', String(events.length)));
+      events.forEach(event => inline.append(inlineEvent(event)));
       button.classList.toggle('has-events', events.length > 0);
       button.classList.toggle('has-overdue', events.some(overdue));
       const label = pretty(button.dataset.date) + ' · ' + events.length + (events.length === 1 ? ' event' : ' events');
@@ -73,6 +86,12 @@
     if (!missing.length) gaps.append(element('p', 'No scheduling gaps for the selected patients.', 'wave-cal-empty'));
     agendaLimit = 40; renderAgenda();
   }
+  function updateView() {
+    const month = view.value;
+    root.classList.toggle('is-month-view', Boolean(month));
+    root.querySelectorAll('.wave-month').forEach(section => { section.hidden = Boolean(month) && section.dataset.month !== month; });
+    grid.setAttribute('aria-label', month ? view.options[view.selectedIndex].text + ' expanded patient calendar' : 'Twelve-month patient calendar');
+  }
   root.querySelectorAll('.wave-day').forEach(button => button.addEventListener('click', function () {
     root.querySelector('#wave-day-title').textContent = pretty(button.dataset.date);
     const body = root.querySelector('#wave-day-events'); body.replaceChildren();
@@ -83,11 +102,12 @@
   }));
   root.querySelector('#wave-day-close').addEventListener('click', () => dialog.close());
   search.addEventListener('input', update); patient.addEventListener('change', update);
+  view.addEventListener('change', updateView);
   toggles.forEach(input => input.addEventListener('change', update));
   range.addEventListener('change', () => { agendaLimit = 40; renderAgenda(); });
   root.querySelector('#wave-cal-more').addEventListener('click', () => { agendaLimit += 40; renderAgenda(); });
   root.querySelector('#wave-cal-reset').addEventListener('click', () => {
     search.value = ''; patient.value = ''; toggles.forEach(input => { input.checked = input.value !== 'suggested'; }); range.value = 'upcoming'; update();
   });
-  update();
+  updateView(); update();
 }());

@@ -49,7 +49,7 @@ Lint PHP and run `git diff --check` before deployment. On production verify menu
 
 ## Annual patient calendar
 
-Admin URL: `/wp-admin/admin.php?page=wave-trt-calendar`, under Wave Consulting → TRT Patient Calendar. Same `manage_woocommerce` restriction and no-cache headers as the patient dashboard. All 12 months render together; the desktop layout uses four columns. Patient search, patient selection and event-type filters update month totals, day markers, the agenda, and scheduling gaps. Click a day for all matching events with patient-action and source-record links.
+Admin URL: `/wp-admin/admin.php?page=wave-trt-calendar`, under Wave Consulting → TRT Patient Calendar. Same `manage_woocommerce` restriction and no-cache headers as the patient dashboard. The calendar opens with all 12 months together; the desktop layout uses four columns. The Calendar view selector can expand any one month to full width, with every matching event shown inside its day by event tag, patient name and event title. Patient search, patient selection and event-type filters update month totals, day markers or expanded event lists, the agenda, and scheduling gaps. Click a day for all matching events with patient-action and source-record links.
 
 Sources and date meaning:
 
