@@ -11,6 +11,13 @@ Omar confirmed:
 
 The guarded implementation therefore registers the renewal with source 769, fetches and submits template 10622 with service 558, and records the returned `ques_map_id` against the exact WooCommerce renewal on the Myogenix side. The production automation flag remains off until a controlled fake-record submission verifies the provider-side result. No real patient questionnaire will be used for that verification.
 
+### October 1 controlled submission result
+
+- Retained fake subscription 5020 / renewal 5021 loaded the 12-question patient form in production and submitted test-only answers successfully.
+- Prescribery returned HTTP 200 and `ques_map_id` **441118**. WooCommerce stored the mapping and operational milestone but no clinical answers; the fake order remains pending with no transaction, provider approval, charge marker, or pharmacy marker.
+- The temporary QA allowlist was deleted after the test. Automated intake remains disabled for real patients.
+- `GET /patients/{patientId}/questionnaires` returned HTTP 401 for the production integration credentials. Prescribery must confirm in its staff system that mapping 441118 is visible for the fake patient as the latest template-10622 refill questionnaire and associated with the latest renewal before Myogenix enables real-patient automation.
+
 ## September 30 update: service 558 filters the refill questionnaire
 
 Neha requested service 558 on September 30. A read-only production retest at September 30, 2026, 9:24 p.m. Eastern (October 1, 01:24 UTC), using the existing client 128 integration, found:
