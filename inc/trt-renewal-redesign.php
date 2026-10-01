@@ -12,11 +12,16 @@ const MYOGENIX_TRT_CONSENT_TTL = 85 * DAY_IN_SECONDS;
 const MYOGENIX_TRT_NORESPONSE_DAYS = 75;
 const MYOGENIX_TRT_ADMIN_EMAILS = array( 'adam@myogenixpharma.com', 'adam@myogenix.com' );
 const MYOGENIX_TRT_REDESIGN_LIVE = true;
+const MYOGENIX_TRT_AUTOMATED_INTAKE_LIVE = false;
+const MYOGENIX_TRT_REFILL_SERVICE_ID = 558;
+const MYOGENIX_TRT_REFILL_TEMPLATE_ID = 10622;
+const MYOGENIX_TRT_RENEWAL_SOURCE_ID = 769;
 
 require_once __DIR__ . '/trt-renewal-presentation.php';
 require_once __DIR__ . '/trt-renewal-approval.php';
 require_once __DIR__ . '/trt-renewal-intake.php';
 require_once __DIR__ . '/trt-renewal-staff.php';
+require_once __DIR__ . '/trt-renewal-questionnaire.php';
 
 function myogenix_trt_subscription_has_product( WC_Subscription $subscription, $product_id ) {
 	foreach ( $subscription->get_items() as $item ) {
@@ -308,7 +313,7 @@ add_filter( 'wcs_renewal_order_created', function ( $order, $sub ) {
 	$order->set_transaction_id( '' );
 	$order->set_date_paid( null );
 	foreach ( array( '_wave_trt_workflow', '_trt_staff_intake_queued', '_trt_waiting_approval', '_trt_approval_received_at', '_trt_lab_created_at' ) as $key ) { $order->delete_meta_data( $key ); }
-	foreach ( array( '_prescription_charge_amount', '_prescription_stripe_charging', '_pharmacy_webhook_sent', '_stripe_intent_id', '_child_order_ids', '_approved_appointment_ids', 'appointment_id', '_lab_fee_paid', '_parent_order_id', '_trt_pricing_ready', '_prescribery_requisition_id', '_trt_provider_approved', '_trt_cycle_advanced', '_trt_wcs_payment_recorded', '_trt_lab_state', '_trt_intake_state', '_trt_intake_sent_at', '_trt_intake_http_code', '_trt_intake_url', '_trt_qa_callback_seen' ) as $key ) { $order->delete_meta_data( $key ); }
+	foreach ( array( '_prescription_charge_amount', '_prescription_stripe_charging', '_pharmacy_webhook_sent', '_stripe_intent_id', '_child_order_ids', '_approved_appointment_ids', 'appointment_id', '_lab_fee_paid', '_parent_order_id', '_trt_pricing_ready', '_prescribery_requisition_id', '_trt_provider_approved', '_trt_cycle_advanced', '_trt_wcs_payment_recorded', '_trt_lab_state', '_trt_intake_state', '_trt_intake_sent_at', '_trt_intake_http_code', '_trt_intake_url', '_trt_questionnaire_state', '_trt_questionnaire_map_id', '_trt_questionnaire_submitted_at', '_trt_questionnaire_http_code', '_trt_qa_callback_seen' ) as $key ) { $order->delete_meta_data( $key ); }
 	foreach ( $order->get_items() as $item ) {
 		foreach ( array( '_item_approved', '_item_rejected', '_item_approved_appointment', '_item_rejected_appointment' ) as $key ) { $item->delete_meta_data( $key ); }
 		$item->save();

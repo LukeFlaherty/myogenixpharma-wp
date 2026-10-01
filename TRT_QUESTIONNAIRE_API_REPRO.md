@@ -1,5 +1,16 @@
 # TRT questionnaire filtering: production reproduction
 
+## October 1 association response
+
+Omar confirmed:
+
+- Do not add `service_id` to `/shopify/callback`.
+- Use source **769** for renewals rather than the initial source 768.
+- Prescribery associates the latest submitted refill questionnaire with the latest renewal.
+- Present the refill questions with the new renewal/lab cycle; Prescribery uses the returned results to proceed with provider scheduling.
+
+The guarded implementation therefore registers the renewal with source 769, fetches and submits template 10622 with service 558, and records the returned `ques_map_id` against the exact WooCommerce renewal on the Myogenix side. The production automation flag remains off until a controlled fake-record submission verifies the provider-side result. No real patient questionnaire will be used for that verification.
+
 ## September 30 update: service 558 filters the refill questionnaire
 
 Neha requested service 558 on September 30. A read-only production retest at September 30, 2026, 9:24 p.m. Eastern (October 1, 01:24 UTC), using the existing client 128 integration, found:

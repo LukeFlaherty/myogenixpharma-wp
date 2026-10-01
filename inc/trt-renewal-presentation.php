@@ -45,8 +45,10 @@ function myogenix_trt_send_consent_email( WC_Subscription $sub, $cycle ) {
 }
 function myogenix_trt_send_response_email( $sub, $action ) {
 	$title = 'continue' === $action ? 'Your renewal is underway.' : 'Your renewal is paused.';
+	$order = 'continue' === $action ? wc_get_order( $sub->get_meta( '_trt_pending_renewal_order' ) ) : null;
+	$intake_button = $order && myogenix_trt_automated_intake_enabled( $sub ) ? myogenix_trt_email_button( myogenix_trt_questionnaire_url( $order ), 'Complete medical check-in →' ) : '';
 	$content = 'continue' === $action
-		? '<p>Thanks for confirming you’d like to continue. We’ve requested your follow-up labs and prepared renewal order <strong>#' . absint( $sub->get_meta( '_trt_pending_renewal_order' ) ) . '</strong> for review.</p><p><strong>No renewal payment has been taken.</strong> Your provider requires updated medical intake every three months and reviews your intake and labs before approval.</p><p>Watch for “Next Step: Complete Your Lab Work” with your lab form and scheduling links. Your care team will contact you to coordinate your required quarterly intake. Medication payment waits for verified intake and provider approval.</p>'
+		? '<p>Thanks for confirming you’d like to continue. We’ve requested your follow-up labs and prepared renewal order <strong>#' . absint( $sub->get_meta( '_trt_pending_renewal_order' ) ) . '</strong> for review.</p><p><strong>No renewal payment has been taken.</strong> Your provider requires updated medical intake every three months and reviews your intake and labs before approval.</p>' . $intake_button . '<p>Watch for “Next Step: Complete Your Lab Work” with your lab form and scheduling links. ' . ( $intake_button ? 'Complete the medical check-in above if you did not finish it after confirming your renewal.' : 'Your care team will contact you to coordinate your required quarterly intake.' ) . ' Medication payment waits for verified intake and provider approval.</p>'
 		: '<p>We’ve recorded your choice and placed your subscription on hold. <strong>No renewal payment has been taken.</strong></p><p>Our team will follow up with you. If you change your mind, reply to this email and we’ll help you with the next steps.</p>';
 	return myogenix_trt_mail( $sub, 'continue' === $action ? 'We’ve received your renewal request' : 'Your renewal has been paused', myogenix_trt_email_shell( $title, '<p>Hi ' . esc_html( $sub->get_billing_first_name() ?: 'there' ) . ',</p>' . $content ) );
 }
@@ -90,10 +92,28 @@ add_action( 'template_redirect', function () {
 	if ( ! get_query_var( 'myogenix_trt_consent' ) ) { return; }
 	if ( ! in_array( $_SERVER['REQUEST_METHOD'], array( 'GET', 'HEAD', 'POST' ), true ) ) { myogenix_trt_html_response( '<p>This request is not supported.</p>', 405 ); }
 	$params = wp_unslash( 'POST' === $_SERVER['REQUEST_METHOD'] ? $_POST : $_GET );
+	if ( 'intake' === (string) ( $params['trt_step'] ?? '' ) ) {
+		$validated = myogenix_trt_validate_questionnaire_request( $params );
+		if ( is_wp_error( $validated ) ) { myogenix_trt_render_error( $validated ); }
+		list( $sub, $order, $submitted ) = $validated;
+		if ( $submitted ) { myogenix_trt_html_response( '<p>Your quarterly medical check-in has already been received.</p><div class="steps"><strong>No renewal payment was taken by this form.</strong><p>Complete your lab work and watch for updates from your care team.</p></div>', 200, 'Your intake is complete.' ); }
+		if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
+			$result = myogenix_trt_submit_questionnaire( $params );
+			if ( ! is_wp_error( $result ) ) { myogenix_trt_html_response( '<p>Your quarterly medical check-in has been securely submitted to Prescribery.</p><div class="steps"><strong>No renewal payment has been taken.</strong><p>Complete your lab work and watch for updates from your care team. Your provider will review your current intake and lab results before approval.</p></div>', 200, 'Thank you. Your intake is complete.' ); }
+			if ( 'questionnaire_uncertain' === $result->get_error_code() ) { myogenix_trt_render_error( $result ); }
+			myogenix_trt_html_response( myogenix_trt_render_questionnaire_form( $order, $result ), $result->get_error_data()['status'] ?? 422, 'Complete your medical check-in.' );
+		}
+		myogenix_trt_html_response( myogenix_trt_render_questionnaire_form( $order ), 200, 'Complete your medical check-in.' );
+	}
 	if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
 		$result = myogenix_trt_process_consent( $params );
 		if ( is_wp_error( $result ) ) { myogenix_trt_render_error( $result ); }
 		$continued = 'continue' === $result['action'];
+		if ( $continued ) {
+			$order = wc_get_order( $result['order_id'] );
+			$sub = $order ? wcs_get_subscription( $order->get_meta( '_trt_subscription_id' ) ) : null;
+			if ( $order && myogenix_trt_automated_intake_enabled( $sub ) ) { wp_safe_redirect( myogenix_trt_questionnaire_url( $order ) ); exit; }
+		}
 		myogenix_trt_html_response( $continued ? '<p>We’ve requested your follow-up labs and prepared your renewal for provider review.</p><div class="steps"><strong>No renewal payment has been taken.</strong><p>Your provider requires updated medical intake every three months. Your care team will contact you to coordinate it.</p><p>Watch for “Next Step: Complete Your Lab Work” in your inbox. Download your lab form and follow the scheduling instructions. Payment is processed only after verified quarterly intake and provider approval.</p></div><p>Look for a confirmation in your inbox.</p>' : '<p>Your subscription is now on hold. No renewal payment has been taken.</p><p>Our team will follow up. If you change your mind, contact us and we’ll help you with the next steps.</p>', 200, $continued ? 'Your renewal is underway.' : 'Your renewal is paused.' );
 	}
 	$result = myogenix_trt_validate_consent_request( $params );

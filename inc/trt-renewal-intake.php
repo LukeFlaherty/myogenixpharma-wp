@@ -19,12 +19,13 @@ function myogenix_trt_register_intake( WC_Subscription $sub, WC_Order $order ) {
 		return new WP_Error( 'intake_config', 'The renewal connection needs to be configured by our team.' );
 	}
 	$options = get_option( 'pre_woo_options', array() );
+	$renewal_source_id = absint( $s['renewal_source_id'] ?? ( 128 === (int) $s['client_id'] ? MYOGENIX_TRT_RENEWAL_SOURCE_ID : $s['source_id'] ) );
 	$payload = array(
 		'uuid' => PreWoo_Utils::encode_order_id( $order->get_id(), $s['client_id'] ),
 		'orderId' => $order->get_id(),
 		'platform' => 'woocommerce',
 		'patient_id' => $patient,
-		'source_id' => (int) $s['source_id'],
+		'source_id' => $renewal_source_id,
 		'client_id' => (int) $s['client_id'],
 	);
 	$order->update_meta_data( '_pre_patient_uid', $patient );
