@@ -115,7 +115,7 @@ function wave_trt_assess( array $f, array $s ) {
 		$flags[] = 'Payment recorded; pharmacy handoff unconfirmed'; $queue = 'fulfillment';
 		if ( $f['age'] >= 7 ) { $tone = 'amber'; }
 	}
-	if ( 'completed' === $f['status'] ) { $stage = 'Order marked completed'; $action = 'Verify delivery evidence; review the next renewal.'; }
+	if ( 'completed' === $f['status'] && empty( $f['shipped'] ) && empty( $f['delivered'] ) ) { $stage = 'Order marked completed'; $action = 'Verify delivery evidence; review the next renewal.'; }
 	if ( $f['closed'] ) { $stage = 'Order ' . $f['status']; $action = 'Review closure reason and subscription plan.'; $queue = 'closed'; $tone = 'gray'; }
 	if ( $s['due_soon'] && ! $f['closed'] ) { $flags[] = 'Renewal due within 21 days'; if ( 'review' === $queue ) { $queue = 'renewal'; } }
 	if ( $s['overdue'] ) { $flags[] = 'Active subscription has a past payment date'; $tone = 'amber'; }
