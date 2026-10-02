@@ -2,6 +2,7 @@
 #wave-year-grid{scroll-margin-top:45px}
 
 .wave-cal-dot.renewal_flow{background:#b53232}.wave-event-tag.renewal_flow{background:#fde9e9;color:#872525}
+.wave-cal-dot.prescribery{background:#197a91}.wave-event-tag.prescribery{background:#e1f2f6;color:#155f70}.wave-calendar.is-month-view .wave-day-inline-event.prescribery{border-left-color:#197a91}
 
 /* Expanded single-month view. The annual view keeps its compact day markers. */
 .wave-cal-view-control select{min-width:170px}.wave-weekdays span em{display:none;font-style:normal}.wave-day-inline{display:none}

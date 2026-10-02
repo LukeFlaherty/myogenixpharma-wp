@@ -59,6 +59,9 @@ add_filter( 'rest_endpoints', function ( $routes ) {
 } );
 
 function myogenix_trt_approval_callback( WP_REST_Request $request ) {
+	$prescribery_event = function_exists( 'wave_prescribery_ingest_webhook' ) ? wave_prescribery_ingest_webhook( $request ) : null;
+	if ( false === $prescribery_event ) { return new WP_REST_Response( array( 'success' => true, 'message' => 'Prescribery event accepted for reconciliation.' ), 202 ); }
+	if ( $prescribery_event instanceof WC_Order && 'prescription_renewal' === wave_prescribery_event_type( wave_prescribery_payload( $request->get_params() ) ) ) { return new WP_REST_Response( array( 'success' => true, 'message' => 'Prescription renewal recorded.' ) ); }
 	$p = $request->get_params();
 	$id = absint( $p['order_id'] ?? $p['data']['order_id'] ?? $p['payload']['data']['order_id'] ?? 0 );
 	$order = wc_get_order( $id );

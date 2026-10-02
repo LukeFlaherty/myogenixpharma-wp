@@ -22,6 +22,7 @@ class CalendarRecord {
 	function get_refunds() { return $this->refunds; }
 	function has_status($status) { return $this->status === $status; }
 	function get_time($key) { return $this->next; }
+	function get_meta($key) { return ''; }
 }
 $checks = 0;
 function ensure($condition, $message) { global $checks; if (!$condition) { throw new Exception($message); } $checks++; }

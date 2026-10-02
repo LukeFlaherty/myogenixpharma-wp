@@ -64,6 +64,8 @@ function wave_trt_order_facts( $order ) {
 	$events = array();
 	$approved = 'yes' === $order->get_meta( '_trt_provider_approved' ) || (bool) $order->get_meta( '_trt_waiting_approval' );
 	$pharmacy = false;
+	$shipped = false;
+	$delivered = false;
 	$notes = wc_get_order_notes( array( 'order_id' => $order->get_id(), 'limit' => 100, 'orderby' => 'date_created', 'order' => 'DESC', 'type' => 'internal' ) );
 	foreach ( $notes as $note ) {
 		$text = wp_strip_all_tags( $note->content );
@@ -74,11 +76,24 @@ function wave_trt_order_facts( $order ) {
 		elseif ( preg_match( '/Attempt \d+: Payment succeeded/', $text ) ) { $label = 'Medication payment succeeded'; }
 		elseif ( false !== strpos( $text, 'Order refunded in Stripe' ) ) { $label = 'Refund recorded in Stripe'; }
 		elseif ( false !== strpos( $text, 'Order status changed from' ) ) { $label = 'Order status updated — open order for details'; }
-		if ( $label ) { $events[] = array( 'date' => $note->date_created, 'label' => $label ); }
+		if ( $label ) { $events[] = array( 'date' => $note->date_created, 'label' => $label, 'source_type' => '' ); }
 	}
+	foreach ( function_exists( 'wave_prescribery_events' ) ? wave_prescribery_events( $order ) : array() as $event ) {
+		$type = sanitize_key( $event['type'] ?? '' );
+		$at = absint( $event['occurred_at'] ?? 0 );
+		if ( ! $at ) { continue; }
+		$label = '';
+		if ( 'shipped' === $type ) { $shipped = true; $pharmacy = true; $label = 'Shipment confirmed by Prescribery'; }
+		elseif ( 'delivered' === $type ) { $delivered = true; $shipped = true; $pharmacy = true; $label = 'Delivery confirmed by Prescribery'; }
+		elseif ( 'prescription_renewal' === $type && ! empty( $event['renewal_at'] ) ) { $label = 'Prescription renewal due ' . $event['renewal_at']; }
+		elseif ( 'appointment_approved' === $type ) { $approved = true; $label = 'Provider approval confirmed by Prescribery'; }
+		elseif ( str_starts_with( $type, 'appointment_' ) ) { $label = 'Prescribery appointment status: ' . str_replace( '_', ' ', substr( $type, 12 ) ); }
+		if ( $label ) { $events[] = array( 'date' => new DateTimeImmutable( '@' . $at ), 'label' => $label, 'source_type' => $type ); }
+	}
+	usort( $events, function ( $a, $b ) { return $b['date']->getTimestamp() <=> $a['date']->getTimestamp(); } );
 	$paid = (bool) $order->get_transaction_id() && (float) $order->get_total() > 0;
 	$age = $order->get_date_created() ? max( 0, (int) floor( ( time() - $order->get_date_created()->getTimestamp() ) / DAY_IN_SECONDS ) ) : 0;
-	return array( 'approved' => $approved, 'pharmacy' => $pharmacy, 'paid' => $paid, 'age' => $age, 'events' => $events,
+	return array( 'approved' => $approved, 'pharmacy' => $pharmacy, 'shipped' => $shipped, 'delivered' => $delivered, 'paid' => $paid, 'age' => $age, 'events' => $events,
 		'lab' => (string) $order->get_meta( '_trt_lab_state' ), 'requisition' => (bool) $order->get_meta( '_prescribery_requisition_id' ),
 		'refunded' => $order->has_status( 'refunded' ) || (float) $order->get_total_refunded() > 0,
 		'closed' => $order->has_status( array( 'refunded', 'cancelled', 'rejected' ) ), 'status' => $order->get_status() );
@@ -91,7 +106,9 @@ function wave_trt_assess( array $f, array $s ) {
 	$tone = 'gray';
 	$stage = 'Journey unconfirmed';
 	$action = 'Reconcile the latest cycle with the provider.';
-	if ( $f['pharmacy'] ) { $stage = 'Pharmacy handoff recorded'; $action = 'Confirm shipment and tracking with the pharmacy.'; $tone = 'blue'; $queue = 'fulfillment'; }
+	if ( ! empty( $f['delivered'] ) ) { $stage = 'Delivered — Prescribery confirmed'; $action = 'Review the aligned renewal date and close any remaining follow-up.'; $tone = 'green'; $queue = 'review'; }
+	elseif ( ! empty( $f['shipped'] ) ) { $stage = 'Shipped — Prescribery confirmed'; $action = 'Monitor delivery; the renewal cycle is aligned from fulfillment.'; $tone = 'blue'; $queue = 'fulfillment'; }
+	elseif ( $f['pharmacy'] ) { $stage = 'Pharmacy handoff recorded'; $action = 'Confirm shipment and tracking with the pharmacy.'; $tone = 'blue'; $queue = 'fulfillment'; }
 	elseif ( $f['approved'] ) { $stage = 'Provider approval recorded'; $action = 'Confirm medication payment and pharmacy handoff.'; $tone = 'blue'; }
 	elseif ( 'created' === $f['lab'] && $f['requisition'] ) { $stage = 'Lab request created'; $action = 'Confirm requisition access and lab completion.'; $tone = 'blue'; $queue = 'labs'; }
 	if ( $f['paid'] && ! $f['closed'] && ! $f['pharmacy'] ) {
@@ -143,7 +160,7 @@ function wave_trt_patient_model( $patient ) {
 		}
 	}
 	$s['multiple'] = $active > 1;
-	$f = $order ? wave_trt_order_facts( $order ) : array( 'approved' => false, 'pharmacy' => false, 'paid' => false, 'age' => 0, 'events' => array(), 'lab' => '', 'requisition' => false, 'refunded' => false, 'closed' => false, 'status' => '' );
+	$f = $order ? wave_trt_order_facts( $order ) : array( 'approved' => false, 'pharmacy' => false, 'shipped' => false, 'delivered' => false, 'paid' => false, 'age' => 0, 'events' => array(), 'lab' => '', 'requisition' => false, 'refunded' => false, 'closed' => false, 'status' => '' );
 	$a = wave_trt_assess( $f, $s );
 	if ( $order && ! $f['closed'] && ! $f['paid'] && function_exists( 'myogenix_trt_is_renewal_order' ) && myogenix_trt_is_renewal_order( $order ) && ! myogenix_trt_intake_verified( $order ) ) {
 		$a['stage'] = $order->get_meta( '_trt_waiting_approval' ) ? 'Approval waiting on quarterly intake' : 'Quarterly intake needs staff coordination';
@@ -163,6 +180,7 @@ function wave_trt_render() {
 	if ( ! current_user_can( 'manage_woocommerce' ) ) { wp_die( esc_html__( 'You do not have permission to view this page.' ), '', array( 'response' => 403 ) ); }
 	if ( ! function_exists( 'wc_get_orders' ) ) { echo '<div class="wrap"><h1>TRT Patients</h1><p>WooCommerce must be active to load patient records.</p></div>'; return; }
 	list( $patients, $limited, $excluded ) = wave_trt_load_patients();
+	$prescribery_sync = get_option( 'wave_prescribery_last_sync', array() );
 	$rows = array_map( 'wave_trt_patient_model', array_values( $patients ) );
 	$rank = array( 'red' => 0, 'amber' => 1, 'gray' => 2, 'blue' => 3, 'green' => 4 );
 	usort( $rows, function ( $a, $b ) use ( $rank ) { return ( $rank[ $a['a']['tone'] ] <=> $rank[ $b['a']['tone'] ] ) ?: ( $b['f']['age'] <=> $a['f']['age'] ); } );
@@ -178,9 +196,9 @@ function wave_trt_render() {
 		<?php if ( isset( $_GET['wave_saved'] ) && '1' === $_GET['wave_saved'] ) : ?><div class="notice notice-success inline"><p>Staff update saved. Verified quarterly intake allows an already received provider approval to proceed to payment. Check the renewal order for its payment outcome.</p></div><?php endif; ?>
 		<div class="wave-brand">WAVE CONSULTING <span>Patient operations</span></div>
 		<header class="wave-heading"><div><p class="wave-eyebrow">MYOGENIX PHARMA</p><h1>TRT patient dashboard</h1><p>See the evidence. Find the next step. Keep every patient moving.</p></div><a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=wave-trt' ) ); ?>">Refresh records</a></header>
-		<p class="wave-fresh">Live WordPress snapshot · <?php echo esc_html( wp_date( 'M j, Y · g:i a T' ) ); ?> · Staff workspace · Testosterone product #883 · <?php echo esc_html( $excluded ); ?> test records excluded</p>
+		<p class="wave-fresh">Live unified snapshot · <?php echo esc_html( wp_date( 'M j, Y · g:i a T' ) ); ?> · Prescribery last reconciled <?php echo esc_html( ! empty( $prescribery_sync['finished_at'] ) ? wp_date( 'M j, Y · g:i a T', $prescribery_sync['finished_at'] ) : 'pending first sync' ); ?> · <?php echo esc_html( $excluded ); ?> test records excluded</p>
 		<?php if ( $limited ) : ?><div class="notice notice-warning inline"><p>Partial results: the scan reached 2,000 records of an order type. Older patients may be missing. Counts below cover loaded records only.</p></div><?php endif; ?>
-		<div class="wave-notice"><strong>What these records can tell you</strong><p>Payments, order notes and subscriptions come from WooCommerce. Lab completion, intake and shipping are unconfirmed unless supported by verified data. “Completed” is an order status, not proof of delivery. Follow-up is flagged after 7 days from order creation; this is a review threshold, not a promised turnaround.</p><?php if ( defined( 'MYOGENIX_TRT_REDESIGN_LIVE' ) && ! MYOGENIX_TRT_REDESIGN_LIVE ) : ?><p><strong>Consent renewal rollout is off.</strong> Existing subscriptions may still use legacy billing. Confirm the provider handoff before enabling the new flow.</p><?php elseif ( defined( 'MYOGENIX_TRT_REDESIGN_LIVE' ) ) : ?><p><strong>Renewal check-ins are live; quarterly intake is staff-assisted.</strong> Coordinate intake with Prescribery and record verified completion on the current renewal order. Payment waits for both intake verification and provider approval. Flagged individual-review subscriptions retain their existing process. See the <a href="<?php echo esc_url( admin_url( 'admin.php?page=wave-trt-calendar' ) ); ?>">TRT Patient Calendar</a> for deadlines and staff tasks.</p><?php endif; ?></div>
+		<div class="wave-notice"><strong>One operational record</strong><p>Prescribery supplies provider, prescription, shipment and delivery facts. WooCommerce supplies payments and subscription billing. Confirmed Prescribery events are written onto the matching WooCommerce treatment cycle and shown here and on the calendar. A WooCommerce “Completed” status alone is not treated as delivery proof.</p><?php if ( defined( 'MYOGENIX_TRT_REDESIGN_LIVE' ) && ! MYOGENIX_TRT_REDESIGN_LIVE ) : ?><p><strong>Consent renewal rollout is off.</strong> Existing subscriptions may still use legacy billing.</p><?php elseif ( defined( 'MYOGENIX_TRT_REDESIGN_LIVE' ) ) : ?><p><strong>Renewal check-ins are live; quarterly intake is staff-assisted.</strong> Payment waits for both intake verification and provider approval. See the <a href="<?php echo esc_url( admin_url( 'admin.php?page=wave-trt-calendar' ) ); ?>">TRT Patient Calendar</a> for the combined timeline.</p><?php endif; ?></div>
 		<div class="wave-stats" aria-label="Patient filters">
 		<?php foreach ( array( 'all' => 'All patients', 'attention' => 'Needs attention', 'fulfillment' => 'Fulfillment review', 'labs' => 'Lab request created', 'renewal' => 'Renewal upcoming', 'closed' => 'Latest order closed' ) as $key => $label ) : ?>
 			<button type="button" class="wave-stat <?php echo 'all' === $key ? 'is-active' : ''; ?>" data-filter="<?php echo esc_attr( $key ); ?>" aria-pressed="<?php echo 'all' === $key ? 'true' : 'false'; ?>"><span><?php echo esc_html( $label ); ?></span><strong><?php echo esc_html( $counts[ $key ] ); ?></strong></button>
@@ -208,11 +226,11 @@ function wave_trt_render() {
 				<?php wave_trt_render_actions( $row ); ?>
 				<details><summary>View journey, subscriptions &amp; order history</summary><div class="wave-detail-body">
 					<div class="wave-journey" aria-label="Confirmed milestones for the latest order">
-					<?php $staff_milestones = wave_trt_work( $r )['milestones'] ?? array(); $intake_value = isset( $staff_milestones['intake'] ) ? ( 'Prescribery API' === ( $staff_milestones['intake']['by'] ?? '' ) ? 'Patient submitted' : 'Staff verified' ) : 'Unconfirmed'; foreach ( array( 'Order' => $o ? 'Recorded' : 'Unconfirmed', 'Intake' => $intake_value, 'Labs' => isset( $staff_milestones['labs'] ) ? 'Completion staff verified' : ( 'created' === $f['lab'] && $f['requisition'] ? 'Request created; results unconfirmed' : 'Unconfirmed' ), 'Provider' => $f['approved'] ? 'Approval recorded' : 'Unconfirmed', 'Payment' => $f['refunded'] ? 'Refund recorded' : ( $f['paid'] ? 'Transaction recorded; see order' : 'Unconfirmed' ), 'Pharmacy' => isset( $staff_milestones['pharmacy'] ) ? 'Handoff staff verified' : ( $f['pharmacy'] ? 'Handoff acknowledged' : 'Unconfirmed' ), 'Delivery' => isset( $staff_milestones['delivery'] ) ? 'Delivery staff verified' : ( isset( $staff_milestones['shipped'] ) ? 'Shipment staff verified; delivery unconfirmed' : 'Unconfirmed' ) ) as $step => $value ) : ?><div class="wave-step <?php echo 'Unconfirmed' === $value ? '' : 'recorded'; ?>"><strong><?php echo esc_html( $step ); ?></strong><span><?php echo esc_html( $value ); ?></span></div><?php endforeach; ?>
+					<?php $staff_milestones = wave_trt_work( $r )['milestones'] ?? array(); $intake_value = isset( $staff_milestones['intake'] ) ? ( 'Prescribery API' === ( $staff_milestones['intake']['by'] ?? '' ) ? 'Patient submitted' : 'Staff verified' ) : 'Unconfirmed'; foreach ( array( 'Order' => $o ? 'Recorded' : 'Unconfirmed', 'Intake' => $intake_value, 'Labs' => isset( $staff_milestones['labs'] ) ? 'Completion staff verified' : ( 'created' === $f['lab'] && $f['requisition'] ? 'Request created; results unconfirmed' : 'Unconfirmed' ), 'Provider' => $f['approved'] ? 'Approval recorded' : 'Unconfirmed', 'Payment' => $f['refunded'] ? 'Refund recorded' : ( $f['paid'] ? 'Transaction recorded; see order' : 'Unconfirmed' ), 'Pharmacy' => $f['pharmacy'] ? 'Prescribery handoff / fulfillment recorded' : 'Unconfirmed', 'Delivery' => $f['delivered'] ? 'Prescribery confirmed delivery' : ( $f['shipped'] ? 'Prescribery confirmed shipment; delivery pending' : ( isset( $staff_milestones['delivery'] ) ? 'Delivery staff verified' : ( isset( $staff_milestones['shipped'] ) ? 'Shipment staff verified; delivery unconfirmed' : 'Unconfirmed' ) ) ) ) as $step => $value ) : ?><div class="wave-step <?php echo 'Unconfirmed' === $value ? '' : 'recorded'; ?>"><strong><?php echo esc_html( $step ); ?></strong><span><?php echo esc_html( $value ); ?></span></div><?php endforeach; ?>
 					</div>
 					<div class="wave-detail-grid"><section><h3>Subscription &amp; next billing</h3>
 					<?php if ( ! $row['subscriptions'] ) : ?><p>No TRT subscription matched to this customer. Check the order for legacy or guest records.</p><?php endif; ?>
-					<?php foreach ( $row['subscriptions'] as $sub ) : ?><div class="wave-sub"><a href="<?php echo esc_url( $sub->get_edit_order_url() ); ?>">Subscription #<?php echo esc_html( $sub->get_id() ); ?></a> <strong><?php echo esc_html( wc_get_order_status_name( $sub->get_status() ) ); ?></strong><p><?php echo wp_kses_post( wave_trt_money( $sub, $sub->get_total() ) ); ?> every <?php echo esc_html( $sub->get_billing_interval() . ' ' . $sub->get_billing_period() . '(s)' ); ?></p><p>Next payment: <?php echo esc_html( $sub->get_time( 'next_payment' ) ? wp_date( 'M j, Y', $sub->get_time( 'next_payment' ) ) : 'Not scheduled' ); ?></p><p>Renewal consent: <?php echo esc_html( $sub->get_meta( '_trt_consent_resolved_action' ) ?: 'Not recorded' ); ?> <small>(stored response; verify cycle)</small></p></div><?php endforeach; ?>
+					<?php foreach ( $row['subscriptions'] as $sub ) : ?><div class="wave-sub"><a href="<?php echo esc_url( $sub->get_edit_order_url() ); ?>">Subscription #<?php echo esc_html( $sub->get_id() ); ?></a> <strong><?php echo esc_html( wc_get_order_status_name( $sub->get_status() ) ); ?></strong><p><?php echo wp_kses_post( wave_trt_money( $sub, $sub->get_total() ) ); ?> every <?php echo esc_html( $sub->get_billing_interval() . ' ' . $sub->get_billing_period() . '(s)' ); ?></p><p>Next renewal / payment: <?php echo esc_html( $sub->get_time( 'next_payment' ) ? wp_date( 'M j, Y', $sub->get_time( 'next_payment' ) ) : 'Not scheduled' ); ?><?php if ( $sub->get_meta( '_wave_prescribery_next_renewal' ) ) : ?> <small>(aligned from Prescribery fulfillment)</small><?php endif; ?></p><p>Renewal consent: <?php echo esc_html( $sub->get_meta( '_trt_consent_resolved_action' ) ?: 'Not recorded' ); ?></p></div><?php endforeach; ?>
 					</section><section><h3>Latest order activity</h3><p class="wave-muted">Selected system notes, newest first. Clinical details and raw provider responses stay in the source record.</p><ol class="wave-events"><?php foreach ( $f['events'] as $event ) : ?><li><time><?php echo esc_html( wave_trt_date( $event['date'] ) ); ?></time> <?php echo esc_html( $event['label'] ); ?></li><?php endforeach; ?></ol><?php if ( ! $f['events'] ) : ?><p>No recognized milestone notes found. Open the order to verify.</p><?php endif; ?></section></div>
 					<h3>TRT order history</h3><div class="wave-history"><table><thead><tr><th>Order</th><th>Created</th><th>Status</th><th>Total</th><th>Refunded</th></tr></thead><tbody><?php foreach ( $row['orders'] as $past ) : ?><tr><td><a href="<?php echo esc_url( $past->get_edit_order_url() ); ?>">#<?php echo esc_html( $past->get_id() ); ?></a></td><td><?php echo esc_html( wave_trt_date( $past->get_date_created() ) ); ?></td><td><?php echo esc_html( wc_get_order_status_name( $past->get_status() ) ); ?></td><td><?php echo wp_kses_post( wave_trt_money( $past, $past->get_total() ) ); ?></td><td><?php echo wp_kses_post( wave_trt_money( $past, $past->get_total_refunded() ) ); ?></td></tr><?php endforeach; ?></tbody></table></div>
 				</div></details>

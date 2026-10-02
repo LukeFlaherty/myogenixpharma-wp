@@ -7,14 +7,14 @@ add_action( 'admin_menu', function () {
 add_action( 'admin_enqueue_scripts', function ( $hook ) {
 	if ( ( $GLOBALS['wave_trt_calendar_hook'] ?? '' ) !== $hook ) { return; }
 	wp_enqueue_style( 'wave-trt', get_stylesheet_directory_uri() . '/assets/css/wave-trt-dashboard.css', array(), '1.1.0' );
-	wp_enqueue_style( 'wave-trt-calendar', get_stylesheet_directory_uri() . '/assets/css/wave-trt-calendar.css', array( 'wave-trt' ), '1.2.0' );
+	wp_enqueue_style( 'wave-trt-calendar', get_stylesheet_directory_uri() . '/assets/css/wave-trt-calendar.css', array( 'wave-trt' ), '1.2.1' );
 	wp_enqueue_script( 'wave-trt-calendar', get_stylesheet_directory_uri() . '/assets/js/wave-trt-calendar.js', array(), '1.1.0', true );
 } );
 add_action( 'admin_init', function () {
 	if ( isset( $_GET['page'] ) && 'wave-trt-calendar' === $_GET['page'] ) { nocache_headers(); }
 } );
 function wave_trt_calendar_types() {
-	return array( 'order' => 'Orders', 'renewal_order' => 'Renewal orders', 'renewal' => 'Scheduled renewals', 'renewal_flow' => 'Renewal invitations / deadlines / labs', 'followup' => 'Intake / staff follow-ups', 'contact' => 'Contact logged', 'milestone' => 'Progress recorded', 'refund' => 'Refunds', 'suggested' => 'Suggested check-ins' );
+	return array( 'order' => 'Orders', 'renewal_order' => 'Renewal orders', 'renewal' => 'Renewals / next payments', 'prescribery' => 'Prescribery updates', 'renewal_flow' => 'Renewal invitations / deadlines / labs', 'followup' => 'Intake / staff follow-ups', 'contact' => 'Contact logged', 'milestone' => 'Progress recorded', 'refund' => 'Refunds', 'suggested' => 'Suggested check-ins' );
 }
 function wave_trt_calendar_year( $value, $default ) {
 	return is_scalar( $value ) && preg_match( '/^20\d{2}$/', (string) $value ) ? (int) $value : $default;
@@ -45,7 +45,10 @@ function wave_trt_calendar_collect( $patients, $year ) {
 			// Only recognized operational notes; never expose raw provider payloads.
 			$facts = wave_trt_order_facts( $order );
 			foreach ( $facts['events'] as $event ) {
-				if ( in_array( $event['label'], array( 'Provider approval recorded', 'Pharmacy handoff acknowledged (not shipment confirmation)', 'Medication payment succeeded' ), true ) && $event['date'] ) { $add( wp_date( 'Y-m-d', $event['date']->getTimestamp() ), 'milestone', $event['label'], $order, 'System note recorded on this date. Open source order for context.' ); }
+				if ( ! $event['date'] ) { continue; }
+				$source_type = $event['source_type'] ?? '';
+				if ( $source_type ) { $add( wp_date( 'Y-m-d', $event['date']->getTimestamp() ), 'prescription_renewal' === $source_type ? 'renewal' : 'prescribery', $event['label'], $order, 'Confirmed by Prescribery and linked to this WooCommerce treatment cycle.' ); }
+				elseif ( in_array( $event['label'], array( 'Provider approval recorded', 'Pharmacy handoff acknowledged (not shipment confirmation)', 'Medication payment succeeded' ), true ) ) { $add( wp_date( 'Y-m-d', $event['date']->getTimestamp() ), 'milestone', $event['label'], $order, 'System note recorded on this date. Open source order for context.' ); }
 			}
 		}
 		foreach ( array_merge( $patient['orders'], $patient['subscriptions'] ) as $record ) {
@@ -62,7 +65,7 @@ function wave_trt_calendar_collect( $patients, $year ) {
 				if ( 'Logged contact / internal note' === $event['label'] ) { $add( wp_date( 'Y-m-d', $event['at'] ), 'contact', 'Contact / internal note logged', $record, 'Recorded by ' . $event['by'] . '. A logged note does not prove a message was delivered.' ); }
 			}
 			foreach ( $work['milestones'] ?? array() as $milestone => $event ) {
-				if ( isset( wave_trt_milestones()[ $milestone ] ) ) { $add( wp_date( 'Y-m-d', $event['at'] ), 'milestone', wave_trt_milestones()[ $milestone ] . ' · staff verified', $record, 'Verification recorded by ' . $event['by'] . ' on this date; the actual event may have occurred earlier.' ); }
+				if ( isset( wave_trt_milestones()[ $milestone ] ) && ! str_starts_with( (string) ( $event['by'] ?? '' ), 'Prescribery' ) ) { $add( wp_date( 'Y-m-d', $event['at'] ), 'milestone', wave_trt_milestones()[ $milestone ] . ' · staff verified', $record, 'Verification recorded by ' . $event['by'] . ' on this date; the actual event may have occurred earlier.' ); }
 			}
 		}
 		foreach ( $patient['subscriptions'] as $sub ) {
@@ -70,7 +73,8 @@ function wave_trt_calendar_collect( $patients, $year ) {
 			if ( ! $sub->has_status( 'active' ) || ! $next ) { continue; }
 			$has_renewal = true;
 			$day = wp_date( 'Y-m-d', $next );
-			$add( $day, 'renewal', 'Scheduled renewal · #' . $sub->get_id(), $sub, 'Next payment date stored in WooCommerce. This does not confirm consent, clinical clearance, payment, or shipment.', 'scheduled' );
+			$aligned = (int) $sub->get_meta( '_wave_prescribery_next_renewal' );
+			$add( $day, 'renewal', ( $aligned ? 'Prescribery-aligned renewal' : 'Scheduled renewal' ) . ' · #' . $sub->get_id(), $sub, $aligned ? 'Treatment cycle aligned from confirmed Prescribery fulfillment; this is also the next WooCommerce payment date.' : 'Next payment date stored in WooCommerce. This does not confirm consent, clinical clearance, payment, or shipment.', 'scheduled' );
 			if ( ! function_exists( 'myogenix_trt_enabled' ) || ! myogenix_trt_enabled( $sub ) ) {
 				$add( wave_trt_calendar_checkin_date( $day ), 'suggested', 'Suggested pre-renewal check-in', $sub, 'Planning suggestion: 21 days before the stored renewal date (' . $day . '). Not a booked appointment, reminder, or patient message.', 'suggested' );
 			}

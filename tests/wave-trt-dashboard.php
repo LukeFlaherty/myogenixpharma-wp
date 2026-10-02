@@ -20,6 +20,10 @@ $a = wave_trt_assess( array_merge( $facts, array( 'paid' => true, 'age' => 3 ) )
 check_rule( 'amber' !== $a['tone'], 'Young order does not trigger seven-day follow-up' );
 $a = wave_trt_assess( array_merge( $facts, array( 'pharmacy' => true, 'approved' => true ) ), $subscription );
 check_rule( 'Pharmacy handoff recorded' === $a['stage'] && str_contains( $a['action'], 'Confirm shipment' ), 'Pharmacy handoff does not prove shipment' );
+$a = wave_trt_assess( array_merge( $facts, array( 'pharmacy' => true, 'shipped' => true ) ), $subscription );
+check_rule( 'Shipped — Prescribery confirmed' === $a['stage'], 'Prescribery shipment is authoritative fulfillment evidence' );
+$a = wave_trt_assess( array_merge( $facts, array( 'pharmacy' => true, 'shipped' => true, 'delivered' => true ) ), $subscription );
+check_rule( 'Delivered — Prescribery confirmed' === $a['stage'] && 'green' === $a['tone'], 'Prescribery delivery completes the fulfillment journey' );
 $a = wave_trt_assess( array_merge( $facts, array( 'closed' => true, 'status' => 'refunded' ) ), array_merge( $subscription, array( 'refund_active' => true ) ) );
 check_rule( 'red' === $a['tone'] && 'attention' === $a['queue'], 'Refund with active subscription is urgent' );
 $a = wave_trt_assess( $facts, array_merge( $subscription, array( 'partial_refund_active' => true ) ) );
