@@ -65,7 +65,7 @@ function wave_trt_calendar_collect( $patients, $year ) {
 				if ( 'Logged contact / internal note' === $event['label'] ) { $add( wp_date( 'Y-m-d', $event['at'] ), 'contact', 'Contact / internal note logged', $record, 'Recorded by ' . $event['by'] . '. A logged note does not prove a message was delivered.' ); }
 			}
 			foreach ( $work['milestones'] ?? array() as $milestone => $event ) {
-				if ( isset( wave_trt_milestones()[ $milestone ] ) && ! str_starts_with( (string) ( $event['by'] ?? '' ), 'Prescribery' ) ) { $add( wp_date( 'Y-m-d', $event['at'] ), 'milestone', wave_trt_milestones()[ $milestone ] . ' · staff verified', $record, 'Verification recorded by ' . $event['by'] . ' on this date; the actual event may have occurred earlier.' ); }
+				if ( isset( wave_trt_milestones()[ $milestone ] ) && false === stripos( (string) ( $event['by'] ?? '' ), 'Prescribery' ) ) { $add( wp_date( 'Y-m-d', $event['at'] ), 'milestone', wave_trt_milestones()[ $milestone ] . ' · staff verified', $record, 'Verification recorded by ' . $event['by'] . ' on this date; the actual event may have occurred earlier.' ); }
 			}
 		}
 		foreach ( $patient['subscriptions'] as $sub ) {

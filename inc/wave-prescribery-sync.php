@@ -211,10 +211,33 @@ function wave_prescribery_api_get( $path, array $query = array() ) {
 	return array( 'code' => wp_remote_retrieve_response_code( $response ), 'body' => json_decode( wp_remote_retrieve_body( $response ), true ) );
 }
 
+function wave_prescribery_existing_event_time( WC_Order $order, $type ) {
+	$pattern = 'delivered' === $type ? '/deliver/i' : '/tracking|shipp/i';
+	foreach ( wc_get_order_notes( array( 'order_id' => $order->get_id(), 'limit' => 100, 'orderby' => 'date_created', 'order' => 'DESC', 'type' => 'internal' ) ) as $note ) {
+		if ( preg_match( $pattern, wp_strip_all_tags( $note->content ) ) && $note->date_created ) { return $note->date_created->getTimestamp(); }
+	}
+	$modified = $order->get_date_modified();
+	return $modified ? $modified->getTimestamp() : time();
+}
+
+/** Convert evidence saved by the previous webhook handler into unified events. */
+function wave_prescribery_backfill_fulfillment( WC_Order $order ) {
+	$tracking = sanitize_text_field( (string) $order->get_meta( 'pharmacy_tracking_number' ) );
+	$status = strtolower( sanitize_key( $order->get_meta( '_pharmacy_order_status' ) ) );
+	$recorded = 0;
+	if ( $tracking || 'shipped' === $status ) {
+		$recorded += wave_prescribery_record_event( $order, array( 'order_id' => $order->get_id(), 'patient_id' => wave_prescribery_patient_id( $order ), 'appointment_id' => absint( $order->get_meta( 'appointment_id' ) ), 'order_status' => 'Shipped', 'tracking_number' => $tracking, 'occurred_at' => wave_prescribery_existing_event_time( $order, 'shipped' ) ), 'Existing Prescribery webhook record' ) ? 1 : 0;
+	}
+	if ( 'delivered' === $status ) {
+		$recorded += wave_prescribery_record_event( $order, array( 'order_id' => $order->get_id(), 'patient_id' => wave_prescribery_patient_id( $order ), 'appointment_id' => absint( $order->get_meta( 'appointment_id' ) ), 'order_status' => 'Delivered', 'tracking_number' => $tracking, 'occurred_at' => wave_prescribery_existing_event_time( $order, 'delivered' ) ), 'Existing Prescribery webhook record' ) ? 1 : 0;
+	}
+	return $recorded;
+}
+
 function wave_prescribery_sync_all_patients() {
 	if ( ! function_exists( 'wc_get_orders' ) || get_transient( 'wave_prescribery_sync_lock' ) ) { return; }
 	set_transient( 'wave_prescribery_sync_lock', 1, 15 * MINUTE_IN_SECONDS );
-	$summary = array( 'started_at' => time(), 'patients' => 0, 'mapped' => 0, 'appointments' => 0, 'errors' => 0 );
+	$summary = array( 'started_at' => time(), 'patients' => 0, 'mapped' => 0, 'appointments' => 0, 'fulfillment' => 0, 'errors' => 0 );
 	try {
 		list( $patients ) = wave_trt_load_patients();
 		foreach ( $patients as $patient ) {
@@ -234,6 +257,7 @@ function wave_prescribery_sync_all_patients() {
 			foreach ( array_merge( $patient['orders'], $patient['subscriptions'] ) as $candidate ) {
 				if ( ! wave_prescribery_patient_id( $candidate ) ) { $candidate->update_meta_data( '_prescribery_patient_id', $patient_id ); $candidate->save(); }
 			}
+			foreach ( $patient['orders'] as $order ) { $summary['fulfillment'] += wave_prescribery_backfill_fulfillment( $order ); }
 			$from = gmdate( 'Y-m-d', time() - YEAR_IN_SECONDS );
 			$to = gmdate( 'Y-m-d', time() + YEAR_IN_SECONDS );
 			foreach ( array( 'completed', 'upcoming', 'cancelled' ) as $type ) {
