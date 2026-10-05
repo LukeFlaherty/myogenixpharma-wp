@@ -123,9 +123,10 @@ function wave_email_load_wp_entries( $start, $end, $search, $customer_emails ) {
 	$entries = array();
 	foreach ( array_slice( $rows, 0, 5000 ) as $row ) {
 		$addresses = wave_email_extract_addresses( $row['receiver'] );
+		$is_test = (bool) preg_match( '/^\[TEST(?:\s+STAFF\s+NOTICE)?\]/i', trim( (string) $row['subject'] ) );
 		$entries[] = array(
 			'id' => 'wp-' . absint( $row['mail_id'] ), 'timestamp' => wave_email_log_timestamp( $row['timestamp'] ), 'source' => wave_email_source( $row['subject'], $row['message'] ),
-			'status' => empty( $row['error'] ) ? 'accepted' : 'failed', 'audience' => wave_email_is_customer_recipient( $row['receiver'] ) ? 'customer' : 'internal',
+			'status' => empty( $row['error'] ) ? 'accepted' : 'failed', 'audience' => ! $is_test && wave_email_is_customer_recipient( $row['receiver'] ) ? 'customer' : 'internal',
 			'recipients' => $addresses, 'subject' => (string) $row['subject'], 'message' => wave_email_redact_message( $row['message'] ),
 			'detail' => empty( $row['error'] ) ? 'Accepted by WordPress mail transport; inbox delivery is not verified.' : sanitize_text_field( $row['error'] ), 'order_id' => 0,
 		);
