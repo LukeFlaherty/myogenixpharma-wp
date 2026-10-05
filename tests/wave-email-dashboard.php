@@ -21,5 +21,5 @@ check( 'token=[hidden]' === $redacted, 'Standalone security tokens are hidden' )
 check( 'TRT renewal' === wave_email_source( 'Your renewal is ready to review' ), 'TRT source classification' );
 check( 'WooCommerce' === wave_email_source( 'Your order is complete' ), 'WooCommerce source classification' );
 check( 'WordPress' === wave_email_source( 'Welcome to the newsletter' ), 'WordPress source classification' );
-check( 1 === preg_match( '/^\[TEST(?:\s+STAFF\s+NOTICE)?\]/i', '[TEST STAFF NOTICE] Renewal review' ), 'QA subject detection' );
+check( 1 === preg_match( '/^\[[^\]]*TEST[^\]]*\]/i', '[CORRECTED TEST PREVIEW] Renewal review' ), 'QA subject detection' );
 echo "PASS: {$checks} outbound communication checks\n";

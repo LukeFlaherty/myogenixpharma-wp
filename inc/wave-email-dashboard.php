@@ -28,7 +28,7 @@ function wave_email_extract_addresses( $value ) {
 }
 
 function wave_email_internal_addresses() {
-	$addresses = array( 'support@myogenixpharma.com', 'customersupport@myogenixpharma.com', 'adam@myogenixpharma.com', 'adam@myogenix.com' );
+	$addresses = array( 'support@myogenixpharma.com', 'customersupport@myogenixpharma.com', 'adam@myogenixpharma.com', 'adam@myogenix.com', 'luke@waveconsulting.biz', 'luke@myogenixpharma.com', 'luke+trt-qa-20260915@waveconsulting.biz' );
 	$admin = sanitize_email( get_option( 'admin_email' ) );
 	if ( $admin ) { $addresses[] = strtolower( $admin ); }
 	return array_values( array_unique( apply_filters( 'wave_email_internal_addresses', $addresses ) ) );
@@ -123,7 +123,7 @@ function wave_email_load_wp_entries( $start, $end, $search, $customer_emails ) {
 	$entries = array();
 	foreach ( array_slice( $rows, 0, 5000 ) as $row ) {
 		$addresses = wave_email_extract_addresses( $row['receiver'] );
-		$is_test = (bool) preg_match( '/^\[TEST(?:\s+STAFF\s+NOTICE)?\]/i', trim( (string) $row['subject'] ) );
+		$is_test = (bool) preg_match( '/^\[[^\]]*TEST[^\]]*\]/i', trim( (string) $row['subject'] ) );
 		$entries[] = array(
 			'id' => 'wp-' . absint( $row['mail_id'] ), 'timestamp' => wave_email_log_timestamp( $row['timestamp'] ), 'source' => wave_email_source( $row['subject'], $row['message'] ),
 			'status' => empty( $row['error'] ) ? 'accepted' : 'failed', 'audience' => ! $is_test && wave_email_is_customer_recipient( $row['receiver'] ) ? 'customer' : 'internal',
