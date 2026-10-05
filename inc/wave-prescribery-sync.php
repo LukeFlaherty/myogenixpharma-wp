@@ -237,7 +237,7 @@ function wave_prescribery_backfill_fulfillment( WC_Order $order ) {
 function wave_prescribery_sync_all_patients() {
 	if ( ! function_exists( 'wc_get_orders' ) || get_transient( 'wave_prescribery_sync_lock' ) ) { return; }
 	set_transient( 'wave_prescribery_sync_lock', 1, 15 * MINUTE_IN_SECONDS );
-	$summary = array( 'started_at' => time(), 'patients' => 0, 'mapped' => 0, 'appointments' => 0, 'fulfillment' => 0, 'errors' => 0 );
+	$summary = array( 'started_at' => time(), 'patients' => 0, 'mapped' => 0, 'appointments' => 0, 'communications' => 0, 'fulfillment' => 0, 'errors' => 0 );
 	try {
 		list( $patients ) = wave_trt_load_patients();
 		foreach ( $patients as $patient ) {
@@ -265,10 +265,28 @@ function wave_prescribery_sync_all_patients() {
 				if ( is_wp_error( $response ) || ! in_array( $response['code'], array( 200, 404 ), true ) ) { $summary['errors']++; continue; }
 				foreach ( $response['body']['data'] ?? array() as $appointment ) {
 					if ( ! is_array( $appointment ) ) { continue; }
-					$event = array( 'type' => 'appointment_' . sanitize_key( $appointment['status'] ?? $type ), 'occurred_at' => strtotime( (string) ( $appointment['updated_at'] ?? $appointment['start_date_time'] ?? '' ) ) ?: time(), 'received_at' => time(), 'source' => 'Prescribery API', 'external_order_id' => '', 'related_order_ids' => array(), 'appointment_id' => absint( $appointment['id'] ?? 0 ), 'tracking_number' => '', 'renewal_at' => '', 'drugs' => array(), 'hash' => '' );
+					$message = sanitize_textarea_field( (string) ( $appointment['message_to_patient'] ?? '' ) );
+					$event = array( 'type' => 'appointment_' . sanitize_key( $appointment['status'] ?? $type ), 'occurred_at' => strtotime( (string) ( $appointment['updated_at'] ?? $appointment['start_date_time'] ?? '' ) ) ?: time(), 'received_at' => time(), 'source' => 'Prescribery API', 'external_order_id' => '', 'related_order_ids' => array(), 'appointment_id' => absint( $appointment['id'] ?? 0 ), 'tracking_number' => '', 'renewal_at' => '', 'drugs' => array(), 'message_to_patient' => mb_substr( $message, 0, 4000 ), 'hash' => '' );
 					$event['hash'] = wave_prescribery_event_hash( $event );
 					$events = wave_prescribery_events( $record );
-					if ( ! array_filter( $events, function ( $existing ) use ( $event ) { return ( $existing['hash'] ?? '' ) === $event['hash']; } ) ) { $events[] = $event; $record->update_meta_data( WAVE_PRESCRIBERY_EVENT_META, array_slice( $events, -50 ) ); $summary['appointments']++; }
+					$matched = false;
+					foreach ( $events as $index => $existing ) {
+						if ( ( $existing['hash'] ?? '' ) !== $event['hash'] ) { continue; }
+						$matched = true;
+						if ( $message && $message !== (string) ( $existing['message_to_patient'] ?? '' ) ) {
+							$events[ $index ]['message_to_patient'] = $event['message_to_patient'];
+							$events[ $index ]['received_at'] = time();
+							$record->update_meta_data( WAVE_PRESCRIBERY_EVENT_META, array_slice( $events, -50 ) );
+							$summary['communications']++;
+						}
+						break;
+					}
+					if ( ! $matched ) {
+						$events[] = $event;
+						$record->update_meta_data( WAVE_PRESCRIBERY_EVENT_META, array_slice( $events, -50 ) );
+						$summary['appointments']++;
+						if ( $message ) { $summary['communications']++; }
+					}
 				}
 			}
 			$record->update_meta_data( '_wave_prescribery_synced_at', time() );
