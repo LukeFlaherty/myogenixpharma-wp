@@ -4,6 +4,7 @@
  */
 
 require_once get_stylesheet_directory() . '/inc/product-reviews.php';
+require_once get_stylesheet_directory() . '/inc/outbound-email.php';
 require_once get_stylesheet_directory() . '/inc/trt-renewal-redesign.php';
 require_once get_stylesheet_directory() . '/inc/wave-prescribery-sync.php';
 require_once get_stylesheet_directory() . '/inc/wave-trt-dashboard.php';
