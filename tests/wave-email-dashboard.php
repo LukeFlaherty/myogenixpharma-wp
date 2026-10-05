@@ -11,6 +11,7 @@ require dirname( __DIR__ ) . '/inc/wave-email-dashboard.php';
 $checks = 0;
 function check( $ok, $label ) { global $checks; if ( ! $ok ) { throw new RuntimeException( $label ); } $checks++; }
 check( array( 'one@example.com', 'two@example.org' ) === wave_email_extract_addresses( "One <ONE@example.com>,\n two@example.org" ), 'Extract and normalize recipients' );
+check( array( 'one@example.com', 'two@example.org' ) === wave_email_extract_addresses( 'one@example.com,\\ntwo@example.org' ), 'Normalize mail logger literal newlines' );
 check( wave_email_is_customer_recipient( 'support@myogenixpharma.com, client@example.com' ), 'Mixed recipient list is customer communication' );
 check( ! wave_email_is_customer_recipient( 'adam@myogenix.com, support@myogenixpharma.com' ), 'Internal-only message is not customer communication' );
 $redacted = wave_email_redact_message( '<p>Continue at https://example.com/path?token=secret</p>' );

@@ -21,7 +21,9 @@ function wave_email_value( $key, $default = '' ) {
 }
 
 function wave_email_extract_addresses( $value ) {
-	preg_match_all( '/[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,}/i', (string) $value, $matches );
+	// WP Mail Logging stores multi-recipient separators as both real and literal newlines.
+	$value = str_replace( array( '\\n', '\\r' ), "\n", (string) $value );
+	preg_match_all( '/[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,}/i', $value, $matches );
 	return array_values( array_unique( array_map( 'strtolower', $matches[0] ?? array() ) ) );
 }
 
