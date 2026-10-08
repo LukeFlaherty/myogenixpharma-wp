@@ -481,6 +481,8 @@ if ( $is_weight_loss ) :
 	<!-- Common Questions Section -->
 	<?php myogenix_render_product_faq( $product->get_id() ); ?>
 
+	<?php get_template_part( 'template-parts/product-evidence', null, [ 'product' => $product ] ); ?>
+
 	<!-- Explore More Treatment Lines -->
 	<section class="myogenix-pdp__explore">
 		<div class="myogenix-pdp__container">
@@ -863,6 +865,8 @@ if ( $is_weight_loss ) :
 
 	<!-- Common Questions -->
 	<?php myogenix_render_product_faq( $product->get_id() ); ?>
+
+	<?php get_template_part( 'template-parts/product-evidence', null, [ 'product' => $product ] ); ?>
 
 	<!-- Explore More Treatment Lines -->
 	<section class="myogenix-pdp__explore">
@@ -1561,6 +1565,8 @@ if ( $is_weight_loss ) :
 	<?php else : ?>
 	<?php myogenix_render_product_faq( $product->get_id() ); ?>
 	<?php endif; ?>
+
+	<?php get_template_part( 'template-parts/product-evidence', null, [ 'product' => $product ] ); ?>
 
 	<!-- Explore More Treatment Lines -->
 	<section class="myogenix-pdp__explore">

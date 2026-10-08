@@ -3225,3 +3225,36 @@ body:has(.home-nav.grunge-nav) { padding-top: var(--myo-nav-height, 92px); }
   .myo-stories .grunge-section__header { flex-direction: column; align-items: start; gap: 22px; }
 }
 @media (prefers-reduced-motion: reduce) { .myo-stories__track { scroll-behavior: auto; } }
+
+/* Compact story outcomes and links, separated from the quoted experience. */
+.myo-story { display: flex; flex-direction: column; }
+.myo-story__before p, .myo-story__after p { font: 400 25px/1.15 var(--myo-font-display); letter-spacing: .025em; }
+.myo-story__after { min-height: 84px; box-sizing: border-box; }
+.myo-story__explore { padding-top: 20px; margin-top: auto; }
+.myo-story__explore > span { display: block; padding-top: 16px; border-top: 1px solid #442121; color: #a1a1aa; font: 400 10px/1.5 var(--myo-font-body); }
+.myo-story__explore a { display: flex; justify-content: space-between; gap: 12px; align-items: center; min-height: 44px; color: #fff; font: 400 22px/1.2 var(--myo-font-display); }
+.myo-story__explore a:hover { color: #ff7777; }
+.myo-story__explore a:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.myo-stories__footer p { max-width: 720px; }
+
+/* Research uses its own labels and never contributes review/rating markup. */
+.myo-evidence { padding: 64px 0; border-block: 1px solid #442121; background: radial-gradient(ellipse at 85% 0, rgba(127, 29, 29, .2), transparent 60%), #080808; color: #fff; font-family: var(--myo-font-body); }
+.myo-evidence__header { margin-bottom: 28px; }
+.myo-evidence__header .grunge-kicker { line-height: 1.6; transform: none; letter-spacing: .18em; color: #ff7777; }
+.myo-evidence__header h2 { margin: 12px 0; font: 400 clamp(38px, 4vw, 60px)/1 var(--myo-font-display); text-transform: uppercase; }
+.myo-evidence__header > p:last-child { margin: 0; color: #bcbcc4; font: 400 13px/1.8 var(--myo-font-body); }
+.myo-evidence__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.myo-evidence__card { display: flex; flex-direction: column; padding: 26px; border: 1px solid #442121; border-top: 3px solid #dc2626; background: linear-gradient(145deg, #1b1414, #0b0b0b 75%); }
+.myo-evidence__tag { color: #ff7777; font: 600 10px/1.5 var(--myo-font-body); text-transform: uppercase; letter-spacing: .12em; }
+.myo-evidence__card h3 { margin: 18px 0 14px; color: #fff; font: 400 32px/1.12 var(--myo-font-display); }
+.myo-evidence__card p { margin: 0 0 24px; color: #d4d4d8; font: 400 13px/1.8 var(--myo-font-body); }
+.myo-evidence__card a { margin-top: auto; padding-top: 14px; min-height: 44px; display: flex; gap: 12px; align-items: center; justify-content: space-between; border-top: 1px solid #442121; color: #fff; font: 500 11px/1.6 var(--myo-font-body); text-decoration: underline; text-underline-offset: 3px; }
+.myo-evidence__card a:hover { color: #ff7777; }
+.myo-evidence__card a:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+.myo-evidence__context { margin: 24px 0 0; max-width: 1000px; color: #d4d4d8; font: 400 12px/1.8 var(--myo-font-body); }
+.myo-evidence__footnote { margin: 12px 0 0; color: #a1a1aa; font: 400 11px/1.8 var(--myo-font-body); }
+@media (max-width: 800px) {
+  .myo-evidence__grid { grid-template-columns: 1fr; gap: 14px; }
+  .myo-evidence__card { padding: 22px; }
+  .myo-evidence { padding: 44px 0; }
+}

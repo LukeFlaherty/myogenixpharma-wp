@@ -2,16 +2,16 @@
 /** Customer stories supplied for the homepage. */
 defined( 'ABSPATH' ) || exit;
 $stories = [
-	[ 'Jordan M.', 'Low energy and difficulty maintaining a consistent wellness routine.', 'A personalized plan and clearer habits that made staying consistent feel manageable.', 'Myogenix Pharma took the time to understand my goals and explain every step. I finally felt like I had a plan designed for me—not a one-size-fits-all solution.' ],
-	[ 'Taylor R.', 'Feeling stuck despite making changes to diet and exercise.', 'Greater accountability, renewed motivation, and a structured path forward.', 'The support made all the difference. The team listened, answered my questions, and helped me stay focused on realistic progress.' ],
-	[ 'Marcus D.', 'Uncertainty about which wellness options were appropriate.', 'A clearer understanding of available options and greater confidence in the next steps.', 'I appreciated how straightforward and informative the entire experience was. I never felt rushed or pressured.' ],
-	[ 'Alyssa K.', 'Inconsistent progress and frustration with generic programs.', 'A more individualized approach with goals that felt practical and sustainable.', 'For the first time, I felt like someone was looking at the full picture. The team was attentive, professional, and encouraging throughout the process.' ],
-	[ 'Daniel S.', 'Low motivation and difficulty following a structured routine.', 'Better consistency and a plan that fit more naturally into everyday life.', 'Myogenix Pharma helped turn a vague goal into clear, manageable steps. Having ongoing guidance kept me accountable.' ],
-	[ 'Nicole B.', 'Feeling overwhelmed by conflicting wellness information.', 'A simpler, more focused plan backed by professional guidance.', 'The team made everything easy to understand. I left each conversation knowing exactly what to focus on next.' ],
-	[ 'Chris W.', 'A demanding schedule that made personal wellness a low priority.', 'A convenient routine and support system that worked around a busy lifestyle.', 'The process was smooth, responsive, and respectful of my time. I always felt supported without feeling overwhelmed.' ],
-	[ 'Samantha L.', 'Difficulty knowing where to begin and concerns about choosing the right approach.', 'Defined goals, clearer expectations, and greater confidence moving forward.', 'Everyone I worked with was kind, knowledgeable, and patient. They made it comfortable to ask questions and discuss my concerns.' ],
-	[ 'Andre P.', 'Plateaued progress and a lack of accountability.', 'Renewed momentum, regular support, and a more purposeful routine.', 'What stood out was the personal attention. I wasn’t treated like a number—the team genuinely cared about helping me stay on track.' ],
-	[ 'Megan T.', 'Wanting to feel more confident and proactive about long-term wellness.', 'A tailored plan, dependable guidance, and habits that felt easier to maintain.', 'My experience with Myogenix Pharma has been positive from the beginning. The communication was excellent, and the plan felt thoughtful and personalized.' ],
+	[ 'Jordan M.', 'Low energy, inconsistent routine', 'Clear plan, consistent habits', 'I finally felt like I had a plan designed for me—not a one-size-fits-all solution.', 'testosterone', 'TRT evaluation' ],
+	[ 'Taylor R.', 'Progress felt stuck', 'Renewed motivation, clear direction', 'The team listened, answered my questions, and helped me stay focused on realistic progress.', 'compound-tirzepatide', 'Tirzepatide' ],
+	[ 'Marcus D.', 'Unsure where to start', 'Clarity and confidence', 'I never felt rushed or pressured.', 'testosterone', 'TRT evaluation' ],
+	[ 'Alyssa K.', 'Inconsistent progress', 'Personalized, practical goals', 'For the first time, I felt like someone was looking at the full picture.', 'compound-semaglutide', 'Semaglutide' ],
+	[ 'Daniel S.', 'Low motivation', 'Better daily consistency', 'Having ongoing guidance kept me accountable.', 'testosterone', 'TRT evaluation' ],
+	[ 'Nicole B.', 'Information overload', 'Simple, focused plan', 'I left each conversation knowing exactly what to focus on next.', 'compound-semaglutide', 'Semaglutide' ],
+	[ 'Chris W.', 'Too busy for wellness', 'Care that fits', 'The process was smooth, responsive, and respectful of my time.', 'compound-tirzepatide', 'Tirzepatide' ],
+	[ 'Samantha L.', 'Uncertain next steps', 'Clear goals, greater confidence', 'They made it comfortable to ask questions and discuss my concerns.', 'compound-semaglutide', 'Semaglutide' ],
+	[ 'Andre P.', 'Progress plateau', 'Renewed momentum', 'I wasn’t treated like a number—the team genuinely cared about helping me stay on track.', 'compound-tirzepatide', 'Tirzepatide' ],
+	[ 'Megan T.', 'Seeking lasting habits', 'Sustainable habits, dependable guidance', 'The communication was excellent, and the plan felt thoughtful and personalized.', 'compound-semaglutide', 'Semaglutide' ],
 ];
 ?>
 <section class="grunge-section myo-stories" aria-labelledby="myo-stories-title" aria-roledescription="carousel" data-review-carousel>
@@ -31,9 +31,10 @@ $stories = [
 				<div class="myo-story__before"><span>Before</span><p><?php echo esc_html( $story[1] ); ?></p></div>
 				<div class="myo-story__after"><span>After</span><p><?php echo esc_html( $story[2] ); ?></p></div>
 				<blockquote>“<?php echo esc_html( $story[3] ); ?>”</blockquote>
+				<div class="myo-story__explore"><span>Explore a treatment option</span><a href="<?php echo esc_url( home_url( '/product/' . $story[4] . '/' ) ); ?>"><?php echo esc_html( $story[5] ); ?> <span aria-hidden="true">&#8599;</span></a></div>
 			</article>
 			<?php endforeach; ?>
 		</div>
-		<div class="myo-stories__footer"><p>Individual experiences. Results vary.</p><span data-carousel-status aria-live="off">01 / 10</span></div>
+		<div class="myo-stories__footer"><p>Results vary. Product links are options to discuss with a provider, not treatments attributed to these reviewers.</p><span data-carousel-status aria-live="off">01 / 10</span></div>
 	</div>
 </section>
