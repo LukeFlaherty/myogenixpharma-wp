@@ -374,6 +374,8 @@ get_header();
 	</section>
 	<?php endif; ?>
 
+	<?php get_template_part( 'template-parts/customer-stories' ); ?>
+
 	<section class="myo-faq grunge-faq" id="faq" aria-label="Frequently asked questions">
 		<div class="grunge-faq__bg" style="background-image:url('<?php echo $myo_asset( 'grunge black section bg blank.png' ); ?>')" aria-hidden="true"></div>
 		<div class="myo-faq__wrap grunge-faq__wrap">

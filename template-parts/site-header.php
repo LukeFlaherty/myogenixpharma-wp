@@ -45,6 +45,7 @@ $_mobile_links = array_merge( [
 ] );
 ?>
 <header class="home-nav grunge-nav" role="banner">
+	<div class="myo-support-banner"><span>Questions? We’re here to help.</span><a href="tel:+15593552245" aria-label="Call Myogenix Pharma at (559) 355-2245"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 3.1 5.2 2 2 0 0 1 5.1 3h3a2 2 0 0 1 2 1.7l.5 2.8a2 2 0 0 1-.6 1.7L8.7 10.5a16 16 0 0 0 4.8 4.8l1.3-1.3a2 2 0 0 1 1.7-.6l2.8.5a2 2 0 0 1 2.7 3Z"/></svg>(559) 355-2245</a></div>
 	<div class="grunge-nav__texture" style="background-image:url('<?php echo $_grunge_asset( 'thin section bg.png' ); ?>')" aria-hidden="true"></div>
 	<div class="grunge-nav__shade" aria-hidden="true"></div>
 

@@ -77,3 +77,56 @@
     });
   });
 })();
+
+// Customer stories: native scrolling keeps every story usable without JavaScript.
+(function () {
+  'use strict';
+  var carousel = document.querySelector('[data-review-carousel]');
+  if (!carousel) return;
+  var track = carousel.querySelector('.myo-stories__track');
+  var cards = Array.from(track.children);
+  var pause = carousel.querySelector('[data-carousel-pause]');
+  var status = carousel.querySelector('[data-carousel-status]');
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var paused = reduced.matches;
+  var hovered = false;
+  var visible = false;
+  var timer;
+  carousel.querySelector('.myo-stories__controls').hidden = false;
+  function position() {
+    var step = cards[1].offsetLeft - cards[0].offsetLeft;
+    return Math.round(track.scrollLeft / step);
+  }
+  function move(direction) {
+    var step = cards[1].offsetLeft - cards[0].offsetLeft;
+    var max = track.scrollWidth - track.clientWidth;
+    var target = track.scrollLeft + direction * step;
+    if (direction > 0 && track.scrollLeft >= max - 2) target = 0;
+    if (direction < 0 && track.scrollLeft <= 2) target = max;
+    track.scrollTo({ left: target, behavior: reduced.matches ? 'instant' : 'smooth' });
+  }
+  function schedule() {
+    clearInterval(timer);
+    pause.textContent = paused ? 'Play' : 'Pause';
+    pause.setAttribute('aria-label', paused ? 'Play customer stories' : 'Pause customer stories');
+    status.setAttribute('aria-live', paused ? 'polite' : 'off');
+    if (!paused && !hovered && visible && !document.hidden) timer = setInterval(function () { move(1); }, 7000);
+  }
+  pause.addEventListener('click', function () { paused = !paused; schedule(); });
+  carousel.querySelector('[data-carousel-prev]').addEventListener('click', function () { paused = true; move(-1); schedule(); });
+  carousel.querySelector('[data-carousel-next]').addEventListener('click', function () { paused = true; move(1); schedule(); });
+  carousel.addEventListener('mouseenter', function () { hovered = true; schedule(); });
+  carousel.addEventListener('mouseleave', function () { hovered = false; schedule(); });
+  carousel.addEventListener('focusin', function (event) { if (event.target !== pause) { paused = true; schedule(); } });
+  track.addEventListener('pointerdown', function () { paused = true; schedule(); }, { passive: true });
+  track.addEventListener('keydown', function (event) {
+    if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+      event.preventDefault(); paused = true; move(event.key === 'ArrowRight' ? 1 : -1); schedule();
+    }
+  });
+  track.addEventListener('scroll', function () { status.textContent = String(position() + 1).padStart(2, '0') + ' / 10'; }, { passive: true });
+  reduced.addEventListener('change', function () { if (reduced.matches) paused = true; schedule(); });
+  document.addEventListener('visibilitychange', schedule);
+  new IntersectionObserver(function (entries) { visible = entries[0].isIntersecting; schedule(); }, { threshold: 0.2 }).observe(carousel);
+  schedule();
+})();
