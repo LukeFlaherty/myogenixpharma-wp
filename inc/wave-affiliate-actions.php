@@ -129,6 +129,11 @@ function wave_aff_handle_action() {
 			if ( 'yes' !== wave_aff_input( 'confirmed' ) ) { wave_aff_fail( 'Confirm the commission decision and supporting evidence.' ); }
 			wave_aff_resolve_referral( absint( wave_aff_input( 'referral_id' ) ), wave_aff_input( 'revision' ), wave_aff_input( 'decision' ), wave_aff_input( 'amount' ), wave_aff_input( 'reason' ) );
 			$args['view'] = 'review';
+		} elseif ( 'reconcile_order' === $op ) {
+			if ( 'yes' !== wave_aff_input( 'confirmed' ) ) { wave_aff_fail( 'Confirm the attribution and commission evidence.' ); }
+			$rid = wave_aff_reconcile_order( absint( wave_aff_input( 'order_id' ) ), wave_aff_input( 'revision' ), wave_aff_input( 'reconcile_decision' ), absint( wave_aff_input( 'affiliate_id' ) ), wave_aff_input( 'amount' ), wave_aff_input( 'reason' ), 'yes' === wave_aff_input( 'lifetime' ) );
+			$args['view'] = $rid ? 'review' : 'missing';
+			if ( $rid ) { $args['referral'] = $rid; }
 		} elseif ( 'referral' === $op ) {
 			if ( 'yes' !== wave_aff_input( 'confirmed' ) ) { wave_aff_fail( 'Confirm the commission amount and attribution evidence.' ); }
 			wave_aff_create_referral( absint( wave_aff_input( 'order_id' ) ), absint( wave_aff_input( 'affiliate_id' ) ), wave_aff_input( 'amount' ), wave_aff_input( 'reason' ) ); $args['view'] = 'review';

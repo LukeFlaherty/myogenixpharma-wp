@@ -4,14 +4,15 @@ defined( 'ABSPATH' ) || exit;
 require_once __DIR__ . '/wave-affiliate-actions.php';
 require_once __DIR__ . '/wave-affiliate-view.php';
 require_once __DIR__ . '/wave-affiliate-workflow.php';
+require_once __DIR__ . '/wave-affiliate-reconcile.php';
 add_action( 'admin_menu', function () {
 	$GLOBALS['wave_aff_hook'] = add_submenu_page( 'wave-trt', 'Affiliates', 'Affiliates', 'manage_options', 'wave-affiliates', 'wave_aff_render' );
 }, 20 );
 add_action( 'admin_enqueue_scripts', function ( $hook ) {
 	if ( $hook !== ( $GLOBALS['wave_aff_hook'] ?? '' ) ) { return; }
 	wp_enqueue_style( 'wave-trt', get_stylesheet_directory_uri() . '/assets/css/wave-trt-dashboard.css', array(), '1.1.1' );
-	wp_enqueue_style( 'wave-affiliates', get_stylesheet_directory_uri() . '/assets/css/wave-affiliates.css', array( 'wave-trt' ), '1.1.1' );
-	wp_enqueue_script( 'wave-affiliates', get_stylesheet_directory_uri() . '/assets/js/wave-affiliates.js', array(), '1.1.1', true );
+	wp_enqueue_style( 'wave-affiliates', get_stylesheet_directory_uri() . '/assets/css/wave-affiliates.css', array( 'wave-trt' ), '1.2.0' );
+	wp_enqueue_script( 'wave-affiliates', get_stylesheet_directory_uri() . '/assets/js/wave-affiliates.js', array(), '1.2.0', true );
 } );
 add_action( 'admin_init', function () { if ( isset( $_GET['page'] ) && 'wave-affiliates' === $_GET['page'] ) { nocache_headers(); } } );
 add_action( 'init', function () { register_post_type( 'wave_aff_report', array( 'public' => false, 'show_ui' => false, 'show_in_rest' => false, 'can_export' => false, 'supports' => array( 'title' ) ) ); } );
@@ -133,8 +134,10 @@ function wave_aff_load( $month ) {
 	}
 	$missing = array();
 	foreach ( $people as $target => $p ) { foreach ( $p['orders'] as $o ) { if ( ! isset( $order_refs[ $o->get_id() ] ) && $o->get_transaction_id() && (float) $o->get_total() > 0 && ! $o->has_status( array( 'cancelled', 'refunded', 'failed', 'rejected' ) ) ) { $missing[] = array( 'target' => $target, 'person' => $p, 'order' => $o ); } } }
+	$missing_all = $missing;
+	$missing = array_values( array_filter( $missing, function ( $row ) { $decision = $row['order']->get_meta( '_wave_aff_decision' ); return 'direct' !== ( $decision['decision'] ?? '' ); } ) );
 	// Rank by recorded earned commission in USD (current store currency); other currencies remain separate in every total.
 	$rank_currency = get_woocommerce_currency();
 	uasort( $board, function( $a, $b ) use ( $rank_currency ) { return ( ( $b['earned'][ $rank_currency ] ?? 0 ) <=> ( $a['earned'][ $rank_currency ] ?? 0 ) ) ?: ( $b['visits'] <=> $a['visits'] ); } );
-	return compact( 'affmap', 'board', 'customers', 'links', 'people', 'orders', 'order_refs', 'report', 'totals', 'limited', 'orphan', 'missing', 'month', 'rank_currency' );
+	return compact( 'affmap', 'board', 'customers', 'links', 'people', 'orders', 'order_refs', 'report', 'totals', 'limited', 'orphan', 'missing', 'missing_all', 'month', 'rank_currency' );
 }

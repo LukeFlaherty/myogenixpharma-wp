@@ -11,6 +11,7 @@ require_once get_stylesheet_directory() . '/inc/wave-trt-dashboard.php';
 require_once get_stylesheet_directory() . '/inc/wave-billing.php';
 require_once get_stylesheet_directory() . '/inc/wave-email-dashboard.php';
 require_once get_stylesheet_directory() . '/inc/wave-affiliates.php';
+require_once get_stylesheet_directory() . '/inc/wave-orders.php';
 
 // Enqueue parent theme styles
 add_action( 'wp_enqueue_scripts', function() {

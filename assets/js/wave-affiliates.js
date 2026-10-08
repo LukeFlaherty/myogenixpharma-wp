@@ -64,4 +64,16 @@
       amount.required = select.value !== 'reject';
     });
   });
+  document.querySelectorAll('select[name="reconcile_decision"]').forEach(function (select) {
+    function update() {
+      var block = select.form.querySelector('[data-wa-attribution]');
+      block.hidden = select.value !== 'affiliate';
+      block.querySelectorAll('input,select').forEach(function (input) {
+        input.disabled = block.hidden;
+        input.required = !block.hidden && input.type !== 'checkbox';
+      });
+    }
+    select.addEventListener('change', update);
+    update();
+  });
 })();

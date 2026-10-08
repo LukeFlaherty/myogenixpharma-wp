@@ -3,7 +3,7 @@
 defined( 'ABSPATH' ) || exit;
 function wave_aff_issue( $row ) {
 	$r = $row['reason'];
-	if ( 'Proposed payable' === $row['decision'] ) { return array( 'ready', 'Ready for payout review', 'Check the payout history before including this commission in a payment.' ); }
+	if ( 'Proposed payable' === $row['decision'] ) { return array( 'ready', 'Included in amount owed', 'Compare your own payment records before paying this commission.' ); }
 	if ( false !== strpos( $r, 'precision' ) ) { return array( 'rounding', 'Amount needs rounding', 'Confirm the agreed commission, enter the final amount to the currency’s precision, then save the correction.' ); }
 	if ( false !== strpos( $r, 'Zero or invalid' ) ) { return array( 'amount', 'Commission amount missing', 'Check the affiliate agreement and enter the correct commission, or reject it if no commission is owed.' ); }
 	if ( false !== strpos( $r, 'refund' ) || preg_match( '/Order (cancelled|failed|rejected|trash)/', $r ) ) { return array( 'refund', 'Refund or cancelled order', 'Open the order and reconcile the refund. Reject a commission that is no longer owed; partial refunds need an agreed adjustment.' ); }
