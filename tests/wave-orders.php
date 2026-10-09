@@ -16,6 +16,8 @@ function wave_aff_ready() { return true; }
 function affwp_get_affiliate( $id ) { global $affiliates; return $affiliates[ $id ] ?? false; }
 function get_userdata( $id ) { global $users_by_id; return $users_by_id[ $id ] ?? false; }
 function get_user_by( $field, $value ) { global $users_by_email; return 'email' === $field ? ( $users_by_email[ strtolower( $value ) ] ?? false ) : false; }
+class Wave_Test_Countries { public function get_countries() { return array( 'US' => 'United States', 'CA' => 'Canada' ); } }
+function WC() { static $wc; if ( ! $wc ) { $wc = (object) array( 'countries' => new Wave_Test_Countries() ); } return $wc; }
 
 class Wave_Test_Product {
 	private $id; private $type; private $status; private $stock; private $purchasable; private $sold; private $parent; private $attributes;
@@ -73,9 +75,10 @@ $affiliates = array( 5 => (object) array( 'affiliate_id' => 5, 'user_id' => 70, 
 $coupons = array( 'save10' => 100, 'other-affiliate' => 101 );
 $coupon_affiliates = array( 101 => 8 );
 
-$prepared = wave_orders_prepare( array( 'customer_id' => 7, 'email' => 'existing@example.com', 'first_name' => 'Existing', 'last_name' => 'Customer', 'items' => array( array( 'product' => 10, 'quantity' => '1' ) ), 'affiliate_id' => 5, 'coupons' => 'SAVE10, save10' ) );
+$prepared = wave_orders_prepare( array( 'customer_id' => 7, 'email' => 'existing@example.com', 'first_name' => 'Existing', 'last_name' => 'Customer', 'country' => 'us', 'address_1' => '10 Main St', 'items' => array( array( 'product' => 10, 'quantity' => '1' ) ), 'affiliate_id' => 5, 'coupons' => 'SAVE10, save10' ) );
 check_order( 7 === $prepared['customer_id'], 'an exact email reuses the existing customer account' );
 check_order( array( 'save10' ) === $prepared['coupons'], 'coupon input is normalized and deduplicated' );
+check_order( 'US' === $prepared['address']['country'] && '10 Main St' === $prepared['address']['address_1'], 'billing details are normalized and stored with the draft' );
 check_order( 7 * DAY_IN_SECONDS === $prepared['expires'] - $prepared['created'], 'payment links expire after seven days' );
 rejects_order( function () { wave_orders_prepare( array( 'customer_id' => 8, 'email' => 'existing@example.com', 'first_name' => 'Wrong', 'last_name' => 'Account', 'items' => array( array( 'product' => 10, 'quantity' => '1' ) ) ) ); }, 'a selected account/email mismatch is rejected' );
 rejects_order( function () { wave_orders_prepare( array( 'email' => 'affiliate@example.com', 'first_name' => 'Self', 'last_name' => 'Referral', 'items' => array( array( 'product' => 10, 'quantity' => '1' ) ), 'affiliate_id' => 5 ) ); }, 'affiliate self-referrals are rejected by email' );

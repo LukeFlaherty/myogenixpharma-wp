@@ -171,6 +171,7 @@ add_filter( 'affwp_get_referring_affiliate_id', function ( $aid, $reference, $co
 	return $selected ?: $aid;
 }, PHP_INT_MAX, 3 );
 add_filter( 'affwp_was_referred', function ( $referred ) {
+	if ( ! empty( $GLOBALS['wave_order_admin_affiliate'] ) ) { return true; }
 	$pair = wave_orders_session_draft();
 	return $pair && ! empty( $GLOBALS['wave_order_checkout_lock'] ) && $pair[1]['affiliate_id'] ? true : $referred;
 }, 100 );

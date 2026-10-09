@@ -27,7 +27,7 @@
             button.type = 'button'; button.className = 'wo-customer-result'; button.textContent = customer.label;
             button.addEventListener('click', function () {
               form.elements.customer_id.value = customer.id;
-              ['email', 'first_name', 'last_name'].forEach(function (key) { form.elements[key].value = customer[key]; });
+              ['email', 'first_name', 'last_name', 'phone', 'address_1', 'address_2', 'city', 'state', 'postcode', 'country'].forEach(function (key) { if (form.elements[key]) form.elements[key].value = customer[key] || (key === 'country' ? 'US' : ''); });
               form.elements.email.readOnly = true;
               document.getElementById('wo-customer-selected').textContent = 'Selected: ' + customer.label;
               results.replaceChildren();
@@ -39,7 +39,8 @@
     });
     document.getElementById('wo-new-customer').addEventListener('click', function () {
       form.elements.customer_id.value = '0'; form.elements.email.readOnly = false;
-      ['email', 'first_name', 'last_name'].forEach(function (key) { form.elements[key].value = ''; });
+      ['email', 'first_name', 'last_name', 'phone', 'address_1', 'address_2', 'city', 'state', 'postcode'].forEach(function (key) { form.elements[key].value = ''; });
+      form.elements.country.value = 'US';
       document.getElementById('wo-customer-selected').textContent = 'New customer or guest. An exact email match will reuse an existing account.';
       search.value = ''; results.replaceChildren(); form.elements.first_name.focus();
     });
@@ -65,6 +66,18 @@
     var link = document.getElementById('wo-link'); link.select();
     try { await navigator.clipboard.writeText(link.value); copy.textContent = 'Copied'; }
     catch (error) { copy.textContent = 'Link selected — copy manually'; }
+  });
+  document.addEventListener('click', function (event) {
+    if (!event.target.closest('.wc-stripe-pay-order')) return;
+    var customer = document.getElementById('customer_user');
+    if (!customer || customer.value !== '0') return;
+    window.setTimeout(function () {
+      var save = document.querySelector('.wc-backbone-modal .wc-stripe-save-payment-container');
+      if (save) {
+        save.replaceChildren();
+        save.textContent = 'Guest card — saving for future purchases requires a customer account.';
+      }
+    }, 0);
   });
   document.querySelectorAll('.wo-form').forEach(function (form) {
     form.addEventListener('submit', function () { form.querySelectorAll('button[type="submit"],button:not([type])').forEach(function (b) { b.disabled = true; }); });
