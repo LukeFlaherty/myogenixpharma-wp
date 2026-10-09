@@ -34,7 +34,7 @@ return [
 	'compound-tirzepatide' => [
 		'name' => 'Tirzepatide',
 		'context' => 'SURMOUNT-1 · 2,539 adults with obesity or overweight and a complication, without diabetes · 72 weeks',
-		'note' => 'Figures below are from the 15 mg weekly trial group with lifestyle intervention, not this compounded formulation. Gastrointestinal side effects were common; study dosing is not a personal dosing recommendation.',
+		'note' => 'Figures shown here are from the 15 mg weekly trial group with lifestyle intervention, not this compounded formulation. Gastrointestinal side effects were common; study dosing is not a personal dosing recommendation.',
 		'cards' => [
 			[
 				'tag' => 'Human trial',
@@ -204,7 +204,7 @@ return [
 	'motsc' => [
 		'name' => 'MOTS-c',
 		'context' => 'Exercise and metabolic research · Animal experiments and human observations',
-		'note' => 'The treatment findings below are in mice. Observing naturally occurring MOTS-c in people does not show that MOTS-c injections improve human fitness or longevity.',
+		'note' => 'The treatment findings shown here are in mice. Observing naturally occurring MOTS-c in people does not show that MOTS-c injections improve human fitness or longevity.',
 		'cards' => [
 			[
 				'tag' => 'Animal study',

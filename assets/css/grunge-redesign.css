@@ -3252,6 +3252,8 @@ body:has(.home-nav.grunge-nav) { padding-top: var(--myo-nav-height, 92px); }
 .myo-evidence__card a:hover { color: #ff7777; }
 .myo-evidence__card a:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
 .myo-evidence__context { margin: 24px 0 0; max-width: 1000px; color: #d4d4d8; font: 400 12px/1.8 var(--myo-font-body); }
+.myo-evidence__context a { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+.myo-evidence__context a:hover { color: #fca5a5; }
 .myo-evidence__footnote { margin: 12px 0 0; color: #a1a1aa; font: 400 11px/1.8 var(--myo-font-body); }
 @media (max-width: 800px) {
   .myo-evidence__grid { grid-template-columns: 1fr; gap: 14px; }
