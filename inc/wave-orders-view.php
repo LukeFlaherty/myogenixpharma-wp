@@ -38,7 +38,7 @@ function wave_orders_render() {
 		$state = $r['order_id'] ? 'WooCommerce order #' . $r['order_id'] : ( 'cancelled' === $r['state'] ? 'Cancelled' : ( $r['expires'] <= time() ? 'Link expired' : ( 'sent' === $r['state'] ? 'Link sent — awaiting checkout' : 'Draft — not sent' ) ) );
 		echo '<tr data-wo-recent><td><strong>#' . esc_html( $p->ID . ' · ' . $r['first_name'] . ' ' . $r['last_name'] ) . '</strong><small>' . esc_html( $r['email'] ) . '</small></td><td>' . esc_html( wp_date( 'M j, Y', $r['created'] ) ) . '</td><td>' . esc_html( $state ) . '</td><td><a class="button" href="' . esc_url( wave_orders_url( $p->ID ) ) . '">Open</a></td></tr>';
 	}
-	if ( ! $drafts ) { echo '<tr><td colspan="4">Your prepared orders will appear here.</td></tr>'; } wave_aff_table_end(); echo '</section></div>';
+	if ( ! $drafts ) { echo '<tr><td colspan="4">Your prepared orders will appear here.</td></tr>'; } wave_aff_table_end(); echo '</section><section class="wa-panel"><h2>Diagnostics</h2><p>Every order-desk step is recorded with a request ID, prepared-order ID and WooCommerce order ID. Card details, customer contact details and billing addresses are excluded.</p><p><a class="button" href="' . esc_url( admin_url( 'admin.php?page=wc-status&tab=logs&source=wave-orders' ) ) . '">Open Wave order logs</a></p><p>When reporting a problem, include the prepared-order number, WooCommerce order number if one exists, the approximate time, and what Adam clicked.</p></section></div>';
 }
 
 function wave_orders_new_form() {

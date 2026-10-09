@@ -31,3 +31,11 @@ Admin URL: `/wp-admin/admin.php?page=wave-orders`
 - Coupon-to-affiliate conflicts and affiliate self-referrals are blocked. Customer lifetime attribution is not changed.
 - A prepared order with a different email or items cannot be edited in place. Cancel it and create a replacement so the original audit trail remains intact.
 - Prepared records and audit metadata are private and not exposed through REST or public archives.
+
+## Diagnostics
+
+- The order desk writes structured WooCommerce logs under source `wave-orders`.
+- Open them from **Wave Consulting → Create an order → Diagnostics → Open Wave order logs**, or **WooCommerce → Status → Logs** and select `wave-orders`.
+- Entries include a per-request correlation ID, prepared-order ID, WooCommerce order ID, actor ID, product IDs/quantities, pricing decisions, coupons, affiliate/referral results, Stripe admin-payment success/failure, payment completion and order status transitions.
+- Full card details, Stripe tokens/nonces, customer names, email addresses, phone numbers and street addresses are redacted or never written.
+- For a support report, collect the prepared-order number, WooCommerce order number if present, approximate time and the last button clicked. These fields are enough to follow the matching log sequence.

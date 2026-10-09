@@ -37,11 +37,13 @@ function wave_orders_landing() {
 	$key = isset( $_GET['key'] ) && is_string( $_GET['key'] ) ? sanitize_text_field( wp_unslash( $_GET['key'] ) ) : '';
 	$d = wave_orders_get( $id );
 	if ( ! $d || ! $key || ! hash_equals( wave_orders_token( $id, $d ), $key ) ) { wp_die( 'This order link is unavailable.', 'Order link unavailable', array( 'response' => 404 ) ); }
+	wave_orders_log( 'info', 'payment_link_opened', array( 'draft_id' => $id, 'customer_id' => (int) $d['customer_id'], 'state' => $d['state'], 'has_order' => (bool) $d['order_id'], 'logged_in' => is_user_logged_in(), 'method' => (string) ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) );
 	$error = ''; $lock = null; $existing_order = false;
 	try {
 		if ( 'cancelled' === $d['state'] || $d['expires'] <= time() ) { wave_orders_fail( 'This order link has expired or was cancelled. Please contact Myogenix for a new link.' ); }
 		$account = get_user_by( 'email', $d['email'] );
 		if ( $account && ! is_user_logged_in() ) {
+			wave_orders_log( 'debug', 'payment_link_login_required', array( 'draft_id' => $id, 'customer_id' => (int) $account->ID ) );
 			wp_safe_redirect( wp_login_url( wave_orders_payment_url( $id, $d ) ) ); exit;
 		}
 		wave_orders_identity( $d );
@@ -79,10 +81,11 @@ function wave_orders_landing() {
 			}
 			foreach ( $d['coupons'] as $coupon ) { if ( ! WC()->cart->apply_coupon( $coupon ) ) { wc_add_notice( 'A prepared coupon could not be applied. Review your total before paying.', 'notice' ); } }
 			WC()->cart->calculate_totals();
+			wave_orders_log( 'info', 'prepared_cart_ready', array( 'draft_id' => $id, 'customer_id' => (int) $d['customer_id'], 'item_count' => count( WC()->cart->get_cart() ), 'coupon_count' => count( WC()->cart->get_applied_coupons() ), 'cart_total' => WC()->cart->get_total( 'edit' ) ) );
 			wave_orders_unlock( $lock ); $lock = null;
 			wp_safe_redirect( wc_get_checkout_url() ); exit;
 		}
-	} catch ( RuntimeException $e ) { $error = $e->getMessage(); }
+	} catch ( Throwable $e ) { $error = $e instanceof RuntimeException ? $e->getMessage() : 'Checkout is temporarily unavailable. Please try again or contact Myogenix.'; wave_orders_log( 'error', 'payment_link_failed', array( 'draft_id' => $id, 'exception' => get_class( $e ), 'message' => $e->getMessage(), 'file' => wp_basename( $e->getFile() ), 'line' => $e->getLine() ) ); }
 	finally { if ( $lock ) { wave_orders_unlock( $lock ); } }
 	// Render a minimal no-tracking page; no patient or payment information is disclosed.
 	$body = '<h1>Your prepared Myogenix order</h1>';
@@ -119,6 +122,7 @@ function wave_orders_checkout_guard() {
 	ksort( $expected ); ksort( $actual );
 	if ( $expected !== $actual ) { wave_orders_fail( 'Your basket changed. Open your prepared-order link again to restore the selected items, or contact Myogenix to change this order.' ); }
 	wave_orders_validate_affiliate_checkout( $d, WC()->cart->get_applied_coupons() );
+	wave_orders_log( 'info', 'classic_checkout_guard_passed', array( 'draft_id' => $id, 'expected_items' => $expected, 'actual_items' => $actual, 'affiliate_id' => (int) $d['affiliate_id'] ) );
 }
 
 /** Blocks checkout: validate the final Store API request after addresses and payment data are present. */
@@ -134,6 +138,7 @@ add_action( 'woocommerce_store_api_checkout_update_order_from_request', function
 	if ( $expected !== $actual ) { wave_orders_fail( 'Your basket changed. Open your prepared-order link again or contact Myogenix to change this order.' ); }
 	wave_orders_validate_affiliate_checkout( $d, $order->get_coupon_codes() );
 	$order->update_meta_data( '_wave_order_draft', $id ); $order->update_meta_data( '_wave_order_affiliate', $d['affiliate_id'] ); $order->update_meta_data( '_wave_order_prepared_by', $d['created_by'] );
+	wave_orders_log( 'info', 'blocks_checkout_guard_passed', array( 'draft_id' => $id, 'order_id' => $order->get_id(), 'expected_items' => $expected, 'actual_items' => $actual, 'affiliate_id' => (int) $d['affiliate_id'] ) );
 }, -100, 2 );
 
 add_action( 'woocommerce_checkout_create_order', function ( $order, $data ) {
@@ -144,6 +149,7 @@ add_action( 'woocommerce_checkout_create_order', function ( $order, $data ) {
 	$order->update_meta_data( '_wave_order_draft', $id );
 	$order->update_meta_data( '_wave_order_affiliate', $d['affiliate_id'] );
 	$order->update_meta_data( '_wave_order_prepared_by', $d['created_by'] );
+	wave_orders_log( 'debug', 'classic_checkout_order_tagged', array( 'draft_id' => $id, 'order_id' => $order->get_id(), 'customer_id' => $order->get_customer_id() ) );
 }, 99, 2 );
 
 // Record the single resulting order before payment/provider status callbacks run.
@@ -153,6 +159,7 @@ add_action( 'woocommerce_checkout_update_order_meta', function ( $order_id ) {
 	if ( $d['order_id'] && (int) $d['order_id'] !== (int) $order_id ) { wave_orders_fail( 'This prepared order already has an order. Contact Myogenix before retrying payment.' ); }
 	$d['order_id'] = $order_id; $d['state'] = 'submitted'; update_post_meta( $id, '_wave_order', $d );
 	$order->add_order_note( 'Prepared in Wave Consulting (#' . $id . ') and submitted by the customer through checkout.' );
+	wave_orders_log( 'info', 'classic_checkout_order_submitted', wave_orders_log_order_context( $order ) );
 }, -100 );
 
 add_action( 'woocommerce_store_api_checkout_order_processed', function ( $order ) {
@@ -162,6 +169,7 @@ add_action( 'woocommerce_store_api_checkout_order_processed', function ( $order 
 	if ( $d['order_id'] && (int) $d['order_id'] !== (int) $order->get_id() ) { wave_orders_fail( 'This prepared order already created another order. Contact Myogenix before retrying payment.' ); }
 	$d['order_id'] = $order->get_id(); $d['state'] = 'submitted'; update_post_meta( $id, '_wave_order', $d );
 	$order->add_order_note( 'Prepared in Wave Consulting (#' . $id . ') and submitted by the customer through checkout.' );
+	wave_orders_log( 'info', 'blocks_checkout_order_submitted', wave_orders_log_order_context( $order ) );
 }, -100 );
 
 // Use the native affiliate calculation; selected attribution only applies to this prepared order.

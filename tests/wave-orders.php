@@ -9,6 +9,7 @@ function sanitize_email( $v ) { return strtolower( trim( (string) $v ) ); }
 function sanitize_text_field( $v ) { return trim( (string) $v ); }
 function is_email( $v ) { return false !== filter_var( $v, FILTER_VALIDATE_EMAIL ); }
 function wc_format_coupon_code( $v ) { return strtolower( trim( $v ) ); }
+function wp_strip_all_tags( $v ) { return strip_tags( $v ); }
 function get_current_user_id() { return 99; }
 function wp_generate_password() { return 'test-secret'; }
 function get_post_meta( $id, $key ) { global $coupon_affiliates; return $coupon_affiliates[ $id ] ?? 0; }
@@ -83,5 +84,7 @@ check_order( 7 * DAY_IN_SECONDS === $prepared['expires'] - $prepared['created'],
 rejects_order( function () { wave_orders_prepare( array( 'customer_id' => 8, 'email' => 'existing@example.com', 'first_name' => 'Wrong', 'last_name' => 'Account', 'items' => array( array( 'product' => 10, 'quantity' => '1' ) ) ) ); }, 'a selected account/email mismatch is rejected' );
 rejects_order( function () { wave_orders_prepare( array( 'email' => 'affiliate@example.com', 'first_name' => 'Self', 'last_name' => 'Referral', 'items' => array( array( 'product' => 10, 'quantity' => '1' ) ), 'affiliate_id' => 5 ) ); }, 'affiliate self-referrals are rejected by email' );
 rejects_order( function () { wave_orders_prepare( array( 'email' => 'new@example.com', 'first_name' => 'Coupon', 'last_name' => 'Conflict', 'items' => array( array( 'product' => 10, 'quantity' => '1' ) ), 'affiliate_id' => 5, 'coupons' => 'other-affiliate' ) ); }, 'conflicting coupon attribution is rejected' );
+check_order( '[redacted]' === wave_orders_safe_log_value( '4111111111111111', 'card_number' ), 'sensitive log keys are redacted' );
+check_order( false === strpos( wave_orders_safe_log_value( 'Failure for person@example.com using 4111 1111 1111 1111' ), 'person@example.com' ), 'emails and card-like values are removed from log messages' );
 
 echo "PASS: {$checks} prepared-order checks\n";

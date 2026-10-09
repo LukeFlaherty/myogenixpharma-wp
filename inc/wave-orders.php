@@ -1,6 +1,7 @@
 <?php
 /** Staff prepared orders. The existing checkout owns payment, subscriptions and patient intake. */
 defined( 'ABSPATH' ) || exit;
+require_once __DIR__ . '/wave-orders-logging.php';
 require_once __DIR__ . '/wave-orders-view.php';
 require_once __DIR__ . '/wave-orders-checkout.php';
 
@@ -76,6 +77,7 @@ function wave_orders_customer_search() {
 	$users = get_users( array( 'search' => '*' . $q . '*', 'search_columns' => array( 'user_email', 'display_name', 'user_login' ), 'number' => 15, 'fields' => array( 'ID', 'display_name', 'user_email' ) ) );
 	$by_meta = get_users( array( 'number' => 15, 'fields' => array( 'ID', 'display_name', 'user_email' ), 'meta_query' => array( 'relation' => 'OR', array( 'key' => 'billing_first_name', 'value' => $q, 'compare' => 'LIKE' ), array( 'key' => 'billing_last_name', 'value' => $q, 'compare' => 'LIKE' ), array( 'key' => 'billing_phone', 'value' => $q, 'compare' => 'LIKE' ) ) ) );
 	$indexed = array(); foreach ( array_merge( $users, $by_meta ) as $u ) { $indexed[ $u->ID ] = $u; } $users = array_slice( array_values( $indexed ), 0, 15 );
+	wave_orders_log( 'debug', 'customer_search_complete', array( 'query_length' => strlen( $q ), 'result_count' => count( $users ) ) );
 	wp_send_json_success( array_map( function ( $u ) {
 		$c = new WC_Customer( $u->ID );
 		return array( 'id' => $u->ID, 'label' => $u->display_name . ' · ' . $u->user_email . ' (#' . $u->ID . ')', 'email' => $u->user_email, 'first_name' => $c->get_billing_first_name() ?: $c->get_first_name(), 'last_name' => $c->get_billing_last_name() ?: $c->get_last_name(), 'phone' => $c->get_billing_phone(), 'address_1' => $c->get_billing_address_1(), 'address_2' => $c->get_billing_address_2(), 'city' => $c->get_billing_city(), 'state' => $c->get_billing_state(), 'postcode' => $c->get_billing_postcode(), 'country' => $c->get_billing_country() ?: 'US' );
@@ -145,6 +147,7 @@ function wave_orders_prescribery_totals( $d ) {
 }
 
 function wave_orders_create_wc_order( $id, $d ) {
+	wave_orders_log( 'info', 'admin_order_create_started', array( 'draft_id' => $id, 'customer_id' => (int) $d['customer_id'], 'affiliate_id' => (int) $d['affiliate_id'], 'items' => array_map( function ( $item ) { return array( 'product_id' => (int) $item['product'], 'quantity' => (int) $item['quantity'] ); }, $d['items'] ), 'coupons' => $d['coupons'] ) );
 	if ( ! empty( $d['order_id'] ) ) { wave_orders_fail( 'This prepared order already has a WooCommerce order.' ); }
 	if ( 'cancelled' === $d['state'] ) { wave_orders_fail( 'This prepared order is cancelled.' ); }
 	if ( wave_orders_has_subscription( $d ) ) { wave_orders_fail( 'Recurring subscription products must use the customer payment link so WooCommerce can create the subscription schedule and consent record.' ); }
@@ -153,20 +156,23 @@ function wave_orders_create_wc_order( $id, $d ) {
 	foreach ( array( 'address_1' => 'street address', 'city' => 'city', 'state' => 'state / region', 'postcode' => 'postal code', 'country' => 'country' ) as $key => $label ) { if ( empty( $address[ $key ] ) ) { wave_orders_fail( 'Add the customer’s billing ' . $label . ' before creating an order for card payment.' ); } }
 	$order = wc_create_order( array( 'customer_id' => (int) $d['customer_id'], 'status' => 'pending', 'created_via' => 'wave-order-desk' ) );
 	if ( is_wp_error( $order ) ) { wave_orders_fail( $order->get_error_message() ); }
+	wave_orders_log( 'info', 'woocommerce_order_record_created', array( 'draft_id' => $id, 'order_id' => $order->get_id(), 'customer_id' => (int) $d['customer_id'] ) );
 	try {
 		$order->set_address( array_merge( $address, array( 'first_name' => $d['first_name'], 'last_name' => $d['last_name'], 'email' => $d['email'] ) ), 'billing' );
 		$order->set_address( array( 'first_name' => $d['first_name'], 'last_name' => $d['last_name'], 'address_1' => $address['address_1'], 'address_2' => $address['address_2'] ?? '', 'city' => $address['city'], 'state' => $address['state'], 'postcode' => $address['postcode'], 'country' => $address['country'] ), 'shipping' );
 		$prewoo = wave_orders_prescribery_totals( $d );
+		wave_orders_log( 'info', 'pricing_rules_calculated', array( 'draft_id' => $id, 'order_id' => $order->get_id(), 'consultation_fee' => $prewoo['fee'], 'expected_after_approval' => $prewoo['expected'], 'expected_discount' => $prewoo['expected_discount'], 'synced_product_ids' => array_keys( $prewoo['synced'] ) ) );
 		foreach ( $d['items'] as $item ) {
 			$product = wc_get_product( $item['product'] ); $args = array();
 			if ( isset( $prewoo['synced'][ $product->get_id() ] ) ) { $args = array( 'subtotal' => 0, 'total' => 0 ); }
 			$order->add_product( $product, (int) $item['quantity'], $args );
 		}
 		if ( $prewoo['fee'] > 0 ) { $fee = new WC_Order_Item_Fee(); $fee->set_name( 'Consultation Fee' ); $fee->set_amount( $prewoo['fee'] ); $fee->set_total( $prewoo['fee'] ); $order->add_item( $fee ); }
-		foreach ( $d['coupons'] as $code ) { $result = $order->apply_coupon( $code ); if ( is_wp_error( $result ) ) { throw new RuntimeException( 'Coupon could not be applied: ' . $code . '. ' . $result->get_error_message() ); } }
+		foreach ( $d['coupons'] as $code ) { $result = $order->apply_coupon( $code ); if ( is_wp_error( $result ) ) { throw new RuntimeException( 'Coupon could not be applied: ' . $code . '. ' . $result->get_error_message() ); } wave_orders_log( 'info', 'coupon_applied', array( 'draft_id' => $id, 'order_id' => $order->get_id(), 'coupon' => $code ) ); }
 		if ( $prewoo['expected'] > 0 ) { $order->update_meta_data( '_prewoo_expected_product_original', $prewoo['expected'] ); $order->update_meta_data( '_prewoo_expected_discount', $prewoo['expected_discount'] ); $order->update_meta_data( '_prewoo_expected_product_charge', max( 0, $prewoo['expected'] - $prewoo['expected_discount'] ) ); }
 		$order->update_meta_data( '_wave_order_draft', $id ); $order->update_meta_data( '_wave_order_affiliate', $d['affiliate_id'] ); $order->update_meta_data( '_wave_order_prepared_by', $d['created_by'] );
 		$order->calculate_totals(); $order->save();
+		wave_orders_log( 'info', 'order_totals_ready', wave_orders_log_order_context( $order, array( 'line_count' => count( $order->get_items() ), 'coupon_count' => count( $order->get_coupon_codes() ), 'fee_total' => $order->get_total_fees(), 'discount_total' => $order->get_discount_total(), 'tax_total' => $order->get_total_tax(), 'shipping_total' => $order->get_shipping_total() ) ) );
 		if ( (float) $order->get_total() <= 0 ) { throw new RuntimeException( 'The amount due now is zero. Review the product and consultation-fee setup before attempting a card payment.' ); }
 		if ( function_exists( 'affiliate_wp' ) ) {
 			$integration = affiliate_wp()->integrations->get( 'woocommerce' );
@@ -174,19 +180,25 @@ function wave_orders_create_wc_order( $id, $d ) {
 				$GLOBALS['wave_order_admin_affiliate'] = (int) $d['affiliate_id'];
 				$integration->add_pending_referral( $order->get_id() );
 				unset( $GLOBALS['wave_order_admin_affiliate'] );
+				$referral = function_exists( 'affwp_get_referral_by' ) ? affwp_get_referral_by( 'reference', $order->get_id(), 'woocommerce' ) : false;
+				$has_referral = is_object( $referral ) && ! is_wp_error( $referral ) && isset( $referral->referral_id );
+				wave_orders_log( $d['affiliate_id'] && ! $has_referral ? 'warning' : 'info', 'affiliate_referral_evaluated', array( 'draft_id' => $id, 'order_id' => $order->get_id(), 'affiliate_id' => (int) $d['affiliate_id'], 'referral_id' => $has_referral ? (int) $referral->referral_id : 0, 'referral_status' => $has_referral ? $referral->status : 'none' ) );
 			}
-		}
+		} elseif ( $d['affiliate_id'] ) { wave_orders_log( 'warning', 'affiliate_integration_unavailable', array( 'draft_id' => $id, 'order_id' => $order->get_id(), 'affiliate_id' => (int) $d['affiliate_id'] ) ); }
 		$order->add_order_note( 'Created in Wave Consulting prepared order #' . $id . ' for secure Stripe card entry by staff.' );
 		$d['order_id'] = $order->get_id(); $d['state'] = 'submitted'; update_post_meta( $id, '_wave_order', $d );
 		add_post_meta( $id, '_wave_order_audit', array( 'at' => gmdate( 'c' ), 'by' => get_current_user_id(), 'action' => 'admin_order_created', 'order_id' => $order->get_id() ) );
+		wave_orders_log( 'info', 'admin_order_ready_for_stripe', wave_orders_log_order_context( $order ) );
 		return $order;
 	} catch ( Throwable $e ) {
+		wave_orders_log( 'error', 'admin_order_create_failed', array( 'draft_id' => $id, 'order_id' => $order->get_id(), 'exception' => get_class( $e ), 'message' => $e->getMessage(), 'file' => wp_basename( $e->getFile() ), 'line' => $e->getLine() ) );
 		$order->update_status( 'cancelled', 'Wave order creation stopped before payment: ' . $e->getMessage() );
 		throw new RuntimeException( $e->getMessage() );
 	}
 }
 
 function wave_orders_send( $id, $d ) {
+	wave_orders_log( 'info', 'payment_link_send_started', array( 'draft_id' => $id, 'customer_id' => (int) $d['customer_id'], 'previous_attempt' => (bool) $d['sent_at'] ) );
 	if ( $d['order_id'] || 'cancelled' === $d['state'] || $d['expires'] <= time() ) { wave_orders_fail( 'This link is no longer available. Review the order status below.' ); }
 	if ( time() - (int) $d['sent_at'] < 60 ) { wave_orders_fail( 'A send was just attempted. Wait one minute before resending.' ); }
 	wave_orders_validate_items( $d['items'] );
@@ -197,6 +209,7 @@ function wave_orders_send( $id, $d ) {
 	$d['mail_state'] = $accepted ? 'accepted' : 'failed'; $d['state'] = $accepted ? 'sent' : 'draft';
 	update_post_meta( $id, '_wave_order', $d );
 	add_post_meta( $id, '_wave_order_audit', array( 'at' => gmdate( 'c' ), 'by' => get_current_user_id(), 'action' => $accepted ? 'mail_accepted' : 'mail_failed' ) );
+	wave_orders_log( $accepted ? 'info' : 'error', 'payment_link_send_finished', array( 'draft_id' => $id, 'mail_accepted' => $accepted ) );
 	if ( ! $accepted ) { wave_orders_fail( 'The email service did not accept this message. The prepared order is saved; retry from its detail screen.' ); }
 }
 
@@ -206,6 +219,7 @@ function wave_orders_handle() {
 	check_admin_referer( 'wave_orders_action' ); $id = absint( wave_orders_input( 'draft_id' ) ); $lock = null;
 	try {
 		$op = wave_orders_input( 'operation' );
+		wave_orders_log( 'info', 'admin_action_started', array( 'operation' => $op, 'draft_id' => $id ) );
 		if ( 'create' === $op ) {
 			$request = wave_orders_input( 'request_id' );
 			if ( ! preg_match( '/^[a-f0-9-]{36}$/', $request ) ) { wave_orders_fail( 'Reload the form and try again.' ); }
@@ -218,6 +232,7 @@ function wave_orders_handle() {
 				$d = wave_orders_prepare( $input );
 				$id = wp_insert_post( array( 'post_type' => 'wave_order_draft', 'post_status' => 'private', 'post_title' => 'Prepared order — ' . wp_date( 'Y-m-d H:i' ), 'post_author' => get_current_user_id(), 'meta_input' => array( '_wave_order' => $d, '_wave_order_request' => get_current_user_id() . ':' . $request ) ), true );
 				if ( is_wp_error( $id ) || ! $id ) { wave_orders_fail( 'The order could not be saved. Please retry.' ); }
+				wave_orders_log( 'info', 'prepared_order_created', array( 'draft_id' => $id, 'customer_id' => (int) $d['customer_id'], 'affiliate_id' => (int) $d['affiliate_id'], 'product_ids' => array_map( function ( $item ) { return (int) $item['product']; }, $d['items'] ), 'coupon_count' => count( $d['coupons'] ) ) );
 			}
 		} else {
 			$lock = wave_orders_lock( $id ); $d = wave_orders_get( $id );
@@ -234,9 +249,12 @@ function wave_orders_handle() {
 				if ( $d['order_id'] ) { wave_orders_fail( 'Checkout already created an order. Review that order before cancelling anything.' ); }
 				$d['state'] = 'cancelled'; update_post_meta( $id, '_wave_order', $d );
 				add_post_meta( $id, '_wave_order_audit', array( 'at' => gmdate( 'c' ), 'by' => get_current_user_id(), 'action' => 'cancelled' ) );
+				wave_orders_log( 'notice', 'prepared_order_cancelled', array( 'draft_id' => $id ) );
 			} else { wave_orders_fail( 'Unknown action.' ); }
 		}
-	} catch ( RuntimeException $e ) {
+		wave_orders_log( 'info', 'admin_action_finished', array( 'operation' => $op, 'draft_id' => $id ) );
+	} catch ( Throwable $e ) {
+		wave_orders_log( 'error', 'admin_action_failed', array( 'operation' => $op ?? 'unknown', 'draft_id' => $id, 'exception' => get_class( $e ), 'message' => $e->getMessage(), 'file' => wp_basename( $e->getFile() ), 'line' => $e->getLine() ) );
 		if ( $lock ) { wave_orders_unlock( $lock ); }
 		wp_die( esc_html( $e->getMessage() ) . ( $id ? ' <a href="' . esc_url( wave_orders_url( $id ) ) . '">Return to prepared order</a>' : '' ), 'Order needs review', array( 'back_link' => true, 'response' => 400 ) );
 	}
